@@ -1,0 +1,475 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{--bg:#0f0f11;--bg2:#1a1a1e;--bg3:#24242a;--border:#2e2e38;--text:#e8e8ec;--muted:#888898;--cyan:#00d4d4;--gold:#f5c842;--green:#2ecc71;--red:#e74c3c;--blue:#4a90e2;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:14px;min-height:100vh;}
+.app{max-width:480px;margin:0 auto;padding:8px;}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:8px;}
+.topbar-title{font-size:13px;font-weight:500;color:var(--cyan);}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--green);}
+.sync-dot.offline{background:var(--gold);}
+
+.monitor{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;}
+.mon-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center;}
+.mon-val{font-size:26px;font-weight:700;line-height:1;}
+.mon-label{font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
+.mon-d .mon-val{color:var(--gold);}
+.mon-d .mon-label{color:var(--gold);opacity:.7;}
+.mon-v .mon-val{color:var(--green);}
+.mon-v .mon-label{color:var(--green);opacity:.7;}
+.mon-a .mon-val{color:var(--red);}
+.mon-a .mon-label{color:var(--red);opacity:.7;}
+
+.search-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;}
+.search-row{display:flex;gap:8px;margin-bottom:10px;}
+.search-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:15px;outline:none;}
+.search-input:focus{border-color:var(--cyan);}
+.search-btn{background:var(--cyan);color:#000;border:none;border-radius:8px;padding:10px 14px;font-weight:700;font-size:13px;cursor:pointer;}
+.action-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.btn-ingreso{background:rgba(46,204,113,.15);border:1px solid var(--green);color:var(--green);border-radius:10px;padding:14px;font-weight:700;font-size:14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.btn-salida{background:rgba(231,76,60,.15);border:1px solid var(--red);color:var(--red);border-radius:10px;padding:14px;font-weight:700;font-size:14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.btn-ingreso:active,.btn-salida:active{opacity:.7;transform:scale(.97);}
+.btn-icon{font-size:20px;}
+
+.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;}
+.qa-btn{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 4px;text-align:center;cursor:pointer;color:var(--muted);font-size:10px;}
+.qa-btn:active{background:var(--bg3);color:var(--text);}
+.qa-icon{font-size:16px;display:block;margin-bottom:3px;}
+.qa-btn.cyan{color:var(--cyan);border-color:rgba(0,212,212,.3);}
+.qa-btn.gold{color:var(--gold);border-color:rgba(245,200,66,.3);}
+
+.tabs{display:flex;gap:6px;margin-bottom:8px;}
+.tab{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center;cursor:pointer;font-size:12px;color:var(--muted);}
+.tab.active{background:var(--bg3);color:var(--text);border-color:var(--cyan);}
+
+.section{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;}
+.section-title{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px;}
+
+.registro-form{display:none;flex-direction:column;gap:8px;}
+.registro-form.visible{display:flex;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.form-field label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;}
+.form-field input,
+.form-field select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:14px;outline:none;}
+.form-field input:focus{border-color:var(--cyan);}
+.btn-guardar{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:12px;font-weight:700;font-size:14px;cursor:pointer;width:100%;margin-top:4px;}
+.btn-guardar:active{opacity:.8;}
+
+.lista-registros{display:flex;flex-direction:column;gap:6px;max-height:400px;overflow-y:auto;}
+.reg-item{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;}
+.reg-item.adentro{border-left:3px solid var(--green);}
+.reg-item.afuera{border-left:3px solid var(--red);}
+.reg-info{flex:1;}
+.reg-patente{font-size:14px;font-weight:700;letter-spacing:1px;}
+.reg-detalle{font-size:11px;color:var(--muted);margin-top:2px;}
+.reg-status{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+.badge{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;}
+.badge-in{background:rgba(46,204,113,.2);color:var(--green);}
+.badge-out{background:rgba(231,76,60,.2);color:var(--red);}
+.badge-del{background:rgba(245,200,66,.2);color:var(--gold);}
+.reg-hora{font-size:10px;color:var(--muted);}
+.reg-actions{display:flex;gap:4px;margin-top:4px;}
+.mini-btn{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:10px;cursor:pointer;}
+.mini-btn.red{color:var(--red);}
+.mini-btn:active{opacity:.7;}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1a1e;border:1px solid var(--border);border-radius:10px;padding:10px 20px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;}
+
+.filtro-btns{display:flex;gap:6px;margin-bottom:10px;}
+.filtro-btn{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px;text-align:center;cursor:pointer;font-size:11px;color:var(--muted);}
+.filtro-btn.active{color:var(--cyan);border-color:var(--cyan);}
+
+.empty{text-align:center;padding:30px;color:var(--muted);font-size:13px;}
+
+.config-box{display:none;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;}
+.config-box.visible{display:block;}
+.config-label{font-size:11px;color:var(--muted);margin-bottom:6px;}
+.config-input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:12px;outline:none;margin-bottom:8px;}
+.btn-config{background:var(--bg3);color:var(--cyan);border:1px solid rgba(0,212,212,.3);border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer;}
+
+.panel-section{display:none;}
+.panel-section.active{display:block;}
+</style>
+
+<div class="app">
+  <div class="topbar">
+    <span class="topbar-title">NEXOS - Panel de Acceso</span>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span id="sync-label" style="font-size:11px;color:var(--muted);">offline</span>
+      <div class="sync-dot offline" id="sync-dot"></div>
+    </div>
+  </div>
+
+  <div class="monitor">
+    <div class="mon-card mon-d"><div class="mon-val" id="mon-d">0</div><div class="mon-label">Delivery</div></div>
+    <div class="mon-card mon-v"><div class="mon-val" id="mon-v">0</div><div class="mon-label">Visitas</div></div>
+    <div class="mon-card mon-a"><div class="mon-val" id="mon-a">0</div><div class="mon-label">Alertas</div></div>
+  </div>
+
+  <div class="search-box">
+    <div class="search-row">
+      <input class="search-input" id="buscador" placeholder="DNI o Patente..." oninput="onBuscador(this.value)">
+      <button class="search-btn" onclick="limpiarBuscador()">X</button>
+    </div>
+    <div class="action-btns">
+      <button class="btn-ingreso" onclick="registrarAcceso('ingreso')">
+        <span class="btn-icon">▶</span>
+        <span>INGRESO</span>
+      </button>
+      <button class="btn-salida" onclick="registrarAcceso('salida')">
+        <span class="btn-icon">◀</span>
+        <span>SALIDA</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="quick-actions">
+    <div class="qa-btn cyan" onclick="showPanel('lista')"><span class="qa-icon">≡</span>Lista</div>
+    <div class="qa-btn gold" onclick="showPanel('manual')"><span class="qa-icon">+</span>Manual</div>
+    <div class="qa-btn gold" onclick="showPanel('delivery')"><span class="qa-icon">▣</span>Delivery</div>
+    <div class="qa-btn cyan" onclick="showPanel('config')"><span class="qa-icon">⚙</span>Config</div>
+  </div>
+
+  <div id="panel-config" class="panel-section">
+    <div class="section">
+      <div class="section-title">Configuración Google Sheets</div>
+      <div class="form-field" style="margin-bottom:8px;">
+        <label>ID de la planilla</label>
+        <input class="config-input" id="sheet-id" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms" style="width:100%">
+      </div>
+      <div class="form-field" style="margin-bottom:8px;">
+        <label>Google Apps Script URL (Web App)</label>
+        <input class="config-input" id="gas-url" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%">
+      </div>
+      <button class="btn-guardar" onclick="guardarConfig()">Guardar configuración</button>
+      <p style="font-size:10px;color:var(--muted);margin-top:8px;text-align:center;">Los datos se sincronizan con tu Google Sheet cuando hay internet</p>
+    </div>
+  </div>
+
+  <div id="panel-manual" class="panel-section">
+    <div class="section">
+      <div class="section-title">Carga manual de visitante</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="form-row">
+          <div class="form-field">
+            <label>Patente</label>
+            <input id="m-patente" placeholder="ABC123" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:14px;outline:none;width:100%;" oninput="this.value=this.value.toUpperCase()">
+          </div>
+          <div class="form-field">
+            <label>DNI / Nombre</label>
+            <input id="m-dni" placeholder="..." style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:14px;outline:none;width:100%;">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Manzana</label>
+            <input id="m-mza" placeholder="Mza" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:14px;outline:none;width:100%;">
+          </div>
+          <div class="form-field">
+            <label>Casa / Lote</label>
+            <input id="m-casa" placeholder="Casa" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:14px;outline:none;width:100%;">
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Tipo</label>
+          <select id="m-tipo" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:14px;outline:none;width:100%;">
+            <option>VISITANTE</option>
+            <option>PROVEEDOR</option>
+          </select>
+        </div>
+        <button class="btn-guardar" onclick="cargarManual()">Registrar Ingreso</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-delivery" class="panel-section">
+    <div class="section">
+      <div class="section-title">Registro Delivery</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="form-field">
+          <label>Patente del repartidor</label>
+          <input id="d-patente" placeholder="ABC123" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:14px;outline:none;width:100%;" oninput="this.value=this.value.toUpperCase()">
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Manzana</label>
+            <input id="d-mza" placeholder="Mza" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:14px;outline:none;width:100%;">
+          </div>
+          <div class="form-field">
+            <label>Lote</label>
+            <input id="d-lote" placeholder="Lote" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:14px;outline:none;width:100%;">
+          </div>
+        </div>
+        <button class="btn-guardar" onclick="cargarDelivery()">Registrar Delivery</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-lista" class="panel-section active">
+    <div class="section">
+      <div class="section-title">Registros del turno</div>
+      <div class="filtro-btns">
+        <div class="filtro-btn active" onclick="setFiltro('todos',this)">Todos</div>
+        <div class="filtro-btn" onclick="setFiltro('adentro',this)">Adentro</div>
+        <div class="filtro-btn" onclick="setFiltro('delivery',this)">Delivery</div>
+      </div>
+      <div class="lista-registros" id="lista"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var DB = [];
+var filtroActual = 'todos';
+var gasUrl = '';
+
+function cargarConfig() {
+  var sid = localStorage.getItem('nx_sheet_id') || '';
+  var gurl = localStorage.getItem('nx_gas_url') || '';
+  document.getElementById('sheet-id').value = sid;
+  document.getElementById('gas-url').value = gurl;
+  gasUrl = gurl;
+}
+
+function guardarConfig() {
+  var sid = document.getElementById('sheet-id').value.trim();
+  var gurl = document.getElementById('gas-url').value.trim();
+  localStorage.setItem('nx_sheet_id', sid);
+  localStorage.setItem('nx_gas_url', gurl);
+  gasUrl = gurl;
+  toast('Configuración guardada');
+  sincronizar();
+}
+
+function cargarDB() {
+  var raw = localStorage.getItem('nx_db');
+  DB = raw ? JSON.parse(raw) : [];
+  DB = DB.filter(function(r){ return r && r.patente; });
+}
+
+function guardarDB() {
+  localStorage.setItem('nx_db', JSON.stringify(DB));
+}
+
+function ahora() {
+  var d = new Date();
+  var h = d.getHours().toString().padStart(2,'0');
+  var m = d.getMinutes().toString().padStart(2,'0');
+  return h + ':' + m;
+}
+
+function hoy() {
+  var d = new Date();
+  return d.getDate().toString().padStart(2,'0') + '/' + (d.getMonth()+1).toString().padStart(2,'0');
+}
+
+function id() {
+  return Date.now() + '-' + Math.random().toString(36).substr(2,5);
+}
+
+function onBuscador(val) {
+  document.getElementById('buscador').value = val.toUpperCase();
+}
+
+function limpiarBuscador() {
+  document.getElementById('buscador').value = '';
+  toast('Buscador limpio');
+}
+
+function registrarAcceso(tipo) {
+  var buscar = document.getElementById('buscador').value.trim().toUpperCase();
+  if (!buscar) { toast('Escribí un DNI o Patente'); return; }
+
+  var encontrado = null;
+  for (var i = DB.length - 1; i >= 0; i--) {
+    var r = DB[i];
+    if ((r.patente === buscar || r.dni === buscar) && !r.salida) {
+      encontrado = r;
+      break;
+    }
+  }
+
+  if (tipo === 'ingreso') {
+    if (encontrado) { toast('Ya figura adentro: ' + encontrado.patente); return; }
+    var reg = { id: id(), patente: buscar, dni: buscar, tipo: 'VISITANTE', mza: '', casa: '', entrada: ahora(), fecha: hoy(), salida: '', sync: false };
+    DB.push(reg);
+    guardarDB();
+    sincronizarReg(reg, 'entrada');
+    toast('Ingreso registrado: ' + buscar);
+    limpiarBuscador();
+  } else {
+    if (!encontrado) { toast('No encontrado o ya salió: ' + buscar); return; }
+    encontrado.salida = ahora();
+    encontrado.sync = false;
+    guardarDB();
+    sincronizarReg(encontrado, 'salida');
+    toast('Salida registrada: ' + encontrado.patente);
+    limpiarBuscador();
+  }
+  renderLista();
+  calcMonitor();
+}
+
+function cargarManual() {
+  var p = document.getElementById('m-patente').value.trim().toUpperCase();
+  var d = document.getElementById('m-dni').value.trim();
+  var m = document.getElementById('m-mza').value.trim();
+  var c = document.getElementById('m-casa').value.trim();
+  var t = document.getElementById('m-tipo').value;
+  if (!p) { toast('Falta la patente'); return; }
+  var reg = { id: id(), patente: p, dni: d, tipo: t, mza: m, casa: c, entrada: ahora(), fecha: hoy(), salida: '', sync: false };
+  DB.push(reg);
+  guardarDB();
+  sincronizarReg(reg, 'entrada');
+  toast('Visitante registrado');
+  document.getElementById('m-patente').value = '';
+  document.getElementById('m-dni').value = '';
+  document.getElementById('m-mza').value = '';
+  document.getElementById('m-casa').value = '';
+  showPanel('lista');
+  renderLista();
+  calcMonitor();
+}
+
+function cargarDelivery() {
+  var p = document.getElementById('d-patente').value.trim().toUpperCase();
+  var m = document.getElementById('d-mza').value.trim();
+  var l = document.getElementById('d-lote').value.trim();
+  if (!p) { toast('Falta la patente'); return; }
+  var reg = { id: id(), patente: p, dni: '', tipo: 'DELIVERY', mza: m, casa: l, entrada: ahora(), fecha: hoy(), salida: '', sync: false };
+  DB.push(reg);
+  guardarDB();
+  sincronizarReg(reg, 'entrada');
+  toast('Delivery registrado');
+  document.getElementById('d-patente').value = '';
+  document.getElementById('d-mza').value = '';
+  document.getElementById('d-lote').value = '';
+  showPanel('lista');
+  renderLista();
+  calcMonitor();
+}
+
+function darSalida(regId) {
+  for (var i = 0; i < DB.length; i++) {
+    if (DB[i].id === regId) {
+      DB[i].salida = ahora();
+      DB[i].sync = false;
+      sincronizarReg(DB[i], 'salida');
+      break;
+    }
+  }
+  guardarDB();
+  renderLista();
+  calcMonitor();
+  toast('Salida registrada');
+}
+
+function setFiltro(f, el) {
+  filtroActual = f;
+  document.querySelectorAll('.filtro-btn').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+  renderLista();
+}
+
+function renderLista() {
+  var cont = document.getElementById('lista');
+  var today = hoy();
+  var items = DB.filter(function(r) {
+    if (r.fecha !== today) return false;
+    if (filtroActual === 'adentro') return !r.salida;
+    if (filtroActual === 'delivery') return r.tipo === 'DELIVERY';
+    return true;
+  }).slice().reverse();
+
+  if (!items.length) {
+    cont.innerHTML = '<div class="empty">Sin registros</div>';
+    return;
+  }
+
+  cont.innerHTML = items.map(function(r) {
+    var cls = r.salida ? 'afuera' : 'adentro';
+    var badge = r.salida ? '<span class="badge badge-out">Afuera</span>' : (r.tipo === 'DELIVERY' ? '<span class="badge badge-del">Delivery</span>' : '<span class="badge badge-in">Adentro</span>');
+    var detalle = [r.tipo, r.mza ? 'Mza '+r.mza : '', r.casa ? 'Casa '+r.casa : ''].filter(Boolean).join(' · ');
+    var salidaBtn = !r.salida ? '<button class="mini-btn red" onclick="darSalida(\''+r.id+'\')">Salida</button>' : '';
+    return '<div class="reg-item ' + cls + '"><div class="reg-info"><div class="reg-patente">' + r.patente + '</div><div class="reg-detalle">' + detalle + '</div><div class="reg-detalle" style="margin-top:2px;">Entrada: ' + r.entrada + (r.salida ? ' · Salida: ' + r.salida : '') + '</div></div><div class="reg-status">' + badge + salidaBtn + '</div></div>';
+  }).join('');
+}
+
+function calcMonitor() {
+  var today = hoy();
+  var d = 0, v = 0, a = 0;
+  var now = new Date();
+  DB.forEach(function(r) {
+    if (r.fecha !== today || r.salida) return;
+    if (r.tipo === 'DELIVERY') {
+      d++;
+      var partes = r.entrada.split(':');
+      var entH = parseInt(partes[0]), entM = parseInt(partes[1]);
+      var diffMin = (now.getHours() - entH) * 60 + (now.getMinutes() - entM);
+      if (diffMin >= 15) a++;
+    } else {
+      v++;
+    }
+  });
+  document.getElementById('mon-d').innerText = d;
+  document.getElementById('mon-v').innerText = v;
+  document.getElementById('mon-a').innerText = a;
+  if (a > 0) {
+    document.getElementById('mon-a').style.color = '#ff3131';
+  }
+}
+
+function showPanel(name) {
+  document.querySelectorAll('.panel-section').forEach(function(s){ s.classList.remove('active'); });
+  var el = document.getElementById('panel-' + name);
+  if (el) el.classList.add('active');
+}
+
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.innerText = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+
+function sincronizarReg(reg, accion) {
+  if (!gasUrl) return;
+  var payload = { accion: accion, reg: reg };
+  fetch(gasUrl, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(function() {
+    reg.sync = true;
+    guardarDB();
+  }).catch(function() {});
+}
+
+function sincronizar() {
+  var online = navigator.onLine;
+  var dot = document.getElementById('sync-dot');
+  var label = document.getElementById('sync-label');
+  if (online) {
+    dot.classList.remove('offline');
+    label.innerText = 'online';
+  } else {
+    dot.classList.add('offline');
+    label.innerText = 'offline';
+  }
+}
+
+window.addEventListener('online', sincronizar);
+window.addEventListener('offline', sincronizar);
+
+cargarConfig();
+cargarDB();
+renderLista();
+calcMonitor();
+sincronizar();
+setInterval(calcMonitor, 60000);
+</script>
