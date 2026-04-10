@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>NEXOS CONTROL</title>
   <style>
-    /* TU ESTÉTICA (NO SE TOCA) */
+    /* RESET Y ESTÉTICA (MANTENIDA) */
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
     :root{--bg:#0f0f11;--bg2:#1a1a1e;--bg3:#24242a;--border:#2e2e38;--text:#e8e8ec;--cyan:#00d4d4;--gold:#f5c842;--green:#2ecc71;--red:#e74c3c;--blue:#4a90e2;}
     
@@ -14,6 +14,7 @@
       color: var(--text);
       font-family: -apple-system, system-ui, sans-serif;
       padding: env(safe-area-inset-top, 10px) 10px env(safe-area-inset-bottom, 10px) 10px;
+      user-select: none;
     }
 
     .app { max-width: 500px; margin: 0 auto; }
@@ -42,19 +43,25 @@
     .big-icon { font-size: 45px; }
 
     .menu-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
-    .nav-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 5px;text-align:center;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;touch-action:manipulation;}
-    .nav-item.active{color:var(--cyan);border-color:var(--cyan);}
+    .nav-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 5px;text-align:center;color:var(--text);font-size:11px;font-weight:700;cursor:pointer;opacity:0.5;}
+    .nav-item.active{color:var(--cyan);border-color:var(--cyan);opacity:1;background:var(--bg3);}
     .nav-icon{display:block;font-size:24px;margin-bottom:4px;}
 
-    .section{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:15px;}
+    .section{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:18px;margin-bottom:10px;}
     .reg-item{background:var(--bg3);border-radius:12px;padding:15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-left:6px solid var(--border);}
     .reg-item.adentro{border-left-color:var(--green);}
 
-    /* LOS PANELES (OCULTOS POR DEFECTO) */
     .panel { display: none; }
     .panel.active { display: block; }
 
-    .toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:var(--cyan);color:black;padding:12px 25px;border-radius:50px;font-weight:800;opacity:0;transition:0.3s;pointer-events:none;}
+    input[type="text"] { width:100%; padding:15px; margin-bottom:10px; border-radius:10px; background:var(--bg3); color:white; border:1px solid var(--border); text-align:center; font-size:16px; outline:none;}
+    input:focus { border-color: var(--cyan); }
+    label { display:block; font-size:11px; color:var(--cyan); margin-bottom:5px; font-weight:800; text-transform:uppercase;}
+
+    .btn-save { width:100%; padding:20px; background:var(--blue); color:white; border:none; border-radius:12px; font-weight:800; font-size:16px; cursor:pointer;}
+    .btn-save:active { transform:scale(0.95); }
+
+    .toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:var(--cyan);color:black;padding:12px 25px;border-radius:50px;font-weight:800;opacity:0;transition:0.3s;pointer-events:none;z-index:999;}
     .toast.show{opacity:1;}
   </style>
 </head>
@@ -63,7 +70,7 @@
 <div class="app">
   <div class="topbar">
     <span style="font-weight:800; color:var(--cyan)">NEXOS CONTROL</span>
-    <div class="sync-dot"></div>
+    <div class="sync-dot" id="sync-dot"></div>
   </div>
 
   <div class="monitor">
@@ -91,27 +98,45 @@
     <div class="nav-item" id="btn-config" onclick="ver('config')"><span class="nav-icon">⚙️</span>CONFIG</div>
   </div>
 
-  <div id="p-lista" class="panel active"><div class="section" id="cont-lista"></div></div>
+  <div id="p-lista" class="panel active">
+    <div class="section" id="cont-lista"></div>
+  </div>
   
   <div id="p-manual" class="panel">
     <div class="section">
-      <h3 style="margin-bottom:10px">Carga Manual</h3>
-      <input id="m-pat" placeholder="PATENTE" style="width:100%; padding:15px; margin-bottom:10px; border-radius:10px; background:var(--bg3); color:white; border:none; text-align:center;">
-      <button onclick="guardarManual()" style="width:100%; padding:20px; background:var(--blue); color:white; border:none; border-radius:12px; font-weight:800;">REGISTRAR</button>
+      <label>Datos del Visitante</label>
+      <input id="m-pat" placeholder="PATENTE" oninput="this.value=this.value.toUpperCase()">
+      <input id="m-dni" placeholder="DNI / NOMBRE">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <input id="m-mza" placeholder="MZA">
+        <input id="m-casa" placeholder="CASA">
+      </div>
+      <button class="btn-save" onclick="guardarManual()">REGISTRAR INGRESO</button>
     </div>
   </div>
 
   <div id="p-delivery" class="panel">
     <div class="section">
-      <h3 style="margin-bottom:10px; color:var(--gold)">Panel Delivery</h3>
-      <p style="opacity:0.6">Registros rápidos de repartidores.</p>
+      <label style="color:var(--gold)">Ingreso Delivery</label>
+      <input id="d-pat" placeholder="PATENTE MOTO/AUTO" oninput="this.value=this.value.toUpperCase()">
+      <input id="d-empresa" placeholder="EMPRESA (PEDIDOSYA, MOTO, ETC)">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <input id="d-mza" placeholder="MZA">
+        <input id="d-casa" placeholder="CASA">
+      </div>
+      <button class="btn-save" style="background:var(--gold); color:black;" onclick="guardarDelivery()">REGISTRAR DELIVERY</button>
     </div>
   </div>
 
   <div id="p-config" class="panel">
     <div class="section">
-      <h3 style="margin-bottom:10px; color:var(--cyan)">Configuración</h3>
-      <p style="opacity:0.6">ID Planilla: NEXOS_DATABASE_2026</p>
+      <label>Configuración de Sistema</label>
+      <div style="margin-bottom:15px;">
+        <label style="color:var(--text); opacity:0.6; font-size:9px;">Google Apps Script URL</label>
+        <input id="cfg-url" placeholder="https://script.google.com/macros/s/...">
+      </div>
+      <button class="btn-save" style="background:var(--cyan); color:black;" onclick="guardarConfig()">GUARDAR CONFIGURACIÓN</button>
+      <p style="font-size:10px; margin-top:15px; opacity:0.4; text-align:center;">ID Planilla: NEXOS_DATABASE_2026</p>
     </div>
   </div>
 </div>
@@ -119,7 +144,7 @@
 <div id="toast" class="toast"></div>
 
 <script>
-  let DB = [];
+  let DB = JSON.parse(localStorage.getItem('nx_db') || '[]');
 
   function vibrar() { if(navigator.vibrate) navigator.vibrate(50); }
 
@@ -129,17 +154,11 @@
     setTimeout(() => t.classList.remove('show'), 2000);
   }
 
-  // ESTA FUNCIÓN ES LA QUE HACÍA FALLAR EL TÁCTIL (REPARADA)
   function ver(nombre) {
     vibrar();
-    // 1. Ocultar todos los paneles
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    // 2. Desactivar todos los botones del menú
     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-    
-    // 3. Activar el panel elegido
     document.getElementById('p-' + nombre).classList.add('active');
-    // 4. Activar el botón del menú elegido
     document.getElementById('btn-' + nombre).classList.add('active');
   }
 
@@ -150,7 +169,7 @@
     
     const hora = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
     if(tipo === 'ingreso') {
-      DB.push({pat: val, hE: hora, hS: ''});
+      DB.push({id: Date.now(), pat: val, tipo:'VISITA', hE: hora, hS: ''});
       showToast("✅ INGRESO OK");
     } else {
       let r = DB.find(x => x.pat === val && !x.hS);
@@ -158,17 +177,60 @@
       else showToast("❌ NO ENCONTRADO");
     }
     document.getElementById('buscador').value = '';
-    render();
+    finalizar();
   }
 
   function guardarManual() {
     vibrar();
     const p = document.getElementById('m-pat').value.trim();
-    if(!p) return;
-    DB.push({pat: p, hE: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), hS: ''});
+    if(!p) { showToast("FALTA PATENTE"); return; }
+    DB.push({
+      id: Date.now(), 
+      pat: p, 
+      tipo: 'MANUAL', 
+      hE: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), 
+      hS: ''
+    });
+    // Limpiar campos
     document.getElementById('m-pat').value = '';
     showToast("✅ REGISTRADO");
     ver('lista');
+    finalizar();
+  }
+
+  function guardarDelivery() {
+    vibrar();
+    const p = document.getElementById('d-pat').value.trim();
+    if(!p) { showToast("FALTA PATENTE"); return; }
+    DB.push({
+      id: Date.now(), 
+      pat: p, 
+      tipo: 'DELIVERY', 
+      hE: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), 
+      hS: ''
+    });
+    document.getElementById('d-pat').value = '';
+    showToast("🛵 DELIVERY REGISTRADO");
+    ver('lista');
+    finalizar();
+  }
+
+  function guardarConfig() {
+    vibrar();
+    const url = document.getElementById('cfg-url').value.trim();
+    localStorage.setItem('nx_url', url);
+    showToast("⚙️ CONFIGURACIÓN GUARDADA");
+  }
+
+  function darSalida(id) {
+    vibrar();
+    let r = DB.find(x => x.id === id);
+    if(r) r.hS = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    finalizar();
+  }
+
+  function finalizar() {
+    localStorage.setItem('nx_db', JSON.stringify(DB));
     render();
   }
 
@@ -176,11 +238,22 @@
     const cont = document.getElementById('cont-lista');
     cont.innerHTML = DB.slice().reverse().map(r => `
       <div class="reg-item ${r.hS ? '' : 'adentro'}">
-        <div><strong>${r.pat}</strong><br><small>E: ${r.hE} ${r.hS ? ' S: '+r.hS : ''}</small></div>
+        <div>
+          <div style="font-size:16px; font-weight:800;">${r.pat}</div>
+          <div style="font-size:10px; color:var(--text); opacity:0.6;">${r.tipo} | E: ${r.hE} ${r.hS ? ' S: '+r.hS : ''}</div>
+        </div>
+        ${!r.hS ? `<button onclick="darSalida(${r.id})" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:800; font-size:11px;">SALIDA</button>` : '<span style="font-size:10px; opacity:0.5;">FUERA</span>'}
       </div>
-    `).join('') || '<div style="text-align:center; padding:20px; opacity:0.5">Vacío</div>';
-    document.getElementById('mon-v').innerText = DB.filter(x => !x.hS).length;
+    `).join('') || '<div style="text-align:center; padding:40px; opacity:0.3;">SIN REGISTROS</div>';
+    
+    // Contadores
+    document.getElementById('mon-v').innerText = DB.filter(x => x.tipo !== 'DELIVERY' && !x.hS).length;
+    document.getElementById('mon-d').innerText = DB.filter(x => x.tipo === 'DELIVERY' && !x.hS).length;
   }
+
+  // Al iniciar, cargar URL guardada si existe
+  document.getElementById('cfg-url').value = localStorage.getItem('nx_url') || '';
+  render();
 </script>
 </body>
 </html>
