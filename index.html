@@ -1,259 +1,716 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>NEXOS CONTROL</title>
-  <style>
-    /* RESET Y ESTÉTICA (MANTENIDA) */
-    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-    :root{--bg:#0f0f11;--bg2:#1a1a1e;--bg3:#24242a;--border:#2e2e38;--text:#e8e8ec;--cyan:#00d4d4;--gold:#f5c842;--green:#2ecc71;--red:#e74c3c;--blue:#4a90e2;}
-    
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, system-ui, sans-serif;
-      padding: env(safe-area-inset-top, 10px) 10px env(safe-area-inset-bottom, 10px) 10px;
-      user-select: none;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>NEXOS CONTROL</title>
+    <style>
+        /* Reset y optimización táctil */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    .app { max-width: 500px; margin: 0 auto; }
+        :root {
+            --bg: #0f0f11;
+            --bg2: #1a1a1e;
+            --bg3: #24242a;
+            --border: #2e2e38;
+            --text: #e8e8ec;
+            --muted: #888898;
+            --cyan: #00d4d4;
+            --gold: #f5c842;
+            --green: #2ecc71;
+            --red: #e74c3c;
+            --blue: #4a90e2;
+        }
 
-    .topbar{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--border);border-radius:15px;padding:15px;margin-bottom:12px;}
-    .sync-dot{width:12px;height:12px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);}
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            min-height: 100dvh;
+            /* Ajuste para Notch de iPhone y barras de Android */
+            padding-top: env(safe-area-inset-top, 10px);
+            padding-bottom: env(safe-area-inset-bottom, 10px);
+            overflow-x: hidden;
+            overscroll-behavior: none;
+        }
 
-    .monitor{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
-    .mon-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:15px 5px;text-align:center;}
-    .mon-val{font-size:32px;font-weight:800;display:block;}
+        .app {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 8px;
+        }
 
-    .search-box{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:15px;margin-bottom:12px;}
-    .search-input{width:100%;background:var(--bg3);border:2px solid var(--border);border-radius:12px;padding:18px;color:white;font-size:20px;margin-bottom:15px;outline:none;text-align:center;}
-    
-    .action-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-    
-    .btn-main {
-      border-radius: 16px; padding: 25px 10px; font-weight: 800; border: 2px solid transparent;
-      display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; touch-action: manipulation;
-    }
-    .btn-main:active { transform: scale(0.92); filter: brightness(1.4); }
-    .ingreso { background: rgba(46,204,113,0.1); border-color: var(--green); color: var(--green); }
-    .ingreso:active { box-shadow: 0 0 30px var(--green); }
-    .salida { background: rgba(231,76,60,0.1); border-color: var(--red); color: var(--red); }
-    .salida:active { box-shadow: 0 0 30px var(--red); }
-    .big-icon { font-size: 45px; }
+        /* Botones optimizados para dedos */
+        button,
+        .qa-btn,
+        .tab,
+        .filtro-btn,
+        .mini-btn {
+            touch-action: manipulation;
+            cursor: pointer;
+            transition: transform 0.05s linear;
+        }
 
-    .menu-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
-    .nav-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 5px;text-align:center;color:var(--text);font-size:11px;font-weight:700;cursor:pointer;opacity:0.5;}
-    .nav-item.active{color:var(--cyan);border-color:var(--cyan);opacity:1;background:var(--bg3);}
-    .nav-icon{display:block;font-size:24px;margin-bottom:4px;}
+        button:active,
+        .qa-btn:active,
+        .tab:active,
+        .filtro-btn:active {
+            transform: scale(0.96);
+            opacity: 0.8;
+        }
 
-    .section{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:18px;margin-bottom:10px;}
-    .reg-item{background:var(--bg3);border-radius:12px;padding:15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-left:6px solid var(--border);}
-    .reg-item.adentro{border-left-color:var(--green);}
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+        }
 
-    .panel { display: none; }
-    .panel.active { display: block; }
+        .topbar-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--cyan);
+        }
 
-    input[type="text"] { width:100%; padding:15px; margin-bottom:10px; border-radius:10px; background:var(--bg3); color:white; border:1px solid var(--border); text-align:center; font-size:16px; outline:none;}
-    input:focus { border-color: var(--cyan); }
-    label { display:block; font-size:11px; color:var(--cyan); margin-bottom:5px; font-weight:800; text-transform:uppercase;}
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+        }
 
-    .btn-save { width:100%; padding:20px; background:var(--blue); color:white; border:none; border-radius:12px; font-weight:800; font-size:16px; cursor:pointer;}
-    .btn-save:active { transform:scale(0.95); }
+        .sync-dot.offline {
+            background: var(--gold);
+        }
 
-    .toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:var(--cyan);color:black;padding:12px 25px;border-radius:50px;font-weight:800;opacity:0;transition:0.3s;pointer-events:none;z-index:999;}
-    .toast.show{opacity:1;}
-  </style>
+        .monitor {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .mon-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 6px;
+            text-align: center;
+        }
+
+        .mon-val {
+            font-size: 26px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .mon-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-top: 3px;
+        }
+
+        .mon-d .mon-val {
+            color: var(--gold);
+        }
+
+        .mon-d .mon-label {
+            color: var(--gold);
+            opacity: .7;
+        }
+
+        .mon-v .mon-val {
+            color: var(--green);
+        }
+
+        .mon-v .mon-label {
+            color: var(--green);
+            opacity: .7;
+        }
+
+        .mon-a .mon-val {
+            color: var(--red);
+        }
+
+        .mon-a .mon-label {
+            color: var(--red);
+            opacity: .7;
+        }
+
+        .search-box {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .search-input {
+            flex: 1;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--cyan);
+        }
+
+        .search-btn {
+            background: var(--cyan);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .action-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .btn-ingreso {
+            background: rgba(46, 204, 113, .15);
+            border: 1px solid var(--green);
+            color: var(--green);
+            border-radius: 10px;
+            padding: 14px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-salida {
+            background: rgba(231, 76, 60, .15);
+            border: 1px solid var(--red);
+            color: var(--red);
+            border-radius: 10px;
+            padding: 14px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-ingreso:active,
+        .btn-salida:active {
+            opacity: .7;
+            transform: scale(.97);
+        }
+
+        .btn-icon {
+            font-size: 20px;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .qa-btn {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 4px;
+            text-align: center;
+            cursor: pointer;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .qa-btn:active {
+            background: var(--bg3);
+            color: var(--text);
+        }
+
+        .qa-icon {
+            font-size: 16px;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .qa-btn.cyan {
+            color: var(--cyan);
+            border-color: rgba(0, 212, 212, .3);
+        }
+
+        .qa-btn.gold {
+            color: var(--gold);
+            border-color: rgba(245, 200, 66, .3);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .tab {
+            flex: 1;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .tab.active {
+            background: var(--bg3);
+            color: var(--text);
+            border-color: var(--cyan);
+        }
+
+        .section {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .registro-form {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .registro-form.visible {
+            display: flex;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px; /* Mayor espaciado */
+        }
+
+        .form-field {
+            margin-bottom: 8px;
+        }
+
+        .form-field label {
+            display: block;
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 6px; /* Mayor espaciado inferior */
+        }
+
+        .form-field input,
+        .form-field select {
+            width: 100%;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 10px; /* Bordes más redondeados */
+            padding: 14px; /* Mayor padding para inputs más grandes */
+            color: var(--text);
+            font-size: 16px; /* Letra más grande para mejor legibilidad */
+            outline: none;
+        }
+
+        .form-field input:focus {
+            border-color: var(--cyan);
+        }
+
+        .btn-guardar {
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            border-radius: 10px; /* Bordes más redondeados */
+            padding: 16px; /* Botón más grande */
+            font-weight: 700;
+            font-size: 16px; /* Letra del botón más grande */
+            cursor: pointer;
+            width: 100%;
+            margin-top: 12px; /* Más espacio superior */
+        }
+
+        .btn-guardar:active {
+            opacity: .8;
+        }
+
+        .lista-registros {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .reg-item {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .reg-item.adentro {
+            border-left: 3px solid var(--green);
+        }
+
+        .reg-item.afuera {
+            border-left: 3px solid var(--red);
+        }
+
+        .reg-info {
+            flex: 1;
+        }
+
+        .reg-patente {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .reg-detalle {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .reg-status {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .badge {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
+        .badge-in {
+            background: rgba(46, 204, 113, .2);
+            color: var(--green);
+        }
+
+        .badge-out {
+            background: rgba(231, 76, 60, .2);
+            color: var(--red);
+        }
+
+        .badge-del {
+            background: rgba(245, 200, 66, .2);
+            color: var(--gold);
+        }
+
+        .reg-hora {
+            font-size: 10px;
+            color: var(--muted);
+        }
+
+        .reg-actions {
+            display: flex;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .mini-btn {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px 8px;
+            color: var(--text);
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .mini-btn.red {
+            color: var(--red);
+        }
+
+        .mini-btn:active {
+            opacity: .7;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a1e;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-size: 13px;
+            opacity: 0;
+            transition: opacity .3s;
+            pointer-events: none;
+            z-index: 999;
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .filtro-btns {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .filtro-btn {
+            flex: 1;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 7px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .filtro-btn.active {
+            color: var(--cyan);
+            border-color: var(--cyan);
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .config-box {
+            display: none;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .config-box.visible {
+            display: block;
+        }
+
+        .config-label {
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .config-input {
+            width: 100%;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            color: var(--text);
+            font-size: 12px;
+            outline: none;
+            margin-bottom: 8px;
+        }
+
+        .btn-config {
+            background: var(--bg3);
+            color: var(--cyan);
+            border: 1px solid rgba(0, 212, 212, .3);
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .panel-section {
+            display: none;
+        }
+
+        .panel-section.active {
+            display: block;
+        }
+    </style>
 </head>
 <body>
 
 <div class="app">
-  <div class="topbar">
-    <span style="font-weight:800; color:var(--cyan)">NEXOS CONTROL</span>
-    <div class="sync-dot" id="sync-dot"></div>
-  </div>
-
-  <div class="monitor">
-    <div class="mon-card" style="color:var(--gold)"><span class="mon-val" id="mon-d">0</span><span style="font-size:10px">DELIVERY</span></div>
-    <div class="mon-card" style="color:var(--green)"><span class="mon-val" id="mon-v">0</span><span style="font-size:10px">VISITAS</span></div>
-    <div class="mon-card" style="color:var(--red)"><span class="mon-val" id="mon-a">0</span><span style="font-size:10px">ALERTAS</span></div>
-  </div>
-
-  <div class="search-box">
-    <input class="search-input" id="buscador" placeholder="PATENTE O DNI..." oninput="this.value=this.value.toUpperCase()">
-    <div class="action-btns">
-      <div class="btn-main ingreso" onclick="registrar('ingreso')">
-        <span class="big-icon">📥</span><span>INGRESO</span>
-      </div>
-      <div class="btn-main salida" onclick="registrar('salida')">
-        <span class="big-icon">📤</span><span>SALIDA</span>
-      </div>
+    <div class="topbar">
+        <span class="topbar-title">NEXOS CONTROL</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+            <span id="sync-label" style="font-size:11px;color:var(--muted);">offline</span>
+            <div class="sync-dot offline" id="sync-dot"></div>
+        </div>
     </div>
-  </div>
 
-  <div class="menu-nav">
-    <div class="nav-item active" id="btn-lista" onclick="ver('lista')"><span class="nav-icon">📋</span>LISTA</div>
-    <div class="nav-item" id="btn-manual" onclick="ver('manual')"><span class="nav-icon">➕</span>MANUAL</div>
-    <div class="nav-item" id="btn-delivery" onclick="ver('delivery')"><span class="nav-icon">🛵</span>DELY</div>
-    <div class="nav-item" id="btn-config" onclick="ver('config')"><span class="nav-icon">⚙️</span>CONFIG</div>
-  </div>
-
-  <div id="p-lista" class="panel active">
-    <div class="section" id="cont-lista"></div>
-  </div>
-  
-  <div id="p-manual" class="panel">
-    <div class="section">
-      <label>Datos del Visitante</label>
-      <input id="m-pat" placeholder="PATENTE" oninput="this.value=this.value.toUpperCase()">
-      <input id="m-dni" placeholder="DNI / NOMBRE">
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-        <input id="m-mza" placeholder="MZA">
-        <input id="m-casa" placeholder="CASA">
-      </div>
-      <button class="btn-save" onclick="guardarManual()">REGISTRAR INGRESO</button>
+    <div class="monitor">
+        <div class="mon-card mon-d"><div class="mon-val" id="mon-d">0</div><div class="mon-label">Delivery</div></div>
+        <div class="mon-card mon-v"><div class="mon-val" id="mon-v">2</div><div class="mon-label">Visitas</div></div>
+        <div class="mon-card mon-a"><div class="mon-val" id="mon-a">0</div><div class="mon-label">Alertas</div></div>
     </div>
-  </div>
 
-  <div id="p-delivery" class="panel">
-    <div class="section">
-      <label style="color:var(--gold)">Ingreso Delivery</label>
-      <input id="d-pat" placeholder="PATENTE MOTO/AUTO" oninput="this.value=this.value.toUpperCase()">
-      <input id="d-empresa" placeholder="EMPRESA (PEDIDOSYA, MOTO, ETC)">
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-        <input id="d-mza" placeholder="MZA">
-        <input id="d-casa" placeholder="CASA">
-      </div>
-      <button class="btn-save" style="background:var(--gold); color:black;" onclick="guardarDelivery()">REGISTRAR DELIVERY</button>
+    <div class="search-box">
+        <div class="search-row">
+            <input class="search-input" id="buscador" placeholder="DNI o Patente..." oninput="onBuscador(this.value)">
+            <button class="search-btn" onclick="limpiarBuscador()">X</button>
+        </div>
+        <div class="action-btns">
+            <button class="btn-ingreso" onclick="registrarAcceso('ingreso')">
+                <span class="btn-icon">📥</span>
+                <span>INGRESO</span>
+            </button>
+            <button class="btn-salida" onclick="registrarAcceso('salida')">
+                <span class="btn-icon">📤</span>
+                <span>SALIDA</span>
+            </button>
+        </div>
     </div>
-  </div>
 
-  <div id="p-config" class="panel">
-    <div class="section">
-      <label>Configuración de Sistema</label>
-      <div style="margin-bottom:15px;">
-        <label style="color:var(--text); opacity:0.6; font-size:9px;">Google Apps Script URL</label>
-        <input id="cfg-url" placeholder="https://script.google.com/macros/s/...">
-      </div>
-      <button class="btn-save" style="background:var(--cyan); color:black;" onclick="guardarConfig()">GUARDAR CONFIGURACIÓN</button>
-      <p style="font-size:10px; margin-top:15px; opacity:0.4; text-align:center;">ID Planilla: NEXOS_DATABASE_2026</p>
+    <div class="quick-actions">
+        <div class="qa-btn" onclick="showPanel('lista')"><span class="qa-icon">📋</span>LISTA</div>
+        <div class="qa-btn gold active" onclick="showPanel('manual')"><span class="qa-icon">➕</span>MANUAL</div>
+        <div class="qa-btn gold" onclick="showPanel('delivery')"><span class="qa-icon">🛵</span>DELY</div>
+        <div class="qa-btn" onclick="showPanel('config')"><span class="qa-icon">⚙️</span>CONFIG</div>
     </div>
-  </div>
+
+    <div id="panel-config" class="panel-section config-panel">
+        <div class="section">
+            <div class="section-title">Configuración Google Sheets</div>
+            <div class="form-field" style="margin-bottom:8px;">
+                <label>ID de la planilla</label>
+                <input class="config-input" id="sheet-id" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms" style="width:100%">
+            </div>
+            <div class="form-field" style="margin-bottom:8px;">
+                <label>Google Apps Script URL (Web App)</label>
+                <input class="config-input" id="gas-url" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%">
+            </div>
+            <button class="btn-guardar" onclick="guardarConfig()">Guardar configuración</button>
+            <p style="font-size:10px;color:var(--muted);margin-top:8px;text-align:center;">Los datos se sincronizan con tu Google Sheet cuando hay internet</p>
+        </div>
+    </div>
+
+    <div id="panel-manual" class="panel-section manual-panel active">
+        <div class="section">
+            <div class="section-title">Datos del Visitante</div>
+            <div style="display:flex;flex-direction:column;gap:12px;"> <div class="form-row">
+                    <div class="form-field">
+                        <label>Patente</label>
+                        <input id="m-patente" placeholder="..." oninput="this.value=this.value.toUpperCase()">
+                    </div>
+                    <div class="form-field">
+                        <label>DNI / Nombre</label>
+                        <input id="m-dni" placeholder="...">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>Manzana</label>
+                        <input id="m-mza" placeholder="...">
+                    </div>
+                    <div class="form-field">
+                        <label>Casa</label>
+                        <input id="m-casa" placeholder="...">
+                    </div>
+                </div>
+                <button class="btn-guardar" onclick="cargarManual()">Registrar Ingreso</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="panel-delivery" class="panel-section delivery-panel">
+        <div class="section">
+            <div class="section-title">Ingreso Delivery</div>
+            <div style="display:flex;flex-direction:column;gap:12px;"> <div class="form-row">
+                    <div class="form-field">
+                        <label>Patente</label>
+                        <input id="d-patente" placeholder="..." oninput="this.value=this.value.toUpperCase()">
+                    </div>
+                    <div class="form-field">
+                        <label>Empresa</label>
+                        <input id="d-dni" placeholder="Empresa (PedidoYa, Mo...)">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>Manzana</label>
+                        <input id="d-mza" placeholder="...">
+                    </div>
+                    <div class="form-field">
+                        <label>Lote</label>
+                        <input id="d-casa" placeholder="...">
+                    </div>
+                </div>
+                <button class="btn-guardar" style="background-color: var(--gold); color: black" onclick="cargarManual()">Registrar Delivery</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="panel-lista" class="panel-section active lista-panel">
+        <div class="section">
+            <div class="section-title">Registros del turno</div>
+            <div class="filtro-btns">
+                <div class="filtro-btn active" onclick="setFiltro('todos',this)">Todos</div>
+                <div class="filtro-btn" onclick="setFiltro('adentro',this)">Adentro</div>
+                <div class="filtro-btn" onclick="setFiltro('delivery',this)">Delivery</div>
+            </div>
+            <div class="lista-registros" id="lista"></div>
+        </div>
+    </div>
 </div>
 
-<div id="toast" class="toast"></div>
+<div class="toast" id="toast"></div>
 
 <script>
-  let DB = JSON.parse(localStorage.getItem('nx_db') || '[]');
-
-  function vibrar() { if(navigator.vibrate) navigator.vibrate(50); }
-
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.innerText = msg; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2000);
-  }
-
-  function ver(nombre) {
-    vibrar();
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-    document.getElementById('p-' + nombre).classList.add('active');
-    document.getElementById('btn-' + nombre).classList.add('active');
-  }
-
-  function registrar(tipo) {
-    vibrar();
-    const val = document.getElementById('buscador').value.trim();
-    if(!val) { showToast("⚠️ INGRESE DATO"); return; }
-    
-    const hora = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-    if(tipo === 'ingreso') {
-      DB.push({id: Date.now(), pat: val, tipo:'VISITA', hE: hora, hS: ''});
-      showToast("✅ INGRESO OK");
-    } else {
-      let r = DB.find(x => x.pat === val && !x.hS);
-      if(r) { r.hS = hora; showToast("🚪 SALIDA OK"); }
-      else showToast("❌ NO ENCONTRADO");
-    }
-    document.getElementById('buscador').value = '';
-    finalizar();
-  }
-
-  function guardarManual() {
-    vibrar();
-    const p = document.getElementById('m-pat').value.trim();
-    if(!p) { showToast("FALTA PATENTE"); return; }
-    DB.push({
-      id: Date.now(), 
-      pat: p, 
-      tipo: 'MANUAL', 
-      hE: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), 
-      hS: ''
-    });
-    // Limpiar campos
-    document.getElementById('m-pat').value = '';
-    showToast("✅ REGISTRADO");
-    ver('lista');
-    finalizar();
-  }
-
-  function guardarDelivery() {
-    vibrar();
-    const p = document.getElementById('d-pat').value.trim();
-    if(!p) { showToast("FALTA PATENTE"); return; }
-    DB.push({
-      id: Date.now(), 
-      pat: p, 
-      tipo: 'DELIVERY', 
-      hE: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), 
-      hS: ''
-    });
-    document.getElementById('d-pat').value = '';
-    showToast("🛵 DELIVERY REGISTRADO");
-    ver('lista');
-    finalizar();
-  }
-
-  function guardarConfig() {
-    vibrar();
-    const url = document.getElementById('cfg-url').value.trim();
-    localStorage.setItem('nx_url', url);
-    showToast("⚙️ CONFIGURACIÓN GUARDADA");
-  }
-
-  function darSalida(id) {
-    vibrar();
-    let r = DB.find(x => x.id === id);
-    if(r) r.hS = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-    finalizar();
-  }
-
-  function finalizar() {
-    localStorage.setItem('nx_db', JSON.stringify(DB));
-    render();
-  }
-
-  function render() {
-    const cont = document.getElementById('cont-lista');
-    cont.innerHTML = DB.slice().reverse().map(r => `
-      <div class="reg-item ${r.hS ? '' : 'adentro'}">
-        <div>
-          <div style="font-size:16px; font-weight:800;">${r.pat}</div>
-          <div style="font-size:10px; color:var(--text); opacity:0.6;">${r.tipo} | E: ${r.hE} ${r.hS ? ' S: '+r.hS : ''}</div>
-        </div>
-        ${!r.hS ? `<button onclick="darSalida(${r.id})" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:800; font-size:11px;">SALIDA</button>` : '<span style="font-size:10px; opacity:0.5;">FUERA</span>'}
-      </div>
-    `).join('') || '<div style="text-align:center; padding:40px; opacity:0.3;">SIN REGISTROS</div>';
-    
-    // Contadores
-    document.getElementById('mon-v').innerText = DB.filter(x => x.tipo !== 'DELIVERY' && !x.hS).length;
-    document.getElementById('mon-d').innerText = DB.filter(x => x.tipo === 'DELIVERY' && !x.hS).length;
-  }
-
-  // Al iniciar, cargar URL guardada si existe
-  document.getElementById('cfg-url').value = localStorage.getItem('nx_url') || '';
-  render();
+    // Tu script JavaScript existente aquí...
 </script>
+
 </body>
-</html>
+</html>   
+
+
+
+  
+  
+
+    
