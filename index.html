@@ -4,169 +4,206 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="NEXOS">
-
-  <title>NEXOS - Panel de Acceso</title>
-
+  <meta name="mobile-web-app-status-bar-style" content="black-translucent">
+  <title>NEXOS CONTROL</title>
   <style>
-  /* Reset y optimización táctil */
-  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-  :root{--bg:#0f0f11;--bg2:#1a1a1e;--bg3:#24242a;--border:#2e2e38;--text:#e8e8ec;--muted:#888898;--cyan:#00d4d4;--gold:#f5c842;--green:#2ecc71;--red:#e74c3c;--blue:#4a90e2;}
-  
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    min-height: 100dvh;
-    /* Ajuste para Notch de iPhone y barras de Android */
-    padding-top: env(safe-area-inset-top, 10px);
-    padding-bottom: env(safe-area-inset-bottom, 10px);
-    overflow-x: hidden;
-    overscroll-behavior: none;
-  }
+    /* RESET Y VARIABLES */
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    :root{--bg:#0f0f11;--bg2:#1a1a1e;--bg3:#24242a;--border:#2e2e38;--text:#e8e8ec;--cyan:#00d4d4;--gold:#f5c842;--green:#2ecc71;--red:#e74c3c;--blue:#4a90e2;}
+    
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, system-ui, sans-serif;
+      font-size: 16px;
+      min-height: 100dvh;
+      padding: env(safe-area-inset-top, 10px) 10px env(safe-area-inset-bottom, 10px) 10px;
+    }
 
-  .app{max-width:480px;margin:0 auto;padding:8px;}
+    .app { max-width: 500px; margin: 0 auto; }
 
-  /* Botones optimizados para dedos */
-  button, .qa-btn, .tab, .filtro-btn, .mini-btn {
-    touch-action: manipulation;
-    cursor: pointer;
-    transition: transform 0.05s linear;
-  }
-  
-  button:active, .qa-btn:active, .tab:active, .filtro-btn:active {
-    transform: scale(0.96);
-    opacity: 0.8;
-  }
+    /* TOPBAR */
+    .topbar{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--border);border-radius:15px;padding:15px;margin-bottom:12px;}
+    .sync-dot{width:12px;height:12px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);}
 
-  .topbar{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:8px;}
-  .topbar-title{font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:0.5px;}
-  .sync-dot{width:8px;height:8px;border-radius:50%;background:var(--green);}
-  .sync-dot.offline{background:var(--gold);}
+    /* MONITOR */
+    .monitor{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
+    .mon-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:15px 5px;text-align:center;}
+    .mon-val{font-size:32px;font-weight:800;display:block;}
+    .mon-label{font-size:10px;font-weight:700;opacity:0.7;}
 
-  .monitor{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;}
-  .mon-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center;}
-  .mon-val{font-size:26px;font-weight:700;line-height:1;}
-  .mon-label{font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
-  .mon-d .mon-val{color:var(--gold);}
-  .mon-v .mon-val{color:var(--green);}
-  .mon-a .mon-val{color:var(--red);}
+    /* BUSCADOR Y BOTONES GIGANTES */
+    .search-box{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:15px;margin-bottom:12px;}
+    .search-input{width:100%;background:var(--bg3);border:2px solid var(--border);border-radius:12px;padding:18px;color:white;font-size:20px;margin-bottom:15px;outline:none;text-align:center;}
+    
+    .action-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    
+    /* BOTONES CON EFECTO LUMINICO Y VIBRACION */
+    .btn-main {
+      border-radius: 16px;
+      padding: 25px 10px;
+      font-weight: 800;
+      border: 2px solid transparent;
+      transition: all 0.1s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
 
-  .search-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;}
-  .search-row{display:flex;gap:8px;margin-bottom:10px;}
-  .search-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);font-size:16px;outline:none;}
-  .search-btn{background:var(--cyan);color:#000;border:none;border-radius:8px;padding:0 15px;font-weight:700;}
+    .btn-main:active { transform: scale(0.92); filter: brightness(1.4); }
+    
+    .ingreso { background: rgba(46,204,113,0.1); border-color: var(--green); color: var(--green); }
+    .ingreso:active { box-shadow: 0 0 30px var(--green); }
+    
+    .salida { background: rgba(231,76,60,0.1); border-color: var(--red); color: var(--red); }
+    .salida:active { box-shadow: 0 0 30px var(--red); }
 
-  .action-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-  .btn-ingreso{background:rgba(46,204,113,.15);border:1px solid var(--green);color:var(--green);border-radius:10px;padding:16px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px;}
-  .btn-salida{background:rgba(231,76,60,.15);border:1px solid var(--red);color:var(--red);border-radius:10px;padding:16px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px;}
+    .big-icon { font-size: 45px; }
 
-  .quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;}
-  .qa-btn{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 4px;text-align:center;color:var(--muted);font-size:10px;}
-  .qa-icon{font-size:16px;display:block;margin-bottom:3px;}
-  .qa-btn.cyan{color:var(--cyan);border-color:rgba(0,212,212,.3);}
+    /* MENU INFERIOR */
+    .menu-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+    .nav-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 5px;text-align:center;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;}
+    .nav-item.active{color:var(--cyan);border-color:var(--cyan);}
+    .nav-icon{display:block;font-size:24px;margin-bottom:4px;}
 
-  .section{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;}
-  .section-title{font-size:11px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+    /* LISTA */
+    .section{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:15px;}
+    .reg-item{background:var(--bg3);border-radius:12px;padding:15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-left:6px solid var(--border);}
+    .reg-item.adentro{border-left-color:var(--green);}
+    .reg-item.afuera{border-left-color:var(--red);opacity:0.6;}
 
-  .form-field{margin-bottom:10px;}
-  .form-field label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;}
-  .form-field input, .form-field select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);font-size:16px;outline:none;}
-  .btn-guardar{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:15px;width:100%;}
+    /* PANALES */
+    .panel{display:none;}
+    .panel.active{display:block;}
 
-  .lista-registros{display:flex;flex-direction:column;gap:6px;overflow-y:auto;}
-  .reg-item{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center;}
-  .reg-item.adentro{border-left:4px solid var(--green);}
-  .reg-item.afuera{border-left:4px solid var(--red);}
-  .reg-patente{font-size:15px;font-weight:700;}
-  .reg-detalle{font-size:11px;color:var(--muted);}
-
-  .badge{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;}
-  .badge-in{background:rgba(46,204,113,.2);color:var(--green);}
-  .badge-out{background:rgba(231,76,60,.2);color:var(--red);}
-  .badge-del{background:rgba(245,200,66,.2);color:var(--gold);}
-
-  .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1a1a1e;border:1px solid var(--cyan);border-radius:10px;padding:12px 24px;font-size:14px;opacity:0;transition:opacity .3s;z-index:9999;pointer-events:none;}
-  .toast.show{opacity:1;}
-
-  .panel-section{display:none;}
-  .panel-section.active{display:block;}
-  .filtro-btns{display:flex;gap:6px;margin-bottom:10px;}
-  .filtro-btn{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;font-size:12px;color:var(--muted);}
-  .filtro-btn.active{color:var(--cyan);border-color:var(--cyan);}
+    .toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:var(--cyan);color:black;padding:12px 25px;border-radius:50px;font-weight:800;font-size:14px;opacity:0;transition:0.3s;z-index:999;}
+    .toast.show{opacity:1;bottom:60px;}
   </style>
 </head>
 <body>
 
 <div class="app">
   <div class="topbar">
-    <span class="topbar-title">NEXOS - Panel de Acceso</span>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <span id="sync-label" style="font-size:11px;color:var(--muted);">offline</span>
-      <div class="sync-dot offline" id="sync-dot"></div>
-    </div>
+    <span style="font-weight:800; color:var(--cyan); letter-spacing:1px;">NEXOS CONTROL</span>
+    <div class="sync-dot"></div>
   </div>
 
   <div class="monitor">
-    <div class="mon-card mon-d"><div class="mon-val" id="mon-d">0</div><div class="mon-label">Delivery</div></div>
-    <div class="mon-card mon-v"><div class="mon-val" id="mon-v">0</div><div class="mon-label">Visitas</div></div>
-    <div class="mon-card mon-a"><div class="mon-val" id="mon-a">0</div><div class="mon-label">Alertas</div></div>
+    <div class="mon-card" style="color:var(--gold)"><span class="mon-val" id="mon-d">0</span><span class="mon-label">DELIVERY</span></div>
+    <div class="mon-card" style="color:var(--green)"><span class="mon-val" id="mon-v">0</span><span class="mon-label">VISITAS</span></div>
+    <div class="mon-card" style="color:var(--red)"><span class="mon-val" id="mon-a">0</span><span class="mon-label">ALERTAS</span></div>
   </div>
 
   <div class="search-box">
-    <div class="search-row">
-      <input class="search-input" id="buscador" placeholder="DNI o Patente..." oninput="onBuscador(this.value)">
-      <button class="search-btn" onclick="limpiarBuscador()">X</button>
-    </div>
+    <input class="search-input" id="buscador" placeholder="PATENTE O DNI..." oninput="this.value=this.value.toUpperCase()">
     <div class="action-btns">
-      <button class="btn-ingreso" onclick="registrarAcceso('ingreso')">
-        <span style="font-size:20px">▶</span>
-        <span>INGRESO</span>
+      <button class="btn-main ingreso" onclick="registrar('ingreso')">
+        <span class="big-icon">📥</span><span>INGRESO</span>
       </button>
-      <button class="btn-salida" onclick="registrarAcceso('salida')">
-        <span style="font-size:20px">◀</span>
-        <span>SALIDA</span>
+      <button class="btn-main salida" onclick="registrar('salida')">
+        <span class="big-icon">📤</span><span>SALIDA</span>
       </button>
     </div>
   </div>
 
-  <div class="quick-actions">
-    <div class="qa-btn cyan" onclick="showPanel('lista')"><span class="qa-icon">≡</span>Lista</div>
-    <div class="qa-btn" onclick="showPanel('manual')"><span class="qa-icon">+</span>Manual</div>
-    <div class="qa-btn" onclick="showPanel('delivery')"><span class="qa-icon">▣</span>Delivery</div>
-    <div class="qa-btn cyan" onclick="showPanel('config')"><span class="qa-icon">⚙</span>Config</div>
+  <div class="menu-nav">
+    <div class="nav-item active" onclick="ver('lista')"><span class="nav-icon">📋</span>LISTA</div>
+    <div class="nav-item" onclick="ver('manual')"><span class="nav-icon">➕</span>MANUAL</div>
+    <div class="nav-item" onclick="ver('delivery')"><span class="nav-icon">🛵</span>DELY</div>
+    <div class="nav-item" onclick="ver('config')"><span class="nav-icon">⚙️</span>CONFIG</div>
   </div>
 
-  <div id="panel-config" class="panel-section">
+  <div id="p-lista" class="panel active"><div class="section" id="cont-lista"></div></div>
+  
+  <div id="p-manual" class="panel">
     <div class="section">
-      <div class="section-title">Configuración</div>
-      <div class="form-field">
-        <label>ID de la planilla</label>
-        <input id="sheet-id" placeholder="ID de Google Sheet">
-      </div>
-      <div class="form-field">
-        <label>Apps Script URL</label>
-        <input id="gas-url" placeholder="https://script.google.com/...">
-      </div>
-      <button class="btn-guardar" onclick="guardarConfig()">Guardar configuración</button>
+      <input id="m-pat" placeholder="PATENTE" style="width:100%; padding:15px; margin-bottom:10px; border-radius:10px; border:none; background:var(--bg3); color:white; font-size:18px; text-align:center;" oninput="this.value=this.value.toUpperCase()">
+      <button onclick="guardarManual()" style="width:100%; padding:20px; background:var(--blue); color:white; border:none; border-radius:12px; font-weight:800; font-size:16px;">REGISTRAR VISITANTE</button>
     </div>
   </div>
+</div>
 
-  <div id="panel-manual" class="panel-section">
-    <div class="section">
-      <div class="section-title">Carga manual</div>
-      <div class="form-field"><label>Patente</label><input id="m-patente" placeholder="ABC123" oninput="this.value=this.value.toUpperCase()"></div>
-      <div class="form-field"><label>DNI / Nombre</label><input id="m-dni" placeholder="..."></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        <div class="form-field"><label>Mza</label><input id="m-mza" placeholder="Mza"></div>
-        <div class="form-field"><label>Casa</label><input id="m-casa" placeholder="Casa"></div>
+<div id="toast" class="toast"></div>
+
+<script>
+  let DB = JSON.parse(localStorage.getItem('nx_db') || '[]');
+
+  function vibrar() { if(navigator.vibrate) navigator.vibrate(60); }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.innerText = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  function ver(p) {
+    vibrar();
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    document.getElementById('p-'+p).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+  }
+
+  function registrar(tipo) {
+    vibrar();
+    const val = document.getElementById('buscador').value.trim();
+    if(!val) { showToast("⚠️ INGRESE DATO"); return; }
+
+    if(tipo === 'ingreso') {
+      DB.push({id: Date.now(), pat: val, hE: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), hS: ''});
+      showToast("✅ INGRESO OK");
+    } else {
+      let r = DB.find(x => x.pat === val && !x.hS);
+      if(r) { r.hS = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); showToast("🚪 SALIDA OK"); }
+      else { showToast("❌ NO ENCONTRADO"); }
+    }
+    document.getElementById('buscador').value = '';
+    finalizarAccion();
+  }
+
+  function guardarManual() {
+    vibrar();
+    const p = document.getElementById('m-pat').value.trim();
+    if(!p) return;
+    DB.push({id: Date.now(), pat: p, hE: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), hS: ''});
+    document.getElementById('m-pat').value = '';
+    showToast("✅ REGISTRADO");
+    ver('lista');
+    finalizarAccion();
+  }
+
+  function darSalida(id) {
+    vibrar();
+    let r = DB.find(x => x.id === id);
+    r.hS = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    finalizarAccion();
+  }
+
+  function finalizarAccion() {
+    localStorage.setItem('nx_db', JSON.stringify(DB));
+    render();
+  }
+
+  function render() {
+    const cont = document.getElementById('cont-lista');
+    let html = DB.slice().reverse().map(r => `
+      <div class="reg-item ${r.hS ? 'afuera' : 'adentro'}">
+        <div>
+          <div style="font-size:18px; font-weight:800;">${r.pat}</div>
+          <div style="font-size:12px; color:var(--muted)">Entrada: ${r.hE} ${r.hS ? '· Salida: '+r.hS : ''}</div>
+        </div>
+        ${!r.hS ? `<button onclick="darSalida(${r.id})" style="background:var(--red); color:white; border:none; padding:10px 15px; border-radius:10px; font-weight:800; font-size:12px;">SALIDA</button>` : '<span style="font-size:11px; font-weight:800; color:var(--muted)">AFUERA</span>'}
       </div>
-      <button class="btn-guardar" onclick="cargarManual()">Registrar Ingreso</button>
-    </div>
-  </div>
+    `).join('');
+    cont.innerHTML = html || '<div style="text-align:center; padding:40px; color:var(--muted)">Sin registros hoy</div>';
+    
+    // Actualizar monitor
+    document.getElementById('mon-v').innerText = DB.filter(x => !x.hS).length;
+  }
 
-  <div id="panel-delivery" class="panel-section">
-    <div class="
+  render();
+</script>
+</body>
+</html>
