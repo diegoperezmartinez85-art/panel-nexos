@@ -2,208 +2,143 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-status-bar-style" content="black-translucent">
-  <title>NEXOS CONTROL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>NEXOS</title>
   <style>
-    /* RESET Y VARIABLES */
-    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-    :root{--bg:#0f0f11;--bg2:#1a1a1e;--bg3:#24242a;--border:#2e2e38;--text:#e8e8ec;--cyan:#00d4d4;--gold:#f5c842;--green:#2ecc71;--red:#e74c3c;--blue:#4a90e2;}
+    *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; user-select:none;}
+    :root{--bg:#0f0f11;--bg2:#1a1a1e;--cyan:#00d4d4;--green:#2ecc71;--red:#e74c3c;--text:#e8e8ec;}
     
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: -apple-system, system-ui, sans-serif;
-      font-size: 16px;
-      min-height: 100dvh;
-      padding: env(safe-area-inset-top, 10px) 10px env(safe-area-inset-bottom, 10px) 10px;
-    }
-
-    .app { max-width: 500px; margin: 0 auto; }
-
-    /* TOPBAR */
-    .topbar{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--border);border-radius:15px;padding:15px;margin-bottom:12px;}
-    .sync-dot{width:12px;height:12px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);}
-
-    /* MONITOR */
-    .monitor{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
-    .mon-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:15px 5px;text-align:center;}
-    .mon-val{font-size:32px;font-weight:800;display:block;}
-    .mon-label{font-size:10px;font-weight:700;opacity:0.7;}
-
-    /* BUSCADOR Y BOTONES GIGANTES */
-    .search-box{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:15px;margin-bottom:12px;}
-    .search-input{width:100%;background:var(--bg3);border:2px solid var(--border);border-radius:12px;padding:18px;color:white;font-size:20px;margin-bottom:15px;outline:none;text-align:center;}
-    
-    .action-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-    
-    /* BOTONES CON EFECTO LUMINICO Y VIBRACION */
-    .btn-main {
-      border-radius: 16px;
-      padding: 25px 10px;
-      font-weight: 800;
-      border: 2px solid transparent;
-      transition: all 0.1s ease;
+      font-family: sans-serif;
+      padding: 20px 15px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
-      cursor: pointer;
     }
 
-    .btn-main:active { transform: scale(0.92); filter: brightness(1.4); }
-    
-    .ingreso { background: rgba(46,204,113,0.1); border-color: var(--green); color: var(--green); }
-    .ingreso:active { box-shadow: 0 0 30px var(--green); }
-    
-    .salida { background: rgba(231,76,60,0.1); border-color: var(--red); color: var(--red); }
-    .salida:active { box-shadow: 0 0 30px var(--red); }
+    .app { width: 100%; max-width: 400px; }
 
-    .big-icon { font-size: 45px; }
+    /* BOTONES GIGANTES */
+    .btn-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 20px;
+    }
 
-    /* MENU INFERIOR */
-    .menu-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
-    .nav-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 5px;text-align:center;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;}
-    .nav-item.active{color:var(--cyan);border-color:var(--cyan);}
-    .nav-icon{display:block;font-size:24px;margin-bottom:4px;}
+    .boton {
+      background: var(--bg2);
+      border: 2px solid #333;
+      border-radius: 20px;
+      padding: 30px 10px;
+      text-align: center;
+      color: white;
+      font-weight: bold;
+      transition: all 0.1s;
+      /* Esto asegura que el táctil responda */
+      cursor: pointer;
+      touch-action: manipulation;
+    }
 
-    /* LISTA */
-    .section{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:15px;}
-    .reg-item{background:var(--bg3);border-radius:12px;padding:15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-left:6px solid var(--border);}
-    .reg-item.adentro{border-left-color:var(--green);}
-    .reg-item.afuera{border-left-color:var(--red);opacity:0.6;}
+    .boton:active {
+      transform: scale(0.9);
+      filter: brightness(1.5);
+    }
 
-    /* PANALES */
-    .panel{display:none;}
-    .panel.active{display:block;}
+    .ingreso:active { border-color: var(--green); box-shadow: 0 0 20px var(--green); }
+    .salida:active { border-color: var(--red); box-shadow: 0 0 20px var(--red); }
 
-    .toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:var(--cyan);color:black;padding:12px 25px;border-radius:50px;font-weight:800;font-size:14px;opacity:0;transition:0.3s;z-index:999;}
-    .toast.show{opacity:1;bottom:60px;}
+    .icon { font-size: 50px; display: block; margin-bottom: 10px; }
+
+    input {
+      width: 100%;
+      padding: 20px;
+      border-radius: 15px;
+      border: 2px solid #333;
+      background: #000;
+      color: var(--cyan);
+      font-size: 24px;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .lista {
+      margin-top: 20px;
+      background: var(--bg2);
+      border-radius: 15px;
+      padding: 10px;
+      width: 100%;
+      min-height: 100px;
+    }
+
+    .item {
+      padding: 15px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+    }
   </style>
 </head>
 <body>
 
 <div class="app">
-  <div class="topbar">
-    <span style="font-weight:800; color:var(--cyan); letter-spacing:1px;">NEXOS CONTROL</span>
-    <div class="sync-dot"></div>
-  </div>
-
-  <div class="monitor">
-    <div class="mon-card" style="color:var(--gold)"><span class="mon-val" id="mon-d">0</span><span class="mon-label">DELIVERY</span></div>
-    <div class="mon-card" style="color:var(--green)"><span class="mon-val" id="mon-v">0</span><span class="mon-label">VISITAS</span></div>
-    <div class="mon-card" style="color:var(--red)"><span class="mon-val" id="mon-a">0</span><span class="mon-label">ALERTAS</span></div>
-  </div>
-
-  <div class="search-box">
-    <input class="search-input" id="buscador" placeholder="PATENTE O DNI..." oninput="this.value=this.value.toUpperCase()">
-    <div class="action-btns">
-      <button class="btn-main ingreso" onclick="registrar('ingreso')">
-        <span class="big-icon">📥</span><span>INGRESO</span>
-      </button>
-      <button class="btn-main salida" onclick="registrar('salida')">
-        <span class="big-icon">📤</span><span>SALIDA</span>
-      </button>
-    </div>
-  </div>
-
-  <div class="menu-nav">
-    <div class="nav-item active" onclick="ver('lista')"><span class="nav-icon">📋</span>LISTA</div>
-    <div class="nav-item" onclick="ver('manual')"><span class="nav-icon">➕</span>MANUAL</div>
-    <div class="nav-item" onclick="ver('delivery')"><span class="nav-icon">🛵</span>DELY</div>
-    <div class="nav-item" onclick="ver('config')"><span class="nav-icon">⚙️</span>CONFIG</div>
-  </div>
-
-  <div id="p-lista" class="panel active"><div class="section" id="cont-lista"></div></div>
+  <h2 style="text-align:center; color:var(--cyan); margin-bottom:20px;">NEXOS CONTROL</h2>
   
-  <div id="p-manual" class="panel">
-    <div class="section">
-      <input id="m-pat" placeholder="PATENTE" style="width:100%; padding:15px; margin-bottom:10px; border-radius:10px; border:none; background:var(--bg3); color:white; font-size:18px; text-align:center;" oninput="this.value=this.value.toUpperCase()">
-      <button onclick="guardarManual()" style="width:100%; padding:20px; background:var(--blue); color:white; border:none; border-radius:12px; font-weight:800; font-size:16px;">REGISTRAR VISITANTE</button>
+  <input type="text" id="dni" placeholder="PATENTE / DNI" oninput="this.value=this.value.toUpperCase()">
+
+  <div class="btn-box">
+    <div class="boton ingreso" onclick="registrar('ENTRADA')">
+      <span class="icon">📥</span> ENTRADA
     </div>
+    <div class="boton salida" onclick="registrar('SALIDA')">
+      <span class="icon">📤</span> SALIDA
+    </div>
+  </div>
+
+  <div class="lista" id="lista">
+    <p style="text-align:center; opacity:0.5; padding:20px;">Sin movimientos</p>
   </div>
 </div>
 
-<div id="toast" class="toast"></div>
-
 <script>
-  let DB = JSON.parse(localStorage.getItem('nx_db') || '[]');
-
-  function vibrar() { if(navigator.vibrate) navigator.vibrate(60); }
-
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.innerText = msg; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2000);
-  }
-
-  function ver(p) {
-    vibrar();
-    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
-    document.getElementById('p-'+p).classList.add('active');
-    document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
-    event.currentTarget.classList.add('active');
+  // Función para vibrar
+  function vibrar() {
+    if (navigator.vibrate) {
+      navigator.vibrate(50);
+    }
   }
 
   function registrar(tipo) {
     vibrar();
-    const val = document.getElementById('buscador').value.trim();
-    if(!val) { showToast("⚠️ INGRESE DATO"); return; }
-
-    if(tipo === 'ingreso') {
-      DB.push({id: Date.now(), pat: val, hE: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), hS: ''});
-      showToast("✅ INGRESO OK");
-    } else {
-      let r = DB.find(x => x.pat === val && !x.hS);
-      if(r) { r.hS = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); showToast("🚪 SALIDA OK"); }
-      else { showToast("❌ NO ENCONTRADO"); }
-    }
-    document.getElementById('buscador').value = '';
-    finalizarAccion();
-  }
-
-  function guardarManual() {
-    vibrar();
-    const p = document.getElementById('m-pat').value.trim();
-    if(!p) return;
-    DB.push({id: Date.now(), pat: p, hE: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), hS: ''});
-    document.getElementById('m-pat').value = '';
-    showToast("✅ REGISTRADO");
-    ver('lista');
-    finalizarAccion();
-  }
-
-  function darSalida(id) {
-    vibrar();
-    let r = DB.find(x => x.id === id);
-    r.hS = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-    finalizarAccion();
-  }
-
-  function finalizarAccion() {
-    localStorage.setItem('nx_db', JSON.stringify(DB));
-    render();
-  }
-
-  function render() {
-    const cont = document.getElementById('cont-lista');
-    let html = DB.slice().reverse().map(r => `
-      <div class="reg-item ${r.hS ? 'afuera' : 'adentro'}">
-        <div>
-          <div style="font-size:18px; font-weight:800;">${r.pat}</div>
-          <div style="font-size:12px; color:var(--muted)">Entrada: ${r.hE} ${r.hS ? '· Salida: '+r.hS : ''}</div>
-        </div>
-        ${!r.hS ? `<button onclick="darSalida(${r.id})" style="background:var(--red); color:white; border:none; padding:10px 15px; border-radius:10px; font-weight:800; font-size:12px;">SALIDA</button>` : '<span style="font-size:11px; font-weight:800; color:var(--muted)">AFUERA</span>'}
-      </div>
-    `).join('');
-    cont.innerHTML = html || '<div style="text-align:center; padding:40px; color:var(--muted)">Sin registros hoy</div>';
+    const campo = document.getElementById('dni');
+    const valor = campo.value.trim();
     
-    // Actualizar monitor
-    document.getElementById('mon-v').innerText = DB.filter(x => !x.hS).length;
-  }
+    if (valor === "") {
+      alert("PONÉ ALGO");
+      return;
+    }
 
-  render();
+    const lista = document.getElementById('lista');
+    // Si es el primer item, borramos el "Sin movimientos"
+    if (lista.innerHTML.includes("Sin movimientos")) {
+      lista.innerHTML = "";
+    }
+
+    const hora = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    
+    const nuevoItem = document.createElement('div');
+    nuevoItem.className = 'item';
+    nuevoItem.innerHTML = `
+      <span><strong>${valor}</strong></span>
+      <span style="color:${tipo === 'ENTRADA' ? '#2ecc71' : '#e74c3c'}">${tipo} ${hora}</span>
+    `;
+
+    lista.prepend(nuevoItem);
+    campo.value = ""; // Limpiar buscador
+  }
 </script>
+
 </body>
 </html>
