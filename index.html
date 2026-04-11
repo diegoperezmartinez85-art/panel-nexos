@@ -7,45 +7,47 @@
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
     :root{--bg:#0f0f11;--bg2:#1a1a1e;--bg3:#24242a;--border:#2e2e38;--text:#e8e8ec;--cyan:#00d4d4;--gold:#f5c842;--green:#2ecc71;--red:#e74c3c;--blue:#4a90e2;}
-    body { background: var(--bg); color: var(--text); font-family: -apple-system, system-ui, sans-serif; padding: 10px; user-select: none; }
-    .app { max-width: 500px; margin: 0 auto; }
+    body{background:var(--bg);color:var(--text);font-family:-apple-system,system-ui,sans-serif;padding:10px;user-select:none;}
+    .app{max-width:500px;margin:0 auto;}
     .monitor{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
     .mon-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:15px 5px;text-align:center;}
     .mon-val{font-size:32px;font-weight:800;display:block;}
     .search-box{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:15px;margin-bottom:12px;}
     .search-input{width:100%;background:var(--bg3);border:2px solid var(--border);border-radius:12px;padding:18px;color:white;font-size:22px;margin-bottom:15px;outline:none;text-align:center;}
     .action-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-    .btn-main { border-radius: 16px; padding: 20px 10px; font-weight: 800; border: 2px solid transparent; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
-    .ingreso { background: rgba(46,204,113,0.1); border-color: var(--green); color: var(--green); }
-    .salida { background: rgba(231,76,60,0.1); border-color: var(--red); color: var(--red); }
+    .btn-main{border-radius:16px;padding:20px 10px;font-weight:800;border:2px solid transparent;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;}
+    .ingreso{background:rgba(46,204,113,0.1);border-color:var(--green);color:var(--green);}
+    .salida{background:rgba(231,76,60,0.1);border-color:var(--red);color:var(--red);}
     .menu-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
     .nav-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 5px;text-align:center;color:white;font-size:11px;font-weight:700;cursor:pointer;opacity:0.4;}
     .nav-item.active{color:var(--cyan);border-color:var(--cyan);opacity:1;background:var(--bg3);}
     .section{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:20px;margin-bottom:10px;}
-    input.giant { width:100%; padding:18px; margin-bottom:10px; border-radius:12px; background:var(--bg3); color:white; border:2px solid var(--border); text-align:center; font-size:18px; outline:none; }
-    .btn-save { width:100%; padding:22px; background:var(--blue); color:white; border:none; border-radius:15px; font-weight: 800; font-size: 18px; cursor:pointer; }
-    .panel { display: none; }
-    .panel.active { display: block; }
+    input.giant{width:100%;padding:18px;margin-bottom:10px;border-radius:12px;background:var(--bg3);color:white;border:2px solid var(--border);text-align:center;font-size:18px;outline:none;}
+    .btn-save{width:100%;padding:22px;background:var(--blue);color:white;border:none;border-radius:15px;font-weight:800;font-size:18px;cursor:pointer;}
+    .panel{display:none;}
+    .panel.active{display:block;}
     .reg-item{background:var(--bg3);border-radius:12px;padding:15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-left:6px solid var(--border);}
-    
     .adentro{border-left-color:var(--green);}
     .dely-adentro{border-left-color:var(--gold);}
-    .alerta{border-left-color:var(--red); background: rgba(231,76,60,0.1);}
-
+    .alerta{border-left-color:var(--red);background:rgba(231,76,60,0.1);}
     .toast{position:fixed;bottom:50px;left:50%;transform:translateX(-50%);background:var(--cyan);color:black;padding:15px 30px;border-radius:50px;font-weight:800;opacity:0;transition:0.3s;pointer-events:none;z-index:999;}
     .toast.show{opacity:1;}
-    .btn-sync { width:100%; background:var(--bg3); color:var(--cyan); border:1px solid var(--cyan); padding:10px; border-radius:10px; margin-bottom:10px; font-weight:800; cursor:pointer;}
+    .btn-sync{width:100%;background:var(--bg3);color:var(--cyan);border:1px solid var(--cyan);padding:10px;border-radius:10px;margin-bottom:10px;font-weight:800;cursor:pointer;}
+    .sync-status{text-align:center;font-size:11px;margin-bottom:8px;height:14px;transition:0.3s;}
+    .sync-ok{color:var(--green);}
+    .sync-err{color:var(--red);}
+    .sync-loading{color:var(--gold);}
   </style>
 </head>
 <body>
-
+ 
 <div class="app">
   <div class="monitor">
     <div class="mon-card" style="color:var(--gold)"><span class="mon-val" id="mon-d">0</span><span style="font-size:10px">DELIVERY</span></div>
     <div class="mon-card" style="color:var(--green)"><span class="mon-val" id="mon-v">0</span><span style="font-size:10px">VISITAS</span></div>
     <div class="mon-card" style="color:var(--red)"><span class="mon-val" id="mon-a">0</span><span style="font-size:10px">ALERTAS</span></div>
   </div>
-
+ 
   <div class="search-box">
     <input class="search-input" id="buscador" placeholder="PATENTE O DNI..." oninput="this.value=this.value.toUpperCase()">
     <div class="action-btns">
@@ -53,136 +55,282 @@
       <div class="btn-main salida" onclick="registrarRapido('salida')">📤 SALIDA</div>
     </div>
   </div>
-
+ 
   <div class="menu-nav">
     <div class="nav-item active" id="btn-lista" onclick="ver('lista')">📋 LISTA</div>
     <div class="nav-item" id="btn-manual" onclick="ver('manual')">➕ MANUAL</div>
     <div class="nav-item" id="btn-delivery" onclick="ver('delivery')">🛵 DELY</div>
     <div class="nav-item" id="btn-config" onclick="ver('config')">⚙️ CONFIG</div>
   </div>
-
+ 
   <div id="p-lista" class="panel active">
-    <button class="btn-sync" onclick="sincronizar()">🔄 SINCRONIZAR CON LA NUBE</button>
+    <div class="sync-status" id="sync-status"></div>
+    <button class="btn-sync" onclick="sincronizar(true)">🔄 SINCRONIZAR CON LA NUBE</button>
     <div class="section" id="cont-lista"></div>
   </div>
-  
-  <div id="p-manual" class="panel"><div class="section"><input id="m-pat" class="giant" placeholder="PATENTE"><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><input id="m-mza" class="giant" placeholder="MZA"><input id="m-casa" class="giant" placeholder="CASA"></div><button class="btn-save" onclick="guardarForm('manual')">REGISTRAR INGRESO</button></div></div>
-  <div id="p-delivery" class="panel"><div class="section"><input id="d-pat" class="giant" placeholder="MOTO"><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><input id="d-mza" class="giant" placeholder="MZA"><input id="d-casa" class="giant" placeholder="CASA"></div><button class="btn-save" style="background:var(--gold); color:black;" onclick="guardarForm('delivery')">DELIVERY</button></div></div>
-  <div id="p-config" class="panel"><div class="section"><input id="cfg-url" class="giant" placeholder="URL /exec"><button class="btn-save" onclick="guardarConfig()">GUARDAR</button></div></div>
+ 
+  <div id="p-manual" class="panel">
+    <div class="section">
+      <input id="m-pat" class="giant" placeholder="PATENTE" oninput="this.value=this.value.toUpperCase()">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <input id="m-mza" class="giant" placeholder="MZA">
+        <input id="m-casa" class="giant" placeholder="CASA">
+      </div>
+      <button class="btn-save" onclick="guardarForm('manual')">REGISTRAR INGRESO</button>
+    </div>
+  </div>
+ 
+  <div id="p-delivery" class="panel">
+    <div class="section">
+      <input id="d-pat" class="giant" placeholder="MOTO" oninput="this.value=this.value.toUpperCase()">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <input id="d-mza" class="giant" placeholder="MZA">
+        <input id="d-casa" class="giant" placeholder="CASA">
+      </div>
+      <button class="btn-save" style="background:var(--gold);color:black;" onclick="guardarForm('delivery')">DELIVERY</button>
+    </div>
+  </div>
+ 
+  <div id="p-config" class="panel">
+    <div class="section">
+      <input id="cfg-url" class="giant" placeholder="URL /exec">
+      <button class="btn-save" onclick="guardarConfig()">GUARDAR</button>
+    </div>
+  </div>
 </div>
-
+ 
 <div id="toast" class="toast"></div>
-
+ 
 <script>
+  // ─── Estado ───────────────────────────────────────────────────────────────
   let DB = JSON.parse(localStorage.getItem('nx_db') || '[]');
-
-  function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
+  let sincronizando = false;
+ 
+  // ─── Utilidades ───────────────────────────────────────────────────────────
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.innerText = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+ 
+  function setSyncStatus(msg, clase) {
+    const el = document.getElementById('sync-status');
+    el.innerText = msg;
+    el.className = 'sync-status ' + (clase || '');
+  }
+ 
+  function horaActual() {
+    return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+ 
+  // Limpia strings de hora que puedan venir en formato ISO
+  function limpiarHora(h) {
+    if (!h) return '';
+    if (h.includes('T')) return h.split('T')[1].substring(0, 5);
+    return h;
+  }
+ 
+  // ─── Navegación ───────────────────────────────────────────────────────────
   function ver(nombre) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
     document.getElementById('p-' + nombre).classList.add('active');
     document.getElementById('btn-' + nombre).classList.add('active');
   }
-
-  async function sincronizar() {
+ 
+  // ─── Sincronización con merge ─────────────────────────────────────────────
+  // FIX: antes se hacía DB = cloudData, pisando registros locales no subidos.
+  // Ahora se mergea: la nube tiene prioridad sobre registros existentes,
+  // pero se conservan los registros locales que aún no llegaron a la nube.
+  async function sincronizar(manual = false) {
     const url = localStorage.getItem('nx_url');
-    if(!url) return;
+    if (!url) {
+      if (manual) showToast("⚙️ Configurá la URL primero");
+      return;
+    }
+    if (sincronizando) return;
+    sincronizando = true;
+    setSyncStatus('Sincronizando...', 'sync-loading');
+ 
     try {
       const response = await fetch(url);
+      if (!response.ok) throw new Error('HTTP ' + response.status);
       const cloudData = await response.json();
-      DB = cloudData;
+ 
+      // Merge: cloud tiene prioridad; se agregan locales que no están en cloud
+      const cloudIds = new Set(cloudData.map(x => x.id));
+      const soloLocales = DB.filter(x => !cloudIds.has(x.id));
+      DB = [...cloudData, ...soloLocales];
+ 
       actualizar();
-    } catch (e) { console.log("Error sincro"); }
+      setSyncStatus('✔ Sincronizado ' + horaActual(), 'sync-ok');
+    } catch (e) {
+      console.error("Error sincro:", e);
+      setSyncStatus('⚠ Sin conexión', 'sync-err');
+      if (manual) showToast("⚠️ Error al sincronizar");
+    } finally {
+      sincronizando = false;
+    }
   }
-
-  async function enviar(datos) {
+ 
+  // ─── Envío a la nube con retry ────────────────────────────────────────────
+  // FIX: mode:'no-cors' no permite leer la respuesta ni detectar errores.
+  // Se usa mode:'cors' y se reintenta una vez ante fallo.
+  async function enviar(datos, intento = 1) {
     const url = localStorage.getItem('nx_url');
-    if(!url) return;
-    // Nos aseguramos de enviar el campo 'tipo' para la columna E
-    fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) });
+    if (!url) return;
+    try {
+      await fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos)
+      });
+    } catch (e) {
+      console.error('Error envío intento ' + intento + ':', e);
+      if (intento < 2) {
+        setTimeout(() => enviar(datos, intento + 1), 3000);
+      } else {
+        showToast("⚠️ No se pudo subir a la nube");
+      }
+    }
   }
-
+ 
+  // ─── Registro rápido ──────────────────────────────────────────────────────
+  // FIX: al buscar para dar salida, se ordena por tsE para tomar el ingreso
+  // más reciente con esa patente, en vez del primero encontrado.
   function registrarRapido(tipo) {
     const val = document.getElementById('buscador').value.trim();
-    if(!val) return;
-    const hora = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    if (!val) return;
+    const hora = horaActual();
     let item;
-    if(tipo === 'ingreso') {
-      item = {id: Date.now(), pat: val, tipo:'VISITA', hE: hora, hS: '', tsE: Date.now(), mza:'', casa:''};
+ 
+    if (tipo === 'ingreso') {
+      item = { id: Date.now(), pat: val, tipo: 'VISITA', hE: hora, hS: '', tsE: Date.now(), mza: '', casa: '' };
       DB.push(item);
     } else {
-      item = DB.find(x => x.pat === val && !x.hS);
-      if(item) {
-          if(item.hE && item.hE.includes('T')) item.hE = item.hE.split('T')[1].substring(0,5);
-          item.hS = hora;
-      } else { showToast("❌ NO ENCONTRADO"); return; }
+      // Toma el ingreso más reciente sin salida para esa patente
+      const candidatos = DB.filter(x => x.pat === val && !x.hS).sort((a, b) => b.tsE - a.tsE);
+      item = candidatos[0];
+      if (item) {
+        item.hE = limpiarHora(item.hE);
+        item.hS = hora;
+      } else {
+        showToast("❌ NO ENCONTRADO");
+        return;
+      }
     }
+ 
     enviar(item);
     document.getElementById('buscador').value = '';
     actualizar();
   }
-
+ 
+  // ─── Formularios ──────────────────────────────────────────────────────────
   function guardarForm(modo) {
     const pre = modo === 'manual' ? 'm-' : 'd-';
-    const p = document.getElementById(pre+'pat').value.trim();
-    if(!p) return;
-    const item = { id: Date.now(), pat: p, mza: document.getElementById(pre+'mza').value, casa: document.getElementById(pre+'casa').value, tipo: modo.toUpperCase(), hE: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), hS: '', tsE: Date.now() };
+    const p = document.getElementById(pre + 'pat').value.trim();
+    if (!p) return;
+    const item = {
+      id: Date.now(),
+      pat: p,
+      mza: document.getElementById(pre + 'mza').value.trim(),
+      casa: document.getElementById(pre + 'casa').value.trim(),
+      tipo: modo === 'manual' ? 'MANUAL' : 'DELIVERY',
+      hE: horaActual(),
+      hS: '',
+      tsE: Date.now()
+    };
     DB.push(item);
     enviar(item);
-    document.getElementById(pre+'pat').value = '';
+    // Limpiar campos
+    document.getElementById(pre + 'pat').value = '';
+    document.getElementById(pre + 'mza').value = '';
+    document.getElementById(pre + 'casa').value = '';
     showToast("✅ REGISTRADO");
     ver('lista');
     actualizar();
   }
-
+ 
+  // ─── Dar salida ───────────────────────────────────────────────────────────
+  // FIX: se agrega actualizar() que faltaba llamar correctamente
+  // (ya estaba pero ahora también limpia la hora con limpiarHora)
   function darSalida(id) {
-    let item = DB.find(x => x.id === id);
-    if(item) {
-      if(item.hE && item.hE.includes('T')) item.hE = item.hE.split('T')[1].substring(0,5);
-      item.hS = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const item = DB.find(x => x.id === id);
+    if (item) {
+      item.hE = limpiarHora(item.hE);
+      item.hS = horaActual();
       enviar(item);
       actualizar();
     }
   }
-
-  function guardarConfig() { localStorage.setItem('nx_url', document.getElementById('cfg-url').value.trim()); showToast("⚙️ GUARDADO"); }
-  function actualizar() { localStorage.setItem('nx_db', JSON.stringify(DB)); render(); }
-
+ 
+  // ─── Config ───────────────────────────────────────────────────────────────
+  function guardarConfig() {
+    localStorage.setItem('nx_url', document.getElementById('cfg-url').value.trim());
+    showToast("⚙️ GUARDADO");
+  }
+ 
+  // ─── Persistencia ─────────────────────────────────────────────────────────
+  function actualizar() {
+    localStorage.setItem('nx_db', JSON.stringify(DB));
+    render();
+  }
+ 
+  // ─── Render ───────────────────────────────────────────────────────────────
+  // FIX: tsE puede no existir en registros que vienen de la nube sin ese campo.
+  // Se agrega un fallback a 0 para evitar NaN en la comparación de tiempo.
   function render() {
     const cont = document.getElementById('cont-lista');
     const ahora = Date.now();
     let alertas = 0;
-    cont.innerHTML = DB.slice().reverse().map(r => {
-      // Limpieza visual para evitar el 1899
-      let hEntrada = r.hE || ''; if(hEntrada.includes('T')) hEntrada = hEntrada.split('T')[1].substring(0,5);
-      let hSalida = r.hS || ''; if(hSalida.includes('T')) hSalida = hSalida.split('T')[1].substring(0,5);
-
-      let isAlerta = (r.tipo === 'DELIVERY' && !r.hS && (ahora - r.tsE > 900000));
-      if(isAlerta) alertas++;
-      
+ 
+    const html = DB.slice().sort((a, b) => (b.tsE || 0) - (a.tsE || 0)).map(r => {
+      const hEntrada = limpiarHora(r.hE);
+      const hSalida = limpiarHora(r.hS);
+      const tsE = r.tsE || 0; // FIX: fallback si no tiene tsE
+      const isAlerta = (r.tipo === 'DELIVERY' && !r.hS && (ahora - tsE > 900000));
+      if (isAlerta) alertas++;
+ 
       let claseColor = '';
-      if(!r.hS) {
-        if(isAlerta) claseColor = 'alerta';
-        else if(r.tipo === 'DELIVERY') claseColor = 'dely-adentro';
+      if (!r.hS) {
+        if (isAlerta) claseColor = 'alerta';
+        else if (r.tipo === 'DELIVERY') claseColor = 'dely-adentro';
         else claseColor = 'adentro';
       }
-
+ 
+      const idSeguro = String(r.id).replace(/[^a-zA-Z0-9_-]/g, '');
+ 
       return `<div class="reg-item ${claseColor}">
-        <div><strong>${r.pat}</strong><br><small>Mza: ${r.mza} - Lote: ${r.casa}<br>${r.tipo} | ${hEntrada}${hSalida ? ' - '+hSalida : ''}</small></div>
-        ${!r.hS ? `<button onclick="darSalida(${r.id})" style="background:var(--red); color:white; border:none; padding:10px 15px; border-radius:10px; font-weight:800;">SALIDA</button>` : '<span>SALIO</span>'}
+        <div>
+          <strong>${escapeHtml(r.pat)}</strong><br>
+          <small>Mza: ${escapeHtml(r.mza || '-')} - Lote: ${escapeHtml(r.casa || '-')}<br>
+          ${escapeHtml(r.tipo)} | ${hEntrada}${hSalida ? ' → ' + hSalida : ''}</small>
+        </div>
+        ${!r.hS
+          ? `<button onclick="darSalida(${r.id})" style="background:var(--red);color:white;border:none;padding:10px 15px;border-radius:10px;font-weight:800;cursor:pointer;">SALIDA</button>`
+          : '<span style="opacity:0.4;font-size:12px;">SALIÓ</span>'}
       </div>`;
-    }).join('') || '<p style="opacity:0.3; text-align:center;">SIN ACTIVIDAD</p>';
+    }).join('') || '<p style="opacity:0.3;text-align:center;">SIN ACTIVIDAD</p>';
+ 
+    cont.innerHTML = html;
     document.getElementById('mon-v').innerText = DB.filter(x => x.tipo !== 'DELIVERY' && !x.hS).length;
     document.getElementById('mon-d').innerText = DB.filter(x => x.tipo === 'DELIVERY' && !x.hS).length;
     document.getElementById('mon-a').innerText = alertas;
   }
-
+ 
+  // FIX: prevención de XSS en datos que vienen de la nube o del usuario
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+ 
+  // ─── Init ─────────────────────────────────────────────────────────────────
   document.getElementById('cfg-url').value = localStorage.getItem('nx_url') || '';
   sincronizar();
-  // Sincroniza cada 30 segundos solo
-  setInterval(sincronizar, 30000);
-  // Renderiza cada 1 minuto para las alertas
-  setInterval(render, 60000);
+  setInterval(() => sincronizar(), 30000); // Sync cada 30s
+  setInterval(render, 60000);              // Re-render cada 1min para alertas
   render();
 </script>
 </body>
