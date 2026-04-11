@@ -27,10 +27,11 @@
     .panel { display: none; }
     .panel.active { display: block; }
     .reg-item{background:var(--bg3);border-radius:12px;padding:15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-left:6px solid var(--border);}
-    /* ESTILOS DE ESTADO */
-    .reg-item.es-visita{border-left-color:var(--green);}
-    .reg-item.es-delivery{border-left-color:var(--gold);}
-    .reg-item.alerta{border-left-color:var(--red); background: rgba(231,76,60,0.05);}
+    
+    /* COLORES DE ESTADO FIJOS */
+    .reg-item.visita-in{border-left-color:var(--green);}
+    .reg-item.delivery-in{border-left-color:var(--gold);}
+    .reg-item.alerta{border-left-color:var(--red); background: rgba(231,76,60,0.08);}
 
     .toast{position:fixed;bottom:50px;left:50%;transform:translateX(-50%);background:var(--cyan);color:black;padding:15px 30px;border-radius:50px;font-weight:800;opacity:0;transition:0.3s;pointer-events:none;z-index:999;}
     .toast.show{opacity:1;}
@@ -151,18 +152,18 @@
     
     cont.innerHTML = DB.slice().reverse().map(r => {
       const esDely = (r.tipo === 'DELIVERY');
-      const isAlerta = (esDely && !r.hS && (ahora - r.tsE > 900000)); // 15 min
+      const isAlerta = (esDely && !r.hS && (ahora - r.tsE > 900000)); // 15 minutos
       if(isAlerta) alertas++;
       
-      // Lógica de color de borde
-      let claseColor = '';
-      if (!r.hS) {
-        if (isAlerta) claseColor = 'alerta';
-        else if (esDely) claseColor = 'es-delivery';
-        else claseColor = 'es-visita';
+      // Determinar clase de color
+      let estadoClase = '';
+      if(!r.hS) {
+        if(isAlerta) estadoClase = 'alerta';
+        else if(esDely) estadoClase = 'delivery-in';
+        else estadoClase = 'visita-in';
       }
 
-      return `<div class="reg-item ${claseColor}">
+      return `<div class="reg-item ${estadoClase}">
         <div><strong>${r.pat}</strong><br><small>Mza: ${r.mza} - Lote: ${r.casa}<br>${r.tipo} | ${r.hE}${r.hS ? ' - '+r.hS : ''}</small></div>
         ${!r.hS ? `<button onclick="darSalida(${r.id})" style="background:var(--red); color:white; border:none; padding:10px 15px; border-radius:10px; font-weight:800;">SALIDA</button>` : '<span style="opacity:0.5">SALIO</span>'}
       </div>`;
@@ -175,7 +176,7 @@
 
   // Sincronización automática cada 30 segundos
   setInterval(sincronizar, 30000);
-  // Refresco de visual (para el reloj de alertas) cada 60 segundos
+  // Renderizado cada 1 minuto para actualizar las alertas de tiempo
   setInterval(render, 60000);
 
   document.getElementById('cfg-url').value = localStorage.getItem('nx_url') || '';
