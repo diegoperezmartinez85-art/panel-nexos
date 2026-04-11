@@ -131,10 +131,18 @@
     actualizar();
   }
 
-  function darSalida(id) {
+ function darSalida(id) {
     let item = DB.find(x => x.id === id);
     if(item) {
+      // Guardamos la hora de entrada actual para que no se pierda
+      const entradaOriginal = item.hE; 
+      
+      // Seteamos la salida
       item.hS = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      
+      // Forzamos que hE siga siendo lo que era (por si el objeto se deformó)
+      item.hE = entradaOriginal;
+
       enviar(item);
       actualizar();
     }
