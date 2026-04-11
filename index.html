@@ -27,8 +27,11 @@
     .panel { display: none; }
     .panel.active { display: block; }
     .reg-item{background:var(--bg3);border-radius:12px;padding:15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-left:6px solid var(--border);}
-    .reg-item.adentro{border-left-color:var(--green);}
-    .reg-item.alerta{border-left-color:var(--red); background: rgba(231,76,60,0.05);}
+    
+    .adentro{border-left-color:var(--green);}
+    .dely-adentro{border-left-color:var(--gold);}
+    .alerta{border-left-color:var(--red); background: rgba(231,76,60,0.1);}
+
     .toast{position:fixed;bottom:50px;left:50%;transform:translateX(-50%);background:var(--cyan);color:black;padding:15px 30px;border-radius:50px;font-weight:800;opacity:0;transition:0.3s;pointer-events:none;z-index:999;}
     .toast.show{opacity:1;}
     .btn-sync { width:100%; background:var(--bg3); color:var(--cyan); border:1px solid var(--cyan); padding:10px; border-radius:10px; margin-bottom:10px; font-weight:800; cursor:pointer;}
@@ -84,20 +87,18 @@
   async function sincronizar() {
     const url = localStorage.getItem('nx_url');
     if(!url) return;
-    showToast("☁️ SINCRONIZANDO...");
     try {
       const response = await fetch(url);
       const cloudData = await response.json();
-      // Mezclamos lo local con lo de la nube
       DB = cloudData;
       actualizar();
-      showToast("✅ ACTUALIZADO");
-    } catch (e) { showToast("❌ ERROR SINCRO"); }
+    } catch (e) { console.log("Error sincro"); }
   }
 
   async function enviar(datos) {
     const url = localStorage.getItem('nx_url');
     if(!url) return;
+    // Nos aseguramos de enviar el campo 'tipo' para la columna E
     fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) });
   }
 
@@ -111,7 +112,10 @@
       DB.push(item);
     } else {
       item = DB.find(x => x.pat === val && !x.hS);
-      if(item) item.hS = hora; else { showToast("❌ NO ENCONTRADO"); return; }
+      if(item) {
+          if(item.hE && item.hE.includes('T')) item.hE = item.hE.split('T')[1].substring(0,5);
+          item.hS = hora;
+      } else { showToast("❌ NO ENCONTRADO"); return; }
     }
     enviar(item);
     document.getElementById('buscador').value = '';
@@ -131,18 +135,11 @@
     actualizar();
   }
 
- function darSalida(id) {
+  function darSalida(id) {
     let item = DB.find(x => x.id === id);
     if(item) {
-      // Guardamos la hora de entrada actual para que no se pierda
-      const entradaOriginal = item.hE; 
-      
-      // Seteamos la salida
+      if(item.hE && item.hE.includes('T')) item.hE = item.hE.split('T')[1].substring(0,5);
       item.hS = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-      
-      // Forzamos que hE siga siendo lo que era (por si el objeto se deformó)
-      item.hE = entradaOriginal;
-
       enviar(item);
       actualizar();
     }
@@ -156,10 +153,22 @@
     const ahora = Date.now();
     let alertas = 0;
     cont.innerHTML = DB.slice().reverse().map(r => {
+      // Limpieza visual para evitar el 1899
+      let hEntrada = r.hE || ''; if(hEntrada.includes('T')) hEntrada = hEntrada.split('T')[1].substring(0,5);
+      let hSalida = r.hS || ''; if(hSalida.includes('T')) hSalida = hSalida.split('T')[1].substring(0,5);
+
       let isAlerta = (r.tipo === 'DELIVERY' && !r.hS && (ahora - r.tsE > 900000));
       if(isAlerta) alertas++;
-      return `<div class="reg-item ${r.hS ? '' : 'adentro'} ${isAlerta ? 'alerta' : ''}">
-        <div><strong>${r.pat}</strong><br><small>Mza: ${r.mza} - Lote: ${r.casa}<br>${r.tipo} | ${r.hE}${r.hS ? ' - '+r.hS : ''}</small></div>
+      
+      let claseColor = '';
+      if(!r.hS) {
+        if(isAlerta) claseColor = 'alerta';
+        else if(r.tipo === 'DELIVERY') claseColor = 'dely-adentro';
+        else claseColor = 'adentro';
+      }
+
+      return `<div class="reg-item ${claseColor}">
+        <div><strong>${r.pat}</strong><br><small>Mza: ${r.mza} - Lote: ${r.casa}<br>${r.tipo} | ${hEntrada}${hSalida ? ' - '+hSalida : ''}</small></div>
         ${!r.hS ? `<button onclick="darSalida(${r.id})" style="background:var(--red); color:white; border:none; padding:10px 15px; border-radius:10px; font-weight:800;">SALIDA</button>` : '<span>SALIO</span>'}
       </div>`;
     }).join('') || '<p style="opacity:0.3; text-align:center;">SIN ACTIVIDAD</p>';
@@ -168,10 +177,12 @@
     document.getElementById('mon-a').innerText = alertas;
   }
 
-  // Al abrir, sincroniza solo
-  sincronizar();
-  setInterval(render, 60000);
   document.getElementById('cfg-url').value = localStorage.getItem('nx_url') || '';
+  sincronizar();
+  // Sincroniza cada 30 segundos solo
+  setInterval(sincronizar, 30000);
+  // Renderiza cada 1 minuto para las alertas
+  setInterval(render, 60000);
   render();
 </script>
 </body>
