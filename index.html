@@ -40,14 +40,14 @@
   </style>
 </head>
 <body>
- 
+
 <div class="app">
   <div class="monitor">
     <div class="mon-card" style="color:var(--gold)"><span class="mon-val" id="mon-d">0</span><span style="font-size:10px">DELIVERY</span></div>
     <div class="mon-card" style="color:var(--green)"><span class="mon-val" id="mon-v">0</span><span style="font-size:10px">VISITAS</span></div>
     <div class="mon-card" style="color:var(--red)"><span class="mon-val" id="mon-a">0</span><span style="font-size:10px">ALERTAS</span></div>
   </div>
- 
+
   <div class="search-box">
     <input class="search-input" id="buscador" placeholder="PATENTE O DNI..." oninput="this.value=this.value.toUpperCase()">
     <div class="action-btns">
@@ -55,20 +55,20 @@
       <div class="btn-main salida" onclick="registrarRapido('salida')">📤 SALIDA</div>
     </div>
   </div>
- 
+
   <div class="menu-nav">
     <div class="nav-item active" id="btn-lista" onclick="ver('lista')">📋 LISTA</div>
     <div class="nav-item" id="btn-manual" onclick="ver('manual')">➕ MANUAL</div>
     <div class="nav-item" id="btn-delivery" onclick="ver('delivery')">🛵 DELY</div>
     <div class="nav-item" id="btn-config" onclick="ver('config')">⚙️ CONFIG</div>
   </div>
- 
+
   <div id="p-lista" class="panel active">
     <div class="sync-status" id="sync-status"></div>
     <button class="btn-sync" onclick="sincronizar(true)">🔄 SINCRONIZAR CON LA NUBE</button>
     <div class="section" id="cont-lista"></div>
   </div>
- 
+
   <div id="p-manual" class="panel">
     <div class="section">
       <input id="m-pat" class="giant" placeholder="PATENTE" oninput="this.value=this.value.toUpperCase()">
@@ -79,7 +79,7 @@
       <button class="btn-save" onclick="guardarForm('manual')">REGISTRAR INGRESO</button>
     </div>
   </div>
- 
+
   <div id="p-delivery" class="panel">
     <div class="section">
       <input id="d-pat" class="giant" placeholder="MOTO" oninput="this.value=this.value.toUpperCase()">
@@ -90,7 +90,7 @@
       <button class="btn-save" style="background:var(--gold);color:black;" onclick="guardarForm('delivery')">DELIVERY</button>
     </div>
   </div>
- 
+
   <div id="p-config" class="panel">
     <div class="section">
       <input id="cfg-url" class="giant" placeholder="URL /exec">
@@ -98,14 +98,14 @@
     </div>
   </div>
 </div>
- 
+
 <div id="toast" class="toast"></div>
- 
+
 <script>
   // ─── Estado ───────────────────────────────────────────────────────────────
   let DB = JSON.parse(localStorage.getItem('nx_db') || '[]');
   let sincronizando = false;
- 
+
   // ─── Utilidades ───────────────────────────────────────────────────────────
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -113,24 +113,23 @@
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2000);
   }
- 
+
   function setSyncStatus(msg, clase) {
     const el = document.getElementById('sync-status');
     el.innerText = msg;
     el.className = 'sync-status ' + (clase || '');
   }
- 
+
   function horaActual() {
     return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
- 
-  // Limpia strings de hora que puedan venir en formato ISO
+
   function limpiarHora(h) {
     if (!h) return '';
-    if (h.includes('T')) return h.split('T')[1].substring(0, 5);
-    return h;
+    if (typeof h === 'string' && h.includes('T')) return h.split('T')[1].substring(0, 5);
+    return String(h);
   }
- 
+
   // ─── Navegación ───────────────────────────────────────────────────────────
   function ver(nombre) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -138,11 +137,8 @@
     document.getElementById('p-' + nombre).classList.add('active');
     document.getElementById('btn-' + nombre).classList.add('active');
   }
- 
+
   // ─── Sincronización con merge ─────────────────────────────────────────────
-  // FIX: antes se hacía DB = cloudData, pisando registros locales no subidos.
-  // Ahora se mergea: la nube tiene prioridad sobre registros existentes,
-  // pero se conservan los registros locales que aún no llegaron a la nube.
   async function sincronizar(manual = false) {
     const url = localStorage.getItem('nx_url');
     if (!url) {
@@ -152,17 +148,17 @@
     if (sincronizando) return;
     sincronizando = true;
     setSyncStatus('Sincronizando...', 'sync-loading');
- 
+
     try {
       const response = await fetch(url);
       if (!response.ok) throw new Error('HTTP ' + response.status);
       const cloudData = await response.json();
- 
-      // Merge: cloud tiene prioridad; se agregan locales que no están en cloud
-      const cloudIds = new Set(cloudData.map(x => x.id));
-      const soloLocales = DB.filter(x => !cloudIds.has(x.id));
+
+      // Merge: cloud tiene prioridad; conserva locales que aún no llegaron a la nube
+      const cloudIds = new Set(cloudData.map(x => String(x.id)));
+      const soloLocales = DB.filter(x => !cloudIds.has(String(x.id)));
       DB = [...cloudData, ...soloLocales];
- 
+
       actualizar();
       setSyncStatus('✔ Sincronizado ' + horaActual(), 'sync-ok');
     } catch (e) {
@@ -173,45 +169,37 @@
       sincronizando = false;
     }
   }
- 
-  // ─── Envío a la nube con retry ────────────────────────────────────────────
-  // FIX: mode:'no-cors' no permite leer la respuesta ni detectar errores.
-  // Se usa mode:'cors' y se reintenta una vez ante fallo.
-  async function enviar(datos, intento = 1) {
+
+  // ─── Envío a la nube ──────────────────────────────────────────────────────
+  // FIX: mode:'no-cors' — Apps Script no soporta CORS en POST.
+  // Con no-cors el navegador no lee la respuesta pero el servidor SÍ recibe
+  // y procesa el dato. Es el único modo que funciona con Apps Script Web App.
+  function enviar(datos) {
     const url = localStorage.getItem('nx_url');
     if (!url) return;
-    try {
-      await fetch(url, {
-        method: 'POST',
-        mode: 'cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datos)
-      });
-    } catch (e) {
-      console.error('Error envío intento ' + intento + ':', e);
-      if (intento < 2) {
-        setTimeout(() => enviar(datos, intento + 1), 3000);
-      } else {
-        showToast("⚠️ No se pudo subir a la nube");
-      }
-    }
+    fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    }).catch(e => {
+      console.error('Error envío:', e);
+      showToast("⚠️ No se pudo subir a la nube");
+    });
   }
- 
+
   // ─── Registro rápido ──────────────────────────────────────────────────────
-  // FIX: al buscar para dar salida, se ordena por tsE para tomar el ingreso
-  // más reciente con esa patente, en vez del primero encontrado.
   function registrarRapido(tipo) {
     const val = document.getElementById('buscador').value.trim();
     if (!val) return;
     const hora = horaActual();
     let item;
- 
+
     if (tipo === 'ingreso') {
       item = { id: Date.now(), pat: val, tipo: 'VISITA', hE: hora, hS: '', tsE: Date.now(), mza: '', casa: '' };
       DB.push(item);
     } else {
-      // Toma el ingreso más reciente sin salida para esa patente
-      const candidatos = DB.filter(x => x.pat === val && !x.hS).sort((a, b) => b.tsE - a.tsE);
+      const candidatos = DB.filter(x => x.pat === val && !x.hS).sort((a, b) => (b.tsE || 0) - (a.tsE || 0));
       item = candidatos[0];
       if (item) {
         item.hE = limpiarHora(item.hE);
@@ -221,12 +209,12 @@
         return;
       }
     }
- 
+
     enviar(item);
     document.getElementById('buscador').value = '';
     actualizar();
   }
- 
+
   // ─── Formularios ──────────────────────────────────────────────────────────
   function guardarForm(modo) {
     const pre = modo === 'manual' ? 'm-' : 'd-';
@@ -244,7 +232,6 @@
     };
     DB.push(item);
     enviar(item);
-    // Limpiar campos
     document.getElementById(pre + 'pat').value = '';
     document.getElementById(pre + 'mza').value = '';
     document.getElementById(pre + 'casa').value = '';
@@ -252,10 +239,8 @@
     ver('lista');
     actualizar();
   }
- 
+
   // ─── Dar salida ───────────────────────────────────────────────────────────
-  // FIX: se agrega actualizar() que faltaba llamar correctamente
-  // (ya estaba pero ahora también limpia la hora con limpiarHora)
   function darSalida(id) {
     const item = DB.find(x => x.id === id);
     if (item) {
@@ -265,43 +250,39 @@
       actualizar();
     }
   }
- 
+
   // ─── Config ───────────────────────────────────────────────────────────────
   function guardarConfig() {
     localStorage.setItem('nx_url', document.getElementById('cfg-url').value.trim());
     showToast("⚙️ GUARDADO");
   }
- 
+
   // ─── Persistencia ─────────────────────────────────────────────────────────
   function actualizar() {
     localStorage.setItem('nx_db', JSON.stringify(DB));
     render();
   }
- 
+
   // ─── Render ───────────────────────────────────────────────────────────────
-  // FIX: tsE puede no existir en registros que vienen de la nube sin ese campo.
-  // Se agrega un fallback a 0 para evitar NaN en la comparación de tiempo.
   function render() {
     const cont = document.getElementById('cont-lista');
     const ahora = Date.now();
     let alertas = 0;
- 
+
     const html = DB.slice().sort((a, b) => (b.tsE || 0) - (a.tsE || 0)).map(r => {
       const hEntrada = limpiarHora(r.hE);
-      const hSalida = limpiarHora(r.hS);
-      const tsE = r.tsE || 0; // FIX: fallback si no tiene tsE
+      const hSalida  = limpiarHora(r.hS);
+      const tsE      = r.tsE || 0;
       const isAlerta = (r.tipo === 'DELIVERY' && !r.hS && (ahora - tsE > 900000));
       if (isAlerta) alertas++;
- 
+
       let claseColor = '';
       if (!r.hS) {
         if (isAlerta) claseColor = 'alerta';
         else if (r.tipo === 'DELIVERY') claseColor = 'dely-adentro';
         else claseColor = 'adentro';
       }
- 
-      const idSeguro = String(r.id).replace(/[^a-zA-Z0-9_-]/g, '');
- 
+
       return `<div class="reg-item ${claseColor}">
         <div>
           <strong>${escapeHtml(r.pat)}</strong><br>
@@ -313,24 +294,23 @@
           : '<span style="opacity:0.4;font-size:12px;">SALIÓ</span>'}
       </div>`;
     }).join('') || '<p style="opacity:0.3;text-align:center;">SIN ACTIVIDAD</p>';
- 
+
     cont.innerHTML = html;
     document.getElementById('mon-v').innerText = DB.filter(x => x.tipo !== 'DELIVERY' && !x.hS).length;
     document.getElementById('mon-d').innerText = DB.filter(x => x.tipo === 'DELIVERY' && !x.hS).length;
     document.getElementById('mon-a').innerText = alertas;
   }
- 
-  // FIX: prevención de XSS en datos que vienen de la nube o del usuario
+
   function escapeHtml(str) {
     if (!str) return '';
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
- 
+
   // ─── Init ─────────────────────────────────────────────────────────────────
   document.getElementById('cfg-url').value = localStorage.getItem('nx_url') || '';
   sincronizar();
-  setInterval(() => sincronizar(), 30000); // Sync cada 30s
-  setInterval(render, 60000);              // Re-render cada 1min para alertas
+  setInterval(() => sincronizar(), 30000);
+  setInterval(render, 60000);
   render();
 </script>
 </body>
