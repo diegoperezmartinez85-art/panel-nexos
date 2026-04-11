@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>NEXOS CONTROL</title>
+  
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Nexos Control">
+  <meta name="theme-color" content="#0f0f11">
+
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
     :root{--bg:#0f0f11;--bg2:#1a1a1e;--bg3:#24242a;--border:#2e2e38;--text:#e8e8ec;--cyan:#00d4d4;--gold:#f5c842;--green:#2ecc71;--red:#e74c3c;--blue:#4a90e2;}
@@ -29,146 +37,4 @@
     .reg-item{background:var(--bg3);border-radius:12px;padding:15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-left:6px solid var(--border);}
     .reg-item.adentro{border-left-color:var(--green);}
     .reg-item.alerta{border-left-color:var(--red); background: rgba(231,76,60,0.05);}
-    .toast{position:fixed;bottom:50px;left:50%;transform:translateX(-50%);background:var(--cyan);color:black;padding:15px 30px;border-radius:50px;font-weight:800;opacity:0;transition:0.3s;pointer-events:none;z-index:999;}
-    .toast.show{opacity:1;}
-    .btn-sync { width:100%; background:var(--bg3); color:var(--cyan); border:1px solid var(--cyan); padding:10px; border-radius:10px; margin-bottom:10px; font-weight:800; cursor:pointer;}
-  </style>
-</head>
-<body>
-
-<div class="app">
-  <div class="monitor">
-    <div class="mon-card" style="color:var(--gold)"><span class="mon-val" id="mon-d">0</span><span style="font-size:10px">DELIVERY</span></div>
-    <div class="mon-card" style="color:var(--green)"><span class="mon-val" id="mon-v">0</span><span style="font-size:10px">VISITAS</span></div>
-    <div class="mon-card" style="color:var(--red)"><span class="mon-val" id="mon-a">0</span><span style="font-size:10px">ALERTAS</span></div>
-  </div>
-
-  <div class="search-box">
-    <input class="search-input" id="buscador" placeholder="PATENTE O DNI..." oninput="this.value=this.value.toUpperCase()">
-    <div class="action-btns">
-      <div class="btn-main ingreso" onclick="registrarRapido('ingreso')">📥 INGRESO</div>
-      <div class="btn-main salida" onclick="registrarRapido('salida')">📤 SALIDA</div>
-    </div>
-  </div>
-
-  <div class="menu-nav">
-    <div class="nav-item active" id="btn-lista" onclick="ver('lista')">📋 LISTA</div>
-    <div class="nav-item" id="btn-manual" onclick="ver('manual')">➕ MANUAL</div>
-    <div class="nav-item" id="btn-delivery" onclick="ver('delivery')">🛵 DELY</div>
-    <div class="nav-item" id="btn-config" onclick="ver('config')">⚙️ CONFIG</div>
-  </div>
-
-  <div id="p-lista" class="panel active">
-    <button class="btn-sync" onclick="sincronizar()">🔄 SINCRONIZAR CON LA NUBE</button>
-    <div class="section" id="cont-lista"></div>
-  </div>
-  
-  <div id="p-manual" class="panel"><div class="section"><input id="m-pat" class="giant" placeholder="PATENTE"><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><input id="m-mza" class="giant" placeholder="MZA"><input id="m-casa" class="giant" placeholder="CASA"></div><button class="btn-save" onclick="guardarForm('manual')">REGISTRAR INGRESO</button></div></div>
-  <div id="p-delivery" class="panel"><div class="section"><input id="d-pat" class="giant" placeholder="MOTO"><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><input id="d-mza" class="giant" placeholder="MZA"><input id="d-casa" class="giant" placeholder="CASA"></div><button class="btn-save" style="background:var(--gold); color:black;" onclick="guardarForm('delivery')">DELIVERY</button></div></div>
-  <div id="p-config" class="panel"><div class="section"><input id="cfg-url" class="giant" placeholder="URL /exec"><button class="btn-save" onclick="guardarConfig()">GUARDAR</button></div></div>
-</div>
-
-<div id="toast" class="toast"></div>
-
-<script>
-  let DB = JSON.parse(localStorage.getItem('nx_db') || '[]');
-
-  function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
-  function ver(nombre) {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-    document.getElementById('p-' + nombre).classList.add('active');
-    document.getElementById('btn-' + nombre).classList.add('active');
-  }
-
-  async function sincronizar() {
-    const url = localStorage.getItem('nx_url');
-    if(!url) return;
-    showToast("☁️ SINCRONIZANDO...");
-    try {
-      const response = await fetch(url);
-      const cloudData = await response.json();
-      // Mezclamos lo local con lo de la nube
-      DB = cloudData;
-      actualizar();
-      showToast("✅ ACTUALIZADO");
-    } catch (e) { showToast("❌ ERROR SINCRO"); }
-  }
-
-  async function enviar(datos) {
-    const url = localStorage.getItem('nx_url');
-    if(!url) return;
-    fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) });
-  }
-
-  function registrarRapido(tipo) {
-    const val = document.getElementById('buscador').value.trim();
-    if(!val) return;
-    const hora = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-    let item;
-    if(tipo === 'ingreso') {
-      item = {id: Date.now(), pat: val, tipo:'VISITA', hE: hora, hS: '', tsE: Date.now(), mza:'', casa:''};
-      DB.push(item);
-    } else {
-      item = DB.find(x => x.pat === val && !x.hS);
-      if(item) item.hS = hora; else { showToast("❌ NO ENCONTRADO"); return; }
-    }
-    enviar(item);
-    document.getElementById('buscador').value = '';
-    actualizar();
-  }
-
-  function guardarForm(modo) {
-    const pre = modo === 'manual' ? 'm-' : 'd-';
-    const p = document.getElementById(pre+'pat').value.trim();
-    if(!p) return;
-    const item = { id: Date.now(), pat: p, mza: document.getElementById(pre+'mza').value, casa: document.getElementById(pre+'casa').value, tipo: modo.toUpperCase(), hE: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), hS: '', tsE: Date.now() };
-    DB.push(item);
-    enviar(item);
-    document.getElementById(pre+'pat').value = '';
-    showToast("✅ REGISTRADO");
-    ver('lista');
-    actualizar();
-  }
-
-  function darSalida(id) {
-    let item = DB.find(x => x.id === id);
-    if(item) {
-      item.hS = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-      enviar(item);
-      actualizar();
-    }
-  }
-
-  function guardarConfig() { localStorage.setItem('nx_url', document.getElementById('cfg-url').value.trim()); showToast("⚙️ GUARDADO"); }
-  function actualizar() { localStorage.setItem('nx_db', JSON.stringify(DB)); render(); }
-
-  function render() {
-    const cont = document.getElementById('cont-lista');
-    const ahora = Date.now();
-    let alertas = 0;
-    cont.innerHTML = DB.slice().reverse().map(r => {
-      let isAlerta = (r.tipo === 'DELIVERY' && !r.hS && (ahora - r.tsE > 900000));
-      if(isAlerta) alertas++;
-      return `<div class="reg-item ${r.hS ? '' : 'adentro'} ${isAlerta ? 'alerta' : ''}">
-        <div><strong>${r.pat}</strong><br><small>Mza: ${r.mza} - Lote: ${r.casa}<br>${r.tipo} | ${r.hE}${r.hS ? ' - '+r.hS : ''}</small></div>
-        ${!r.hS ? `<button onclick="darSalida(${r.id})" style="background:var(--red); color:white; border:none; padding:10px 15px; border-radius:10px; font-weight:800;">SALIDA</button>` : '<span>SALIO</span>'}
-      </div>`;
-    }).join('') || '<p style="opacity:0.3; text-align:center;">SIN ACTIVIDAD</p>';
-    document.getElementById('mon-v').innerText = DB.filter(x => x.tipo !== 'DELIVERY' && !x.hS).length;
-    document.getElementById('mon-d').innerText = DB.filter(x => x.tipo === 'DELIVERY' && !x.hS).length;
-    document.getElementById('mon-a').innerText = alertas;
-  }
-
-  // Al abrir, sincroniza solo
-  sincronizar();
-  setInterval(render, 60000);
-  document.getElementById('cfg-url').value = localStorage.getItem('nx_url') || '';
-  render();
-</script>
-</body>
-</html>
-// --- AUTO-SINCRONIZACIÓN CADA 30 SEGUNDOS ---
-setInterval(() => {
-  sincronizar();
-}, 30000); // 30000 milisegundos = 30 segundos
+    .toast{
