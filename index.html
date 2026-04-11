@@ -44,7 +44,7 @@
     .nav-item.active{color:var(--cyan);border-color:var(--cyan);opacity:1;background:var(--bg3);}
     .nav-icon{display:block;font-size:24px;margin-bottom:4px;}
 
-    /* INPUTS GIGANTES PARA MANUAL/DELIVERY */
+    /* INPUTS GIGANTES */
     .section{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:20px;margin-bottom:10px;}
     input.giant { 
       width:100%; padding:20px; margin-bottom:15px; border-radius:12px; 
@@ -65,6 +65,7 @@
 
     .reg-item{background:var(--bg3);border-radius:12px;padding:15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-left:6px solid var(--border);}
     .reg-item.adentro{border-left-color:var(--green);}
+    .reg-item.alerta{border-left-color:var(--red); background: rgba(231,76,60,0.05);}
     
     .toast{position:fixed;bottom:50px;left:50%;transform:translateX(-50%);background:var(--cyan);color:black;padding:15px 30px;border-radius:50px;font-weight:800;opacity:0;transition:0.3s;pointer-events:none;z-index:999;}
     .toast.show{opacity:1;}
@@ -98,9 +99,7 @@
     <div class="nav-item" id="btn-config" onclick="ver('config')"><span class="nav-icon">⚙️</span>CONFIG</div>
   </div>
 
-  <div id="p-lista" class="panel active">
-    <div class="section" id="cont-lista"></div>
-  </div>
+  <div id="p-lista" class="panel active"><div class="section" id="cont-lista"></div></div>
   
   <div id="p-manual" class="panel">
     <div class="section">
@@ -155,13 +154,13 @@
     const val = document.getElementById('buscador').value.trim();
     if(!val) { showToast("⚠️ INGRESE DATO"); return; }
     
-    const hora = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const horaTexto = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
     if(tipo === 'ingreso') {
-      DB.push({id: Date.now(), pat: val, tipo:'VISITA', hE: hora, hS: ''});
+      DB.push({id: Date.now(), pat: val, tipo:'VISITA', hE: horaTexto, hS: '', tsE: Date.now()});
       showToast("✅ INGRESO OK");
     } else {
       let r = DB.find(x => x.pat === val && !x.hS);
-      if(r) { r.hS = hora; showToast("🚪 SALIDA OK"); }
+      if(r) { r.hS = horaTexto; showToast("🚪 SALIDA OK"); }
       else showToast("❌ NO ENCONTRADO");
     }
     document.getElementById('buscador').value = '';
@@ -172,7 +171,7 @@
     vibrar();
     const p = document.getElementById('m-pat').value.trim();
     if(!p) return;
-    DB.push({id: Date.now(), pat: p, tipo: 'MANUAL', hE: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), hS: ''});
+    DB.push({id: Date.now(), pat: p, tipo: 'MANUAL', hE: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), hS: '', tsE: Date.now()});
     document.getElementById('m-pat').value = '';
     document.getElementById('m-dni').value = '';
     showToast("✅ REGISTRADO");
@@ -184,7 +183,7 @@
     vibrar();
     const p = document.getElementById('d-pat').value.trim();
     if(!p) return;
-    DB.push({id: Date.now(), pat: p, tipo: 'DELIVERY', hE: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), hS: ''});
+    DB.push({id: Date.now(), pat: p, tipo: 'DELIVERY', hE: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), hS: '', tsE: Date.now()});
     document.getElementById('d-pat').value = '';
     showToast("🛵 DELIVERY OK");
     ver('lista');
@@ -198,12 +197,6 @@
     actualizar();
   }
 
-  function guardarConfig() {
-    vibrar();
-    localStorage.setItem('nx_url', document.getElementById('cfg-url').value);
-    showToast("⚙️ GUARDADO");
-  }
-
   function actualizar() {
     localStorage.setItem('nx_db', JSON.stringify(DB));
     render();
@@ -211,16 +204,32 @@
 
   function render() {
     const cont = document.getElementById('cont-lista');
-    cont.innerHTML = DB.slice().reverse().map(r => `
-      <div class="reg-item ${r.hS ? '' : 'adentro'}">
-        <div><strong>${r.pat}</strong><br><small>${r.tipo} | ${r.hE}${r.hS ? ' - '+r.hS : ''}</small></div>
-        ${!r.hS ? `<button onclick="darSalida(${r.id})" style="background:var(--red); color:white; border:none; padding:10px 15px; border-radius:10px; font-weight:800;">SALIDA</button>` : '<span style="opacity:0.5; font-size:12px;">SALIO</span>'}
-      </div>
-    `).join('') || '<p style="text-align:center; opacity:0.3; margin-top:20px;">SIN REGISTROS</p>';
+    const ahora = Date.now();
+    let alertasCount = 0;
+
+    cont.innerHTML = DB.slice().reverse().map(r => {
+      let claseAlerta = "";
+      // Si es delivery, está adentro, y pasaron más de 15 min (900.000 ms)
+      if (r.tipo === 'DELIVERY' && !r.hS && (ahora - r.tsE > 900000)) {
+        claseAlerta = "alerta";
+        alertasCount++;
+      }
+
+      return `
+        <div class="reg-item ${r.hS ? '' : 'adentro'} ${claseAlerta}">
+          <div><strong>${r.pat}</strong><br><small>${r.tipo} | ${r.hE}${r.hS ? ' - '+r.hS : ''}</small></div>
+          ${!r.hS ? `<button onclick="darSalida(${r.id})" style="background:var(--red); color:white; border:none; padding:10px 15px; border-radius:10px; font-weight:800;">SALIDA</button>` : '<span style="opacity:0.5; font-size:12px;">SALIO</span>'}
+        </div>
+      `;
+    }).join('') || '<p style="text-align:center; opacity:0.3; margin-top:20px;">SIN REGISTROS</p>';
     
     document.getElementById('mon-v').innerText = DB.filter(x => x.tipo !== 'DELIVERY' && !x.hS).length;
     document.getElementById('mon-d').innerText = DB.filter(x => x.tipo === 'DELIVERY' && !x.hS).length;
+    document.getElementById('mon-a').innerText = alertasCount;
   }
+
+  // Reloj interno para chequear alertas cada 60 segundos sin tocar nada
+  setInterval(render, 60000);
 
   document.getElementById('cfg-url').value = localStorage.getItem('nx_url') || '';
   render();
