@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -28,10 +28,10 @@
     .panel.active { display: block; }
     .reg-item{background:var(--bg3);border-radius:12px;padding:15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-left:6px solid var(--border);}
     
-    /* COLORES DE ESTADO FIJOS */
-    .reg-item.visita-in{border-left-color:var(--green);}
-    .reg-item.delivery-in{border-left-color:var(--gold);}
-    .reg-item.alerta{border-left-color:var(--red); background: rgba(231,76,60,0.08);}
+    /* ESTILOS DE ESTADO */
+    .reg-item.adentro{border-left-color:var(--green);}
+    .reg-item.dely-adentro{border-left-color:var(--gold);}
+    .reg-item.alerta{border-left-color:var(--red); background: rgba(231,76,60,0.1);}
 
     .toast{position:fixed;bottom:50px;left:50%;transform:translateX(-50%);background:var(--cyan);color:black;padding:15px 30px;border-radius:50px;font-weight:800;opacity:0;transition:0.3s;pointer-events:none;z-index:999;}
     .toast.show{opacity:1;}
@@ -78,7 +78,6 @@
   let DB = JSON.parse(localStorage.getItem('nx_db') || '[]');
 
   function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
-  
   function ver(nombre) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
@@ -89,12 +88,14 @@
   async function sincronizar() {
     const url = localStorage.getItem('nx_url');
     if(!url) return;
+    showToast("☁️ SINCRONIZANDO...");
     try {
       const response = await fetch(url);
       const cloudData = await response.json();
       DB = cloudData;
       actualizar();
-    } catch (e) { console.log("Error sincro"); }
+      showToast("✅ ACTUALIZADO");
+    } catch (e) { showToast("❌ ERROR SINCRO"); }
   }
 
   async function enviar(datos) {
@@ -149,38 +150,32 @@
     const cont = document.getElementById('cont-lista');
     const ahora = Date.now();
     let alertas = 0;
-    
     cont.innerHTML = DB.slice().reverse().map(r => {
-      const esDely = (r.tipo === 'DELIVERY');
-      const isAlerta = (esDely && !r.hS && (ahora - r.tsE > 900000)); // 15 minutos
+      let isAlerta = (r.tipo === 'DELIVERY' && !r.hS && (ahora - r.tsE > 900000));
       if(isAlerta) alertas++;
       
-      // Determinar clase de color
-      let estadoClase = '';
-      if(!r.hS) {
-        if(isAlerta) estadoClase = 'alerta';
-        else if(esDely) estadoClase = 'delivery-in';
-        else estadoClase = 'visita-in';
+      // LÓGICA DE COLOR
+      let claseColor = '';
+      if(!r.hS) { // Si está adentro
+        if(isAlerta) claseColor = 'alerta';
+        else if(r.tipo === 'DELIVERY') claseColor = 'dely-adentro';
+        else claseColor = 'adentro';
       }
 
-      return `<div class="reg-item ${estadoClase}">
+      return `<div class="reg-item ${claseColor}">
         <div><strong>${r.pat}</strong><br><small>Mza: ${r.mza} - Lote: ${r.casa}<br>${r.tipo} | ${r.hE}${r.hS ? ' - '+r.hS : ''}</small></div>
-        ${!r.hS ? `<button onclick="darSalida(${r.id})" style="background:var(--red); color:white; border:none; padding:10px 15px; border-radius:10px; font-weight:800;">SALIDA</button>` : '<span style="opacity:0.5">SALIO</span>'}
+        ${!r.hS ? `<button onclick="darSalida(${r.id})" style="background:var(--red); color:white; border:none; padding:10px 15px; border-radius:10px; font-weight:800;">SALIDA</button>` : '<span>SALIO</span>'}
       </div>`;
     }).join('') || '<p style="opacity:0.3; text-align:center;">SIN ACTIVIDAD</p>';
-
     document.getElementById('mon-v').innerText = DB.filter(x => x.tipo !== 'DELIVERY' && !x.hS).length;
     document.getElementById('mon-d').innerText = DB.filter(x => x.tipo === 'DELIVERY' && !x.hS).length;
     document.getElementById('mon-a').innerText = alertas;
   }
 
-  // Sincronización automática cada 30 segundos
-  setInterval(sincronizar, 30000);
-  // Renderizado cada 1 minuto para actualizar las alertas de tiempo
-  setInterval(render, 60000);
-
   document.getElementById('cfg-url').value = localStorage.getItem('nx_url') || '';
   sincronizar();
+  setInterval(render, 60000);
+  setInterval(sincronizar, 30000);
   render();
 </script>
 </body>
