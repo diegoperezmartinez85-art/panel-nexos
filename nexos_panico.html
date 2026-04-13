@@ -19,10 +19,23 @@
       user-select:none;
     }
  
-    /* ── PANTALLA INICIAL ── */
-    .pantalla{ width:100%; max-width:380px; text-align:center; }
+    /* ── PANTALLA INICIAL (SETUP) ── */
+    .pantalla{ width:100%; max-width:380px; text-align:center; display:none; }
+    .pantalla.visible{ display:block; }
+    
     .logo{ font-size:13px; letter-spacing:4px; color:#555; margin-bottom:40px; }
- 
+    
+    .setup-box{
+      background:#1a1a1e;
+      border:1px solid #2e2e38;
+      border-radius:24px;
+      padding:28px 24px;
+      margin-bottom:24px;
+    }
+    
+    .setup-title{ font-size:18px; font-weight:900; color:#fff; margin-bottom:24px; }
+    .setup-subtitle{ font-size:13px; color:#888; letter-spacing:1px; margin-bottom:20px; }
+    
     .form-box{
       background:#1a1a1e;
       border:1px solid #2e2e38;
@@ -31,6 +44,7 @@
       margin-bottom:24px;
     }
     .form-title{ font-size:15px; color:#888; letter-spacing:2px; margin-bottom:20px; }
+    
     .campo{
       width:100%;
       background:#24242a;
@@ -48,8 +62,112 @@
     .campo::placeholder{ color:#444; font-size:18px; font-weight:400; }
     .campo:focus{ border-color:#e74c3c; }
  
-    /* ── BOTÓN PÁNICO ── */
-    .btn-panico{
+    /* ── BOTÓN PÁNICO REDONDO ── */
+    .pantalla-panico{
+      width:100%;
+      max-width:380px;
+      display:none;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:20px;
+    }
+    .pantalla-panico.visible{
+      display:flex;
+    }
+    
+    .info-config{
+      text-align:center;
+      color:#888;
+      font-size:13px;
+      margin-bottom:10px;
+    }
+    .info-config strong{
+      color:#00d4d4;
+      font-weight:800;
+    }
+    
+    .boton-redondo-container{
+      width:280px;
+      height:280px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin:40px 0;
+    }
+    
+    .boton-redondo{
+      width:100%;
+      height:100%;
+      border-radius:50%;
+      background:linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+      border:none;
+      color:white;
+      font-size:60px;
+      font-weight:900;
+      cursor:pointer;
+      transition:all 0.2s ease;
+      box-shadow:0 10px 40px rgba(192, 57, 43, 0.4);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      position:relative;
+      overflow:hidden;
+    }
+    
+    .boton-redondo::before{
+      content:'';
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      bottom:0;
+      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1), transparent);
+      pointer-events:none;
+    }
+    
+    .boton-redondo:active{
+      transform:scale(0.95);
+      background:linear-gradient(135deg, #96281b 0%, #b8360f 100%);
+      box-shadow:0 5px 20px rgba(192, 57, 43, 0.6);
+    }
+    
+    .boton-redondo:disabled{
+      background:#444;
+      box-shadow:none;
+      cursor:not-allowed;
+    }
+    
+    .boton-texto{
+      font-size:18px;
+      font-weight:700;
+      letter-spacing:1px;
+      text-align:center;
+      line-height:1.2;
+    }
+    
+    /* ── BOTÓN CONFIGURAR ── */
+    .btn-cfg-main{
+      background:#1a1a1e;
+      color:#00d4d4;
+      border:1px solid #00d4d4;
+      border-radius:50px;
+      padding:14px 40px;
+      font-size:14px;
+      font-weight:800;
+      cursor:pointer;
+      transition:0.2s;
+    }
+    .btn-cfg-main:active{
+      transform:scale(0.98);
+      background:#00d4d4;
+      color:#0f0f11;
+    }
+    
+    /* ── BOTÓN SETUP ── */
+    .btn-setup{
       width:100%;
       background:#c0392b;
       color:white;
@@ -61,11 +179,9 @@
       letter-spacing:1px;
       cursor:pointer;
       transition:0.15s;
-      position:relative;
-      overflow:hidden;
     }
-    .btn-panico:active{ transform:scale(0.97); background:#96281b; }
-    .btn-panico:disabled{ background:#444; cursor:not-allowed; }
+    .btn-setup:active{ transform:scale(0.97); background:#96281b; }
+    .btn-setup:disabled{ background:#444; cursor:not-allowed; }
  
     /* ── PANTALLA ENVIADO ── */
     .enviado{
@@ -73,6 +189,8 @@
       flex-direction:column;
       align-items:center;
       text-align:center;
+      width:100%;
+      max-width:380px;
       animation: fadeIn 0.4s ease;
     }
     .enviado.visible{ display:flex; }
@@ -89,6 +207,12 @@
       font-size:16px;
       font-weight:800;
       cursor:pointer;
+      transition:0.2s;
+    }
+    .btn-volver:active{
+      transform:scale(0.98);
+      background:#00d4d4;
+      color:#0f0f11;
     }
  
     /* ── PANTALLA ERROR ── */
@@ -181,24 +305,62 @@
     .cfg-cerrar:hover{
       color:#bbb;
     }
+ 
+    .cfg-reset-btn{
+      width:100%;
+      background:#e74c3c;
+      color:white;
+      border:none;
+      border-radius:12px;
+      padding:12px;
+      font-weight:700;
+      font-size:14px;
+      cursor:pointer;
+      margin-top:20px;
+      margin-bottom:10px;
+      transition:0.2s;
+    }
+    .cfg-reset-btn:active{
+      transform:scale(0.98);
+      background:#c0392b;
+    }
   </style>
 </head>
 <body>
  
-<!-- ── PANTALLA PRINCIPAL ────────────────────────────────── -->
-<div class="pantalla" id="pantalla-form">
+<!-- ── PANTALLA SETUP (CONFIGURACIÓN INICIAL) ────────────── -->
+<div class="pantalla" id="pantalla-setup">
   <div class="logo">NEXOS · VECINOS</div>
  
   <div class="form-box">
-    <div class="form-title">¿DÓNDE NECESITÁS AYUDA?</div>
-    <input class="campo" id="mza"  type="number" placeholder="N° Manzana" inputmode="numeric">
-    <input class="campo" id="casa" type="number" placeholder="N° Casa"    inputmode="numeric">
-    <div class="error-msg" id="error-msg"></div>
+    <div class="setup-title">⚙️ CONFIGURACIÓN</div>
+    <div class="setup-subtitle">Ingresa tu ubicación una sola vez</div>
+    <input class="campo" id="setup-mza"  type="number" placeholder="N° Manzana" inputmode="numeric">
+    <input class="campo" id="setup-casa" type="number" placeholder="N° Casa" inputmode="numeric">
+    <div class="error-msg" id="setup-error"></div>
   </div>
  
-  <button class="btn-panico" id="btn-panico" onclick="enviarPanico()">
-    🆘&nbsp;&nbsp;PEDIR AYUDA
+  <button class="btn-setup" onclick="guardarSetup()">
+    ✅&nbsp;&nbsp;CONFIRMAR
   </button>
+</div>
+ 
+<!-- ── PANTALLA PÁNICO (BOTÓN REDONDO) ──────────────────── -->
+<div class="pantalla-panico" id="pantalla-panico">
+  <div class="logo">NEXOS · VECINOS</div>
+  
+  <div class="info-config">
+    Configurado: <strong id="config-display"></strong>
+  </div>
+ 
+  <div class="boton-redondo-container">
+    <button class="boton-redondo" id="btn-panico-redondo" onclick="enviarPanico()">
+      <span>🆘</span>
+      <span class="boton-texto">EMERGENCIA</span>
+    </button>
+  </div>
+  
+  <button class="btn-cfg-main" onclick="abrirCfg()">⚙️ Cambiar ubicación</button>
 </div>
  
 <!-- ── PANTALLA CONFIRMACIÓN ─────────────────────────────── -->
@@ -206,10 +368,10 @@
   <div class="enviado-icono">✅</div>
   <div class="enviado-titulo">¡ALERTA ENVIADA!</div>
   <div class="enviado-sub">El vigilador fue notificado.<br>Quedate tranquilo, ya están al tanto.</div>
-  <button class="btn-volver" onclick="volver()">Enviar otra alerta</button>
+  <button class="btn-volver" onclick="volverAlPanico()">Volver</button>
 </div>
  
-<!-- ── CONFIG OCULTA (toque largo en el logo) ────────────── -->
+<!-- ── CONFIG OCULTA (puntos) ────────────────────────────── -->
 <div class="cfg-link" id="cfg-link">···</div>
  
 <div class="cfg-panel" id="cfg-panel">
@@ -217,26 +379,74 @@
     <div class="cfg-title">⚙️ CONFIGURACIÓN</div>
     <input class="cfg-input" id="cfg-url" placeholder="URL del script /exec">
     <button class="cfg-btn" onclick="guardarCfg()">GUARDAR URL</button>
+    <button class="cfg-reset-btn" onclick="resetearApp()">🔄 Cambiar ubicación</button>
     <div class="cfg-cerrar" onclick="cerrarCfg()">Cerrar</div>
   </div>
 </div>
  
 <script>
+  // ─── Inicialización ───────────────────────────────────────
+  function inicializar() {
+    const mza = localStorage.getItem('nx_manzana');
+    const casa = localStorage.getItem('nx_casa');
+    
+    if (mza && casa) {
+      // Ya está configurado, mostrar pantalla de pánico
+      mostrarPantallaPanico();
+    } else {
+      // Mostrar setup
+      mostrarSetup();
+    }
+  }
+ 
+  function mostrarSetup() {
+    document.getElementById('pantalla-setup').classList.add('visible');
+    document.getElementById('pantalla-panico').classList.remove('visible');
+    document.getElementById('pantalla-enviado').classList.remove('visible');
+  }
+ 
+  function mostrarPantallaPanico() {
+    const mza = localStorage.getItem('nx_manzana');
+    const casa = localStorage.getItem('nx_casa');
+    document.getElementById('config-display').innerText = `Mz. ${mza} Casa ${casa}`;
+    
+    document.getElementById('pantalla-setup').classList.remove('visible');
+    document.getElementById('pantalla-panico').classList.add('visible');
+    document.getElementById('pantalla-enviado').classList.remove('visible');
+  }
+ 
+  function guardarSetup() {
+    const mza = document.getElementById('setup-mza').value.trim();
+    const casa = document.getElementById('setup-casa').value.trim();
+    const err = document.getElementById('setup-error');
+    
+    err.innerText = '';
+    
+    if (!mza || !casa) {
+      err.innerText = 'Completá manzana y casa';
+      return;
+    }
+    
+    localStorage.setItem('nx_manzana', mza);
+    localStorage.setItem('nx_casa', casa);
+    
+    mostrarPantallaPanico();
+  }
+ 
   // ─── Envío de pánico ──────────────────────────────────────
   async function enviarPanico() {
-    const mza  = document.getElementById('mza').value.trim();
-    const casa = document.getElementById('casa').value.trim();
-    const url  = localStorage.getItem('nx_panico_url');
-    const err  = document.getElementById('error-msg');
-    const btn  = document.getElementById('btn-panico');
+    const mza = localStorage.getItem('nx_manzana');
+    const casa = localStorage.getItem('nx_casa');
+    const url = localStorage.getItem('nx_panico_url');
+    const btn = document.getElementById('btn-panico-redondo');
  
-    err.innerText = '';
- 
-    if (!mza || !casa) { err.innerText = 'Completá manzana y casa'; return; }
-    if (!url) { err.innerText = 'Sin URL configurada — presioná ··· abajo a la derecha'; return; }
+    if (!url) {
+      alert('⚠️ URL no configurada.\n\nPresiona los 3 puntos (···) abajo a la derecha para configurar.');
+      return;
+    }
  
     btn.disabled = true;
-    btn.innerText = '⏳  Enviando...';
+    btn.innerHTML = '<span>⏳</span><span class="boton-texto">Enviando...</span>';
  
     try {
       await fetch(url, {
@@ -245,23 +455,28 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ accion: 'panico', mza: mza, casa: casa })
       });
-      // Con no-cors no podemos leer la respuesta, pero el servidor la recibe
-      document.getElementById('pantalla-form').style.display   = 'none';
+      
+      document.getElementById('pantalla-panico').classList.remove('visible');
       document.getElementById('pantalla-enviado').classList.add('visible');
     } catch(e) {
-      err.innerText = 'Error de red. Intentá de nuevo.';
-      btn.disabled  = false;
-      btn.innerText = '🆘  PEDIR AYUDA';
+      alert('Error de red. Intentá de nuevo.');
+      btn.disabled = false;
+      btn.innerHTML = '<span>🆘</span><span class="boton-texto">EMERGENCIA</span>';
     }
   }
  
-  function volver() {
-    document.getElementById('mza').value  = '';
-    document.getElementById('casa').value = '';
-    document.getElementById('pantalla-form').style.display = 'flex';
+  function volverAlPanico() {
     document.getElementById('pantalla-enviado').classList.remove('visible');
-    document.getElementById('btn-panico').disabled = false;
-    document.getElementById('btn-panico').innerText = '🆘\u00a0\u00a0PEDIR AYUDA';
+    document.getElementById('pantalla-panico').classList.add('visible');
+    
+    const btn = document.getElementById('btn-panico-redondo');
+    btn.disabled = false;
+    btn.innerHTML = '<span>🆘</span><span class="boton-texto">EMERGENCIA</span>';
+  }
+ 
+  function abrirCfg() {
+    document.getElementById('cfg-url').value = localStorage.getItem('nx_panico_url') || '';
+    document.getElementById('cfg-panel').classList.add('visible');
   }
  
   // ─── Config oculta (presión larga 1.5s) ────────────────
@@ -276,8 +491,7 @@
   
   function iniciarPresion() {
     presionTimer = setTimeout(() => {
-      document.getElementById('cfg-url').value = localStorage.getItem('nx_panico_url') || '';
-      document.getElementById('cfg-panel').classList.add('visible');
+      abrirCfg();
     }, 1500);
   }
   
@@ -293,12 +507,24 @@
     }
     localStorage.setItem('nx_panico_url', urlGuardada);
     cerrarCfg();
+    alert('✅ URL guardada correctamente');
   }
   
   function cerrarCfg() {
     document.getElementById('cfg-panel').classList.remove('visible');
   }
+ 
+  function resetearApp() {
+    if (confirm('¿Estás seguro que querés cambiar la ubicación?\n\nTendrás que configurar manzana y casa nuevamente.')) {
+      localStorage.removeItem('nx_manzana');
+      localStorage.removeItem('nx_casa');
+      cerrarCfg();
+      inicializar();
+    }
+  }
+  
+  // ─── Iniciar al cargar ────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', inicializar);
 </script>
 </body>
 </html>
- 
