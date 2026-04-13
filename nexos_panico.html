@@ -105,25 +105,43 @@
       position:fixed;
       bottom:16px;
       right:16px;
-      font-size:11px;
-      color:#333;
+      font-size:16px;
+      color:#666;
       cursor:pointer;
-      letter-spacing:1px;
+      letter-spacing:2px;
+      padding:10px;
+      user-select:none;
+      -webkit-user-select:none;
+      touch-action:manipulation;
+      z-index:50;
     }
+    .cfg-link:hover{ color:#999; }
+    
     .cfg-panel{
       display:none;
       position:fixed;
       inset:0;
-      background:rgba(0,0,0,0.9);
-      z-index:100;
+      background:rgba(0,0,0,0.95);
+      z-index:200;
       flex-direction:column;
       align-items:center;
       justify-content:center;
       padding:24px;
     }
     .cfg-panel.visible{ display:flex; }
+    .cfg-content{
+      width:100%;
+      max-width:400px;
+      text-align:center;
+    }
+    .cfg-title{
+      font-size:18px;
+      font-weight:900;
+      margin-bottom:24px;
+      color:#fff;
+    }
     .cfg-input{
-      width:100%;max-width:400px;
+      width:100%;
       background:#24242a;
       border:2px solid #2e2e38;
       border-radius:12px;
@@ -133,8 +151,11 @@
       outline:none;
       margin-bottom:12px;
     }
+    .cfg-input:focus{
+      border-color:#4a90e2;
+    }
     .cfg-btn{
-      width:100%;max-width:400px;
+      width:100%;
       background:#4a90e2;
       color:white;
       border:none;
@@ -144,9 +165,21 @@
       font-size:16px;
       cursor:pointer;
       margin-bottom:10px;
+      transition:0.2s;
+    }
+    .cfg-btn:active{
+      transform:scale(0.98);
+      background:#357abd;
     }
     .cfg-cerrar{
-      color:#888;font-size:13px;cursor:pointer;margin-top:6px;
+      color:#888;
+      font-size:13px;
+      cursor:pointer;
+      margin-top:6px;
+      transition:0.2s;
+    }
+    .cfg-cerrar:hover{
+      color:#bbb;
     }
   </style>
 </head>
@@ -177,14 +210,15 @@
 </div>
  
 <!-- ── CONFIG OCULTA (toque largo en el logo) ────────────── -->
-<div class="cfg-link" id="cfg-link" ontouchstart="iniciarPresion()" ontouchend="cancelarPresion()" onmousedown="iniciarPresion()" onmouseup="cancelarPresion()">
-  ···
-</div>
+<div class="cfg-link" id="cfg-link">···</div>
  
 <div class="cfg-panel" id="cfg-panel">
-  <input class="cfg-input" id="cfg-url" placeholder="URL del script /exec">
-  <button class="cfg-btn" onclick="guardarCfg()">GUARDAR URL</button>
-  <div class="cfg-cerrar" onclick="cerrarCfg()">Cerrar</div>
+  <div class="cfg-content">
+    <div class="cfg-title">⚙️ CONFIGURACIÓN</div>
+    <input class="cfg-input" id="cfg-url" placeholder="URL del script /exec">
+    <button class="cfg-btn" onclick="guardarCfg()">GUARDAR URL</button>
+    <div class="cfg-cerrar" onclick="cerrarCfg()">Cerrar</div>
+  </div>
 </div>
  
 <script>
@@ -230,22 +264,41 @@
     document.getElementById('btn-panico').innerText = '🆘\u00a0\u00a0PEDIR AYUDA';
   }
  
-  // ─── Config oculta (presión larga 1.5s en los puntos) ────
+  // ─── Config oculta (presión larga 1.5s) ────────────────
   let presionTimer = null;
+  
+  document.getElementById('cfg-link').addEventListener('touchstart', iniciarPresion, false);
+  document.getElementById('cfg-link').addEventListener('touchend', cancelarPresion, false);
+  document.getElementById('cfg-link').addEventListener('touchcancel', cancelarPresion, false);
+  document.getElementById('cfg-link').addEventListener('mousedown', iniciarPresion, false);
+  document.getElementById('cfg-link').addEventListener('mouseup', cancelarPresion, false);
+  document.getElementById('cfg-link').addEventListener('mouseleave', cancelarPresion, false);
+  
   function iniciarPresion() {
     presionTimer = setTimeout(() => {
       document.getElementById('cfg-url').value = localStorage.getItem('nx_panico_url') || '';
       document.getElementById('cfg-panel').classList.add('visible');
     }, 1500);
   }
-  function cancelarPresion() { clearTimeout(presionTimer); }
+  
+  function cancelarPresion() { 
+    clearTimeout(presionTimer); 
+  }
+  
   function guardarCfg() {
-    localStorage.setItem('nx_panico_url', document.getElementById('cfg-url').value.trim());
+    const urlGuardada = document.getElementById('cfg-url').value.trim();
+    if (!urlGuardada) {
+      alert('Por favor ingresa una URL válida');
+      return;
+    }
+    localStorage.setItem('nx_panico_url', urlGuardada);
     cerrarCfg();
   }
+  
   function cerrarCfg() {
     document.getElementById('cfg-panel').classList.remove('visible');
   }
 </script>
 </body>
 </html>
+ 
