@@ -407,6 +407,30 @@
       background:#2e2e38;
     }
  
+    .alerta-maps-link{
+      display:inline-block;
+      margin-top:10px;
+      background:#0d3b26;
+      border:1px solid #27ae60;
+      color:#2ecc71;
+      font-size:13px;
+      font-weight:700;
+      padding:8px 14px;
+      border-radius:10px;
+      text-decoration:none;
+      letter-spacing:0.3px;
+      transition:0.2s;
+    }
+    .alerta-maps-link:active{
+      background:#27ae60;
+      color:#fff;
+    }
+    .alerta-maps-nodisp{
+      margin-top:10px;
+      font-size:12px;
+      color:#555;
+    }
+ 
     /* ── Indicador de sonido ── */
     .sound-indicator{
       font-size:11px;
@@ -624,7 +648,7 @@
       const txt  = `${String(mins).padStart(2,'0')}:${String(segs).padStart(2,'0')}`;
       document.getElementById('cooldown-restante').innerText = txt;
       document.getElementById('btn-cooldown-txt').innerText  = txt;
-      document.getElementById('btn-texto').innerText = 'BLOQUEADO';
+      document.getElementById('btn-texto').innerText = 'ALERTA RECIBIDA';
  
       // Anillo: progreso de lo transcurrido
       const progreso = 1 - (restante / COOLDOWN_MS);
@@ -646,6 +670,18 @@
     document.getElementById('cooldown-circle').style.strokeDashoffset = '791';
   }
  
+  // ─── Geolocalización ────────────────────────────────────
+  function obtenerUbicacion() {
+    return new Promise((resolve) => {
+      if (!navigator.geolocation) { resolve(null); return; }
+      navigator.geolocation.getCurrentPosition(
+        pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        ()  => resolve(null),
+        { timeout: 8000, maximumAge: 60000 }
+      );
+    });
+  }
+ 
   // ─── Envío de pánico ─────────────────────────────────────
   async function enviarPanico() {
     const mza  = localStorage.getItem('nx_manzana');
@@ -653,6 +689,15 @@
     const btn  = document.getElementById('btn-panico-redondo');
  
     btn.disabled = true;
+    document.getElementById('btn-emoji').innerText = '📍';
+    document.getElementById('btn-texto').innerText = 'Obteniendo ubicación...';
+ 
+    const geo = await obtenerUbicacion();
+    let mapsUrl = null;
+    if (geo) {
+      mapsUrl = `https://maps.google.com/?q=${geo.lat},${geo.lng}`;
+    }
+ 
     document.getElementById('btn-emoji').innerText = '⏳';
     document.getElementById('btn-texto').innerText = 'Enviando...';
  
@@ -661,7 +706,7 @@
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accion: 'panico', mza, casa })
+        body: JSON.stringify({ accion: 'panico', mza, casa, lat: geo?.lat, lng: geo?.lng, mapsUrl })
       });
  
       // Guardar timestamp de cooldown
@@ -758,6 +803,7 @@
         <div class="alerta-item-hora">${a.hora || '—'}</div>
         <div class="alerta-item-titulo">🚨 EMERGENCIA</div>
         <div class="alerta-item-loc">Manzana ${a.mza} — Casa ${a.casa}</div>
+        ${a.mapsUrl ? `<a class="alerta-maps-link" href="${a.mapsUrl}" target="_blank" rel="noopener">📍 Ver ubicación en Maps</a>` : '<div class="alerta-maps-nodisp">📍 Ubicación no disponible</div>'}
       </div>
     `).join('');
   }
@@ -774,3 +820,4 @@
 </script>
 </body>
 </html>
+ 
