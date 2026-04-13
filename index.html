@@ -38,40 +38,53 @@
     .sync-err{color:var(--red);}
     .sync-loading{color:var(--gold);}
  
-    /* ── OVERLAY DE PÁNICO ─────────────────────────────── */
+    /* ── OVERLAY DE PÁNICO ── */
     .panico-overlay{
       display:none;
       position:fixed;inset:0;
-      background:#c0392b;
       z-index:9999;
       flex-direction:column;
       align-items:center;
       justify-content:center;
       text-align:center;
       padding:30px;
-      animation: parpadeo 0.8s infinite alternate;
+      overflow-y:auto;
+      animation: parpadeo 0.7s infinite alternate;
     }
     .panico-overlay.visible{ display:flex; }
     @keyframes parpadeo {
       from { background: #c0392b; }
-      to   { background: #7b0000; }
+      to   { background: #6b0000; }
     }
-    .panico-icono{ font-size:80px; margin-bottom:20px; }
-    .panico-titulo{ font-size:36px; font-weight:900; color:white; letter-spacing:2px; margin-bottom:10px; }
-    .panico-sub{ font-size:18px; color:rgba(255,255,255,0.85); margin-bottom:30px; }
+    .panico-icono{ font-size:80px; margin-bottom:16px; }
+    .panico-titulo{ font-size:34px; font-weight:900; color:white; letter-spacing:2px; margin-bottom:6px; }
+    .panico-sub{ font-size:16px; color:rgba(255,255,255,0.8); margin-bottom:24px; }
     .panico-lista{ width:100%; max-width:340px; }
     .panico-item{
-      background:rgba(0,0,0,0.3);
+      background:rgba(0,0,0,0.35);
       border-radius:16px;
-      padding:20px;
+      padding:18px 20px;
       margin-bottom:12px;
       color:white;
-      font-size:22px;
+      font-size:20px;
       font-weight:800;
+      text-align:left;
     }
-    .panico-hora{ font-size:13px; font-weight:400; opacity:0.7; margin-top:4px; }
+    .panico-hora{ font-size:12px; font-weight:400; opacity:0.65; margin-bottom:6px; }
+    .panico-maps{
+      display:inline-block;
+      margin-top:10px;
+      background:rgba(255,255,255,0.15);
+      border:1px solid rgba(255,255,255,0.4);
+      color:white;
+      font-size:13px;
+      font-weight:700;
+      padding:8px 16px;
+      border-radius:10px;
+      text-decoration:none;
+    }
     .panico-btn{
-      margin-top:20px;
+      margin-top:24px;
       background:white;
       color:#c0392b;
       border:none;
@@ -87,7 +100,7 @@
 </head>
 <body>
  
-<!-- ── OVERLAY EMERGENCIA ─────────────────────────────────── -->
+<!-- ── OVERLAY EMERGENCIA ── -->
 <div class="panico-overlay" id="panico-overlay">
   <div class="panico-icono">🚨</div>
   <div class="panico-titulo">¡ EMERGENCIA !</div>
@@ -158,8 +171,77 @@
  
 <script>
   let DB = JSON.parse(localStorage.getItem('nx_db') || '[]');
-  let sincronizando = false;
-  let panicosPendientes = []; // alertas activas aún no confirmadas
+  let sincronizando    = false;
+  let panicosPendientes = [];
+  let audioCtx         = null;
+  let sirenInterval    = null;
+ 
+  // ─── Audio: sirena policial ────────────────────────────────
+  // Se inicializa con la primera interacción del usuario para
+  // cumplir la política de autoplay de los navegadores móviles.
+  function initAudio() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+ 
+  // Toca el ciclo de sirena policial (hi-lo repetido)
+  function tocarSirena() {
+    if (!audioCtx) return;
+    const ahora = audioCtx.currentTime;
+    const ciclos = 6; // repeticiones del ciclo hi-lo
+ 
+    for (let c = 0; c < ciclos; c++) {
+      const t = ahora + c * 0.6;
+ 
+      // Tono ALTO
+      const oscHi  = audioCtx.createOscillator();
+      const gainHi = audioCtx.createGain();
+      oscHi.connect(gainHi);
+      gainHi.connect(audioCtx.destination);
+      oscHi.type = 'sawtooth';
+      oscHi.frequency.setValueAtTime(1100, t);
+      oscHi.frequency.linearRampToValueAtTime(900, t + 0.28);
+      gainHi.gain.setValueAtTime(0, t);
+      gainHi.gain.linearRampToValueAtTime(0.35, t + 0.02);
+      gainHi.gain.setValueAtTime(0.35, t + 0.27);
+      gainHi.gain.linearRampToValueAtTime(0, t + 0.30);
+      oscHi.start(t);
+      oscHi.stop(t + 0.31);
+ 
+      // Tono BAJO
+      const oscLo  = audioCtx.createOscillator();
+      const gainLo = audioCtx.createGain();
+      oscLo.connect(gainLo);
+      gainLo.connect(audioCtx.destination);
+      oscLo.type = 'sawtooth';
+      oscLo.frequency.setValueAtTime(700, t + 0.30);
+      oscLo.frequency.linearRampToValueAtTime(550, t + 0.58);
+      gainLo.gain.setValueAtTime(0, t + 0.30);
+      gainLo.gain.linearRampToValueAtTime(0.35, t + 0.32);
+      gainLo.gain.setValueAtTime(0.35, t + 0.57);
+      gainLo.gain.linearRampToValueAtTime(0, t + 0.60);
+      oscLo.start(t + 0.30);
+      oscLo.stop(t + 0.61);
+    }
+  }
+ 
+  // Arranca la sirena en loop mientras el overlay está visible
+  function iniciarSirena() {
+    if (sirenInterval) return;
+    tocarSirena(); // toca inmediatamente
+    sirenInterval = setInterval(tocarSirena, 3800); // repite cada ~4s
+  }
+ 
+  function detenerSirena() {
+    clearInterval(sirenInterval);
+    sirenInterval = null;
+  }
+ 
+  // Activa el AudioContext con la primera interacción del usuario
+  document.addEventListener('touchstart', initAudio, { once: true });
+  document.addEventListener('click',      initAudio, { once: true });
  
   // ─── Utilidades ───────────────────────────────────────────
   function showToast(msg) {
@@ -199,17 +281,26 @@
   // ─── PÁNICO ───────────────────────────────────────────────
   function mostrarPanico(alertas) {
     const lista = document.getElementById('panico-lista');
-    lista.innerHTML = alertas.map(a =>
-      `<div class="panico-item">
-        🏠 Mza <strong>${escapeHtml(a.mza)}</strong> — Casa <strong>${escapeHtml(a.casa)}</strong>
+    // FIX: muestra el link de Maps si está disponible
+    lista.innerHTML = alertas.map(a => {
+      const mapsHtml = a.mapsUrl
+        ? `<a class="panico-maps" href="${escapeHtml(a.mapsUrl)}" target="_blank" rel="noopener">📍 Ver ubicación en Maps</a>`
+        : '<div style="opacity:0.5;font-size:12px;margin-top:8px;">📍 Ubicación no disponible</div>';
+      return `<div class="panico-item">
         <div class="panico-hora">${escapeHtml(a.fecha)}</div>
-      </div>`
-    ).join('');
+        🏠 Mza <strong>${escapeHtml(a.mza)}</strong> — Casa <strong>${escapeHtml(a.casa)}</strong>
+        ${mapsHtml}
+      </div>`;
+    }).join('');
+ 
     document.getElementById('panico-overlay').classList.add('visible');
+    // FIX: inicia la sirena cuando aparece el overlay
+    initAudio();
+    iniciarSirena();
   }
  
   function cerrarPanico() {
-    // Confirma todas las alertas pendientes en el Sheet
+    detenerSirena();
     panicosPendientes.forEach(a => {
       const url = localStorage.getItem('nx_url');
       if (!url) return;
@@ -240,11 +331,9 @@
       if (!response.ok) throw new Error('HTTP ' + response.status);
       const data = await response.json();
  
-      // El GS ahora devuelve { activos: [], panico: [] }
       const cloudData = Array.isArray(data) ? data : (data.activos || []);
       const panico    = Array.isArray(data) ? [] : (data.panico  || []);
  
-      // Merge activos
       const cloudIds   = new Set(cloudData.map(x => String(x.id)));
       const pendientes = DB.filter(x => !cloudIds.has(String(x.id)) && (Date.now() - (x.tsE || 0) < 60000));
       DB = [...cloudData, ...pendientes];
@@ -253,12 +342,12 @@
       render();
       setSyncStatus('✔ Sincronizado ' + horaActual(), 'sync-ok');
  
-      // Chequeo de pánico: si hay alertas nuevas que no estaban antes → mostrar overlay
+      // Chequeo de pánico: solo muestra si hay alertas NUEVAS
       if (panico.length > 0) {
         const idsActuales = new Set(panicosPendientes.map(x => String(x.panicoId)));
         const nuevas      = panico.filter(a => !idsActuales.has(String(a.panicoId)));
         if (nuevas.length > 0) {
-          panicosPendientes = panico; // actualiza la lista completa
+          panicosPendientes = panico;
           mostrarPanico(panico);
         } else {
           panicosPendientes = panico;
@@ -298,8 +387,7 @@
       item = { id: Date.now(), pat: val, tipo: 'VISITA', hE: hora, hS: '', tsE: Date.now(), mza: '', casa: '' };
       DB.push(item);
       localStorage.setItem('nx_db', JSON.stringify(DB));
-      render();
-      enviar(item);
+      render(); enviar(item);
     } else {
       const candidatos = DB.filter(x => x.pat === val && !x.hS).sort((a,b) => (b.tsE||0)-(a.tsE||0));
       item = candidatos[0];
@@ -308,11 +396,8 @@
         item.hS = hora;
         DB = DB.filter(x => x.id !== item.id);
         localStorage.setItem('nx_db', JSON.stringify(DB));
-        render();
-        enviar(item);
-      } else {
-        showToast("❌ NO ENCONTRADO"); return;
-      }
+        render(); enviar(item);
+      } else { showToast("❌ NO ENCONTRADO"); return; }
     }
     document.getElementById('buscador').value = '';
   }
@@ -331,8 +416,8 @@
     };
     DB.push(item);
     localStorage.setItem('nx_db', JSON.stringify(DB));
-    document.getElementById(pre+'pat').value = '';
-    document.getElementById(pre+'mza').value = '';
+    document.getElementById(pre+'pat').value  = '';
+    document.getElementById(pre+'mza').value  = '';
     document.getElementById(pre+'casa').value = '';
     showToast("✅ REGISTRADO");
     ver('lista'); render(); enviar(item);
