@@ -8,6 +8,37 @@
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
     :root{--bg:#0f0f11;--bg2:#1a1a1e;--bg3:#24242a;--border:#2e2e38;--text:#e8e8ec;--cyan:#00d4d4;--gold:#f5c842;--green:#2ecc71;--red:#e74c3c;--blue:#4a90e2;}
     body{background:var(--bg);color:var(--text);font-family:-apple-system,system-ui,sans-serif;padding:10px;user-select:none;}
+ 
+    /* ── PANTALLA PIN ── */
+    .pin-screen{
+      position:fixed;inset:0;background:var(--bg);
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      z-index:10000;padding:30px;
+    }
+    .pin-screen.oculto{ display:none; }
+    .pin-logo{ font-size:12px;letter-spacing:4px;color:#555;margin-bottom:36px; }
+    .pin-titulo{ font-size:20px;font-weight:900;color:#fff;margin-bottom:6px; }
+    .pin-sub{ font-size:13px;color:#666;margin-bottom:32px; }
+    .pin-puntos{ display:flex;gap:16px;margin-bottom:32px; }
+    .pin-punto{ width:18px;height:18px;border-radius:50%;background:var(--border);transition:0.2s; }
+    .pin-punto.lleno{ background:var(--cyan); }
+    .pin-teclado{ display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:280px; }
+    .pin-key{
+      background:var(--bg2);border:1px solid var(--border);
+      border-radius:16px;padding:22px 10px;
+      font-size:26px;font-weight:700;color:#fff;
+      text-align:center;cursor:pointer;transition:0.15s;
+    }
+    .pin-key:active{ background:var(--bg3);transform:scale(0.95); }
+    .pin-key.borra{ font-size:18px;color:#888; }
+    .pin-key.vacio{ background:transparent;border-color:transparent;pointer-events:none; }
+    .pin-error{
+      color:var(--red);font-size:13px;font-weight:700;
+      margin-top:16px;min-height:18px;letter-spacing:1px;
+    }
+ 
+    /* ── APP ── */
     .app{max-width:500px;margin:0 auto;}
     .monitor{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
     .mon-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:15px 5px;text-align:center;}
@@ -37,78 +68,74 @@
     .sync-ok{color:var(--green);}
     .sync-err{color:var(--red);}
     .sync-loading{color:var(--gold);}
-
+ 
     /* ── OVERLAY EMERGENCIA ── */
     .panico-overlay{
-      display:none;
-      position:fixed;inset:0;
-      z-index:9999;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      padding:30px;
-      overflow-y:auto;
+      display:none;position:fixed;inset:0;z-index:9999;
+      flex-direction:column;align-items:center;justify-content:center;
+      text-align:center;padding:30px;overflow-y:auto;
       animation:parpadeo 0.7s infinite alternate;
     }
     .panico-overlay.visible{ display:flex; }
-    @keyframes parpadeo{
-      from{ background:#c0392b; }
-      to  { background:#6b0000; }
-    }
-    .panico-icono{ font-size:80px; margin-bottom:16px; animation:pulso 0.8s infinite alternate; }
+    @keyframes parpadeo{ from{background:#c0392b} to{background:#6b0000} }
+    .panico-icono{ font-size:80px;margin-bottom:16px;animation:pulso 0.8s infinite alternate; }
     @keyframes pulso{ from{transform:scale(1)} to{transform:scale(1.15)} }
-    .panico-titulo{ font-size:34px; font-weight:900; color:white; letter-spacing:2px; margin-bottom:6px; }
-    .panico-sub{ font-size:16px; color:rgba(255,255,255,0.85); margin-bottom:24px; }
-    .panico-lista{ width:100%; max-width:360px; }
+    .panico-titulo{ font-size:34px;font-weight:900;color:white;letter-spacing:2px;margin-bottom:6px; }
+    .panico-sub{ font-size:16px;color:rgba(255,255,255,0.85);margin-bottom:24px; }
+    .panico-lista{ width:100%;max-width:360px; }
     .panico-item{
-      background:rgba(0,0,0,0.4);
-      border:1px solid rgba(255,255,255,0.15);
-      border-radius:18px;
-      padding:20px;
-      margin-bottom:14px;
-      color:white;
-      text-align:left;
+      background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.15);
+      border-radius:18px;padding:20px;margin-bottom:14px;color:white;text-align:left;
     }
-    .panico-hora{ font-size:12px; font-weight:400; opacity:0.65; margin-bottom:8px; letter-spacing:1px; }
-    .panico-loc{ font-size:22px; font-weight:900; margin-bottom:12px; }
+    .panico-hora{ font-size:12px;font-weight:400;opacity:0.65;margin-bottom:8px;letter-spacing:1px; }
+    .panico-loc{ font-size:22px;font-weight:900;margin-bottom:14px; }
     .panico-maps-btn{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      background:rgba(255,255,255,0.15);
-      border:1px solid rgba(255,255,255,0.4);
-      border-radius:12px;
-      padding:12px 16px;
-      color:white;
-      font-size:14px;
-      font-weight:800;
-      text-decoration:none;
-      transition:0.2s;
-      width:100%;
-      justify-content:center;
+      display:flex;align-items:center;gap:8px;
+      background:rgba(46,204,113,0.25);border:1px solid rgba(46,204,113,0.6);
+      border-radius:12px;padding:14px 16px;color:white;
+      font-size:15px;font-weight:800;text-decoration:none;
+      width:100%;justify-content:center;transition:0.2s;
     }
-    .panico-maps-btn:active{ background:rgba(255,255,255,0.3); }
-    .panico-no-maps{ font-size:12px; opacity:0.45; margin-top:8px; }
+    .panico-maps-btn:active{ background:rgba(46,204,113,0.5); }
+    .panico-no-maps{ font-size:12px;opacity:0.45;margin-top:8px; }
     .panico-btn{
-      margin-top:24px;
-      background:white;
-      color:#c0392b;
-      border:none;
-      border-radius:50px;
-      padding:18px 50px;
-      font-size:20px;
-      font-weight:900;
-      cursor:pointer;
-      width:100%;
-      max-width:360px;
-      box-shadow:0 4px 20px rgba(0,0,0,0.3);
+      margin-top:24px;background:white;color:#c0392b;border:none;
+      border-radius:50px;padding:18px 50px;font-size:20px;font-weight:900;
+      cursor:pointer;width:100%;max-width:360px;box-shadow:0 4px 20px rgba(0,0,0,0.3);
     }
     .panico-btn:active{ transform:scale(0.97); }
   </style>
 </head>
 <body>
-
+ 
+<!-- ── PANTALLA PIN ── -->
+<div class="pin-screen" id="pin-screen">
+  <div class="pin-logo">NEXOS · VECINOS</div>
+  <div class="pin-titulo">🔒 PANEL VIGILADOR</div>
+  <div class="pin-sub">Ingresá el código de acceso</div>
+  <div class="pin-puntos">
+    <div class="pin-punto" id="p0"></div>
+    <div class="pin-punto" id="p1"></div>
+    <div class="pin-punto" id="p2"></div>
+    <div class="pin-punto" id="p3"></div>
+  </div>
+  <div class="pin-teclado">
+    <div class="pin-key" onclick="pinTecla('1')">1</div>
+    <div class="pin-key" onclick="pinTecla('2')">2</div>
+    <div class="pin-key" onclick="pinTecla('3')">3</div>
+    <div class="pin-key" onclick="pinTecla('4')">4</div>
+    <div class="pin-key" onclick="pinTecla('5')">5</div>
+    <div class="pin-key" onclick="pinTecla('6')">6</div>
+    <div class="pin-key" onclick="pinTecla('7')">7</div>
+    <div class="pin-key" onclick="pinTecla('8')">8</div>
+    <div class="pin-key" onclick="pinTecla('9')">9</div>
+    <div class="pin-key vacio"></div>
+    <div class="pin-key" onclick="pinTecla('0')">0</div>
+    <div class="pin-key borra" onclick="pinBorrar()">⌫</div>
+  </div>
+  <div class="pin-error" id="pin-error"></div>
+</div>
+ 
 <!-- ── OVERLAY EMERGENCIA ── -->
 <div class="panico-overlay" id="panico-overlay">
   <div class="panico-icono">🚨</div>
@@ -117,14 +144,13 @@
   <div class="panico-lista" id="panico-lista"></div>
   <button class="panico-btn" onclick="cerrarPanico()">✔ ATENDIDO</button>
 </div>
-
+ 
 <div class="app">
   <div class="monitor">
     <div class="mon-card" style="color:var(--gold)"><span class="mon-val" id="mon-d">0</span><span style="font-size:10px">DELIVERY</span></div>
     <div class="mon-card" style="color:var(--green)"><span class="mon-val" id="mon-v">0</span><span style="font-size:10px">VISITAS</span></div>
     <div class="mon-card" style="color:var(--red)"><span class="mon-val" id="mon-a">0</span><span style="font-size:10px">ALERTAS</span></div>
   </div>
-
   <div class="search-box">
     <input class="search-input" id="buscador" placeholder="PATENTE O DNI..." oninput="this.value=this.value.toUpperCase()">
     <div class="action-btns">
@@ -132,23 +158,20 @@
       <div class="btn-main salida"  onclick="registrarRapido('salida')">📤 SALIDA</div>
     </div>
   </div>
-
   <div class="menu-nav">
     <div class="nav-item active" id="btn-lista"    onclick="ver('lista')">📋 LISTA</div>
     <div class="nav-item"        id="btn-manual"   onclick="ver('manual')">➕ MANUAL</div>
     <div class="nav-item"        id="btn-delivery" onclick="ver('delivery')">🛵 DELY</div>
     <div class="nav-item"        id="btn-config"   onclick="ver('config')">⚙️ CONFIG</div>
   </div>
-
   <div id="p-lista" class="panel active">
     <div class="sync-status" id="sync-status"></div>
     <button class="btn-sync" onclick="sincronizar(true)">🔄 SINCRONIZAR CON LA NUBE</button>
     <div class="section" id="cont-lista"></div>
   </div>
-
   <div id="p-manual" class="panel">
     <div class="section">
-      <input id="m-pat"  class="giant" placeholder="PATENTE" oninput="this.value=this.value.toUpperCase()">
+      <input id="m-pat" class="giant" placeholder="PATENTE" oninput="this.value=this.value.toUpperCase()">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <input id="m-mza"  class="giant" placeholder="MZA">
         <input id="m-casa" class="giant" placeholder="CASA">
@@ -156,10 +179,9 @@
       <button class="btn-save" onclick="guardarForm('manual')">REGISTRAR INGRESO</button>
     </div>
   </div>
-
   <div id="p-delivery" class="panel">
     <div class="section">
-      <input id="d-pat"  class="giant" placeholder="MOTO" oninput="this.value=this.value.toUpperCase()">
+      <input id="d-pat" class="giant" placeholder="MOTO" oninput="this.value=this.value.toUpperCase()">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <input id="d-mza"  class="giant" placeholder="MZA">
         <input id="d-casa" class="giant" placeholder="CASA">
@@ -167,7 +189,6 @@
       <button class="btn-save" style="background:var(--gold);color:black;" onclick="guardarForm('delivery')">DELIVERY</button>
     </div>
   </div>
-
   <div id="p-config" class="panel">
     <div class="section">
       <input id="cfg-url" class="giant" placeholder="URL /exec del Google Script">
@@ -175,287 +196,174 @@
     </div>
   </div>
 </div>
-
 <div id="toast" class="toast"></div>
-
+ 
 <script>
-  let DB = JSON.parse(localStorage.getItem('nx_db') || '[]');
-  let sincronizando     = false;
-  let panicosPendientes = [];
-  let audioCtx          = null;
-  let sirenInterval     = null;
-
-  // ── AUDIO: SIRENA POLICIAL ────────────────────────────────
-  function initAudio() {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
+  // ── PIN ───────────────────────────────────────────────────
+  const PIN_CORRECTO = '2401';
+  let pinActual = '';
+ 
+  function pinTecla(d) {
+    if (pinActual.length >= 4) return;
+    pinActual += d;
+    actualizarPuntos();
+    if (pinActual.length === 4) setTimeout(verificarPin, 120);
   }
-
-  function tocarSirena() {
-    if (!audioCtx) return;
-    const ahora  = audioCtx.currentTime;
-    const ciclos = 6;
-    for (let c = 0; c < ciclos; c++) {
-      const t = ahora + c * 0.6;
-      // Tono ALTO
-      const oscHi  = audioCtx.createOscillator();
-      const gainHi = audioCtx.createGain();
-      oscHi.connect(gainHi); gainHi.connect(audioCtx.destination);
-      oscHi.type = 'sawtooth';
-      oscHi.frequency.setValueAtTime(1100, t);
-      oscHi.frequency.linearRampToValueAtTime(900, t + 0.28);
-      gainHi.gain.setValueAtTime(0, t);
-      gainHi.gain.linearRampToValueAtTime(0.4, t + 0.02);
-      gainHi.gain.setValueAtTime(0.4, t + 0.27);
-      gainHi.gain.linearRampToValueAtTime(0, t + 0.30);
-      oscHi.start(t); oscHi.stop(t + 0.31);
-      // Tono BAJO
-      const oscLo  = audioCtx.createOscillator();
-      const gainLo = audioCtx.createGain();
-      oscLo.connect(gainLo); gainLo.connect(audioCtx.destination);
-      oscLo.type = 'sawtooth';
-      oscLo.frequency.setValueAtTime(700, t + 0.30);
-      oscLo.frequency.linearRampToValueAtTime(550, t + 0.58);
-      gainLo.gain.setValueAtTime(0, t + 0.30);
-      gainLo.gain.linearRampToValueAtTime(0.4, t + 0.32);
-      gainLo.gain.setValueAtTime(0.4, t + 0.57);
-      gainLo.gain.linearRampToValueAtTime(0, t + 0.60);
-      oscLo.start(t + 0.30); oscLo.stop(t + 0.61);
+  function pinBorrar() {
+    pinActual = pinActual.slice(0,-1);
+    actualizarPuntos();
+    document.getElementById('pin-error').innerText = '';
+  }
+  function actualizarPuntos() {
+    for (let i=0;i<4;i++) document.getElementById('p'+i).classList.toggle('lleno', i < pinActual.length);
+  }
+  function verificarPin() {
+    if (pinActual === PIN_CORRECTO) {
+      sessionStorage.setItem('nx_auth','1');
+      document.getElementById('pin-screen').classList.add('oculto');
+      iniciarApp();
+    } else {
+      document.getElementById('pin-error').innerText = 'CLAVE INCORRECTA';
+      pinActual = '';
+      actualizarPuntos();
     }
   }
-
-  function iniciarSirena() {
-    if (sirenInterval) return;
-    tocarSirena();
-    sirenInterval = setInterval(tocarSirena, 3800);
+ 
+  // ── APP ───────────────────────────────────────────────────
+  let DB = JSON.parse(localStorage.getItem('nx_db') || '[]');
+  let sincronizando=false, panicosPendientes=[], audioCtx=null, sirenInterval=null;
+ 
+  function initAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    if (audioCtx.state==='suspended') audioCtx.resume();
   }
-  function detenerSirena() { clearInterval(sirenInterval); sirenInterval = null; }
-
-  document.addEventListener('touchstart', initAudio, { once:true });
-  document.addEventListener('click',      initAudio, { once:true });
-
-  // ── HELPERS ───────────────────────────────────────────────
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.innerText = msg; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2000);
+  function tocarSirena() {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    for (let c=0;c<6;c++) {
+      const t=now+c*0.6;
+      const oH=audioCtx.createOscillator(),gH=audioCtx.createGain();
+      oH.connect(gH);gH.connect(audioCtx.destination);oH.type='sawtooth';
+      oH.frequency.setValueAtTime(1100,t);oH.frequency.linearRampToValueAtTime(900,t+0.28);
+      gH.gain.setValueAtTime(0,t);gH.gain.linearRampToValueAtTime(0.4,t+0.02);
+      gH.gain.setValueAtTime(0.4,t+0.27);gH.gain.linearRampToValueAtTime(0,t+0.30);
+      oH.start(t);oH.stop(t+0.31);
+      const oL=audioCtx.createOscillator(),gL=audioCtx.createGain();
+      oL.connect(gL);gL.connect(audioCtx.destination);oL.type='sawtooth';
+      oL.frequency.setValueAtTime(700,t+0.30);oL.frequency.linearRampToValueAtTime(550,t+0.58);
+      gL.gain.setValueAtTime(0,t+0.30);gL.gain.linearRampToValueAtTime(0.4,t+0.32);
+      gL.gain.setValueAtTime(0.4,t+0.57);gL.gain.linearRampToValueAtTime(0,t+0.60);
+      oL.start(t+0.30);oL.stop(t+0.61);
+    }
   }
-  function setSyncStatus(msg, cls) {
-    const el = document.getElementById('sync-status');
-    el.innerText = msg; el.className = 'sync-status ' + (cls || '');
-  }
-  function horaActual() { return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
-  function limpiarHora(h) {
-    if (!h) return '';
-    const s = String(h);
-    if (s.includes('T')) return s.split('T')[1].substring(0,5);
-    if (s.includes('\n')) return s.split('\n')[1] || '';
-    return s;
-  }
-  function escapeHtml(str) {
-    if (!str) return '';
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  // ── NAVEGACIÓN ────────────────────────────────────────────
-  function ver(nombre) {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-    document.getElementById('p-' + nombre).classList.add('active');
-    document.getElementById('btn-' + nombre).classList.add('active');
-  }
-
+  function iniciarSirena(){ if(sirenInterval)return; tocarSirena(); sirenInterval=setInterval(tocarSirena,3800); }
+  function detenerSirena(){ clearInterval(sirenInterval); sirenInterval=null; }
+  document.addEventListener('touchstart',initAudio,{once:true});
+  document.addEventListener('click',initAudio,{once:true});
+ 
+  function showToast(msg){ const t=document.getElementById('toast'); t.innerText=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
+  function setSyncStatus(msg,cls){ const el=document.getElementById('sync-status'); el.innerText=msg; el.className='sync-status '+(cls||''); }
+  function horaActual(){ return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
+  function limpiarHora(h){ if(!h)return''; const s=String(h); if(s.includes('T'))return s.split('T')[1].substring(0,5); if(s.includes('\n'))return s.split('\n')[1]||''; return s; }
+  function escapeHtml(str){ if(!str)return''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+ 
+  function ver(n){ document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); document.getElementById('p-'+n).classList.add('active'); document.getElementById('btn-'+n).classList.add('active'); }
+ 
   // ── PÁNICO ────────────────────────────────────────────────
   function mostrarPanico(alertas) {
     const lista = document.getElementById('panico-lista');
     lista.innerHTML = alertas.map(a => {
-      const mapsHtml = a.mapsUrl
-        ? `<a class="panico-maps-btn" href="${escapeHtml(a.mapsUrl)}" target="_blank" rel="noopener">
-             📍 Ver ubicación en Google Maps
-           </a>`
+      // Reconstruir URL desde lat/lng si el campo mapsUrl llegó vacío
+      let mapUrl = (a.mapsUrl || '').trim();
+      if (!mapUrl && a.lat && a.lng && String(a.lat).length > 3) {
+        mapUrl = 'https://maps.google.com/?q=' + a.lat + ',' + a.lng;
+      }
+      const mapsHtml = mapUrl
+        ? `<a class="panico-maps-btn" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener">📍 Ver ubicación en Google Maps</a>`
         : `<div class="panico-no-maps">📍 Ubicación GPS no disponible</div>`;
       return `<div class="panico-item">
-        <div class="panico-hora">${escapeHtml(a.fecha)}</div>
+        <div class="panico-hora">${escapeHtml(a.fecha||'')}</div>
         <div class="panico-loc">🏠 Mza <strong>${escapeHtml(a.mza)}</strong> — Casa <strong>${escapeHtml(a.casa)}</strong></div>
         ${mapsHtml}
       </div>`;
     }).join('');
-
     document.getElementById('panico-overlay').classList.add('visible');
-    initAudio();
-    iniciarSirena();
+    initAudio(); iniciarSirena();
   }
-
+ 
   function cerrarPanico() {
     detenerSirena();
     const url = localStorage.getItem('nx_url');
     panicosPendientes.forEach(a => {
       if (!url) return;
-      fetch(url, {
-        method:'POST', mode:'no-cors',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ accion:'ack_panico', panicoId: a.panicoId })
-      });
+      fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({accion:'ack_panico',panicoId:a.panicoId})});
     });
-    panicosPendientes = [];
+    panicosPendientes=[];
     document.getElementById('panico-overlay').classList.remove('visible');
   }
-
-  // ── SINCRONIZACIÓN ────────────────────────────────────────
-  async function sincronizar(manual = false) {
-    const url = localStorage.getItem('nx_url');
-    if (!url) { if (manual) showToast("⚙️ Configurá la URL primero"); return; }
-    if (sincronizando) return;
-    sincronizando = true;
-    setSyncStatus('Sincronizando...', 'sync-loading');
-
+ 
+  async function sincronizar(manual=false) {
+    const url=localStorage.getItem('nx_url');
+    if(!url){if(manual)showToast("⚙️ Configurá la URL primero");return;}
+    if(sincronizando)return;
+    sincronizando=true; setSyncStatus('Sincronizando...','sync-loading');
     try {
-      const response = await fetch(url + '?t=' + Date.now());
-      if (!response.ok) throw new Error('HTTP ' + response.status);
-      const data = await response.json();
-
-      const cloudData = Array.isArray(data) ? data : (data.activos || []);
-      const panico    = Array.isArray(data) ? [] : (data.panico  || []);
-
-      const cloudIds   = new Set(cloudData.map(x => String(x.id)));
-      const pendientes = DB.filter(x => !cloudIds.has(String(x.id)) && (Date.now() - (x.tsE||0) < 60000));
-      DB = [...cloudData, ...pendientes];
-      localStorage.setItem('nx_db', JSON.stringify(DB));
-      render();
-      setSyncStatus('✔ Sincronizado ' + horaActual(), 'sync-ok');
-
-      if (panico.length > 0) {
-        const idsActuales = new Set(panicosPendientes.map(x => String(x.panicoId)));
-        const nuevas      = panico.filter(a => !idsActuales.has(String(a.panicoId)));
-        if (nuevas.length > 0) {
-          panicosPendientes = panico;
-          mostrarPanico(panico);
-        } else {
-          panicosPendientes = panico;
-        }
+      const r=await fetch(url+'?t='+Date.now());
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const data=await r.json();
+      const cloudData=Array.isArray(data)?data:(data.activos||[]);
+      const panico=Array.isArray(data)?[]:(data.panico||[]);
+      const cloudIds=new Set(cloudData.map(x=>String(x.id)));
+      const pend=DB.filter(x=>!cloudIds.has(String(x.id))&&(Date.now()-(x.tsE||0)<60000));
+      DB=[...cloudData,...pend];
+      localStorage.setItem('nx_db',JSON.stringify(DB)); render();
+      setSyncStatus('✔ Sincronizado '+horaActual(),'sync-ok');
+      if(panico.length>0){
+        const ids=new Set(panicosPendientes.map(x=>String(x.panicoId)));
+        const nuevas=panico.filter(a=>!ids.has(String(a.panicoId)));
+        if(nuevas.length>0){panicosPendientes=panico;mostrarPanico(panico);}
+        else{panicosPendientes=panico;}
       }
-
-    } catch(e) {
-      setSyncStatus('⚠ Sin conexión', 'sync-err');
-      if (manual) showToast("⚠️ Error al sincronizar");
-    } finally {
-      sincronizando = false;
-    }
+    } catch(e){ setSyncStatus('⚠ Sin conexión','sync-err'); if(manual)showToast("⚠️ Error al sincronizar"); }
+    finally{ sincronizando=false; }
   }
-
-  // ── ENVÍO ─────────────────────────────────────────────────
-  function enviar(datos) {
-    const url = localStorage.getItem('nx_url');
-    if (!url) return;
-    fetch(url, {
-      method:'POST', mode:'no-cors',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify(datos)
-    })
-    .then(() => setTimeout(() => sincronizar(), 1500))
-    .catch(() => showToast("⚠️ No se pudo subir"));
+ 
+  function enviar(datos){ const url=localStorage.getItem('nx_url'); if(!url)return; fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)}).then(()=>setTimeout(()=>sincronizar(),1500)).catch(()=>showToast("⚠️ No se pudo subir")); }
+ 
+  function registrarRapido(tipo){ const val=document.getElementById('buscador').value.trim(); if(!val)return; const hora=horaActual(); let item; if(tipo==='ingreso'){item={id:Date.now(),pat:val,tipo:'VISITA',hE:hora,hS:'',tsE:Date.now(),mza:'',casa:''}; DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}else{const c=DB.filter(x=>x.pat===val&&!x.hS).sort((a,b)=>(b.tsE||0)-(a.tsE||0));item=c[0];if(item){item.hE=limpiarHora(item.hE);item.hS=hora;DB=DB.filter(x=>x.id!==item.id);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}else{showToast("❌ NO ENCONTRADO");return;}} document.getElementById('buscador').value=''; }
+ 
+  function guardarForm(modo){ const pre=modo==='manual'?'m-':'d-'; const p=document.getElementById(pre+'pat').value.trim(); if(!p)return; const item={id:Date.now(),pat:p,mza:document.getElementById(pre+'mza').value.trim(),casa:document.getElementById(pre+'casa').value.trim(),tipo:modo==='manual'?'MANUAL':'DELIVERY',hE:horaActual(),hS:'',tsE:Date.now()}; DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));['pat','mza','casa'].forEach(f=>document.getElementById(pre+f).value='');showToast("✅ REGISTRADO");ver('lista');render();enviar(item); }
+ 
+  function darSalida(id){ const item=DB.find(x=>x.id===id); if(!item)return; item.hE=limpiarHora(item.hE);item.hS=horaActual();DB=DB.filter(x=>x.id!==id);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item); }
+ 
+  function guardarConfig(){ localStorage.setItem('nx_url',document.getElementById('cfg-url').value.trim());showToast("⚙️ GUARDADO");sincronizar(); }
+ 
+  function render(){
+    const cont=document.getElementById('cont-lista'); const ahora=Date.now(); let d=0,v=0,a=0;
+    const html=DB.slice().sort((a,b)=>(b.tsE||0)-(a.tsE||0)).map(r=>{
+      const hE=limpiarHora(r.hE); const tsE=r.tsE||0; const isA=(r.tipo==='DELIVERY'&&(ahora-tsE>900000));
+      if(r.tipo==='DELIVERY'){if(isA)a++;else d++;}else v++;
+      let cls='adentro'; if(isA)cls='alerta'; else if(r.tipo==='DELIVERY')cls='dely-adentro';
+      return `<div class="reg-item ${cls}"><div><strong>${escapeHtml(r.pat)}</strong><br><small>Mza: ${escapeHtml(r.mza||'-')} - Lote: ${escapeHtml(r.casa||'-')}<br>${escapeHtml(r.tipo)} | ${hE}${isA?' ⚠️ +15min':''}</small></div><button onclick="darSalida(${r.id})" style="background:var(--red);color:white;border:none;padding:10px 15px;border-radius:10px;font-weight:800;cursor:pointer;flex-shrink:0;">SALIDA</button></div>`;
+    }).join('')||'<p style="opacity:0.3;text-align:center;padding:20px;">SIN ACTIVIDAD</p>';
+    cont.innerHTML=html;
+    document.getElementById('mon-d').innerText=d;
+    document.getElementById('mon-v').innerText=v;
+    document.getElementById('mon-a').innerText=a;
   }
-
-  // ── REGISTRO RÁPIDO ───────────────────────────────────────
-  function registrarRapido(tipo) {
-    const val = document.getElementById('buscador').value.trim();
-    if (!val) return;
-    const hora = horaActual();
-    let item;
-    if (tipo === 'ingreso') {
-      item = { id:Date.now(), pat:val, tipo:'VISITA', hE:hora, hS:'', tsE:Date.now(), mza:'', casa:'' };
-      DB.push(item);
-      localStorage.setItem('nx_db', JSON.stringify(DB));
-      render(); enviar(item);
-    } else {
-      const candidatos = DB.filter(x => x.pat === val && !x.hS).sort((a,b) => (b.tsE||0)-(a.tsE||0));
-      item = candidatos[0];
-      if (item) {
-        item.hE = limpiarHora(item.hE); item.hS = hora;
-        DB = DB.filter(x => x.id !== item.id);
-        localStorage.setItem('nx_db', JSON.stringify(DB));
-        render(); enviar(item);
-      } else { showToast("❌ NO ENCONTRADO"); return; }
-    }
-    document.getElementById('buscador').value = '';
+ 
+  function iniciarApp(){
+    document.getElementById('cfg-url').value=localStorage.getItem('nx_url')||'';
+    render(); sincronizar();
+    setInterval(()=>sincronizar(),15000);
+    setInterval(render,30000);
   }
-
-  // ── FORMULARIOS ───────────────────────────────────────────
-  function guardarForm(modo) {
-    const pre = modo === 'manual' ? 'm-' : 'd-';
-    const p   = document.getElementById(pre + 'pat').value.trim();
-    if (!p) return;
-    const item = {
-      id:Date.now(), pat:p,
-      mza:  document.getElementById(pre+'mza').value.trim(),
-      casa: document.getElementById(pre+'casa').value.trim(),
-      tipo: modo === 'manual' ? 'MANUAL' : 'DELIVERY',
-      hE:horaActual(), hS:'', tsE:Date.now()
-    };
-    DB.push(item);
-    localStorage.setItem('nx_db', JSON.stringify(DB));
-    ['pat','mza','casa'].forEach(f => document.getElementById(pre+f).value = '');
-    showToast("✅ REGISTRADO");
-    ver('lista'); render(); enviar(item);
+ 
+  // ── INIT: saltar PIN si ya autenticó en esta sesión ───────
+  if(sessionStorage.getItem('nx_auth')==='1'){
+    document.getElementById('pin-screen').classList.add('oculto');
+    iniciarApp();
   }
-
-  // ── DAR SALIDA ────────────────────────────────────────────
-  function darSalida(id) {
-    const item = DB.find(x => x.id === id);
-    if (!item) return;
-    item.hE = limpiarHora(item.hE); item.hS = horaActual();
-    DB = DB.filter(x => x.id !== id);
-    localStorage.setItem('nx_db', JSON.stringify(DB));
-    render(); enviar(item);
-  }
-
-  // ── CONFIG ────────────────────────────────────────────────
-  function guardarConfig() {
-    localStorage.setItem('nx_url', document.getElementById('cfg-url').value.trim());
-    showToast("⚙️ GUARDADO");
-    sincronizar();
-  }
-
-  // ── RENDER ────────────────────────────────────────────────
-  function render() {
-    const cont  = document.getElementById('cont-lista');
-    const ahora = Date.now();
-    let delivery = 0, visitas = 0, alertas = 0;
-
-    const html = DB.slice().sort((a,b) => (b.tsE||0)-(a.tsE||0)).map(r => {
-      const hEntrada = limpiarHora(r.hE);
-      const tsE      = r.tsE || 0;
-      const isAlerta = (r.tipo === 'DELIVERY' && (ahora - tsE > 900000));
-
-      if (r.tipo === 'DELIVERY') { if (isAlerta) alertas++; else delivery++; }
-      else visitas++;
-
-      let claseColor = 'adentro';
-      if (isAlerta) claseColor = 'alerta';
-      else if (r.tipo === 'DELIVERY') claseColor = 'dely-adentro';
-
-      return `<div class="reg-item ${claseColor}">
-        <div>
-          <strong>${escapeHtml(r.pat)}</strong><br>
-          <small>Mza: ${escapeHtml(r.mza||'-')} - Lote: ${escapeHtml(r.casa||'-')}<br>
-          ${escapeHtml(r.tipo)} | ${hEntrada}${isAlerta?' ⚠️ +15min':''}</small>
-        </div>
-        <button onclick="darSalida(${r.id})" style="background:var(--red);color:white;border:none;padding:10px 15px;border-radius:10px;font-weight:800;cursor:pointer;flex-shrink:0;">SALIDA</button>
-      </div>`;
-    }).join('') || '<p style="opacity:0.3;text-align:center;padding:20px;">SIN ACTIVIDAD</p>';
-
-    cont.innerHTML = html;
-    document.getElementById('mon-d').innerText = delivery;
-    document.getElementById('mon-v').innerText = visitas;
-    document.getElementById('mon-a').innerText = alertas;
-  }
-
-  // ── INIT ──────────────────────────────────────────────────
-  document.getElementById('cfg-url').value = localStorage.getItem('nx_url') || '';
-  render();
-  sincronizar();
-  setInterval(() => sincronizar(), 15000);
-  setInterval(render, 30000);
 </script>
 </body>
 </html>
