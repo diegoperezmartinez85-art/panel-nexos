@@ -4,6 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>NEXOS — EMERGENCIA</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f0f11">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="NEXOS">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
     body{
@@ -18,16 +28,12 @@
       padding:24px;
       user-select:none;
     }
- 
-    /* ── PANTALLA INICIAL (SETUP) ── */
+
     .pantalla{ width:100%; max-width:380px; text-align:center; display:none; }
     .pantalla.visible{ display:block; }
- 
     .logo{ font-size:13px; letter-spacing:4px; color:#555; margin-bottom:40px; }
- 
     .setup-title{ font-size:18px; font-weight:900; color:#fff; margin-bottom:24px; }
     .setup-subtitle{ font-size:13px; color:#888; letter-spacing:1px; margin-bottom:20px; }
- 
     .form-box{
       background:#1a1a1e;
       border:1px solid #2e2e38;
@@ -35,7 +41,6 @@
       padding:28px 24px;
       margin-bottom:24px;
     }
- 
     .campo{
       width:100%;
       background:#24242a;
@@ -50,174 +55,104 @@
       margin-bottom:12px;
       -moz-appearance:textfield;
     }
+    .campo::-webkit-inner-spin-button,
+    .campo::-webkit-outer-spin-button{ -webkit-appearance:none; }
     .campo::placeholder{ color:#444; font-size:18px; font-weight:400; }
     .campo:focus{ border-color:#e74c3c; }
- 
-    /* ── BOTÓN PÁNICO REDONDO ── */
+
+    /* ── PANTALLA PÁNICO ── */
     .pantalla-panico{
-      width:100%;
-      max-width:380px;
-      display:none;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
+      width:100%; max-width:380px;
+      display:none; flex-direction:column;
+      align-items:center; justify-content:center;
       gap:20px;
     }
     .pantalla-panico.visible{ display:flex; }
- 
-    .info-config{
-      text-align:center;
-      color:#888;
-      font-size:13px;
-      margin-bottom:10px;
-    }
+    .info-config{ text-align:center; color:#888; font-size:13px; margin-bottom:10px; }
     .info-config strong{ color:#00d4d4; font-weight:800; }
- 
+
     .boton-redondo-container{
-      width:280px;
-      height:280px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      margin:20px 0;
-      position:relative;
+      width:280px; height:280px;
+      display:flex; align-items:center; justify-content:center;
+      margin:20px 0; position:relative;
     }
- 
-    /* Anillo de cooldown SVG */
     .cooldown-ring{
-      position:absolute;
-      top:0; left:0;
+      position:absolute; top:0; left:0;
       width:100%; height:100%;
       transform:rotate(-90deg);
       pointer-events:none;
     }
     .cooldown-ring circle{
-      fill:none;
-      stroke:#e74c3c;
-      stroke-width:6;
+      fill:none; stroke:#e74c3c; stroke-width:6;
       stroke-linecap:round;
-      stroke-dasharray: 791;
-      stroke-dashoffset: 791;
-      transition: stroke-dashoffset 1s linear;
+      stroke-dasharray:791; stroke-dashoffset:791;
+      transition:stroke-dashoffset 1s linear;
       opacity:0.6;
     }
- 
     .boton-redondo{
-      width:260px;
-      height:260px;
+      width:260px; height:260px;
       border-radius:50%;
-      background:linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
-      border:none;
-      color:white;
-      cursor:pointer;
+      background:linear-gradient(135deg,#c0392b 0%,#e74c3c 100%);
+      border:none; color:white; cursor:pointer;
       transition:all 0.2s ease;
       box-shadow:0 10px 40px rgba(192,57,43,0.4);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      position:relative;
-      overflow:hidden;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      gap:10px; position:relative; overflow:hidden;
     }
- 
     .boton-redondo::before{
-      content:'';
-      position:absolute;
-      top:0; left:0; right:0; bottom:0;
-      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1), transparent);
+      content:''; position:absolute;
+      top:0;left:0;right:0;bottom:0;
+      background:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.1),transparent);
       pointer-events:none;
     }
- 
     .boton-redondo:active:not(:disabled){
       transform:scale(0.95);
-      background:linear-gradient(135deg, #96281b 0%, #b8360f 100%);
+      background:linear-gradient(135deg,#96281b 0%,#b8360f 100%);
       box-shadow:0 5px 20px rgba(192,57,43,0.6);
     }
- 
     .boton-redondo:disabled{
-      background: linear-gradient(135deg, #2a2a2a 0%, #383838 100%);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      background:linear-gradient(135deg,#2a2a2a 0%,#383838 100%);
+      box-shadow:0 4px 16px rgba(0,0,0,0.4);
       cursor:not-allowed;
     }
- 
     .boton-emoji{ font-size:52px; line-height:1; }
-    .boton-texto{
-      font-size:17px;
-      font-weight:800;
-      letter-spacing:1px;
-      text-align:center;
-      line-height:1.2;
-    }
-    .boton-cooldown-txt{
-      font-size:12px;
-      color:#aaa;
-      font-weight:600;
-      letter-spacing:0.5px;
-      display:none;
-    }
- 
-    /* ── AVISO COOLDOWN ── */
+    .boton-texto{ font-size:17px; font-weight:800; letter-spacing:1px; text-align:center; line-height:1.2; }
+    .boton-cooldown-txt{ font-size:12px; color:#aaa; font-weight:600; letter-spacing:0.5px; display:none; }
+
     .aviso-cooldown{
       display:none;
-      background:#1e1a10;
-      border:1px solid #f39c12;
-      border-radius:16px;
-      padding:14px 20px;
-      text-align:center;
-      color:#f39c12;
-      font-size:13px;
-      font-weight:700;
-      width:100%;
-      max-width:340px;
+      background:#1e1a10; border:1px solid #f39c12;
+      border-radius:16px; padding:14px 20px;
+      text-align:center; color:#f39c12;
+      font-size:13px; font-weight:700;
+      width:100%; max-width:340px;
     }
     .aviso-cooldown.visible{ display:block; }
     .aviso-cooldown span{ font-size:16px; font-weight:900; color:#fff; }
- 
-    /* ── BOTÓN CAMBIAR UB ── */
+
     .btn-cfg-main{
-      background:#1a1a1e;
-      color:#00d4d4;
-      border:1px solid #00d4d4;
-      border-radius:50px;
-      padding:14px 40px;
-      font-size:14px;
-      font-weight:800;
-      cursor:pointer;
-      transition:0.2s;
+      background:#1a1a1e; color:#00d4d4;
+      border:1px solid #00d4d4; border-radius:50px;
+      padding:14px 40px; font-size:14px; font-weight:800;
+      cursor:pointer; transition:0.2s;
     }
-    .btn-cfg-main:active{
-      transform:scale(0.98);
-      background:#00d4d4;
-      color:#0f0f11;
-    }
- 
-    /* ── BOTÓN SETUP ── */
+    .btn-cfg-main:active{ transform:scale(0.98); background:#00d4d4; color:#0f0f11; }
+
     .btn-setup{
-      width:100%;
-      background:#c0392b;
-      color:white;
-      border:none;
-      border-radius:20px;
-      padding:26px;
-      font-size:22px;
-      font-weight:900;
-      letter-spacing:1px;
-      cursor:pointer;
-      transition:0.15s;
+      width:100%; background:#c0392b; color:white;
+      border:none; border-radius:20px; padding:26px;
+      font-size:22px; font-weight:900; letter-spacing:1px;
+      cursor:pointer; transition:0.15s;
     }
     .btn-setup:active{ transform:scale(0.97); background:#96281b; }
-    .btn-setup:disabled{ background:#444; cursor:not-allowed; }
- 
+
     /* ── PANTALLA ENVIADO ── */
     .enviado{
-      display:none;
-      flex-direction:column;
-      align-items:center;
-      text-align:center;
-      width:100%;
-      max-width:380px;
-      animation: fadeIn 0.4s ease;
+      display:none; flex-direction:column;
+      align-items:center; text-align:center;
+      width:100%; max-width:380px;
+      animation:fadeIn 0.4s ease;
     }
     .enviado.visible{ display:flex; }
     @keyframes fadeIn{ from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
@@ -225,225 +160,63 @@
     .enviado-titulo{ font-size:28px; font-weight:900; color:#2ecc71; margin-bottom:10px; }
     .enviado-sub{ font-size:16px; color:#888; margin-bottom:40px; line-height:1.5; }
     .btn-volver{
-      background:#1a1a1e;
-      color:#00d4d4;
-      border:1px solid #00d4d4;
-      border-radius:50px;
-      padding:14px 40px;
-      font-size:16px;
-      font-weight:800;
-      cursor:pointer;
-      transition:0.2s;
+      background:#1a1a1e; color:#00d4d4;
+      border:1px solid #00d4d4; border-radius:50px;
+      padding:14px 40px; font-size:16px; font-weight:800;
+      cursor:pointer; transition:0.2s;
     }
-    .btn-volver:active{
-      transform:scale(0.98);
-      background:#00d4d4;
-      color:#0f0f11;
-    }
- 
-    .error-msg{
-      color:#e74c3c;
-      font-size:13px;
-      margin-top:10px;
-      min-height:18px;
-      font-weight:600;
-    }
- 
-    /* ── CONFIG PANEL (solo manzana/casa) ── */
+    .btn-volver:active{ transform:scale(0.98); background:#00d4d4; color:#0f0f11; }
+
+    .error-msg{ color:#e74c3c; font-size:13px; margin-top:10px; min-height:18px; font-weight:600; }
+
+    /* ── PANEL CAMBIAR UBICACIÓN ── */
     .cfg-panel{
-      display:none;
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,0.95);
-      z-index:200;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
+      display:none; position:fixed; inset:0;
+      background:rgba(0,0,0,0.95); z-index:200;
+      flex-direction:column; align-items:center;
+      justify-content:center; padding:24px;
     }
     .cfg-panel.visible{ display:flex; }
-    .cfg-content{
-      width:100%;
-      max-width:400px;
-      text-align:center;
-    }
-    .cfg-title{
-      font-size:18px;
-      font-weight:900;
-      margin-bottom:6px;
-      color:#fff;
-    }
-    .cfg-sub{
-      font-size:13px;
-      color:#888;
-      margin-bottom:24px;
-    }
+    .cfg-content{ width:100%; max-width:400px; text-align:center; }
+    .cfg-title{ font-size:18px; font-weight:900; margin-bottom:6px; color:#fff; }
+    .cfg-sub{ font-size:13px; color:#888; margin-bottom:24px; }
     .cfg-campo{
-      width:100%;
-      background:#24242a;
-      border:2px solid #2e2e38;
-      border-radius:14px;
-      padding:18px;
-      color:white;
-      font-size:26px;
-      font-weight:700;
-      text-align:center;
-      outline:none;
-      margin-bottom:12px;
-      -moz-appearance:textfield;
+      width:100%; background:#24242a;
+      border:2px solid #2e2e38; border-radius:14px;
+      padding:18px; color:white; font-size:26px;
+      font-weight:700; text-align:center; outline:none;
+      margin-bottom:12px; -moz-appearance:textfield;
     }
+    .cfg-campo::-webkit-inner-spin-button,
+    .cfg-campo::-webkit-outer-spin-button{ -webkit-appearance:none; }
     .cfg-campo::placeholder{ color:#444; font-size:16px; font-weight:400; }
     .cfg-campo:focus{ border-color:#e74c3c; }
     .cfg-btn{
-      width:100%;
-      background:#c0392b;
-      color:white;
-      border:none;
-      border-radius:14px;
-      padding:18px;
-      font-weight:800;
-      font-size:16px;
-      cursor:pointer;
-      margin-bottom:10px;
-      transition:0.2s;
+      width:100%; background:#c0392b; color:white;
+      border:none; border-radius:14px; padding:18px;
+      font-weight:800; font-size:16px; cursor:pointer;
+      margin-bottom:10px; transition:0.2s;
     }
-    .cfg-btn:active{
-      transform:scale(0.98);
-      background:#96281b;
-    }
-    .cfg-cerrar{
-      color:#888;
-      font-size:13px;
-      cursor:pointer;
-      margin-top:6px;
-      transition:0.2s;
-    }
+    .cfg-btn:active{ transform:scale(0.98); background:#96281b; }
+    .cfg-cerrar{ color:#888; font-size:13px; cursor:pointer; margin-top:6px; }
     .cfg-cerrar:hover{ color:#bbb; }
- 
-    /* ── PANTALLA GUARDA ── */
-    .pantalla-guarda{
-      display:none;
-      flex-direction:column;
-      align-items:center;
-      text-align:center;
-      width:100%;
-      max-width:400px;
-      gap:16px;
+
+    /* ── BADGE OFFLINE ── */
+    .offline-badge{
+      position:fixed; top:16px; right:16px;
+      background:#e74c3c; color:white;
+      font-size:11px; font-weight:800;
+      padding:6px 12px; border-radius:20px;
+      display:none; z-index:300; letter-spacing:1px;
     }
-    .pantalla-guarda.visible{ display:flex; }
- 
-    .guarda-header{
-      font-size:13px;
-      letter-spacing:4px;
-      color:#555;
-      margin-bottom:10px;
-    }
-    .guarda-title{
-      font-size:22px;
-      font-weight:900;
-      color:#fff;
-      letter-spacing:2px;
-    }
-    .guarda-log{
-      width:100%;
-      background:#1a1a1e;
-      border:1px solid #2e2e38;
-      border-radius:20px;
-      padding:20px;
-      min-height:240px;
-      max-height:60vh;
-      overflow-y:auto;
-    }
-    .alerta-item{
-      background:#1e0e0e;
-      border:1px solid #6e1a1a;
-      border-radius:14px;
-      padding:16px;
-      margin-bottom:12px;
-      text-align:left;
-      animation: slideIn 0.4s ease;
-    }
-    @keyframes slideIn{ from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
-    .alerta-item.nueva{
-      border-color:#e74c3c;
-      background:#2a0e0e;
-      box-shadow:0 0 20px rgba(231,76,60,0.2);
-    }
-    .alerta-item-hora{
-      font-size:11px;
-      color:#888;
-      margin-bottom:6px;
-      letter-spacing:1px;
-    }
-    .alerta-item-titulo{
-      font-size:18px;
-      font-weight:900;
-      color:#e74c3c;
-      margin-bottom:4px;
-    }
-    .alerta-item-loc{
-      font-size:14px;
-      color:#ccc;
-      font-weight:600;
-    }
-    .guarda-empty{
-      color:#555;
-      font-size:14px;
-      padding:40px 0;
-      text-align:center;
-    }
-    .btn-guarda-limpiar{
-      background:#1a1a1e;
-      color:#888;
-      border:1px solid #2e2e38;
-      border-radius:50px;
-      padding:12px 30px;
-      font-size:13px;
-      font-weight:700;
-      cursor:pointer;
-      transition:0.2s;
-    }
-    .btn-guarda-limpiar:active{
-      background:#2e2e38;
-    }
- 
-    .alerta-maps-link{
-      display:inline-block;
-      margin-top:10px;
-      background:#0d3b26;
-      border:1px solid #27ae60;
-      color:#2ecc71;
-      font-size:13px;
-      font-weight:700;
-      padding:8px 14px;
-      border-radius:10px;
-      text-decoration:none;
-      letter-spacing:0.3px;
-      transition:0.2s;
-    }
-    .alerta-maps-link:active{
-      background:#27ae60;
-      color:#fff;
-    }
-    .alerta-maps-nodisp{
-      margin-top:10px;
-      font-size:12px;
-      color:#555;
-    }
- 
-    /* ── Indicador de sonido ── */
-    .sound-indicator{
-      font-size:11px;
-      color:#555;
-      letter-spacing:1px;
-      text-align:center;
-      margin-top:4px;
-    }
+    .offline-badge.visible{ display:block; }
   </style>
 </head>
 <body>
- 
-<!-- ── PANTALLA SETUP ─────────────────────────────── -->
+
+<div class="offline-badge" id="offline-badge">SIN CONEXIÓN</div>
+
+<!-- ── SETUP ── -->
 <div class="pantalla" id="pantalla-setup">
   <div class="logo">NEXOS · VECINOS</div>
   <div class="form-box">
@@ -455,17 +228,14 @@
   </div>
   <button class="btn-setup" onclick="guardarSetup()">✅&nbsp;&nbsp;CONFIRMAR</button>
 </div>
- 
-<!-- ── PANTALLA PÁNICO ────────────────────────────── -->
+
+<!-- ── PÁNICO ── -->
 <div class="pantalla-panico" id="pantalla-panico">
   <div class="logo">NEXOS · VECINOS</div>
- 
-  <div class="info-config">
-    Configurado: <strong id="config-display"></strong>
-  </div>
- 
+  <div class="info-config">Configurado: <strong id="config-display"></strong></div>
+
   <div class="boton-redondo-container">
-    <svg class="cooldown-ring" id="cooldown-ring" viewBox="0 0 280 280">
+    <svg class="cooldown-ring" viewBox="0 0 280 280">
       <circle cx="140" cy="140" r="126" id="cooldown-circle"/>
     </svg>
     <button class="boton-redondo" id="btn-panico-redondo" onclick="enviarPanico()">
@@ -474,24 +244,24 @@
       <span class="boton-cooldown-txt" id="btn-cooldown-txt"></span>
     </button>
   </div>
- 
+
   <div class="aviso-cooldown" id="aviso-cooldown">
-    ⏳ Alerta enviada recientemente.<br>
+    ✅ Alerta recibida por el vigilador.<br>
     Podés volver a enviar en <span id="cooldown-restante">30:00</span>
   </div>
- 
+
   <button class="btn-cfg-main" onclick="abrirCfg()">📍 Cambiar ubicación</button>
 </div>
- 
-<!-- ── PANTALLA CONFIRMACIÓN ──────────────────────── -->
+
+<!-- ── CONFIRMACIÓN ── -->
 <div class="enviado" id="pantalla-enviado">
   <div class="enviado-icono">✅</div>
   <div class="enviado-titulo">¡ALERTA ENVIADA!</div>
   <div class="enviado-sub">El vigilador fue notificado.<br>Quedate tranquilo, ya están al tanto.</div>
   <button class="btn-volver" onclick="volverAlPanico()">Volver</button>
 </div>
- 
-<!-- ── PANEL CAMBIAR UBICACIÓN ────────────────────── -->
+
+<!-- ── CAMBIAR UBICACIÓN ── -->
 <div class="cfg-panel" id="cfg-panel">
   <div class="cfg-content">
     <div class="cfg-title">📍 CAMBIAR UBICACIÓN</div>
@@ -503,95 +273,42 @@
     <div class="cfg-cerrar" onclick="cerrarCfg()">Cancelar</div>
   </div>
 </div>
- 
-<!-- ── PANTALLA GUARDA ────────────────────────────── -->
-<div class="pantalla-guarda" id="pantalla-guarda">
-  <div class="guarda-header">NEXOS · VECINOS</div>
-  <div class="guarda-title">🛡️ PANEL VIGILADOR</div>
-  <div class="sound-indicator" id="sound-indicator">🔔 Sonido activo</div>
-  <div class="guarda-log" id="guarda-log">
-    <div class="guarda-empty" id="guarda-empty">Sin alertas recientes</div>
-  </div>
-  <button class="btn-guarda-limpiar" onclick="limpiarAlertas()">Limpiar historial</button>
-</div>
- 
+
 <script>
-  // ─── URL HARDCODEADA (interna) ────────────────────────────
-  const PANIC_URL = 'https://script.google.com/macros/s/AKfycbxWEByhah2myGd-UmQgeeEezLmByVU1cpF8uliYOFQJSetnzMZWu1UGyrKqVx1oMSWlEQ/exec';
- 
-  // ─── Cooldown: 30 minutos en ms ──────────────────────────
+  // ── URL INTERNA ───────────────────────────────────────────
+  const PANIC_URL  = 'https://script.google.com/macros/s/AKfycbxWEByhah2myGd-UmQgeeEezLmByVU1cpF8uliYOFQJSetnzMZWu1UGyrKqVx1oMSWlEQ/exec';
   const COOLDOWN_MS = 30 * 60 * 1000;
- 
+
   let cooldownInterval = null;
- 
-  // ─── Detectar modo guarda ────────────────────────────────
-  const esGuarda = new URLSearchParams(location.search).has('guarda');
- 
-  // ─── Audio para guarda (Web Audio API) ─────────────────
-  let audioCtx = null;
- 
-  function crearAudioCtx() {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  // ── SERVICE WORKER ────────────────────────────────────────
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
   }
- 
-  function tocarAlarma() {
-    try {
-      crearAudioCtx();
-      const duracion = 2.5;
-      const frecuencias = [880, 660, 880, 660];
-      frecuencias.forEach((freq, i) => {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.35);
-        gain.gain.setValueAtTime(0.3, audioCtx.currentTime + i * 0.35);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.35 + 0.3);
-        osc.start(audioCtx.currentTime + i * 0.35);
-        osc.stop(audioCtx.currentTime + i * 0.35 + 0.35);
-      });
-      // Segunda ronda
-      setTimeout(() => {
-        frecuencias.forEach((freq, i) => {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.type = 'square';
-          osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.35);
-          gain.gain.setValueAtTime(0.3, audioCtx.currentTime + i * 0.35);
-          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.35 + 0.3);
-          osc.start(audioCtx.currentTime + i * 0.35);
-          osc.stop(audioCtx.currentTime + i * 0.35 + 0.35);
-        });
-      }, 1600);
-    } catch(e) { console.warn('Audio error:', e); }
+
+  // ── OFFLINE DETECTION ─────────────────────────────────────
+  function actualizarOffline() {
+    document.getElementById('offline-badge').classList.toggle('visible', !navigator.onLine);
   }
- 
-  // ─── Inicialización ──────────────────────────────────────
+  window.addEventListener('online',  actualizarOffline);
+  window.addEventListener('offline', actualizarOffline);
+  actualizarOffline();
+
+  // ── INIT ──────────────────────────────────────────────────
   function inicializar() {
-    if (esGuarda) {
-      mostrarPantallaGuarda();
-      return;
-    }
-    const mza = localStorage.getItem('nx_manzana');
+    const mza  = localStorage.getItem('nx_manzana');
     const casa = localStorage.getItem('nx_casa');
-    if (mza && casa) {
-      mostrarPantallaPanico();
-    } else {
-      mostrarSetup();
-    }
+    if (mza && casa) { mostrarPantallaPanico(); } else { mostrarSetup(); }
   }
- 
+
   function mostrarSetup() {
     document.getElementById('pantalla-setup').classList.add('visible');
     document.getElementById('pantalla-panico').classList.remove('visible');
     document.getElementById('pantalla-enviado').classList.remove('visible');
   }
- 
+
   function mostrarPantallaPanico() {
-    const mza = localStorage.getItem('nx_manzana');
+    const mza  = localStorage.getItem('nx_manzana');
     const casa = localStorage.getItem('nx_casa');
     document.getElementById('config-display').innerText = `Mz. ${mza} Casa ${casa}`;
     document.getElementById('pantalla-setup').classList.remove('visible');
@@ -599,7 +316,7 @@
     document.getElementById('pantalla-enviado').classList.remove('visible');
     verificarCooldown();
   }
- 
+
   function guardarSetup() {
     const mza  = document.getElementById('setup-mza').value.trim();
     const casa = document.getElementById('setup-casa').value.trim();
@@ -610,58 +327,44 @@
     localStorage.setItem('nx_casa', casa);
     mostrarPantallaPanico();
   }
- 
-  // ─── Cooldown ────────────────────────────────────────────
+
+  // ── COOLDOWN ──────────────────────────────────────────────
   function verificarCooldown() {
-    const ts = parseInt(localStorage.getItem('nx_last_panico') || '0');
-    const ahora = Date.now();
-    const diff = ahora - ts;
-    if (ts && diff < COOLDOWN_MS) {
-      activarUI_Cooldown(COOLDOWN_MS - diff);
-    } else {
-      desactivarUI_Cooldown();
-    }
+    const ts   = parseInt(localStorage.getItem('nx_last_panico') || '0');
+    const diff = Date.now() - ts;
+    if (ts && diff < COOLDOWN_MS) { activarUI_Cooldown(COOLDOWN_MS - diff); }
+    else { desactivarUI_Cooldown(); }
   }
- 
+
   function activarUI_Cooldown(msRestantes) {
-    const btn = document.getElementById('btn-panico-redondo');
-    btn.disabled = true;
-    document.getElementById('btn-emoji').innerText = '⏳';
+    document.getElementById('btn-panico-redondo').disabled = true;
+    document.getElementById('btn-emoji').innerText = '✅';
     document.getElementById('btn-cooldown-txt').style.display = 'block';
     document.getElementById('aviso-cooldown').classList.add('visible');
- 
-    const circunsferencia = 2 * Math.PI * 126; // ~791.7
+
+    const circ   = 2 * Math.PI * 126;
     const circle = document.getElementById('cooldown-circle');
- 
     if (cooldownInterval) clearInterval(cooldownInterval);
- 
+
     function actualizar() {
-      const ts = parseInt(localStorage.getItem('nx_last_panico') || '0');
+      const ts       = parseInt(localStorage.getItem('nx_last_panico') || '0');
       const restante = COOLDOWN_MS - (Date.now() - ts);
-      if (restante <= 0) {
-        clearInterval(cooldownInterval);
-        desactivarUI_Cooldown();
-        return;
-      }
+      if (restante <= 0) { clearInterval(cooldownInterval); desactivarUI_Cooldown(); return; }
       const mins = Math.floor(restante / 60000);
       const segs = Math.floor((restante % 60000) / 1000);
       const txt  = `${String(mins).padStart(2,'0')}:${String(segs).padStart(2,'0')}`;
       document.getElementById('cooldown-restante').innerText = txt;
       document.getElementById('btn-cooldown-txt').innerText  = txt;
       document.getElementById('btn-texto').innerText = 'ALERTA RECIBIDA';
- 
-      // Anillo: progreso de lo transcurrido
       const progreso = 1 - (restante / COOLDOWN_MS);
-      circle.style.strokeDashoffset = circunsferencia * (1 - progreso);
+      circle.style.strokeDashoffset = circ * (1 - progreso);
     }
- 
     actualizar();
     cooldownInterval = setInterval(actualizar, 1000);
   }
- 
+
   function desactivarUI_Cooldown() {
-    const btn = document.getElementById('btn-panico-redondo');
-    btn.disabled = false;
+    document.getElementById('btn-panico-redondo').disabled = false;
     document.getElementById('btn-emoji').innerText = '🆘';
     document.getElementById('btn-texto').innerText = 'EMERGENCIA';
     document.getElementById('btn-cooldown-txt').style.display = 'none';
@@ -669,8 +372,8 @@
     document.getElementById('aviso-cooldown').classList.remove('visible');
     document.getElementById('cooldown-circle').style.strokeDashoffset = '791';
   }
- 
-  // ─── Geolocalización ────────────────────────────────────
+
+  // ── GEOLOCALIZACIÓN ───────────────────────────────────────
   function obtenerUbicacion() {
     return new Promise((resolve) => {
       if (!navigator.geolocation) { resolve(null); return; }
@@ -681,64 +384,79 @@
       );
     });
   }
- 
-  // ─── Envío de pánico ─────────────────────────────────────
+
+  // ── ENVÍO ─────────────────────────────────────────────────
   async function enviarPanico() {
     const mza  = localStorage.getItem('nx_manzana');
     const casa = localStorage.getItem('nx_casa');
     const btn  = document.getElementById('btn-panico-redondo');
- 
+
     btn.disabled = true;
     document.getElementById('btn-emoji').innerText = '📍';
-    document.getElementById('btn-texto').innerText = 'Obteniendo ubicación...';
- 
+    document.getElementById('btn-texto').innerText = 'Ubicando...';
+
     const geo = await obtenerUbicacion();
-    let mapsUrl = null;
-    if (geo) {
-      mapsUrl = `https://maps.google.com/?q=${geo.lat},${geo.lng}`;
-    }
- 
+    const mapsUrl = geo ? `https://maps.google.com/?q=${geo.lat},${geo.lng}` : null;
+
     document.getElementById('btn-emoji').innerText = '⏳';
     document.getElementById('btn-texto').innerText = 'Enviando...';
- 
+
+    const payload = { accion:'panico', mza, casa, lat: geo?.lat, lng: geo?.lng, mapsUrl };
+
     try {
       await fetch(PANIC_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accion: 'panico', mza, casa, lat: geo?.lat, lng: geo?.lng, mapsUrl })
+        method:'POST', mode:'no-cors',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify(payload)
       });
- 
-      // Guardar timestamp de cooldown
       localStorage.setItem('nx_last_panico', String(Date.now()));
- 
       document.getElementById('pantalla-panico').classList.remove('visible');
       document.getElementById('pantalla-enviado').classList.add('visible');
     } catch(e) {
-      alert('Error de red. Intentá de nuevo.');
-      document.getElementById('btn-emoji').innerText = '🆘';
-      document.getElementById('btn-texto').innerText = 'EMERGENCIA';
-      btn.disabled = false;
+      // Si no hay conexión, guardar en cola offline
+      guardarOffline(payload);
+      localStorage.setItem('nx_last_panico', String(Date.now()));
+      document.getElementById('pantalla-panico').classList.remove('visible');
+      document.getElementById('pantalla-enviado').classList.add('visible');
     }
   }
- 
+
+  // ── COLA OFFLINE ─────────────────────────────────────────
+  function guardarOffline(payload) {
+    const cola = JSON.parse(localStorage.getItem('nx_offline_queue') || '[]');
+    cola.push({ payload, ts: Date.now() });
+    localStorage.setItem('nx_offline_queue', JSON.stringify(cola));
+  }
+
+  async function enviarColaOffline() {
+    const cola = JSON.parse(localStorage.getItem('nx_offline_queue') || '[]');
+    if (!cola.length || !navigator.onLine) return;
+    for (const item of cola) {
+      try {
+        await fetch(PANIC_URL, {
+          method:'POST', mode:'no-cors',
+          headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify(item.payload)
+        });
+      } catch(e) { return; }
+    }
+    localStorage.removeItem('nx_offline_queue');
+  }
+  window.addEventListener('online', enviarColaOffline);
+
   function volverAlPanico() {
     document.getElementById('pantalla-enviado').classList.remove('visible');
     mostrarPantallaPanico();
   }
- 
-  // ─── Panel cambiar ubicación ─────────────────────────────
+
+  // ── CAMBIAR UBICACIÓN ────────────────────────────────────
   function abrirCfg() {
     document.getElementById('cfg-mza').value  = localStorage.getItem('nx_manzana') || '';
-    document.getElementById('cfg-casa').value = localStorage.getItem('nx_casa') || '';
+    document.getElementById('cfg-casa').value = localStorage.getItem('nx_casa')    || '';
     document.getElementById('cfg-error').innerText = '';
     document.getElementById('cfg-panel').classList.add('visible');
   }
- 
-  function cerrarCfg() {
-    document.getElementById('cfg-panel').classList.remove('visible');
-  }
- 
+  function cerrarCfg() { document.getElementById('cfg-panel').classList.remove('visible'); }
   function guardarCfg() {
     const mza  = document.getElementById('cfg-mza').value.trim();
     const casa = document.getElementById('cfg-casa').value.trim();
@@ -750,74 +468,8 @@
     cerrarCfg();
     mostrarPantallaPanico();
   }
- 
-  // ─── Panel guarda ────────────────────────────────────────
-  let alertasGuarda = [];
-  let ultimoCheck   = 0;
- 
-  function mostrarPantallaGuarda() {
-    document.getElementById('pantalla-guarda').classList.add('visible');
-    // Activar AudioContext con clic del usuario
-    document.body.addEventListener('click', () => { crearAudioCtx(); }, { once: true });
-    cargarAlertasGuarda();
-    // Polling cada 15 segundos
-    setInterval(cargarAlertasGuarda, 15000);
-  }
- 
-  async function cargarAlertasGuarda() {
-    try {
-      const res = await fetch(`${PANIC_URL}?accion=listar&desde=${ultimoCheck}`);
-      const data = await res.json();
- 
-      if (data && data.alertas && data.alertas.length > 0) {
-        const nuevas = data.alertas.filter(a => !alertasGuarda.find(x => x.id === a.id));
-        if (nuevas.length > 0) {
-          tocarAlarma();
-          document.getElementById('sound-indicator').innerText = '🔔 Sonido activo — ' + new Date().toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'});
-          nuevas.forEach(a => alertasGuarda.unshift({ ...a, nueva: true }));
-          // Quitar marca "nueva" después de 5s
-          setTimeout(() => {
-            alertasGuarda = alertasGuarda.map(a => ({ ...a, nueva: false }));
-            renderizarAlertas();
-          }, 5000);
-        }
-        alertasGuarda = [...nuevas.map(a => ({ ...a, nueva: true })), ...alertasGuarda.filter(a => !nuevas.find(x => x.id === a.id))];
-        if (data.alertas.length > 0) {
-          ultimoCheck = Math.max(...data.alertas.map(a => a.timestamp || 0));
-        }
-        renderizarAlertas();
-      }
-    } catch(e) {
-      // Silencioso si no hay respuesta
-    }
-  }
- 
-  function renderizarAlertas() {
-    const log = document.getElementById('guarda-log');
-    if (alertasGuarda.length === 0) {
-      log.innerHTML = '<div class="guarda-empty">Sin alertas recientes</div>';
-      return;
-    }
-    log.innerHTML = alertasGuarda.map(a => `
-      <div class="alerta-item ${a.nueva ? 'nueva' : ''}">
-        <div class="alerta-item-hora">${a.hora || '—'}</div>
-        <div class="alerta-item-titulo">🚨 EMERGENCIA</div>
-        <div class="alerta-item-loc">Manzana ${a.mza} — Casa ${a.casa}</div>
-        ${a.mapsUrl ? `<a class="alerta-maps-link" href="${a.mapsUrl}" target="_blank" rel="noopener">📍 Ver ubicación en Maps</a>` : '<div class="alerta-maps-nodisp">📍 Ubicación no disponible</div>'}
-      </div>
-    `).join('');
-  }
- 
-  function limpiarAlertas() {
-    if (confirm('¿Limpiar el historial de alertas?')) {
-      alertasGuarda = [];
-      renderizarAlertas();
-    }
-  }
- 
-  // ─── Iniciar ─────────────────────────────────────────────
+
   window.addEventListener('DOMContentLoaded', inicializar);
 </script>
 </body>
 </html>
- 
