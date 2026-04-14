@@ -547,7 +547,7 @@
     document.getElementById('btn-texto').innerText = 'Ubicando...';
  
     const geo     = await obtenerUbicacion();
-    const mapsUrl = geo ? `https://maps.google.com/?q=${geo.lat},${geo.lng}` : null;
+    const mapsUrl = geo ? `https://www.google.com/maps?q=${geo.lat},${geo.lng}` : null;
  
     document.getElementById('btn-emoji').innerText = '⏳';
     document.getElementById('btn-texto').innerText = 'Enviando...';
