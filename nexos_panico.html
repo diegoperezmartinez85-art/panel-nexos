@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>NEXOS — EMERGENCIA</title>
-
+ 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f0f11">
@@ -13,7 +13,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="NEXOS">
   <link rel="apple-touch-icon" href="icon-192.png">
-
+ 
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
     body{
@@ -28,7 +28,7 @@
       padding:24px;
       user-select:none;
     }
-
+ 
     .pantalla{ width:100%; max-width:380px; text-align:center; display:none; }
     .pantalla.visible{ display:block; }
     .logo{ font-size:13px; letter-spacing:4px; color:#555; margin-bottom:40px; }
@@ -59,7 +59,28 @@
     .campo::-webkit-outer-spin-button{ -webkit-appearance:none; }
     .campo::placeholder{ color:#444; font-size:18px; font-weight:400; }
     .campo:focus{ border-color:#e74c3c; }
-
+ 
+    /* ── PIN ── */
+    .pin-campo{
+      width:100%;
+      background:#24242a;
+      border:2px solid #2e2e38;
+      border-radius:14px;
+      padding:20px;
+      color:white;
+      font-size:36px;
+      font-weight:900;
+      text-align:center;
+      outline:none;
+      margin-bottom:12px;
+      letter-spacing:8px;
+      -moz-appearance:textfield;
+    }
+    .pin-campo::-webkit-inner-spin-button,
+    .pin-campo::-webkit-outer-spin-button{ -webkit-appearance:none; }
+    .pin-campo:focus{ border-color:#e74c3c; }
+    .pin-hint{ font-size:12px; color:#555; margin-bottom:16px; }
+ 
     /* ── PANTALLA PÁNICO ── */
     .pantalla-panico{
       width:100%; max-width:380px;
@@ -70,7 +91,7 @@
     .pantalla-panico.visible{ display:flex; }
     .info-config{ text-align:center; color:#888; font-size:13px; margin-bottom:10px; }
     .info-config strong{ color:#00d4d4; font-weight:800; }
-
+ 
     .boton-redondo-container{
       width:280px; height:280px;
       display:flex; align-items:center; justify-content:center;
@@ -119,7 +140,7 @@
     .boton-emoji{ font-size:52px; line-height:1; }
     .boton-texto{ font-size:17px; font-weight:800; letter-spacing:1px; text-align:center; line-height:1.2; }
     .boton-cooldown-txt{ font-size:12px; color:#aaa; font-weight:600; letter-spacing:0.5px; display:none; }
-
+ 
     .aviso-cooldown{
       display:none;
       background:#1e1a10; border:1px solid #f39c12;
@@ -130,7 +151,7 @@
     }
     .aviso-cooldown.visible{ display:block; }
     .aviso-cooldown span{ font-size:16px; font-weight:900; color:#fff; }
-
+ 
     .btn-cfg-main{
       background:#1a1a1e; color:#00d4d4;
       border:1px solid #00d4d4; border-radius:50px;
@@ -138,7 +159,7 @@
       cursor:pointer; transition:0.2s;
     }
     .btn-cfg-main:active{ transform:scale(0.98); background:#00d4d4; color:#0f0f11; }
-
+ 
     .btn-setup{
       width:100%; background:#c0392b; color:white;
       border:none; border-radius:20px; padding:26px;
@@ -146,7 +167,7 @@
       cursor:pointer; transition:0.15s;
     }
     .btn-setup:active{ transform:scale(0.97); background:#96281b; }
-
+ 
     /* ── PANTALLA ENVIADO ── */
     .enviado{
       display:none; flex-direction:column;
@@ -166,10 +187,10 @@
       cursor:pointer; transition:0.2s;
     }
     .btn-volver:active{ transform:scale(0.98); background:#00d4d4; color:#0f0f11; }
-
+ 
     .error-msg{ color:#e74c3c; font-size:13px; margin-top:10px; min-height:18px; font-weight:600; }
-
-    /* ── PANEL CAMBIAR UBICACIÓN ── */
+ 
+    /* ── PANEL CAMBIAR UBICACIÓN (con PIN) ── */
     .cfg-panel{
       display:none; position:fixed; inset:0;
       background:rgba(0,0,0,0.95); z-index:200;
@@ -200,7 +221,28 @@
     .cfg-btn:active{ transform:scale(0.98); background:#96281b; }
     .cfg-cerrar{ color:#888; font-size:13px; cursor:pointer; margin-top:6px; }
     .cfg-cerrar:hover{ color:#bbb; }
-
+ 
+    /* ── PIN PANEL (para cambiar ubicación) ── */
+    .pin-panel{
+      display:none; position:fixed; inset:0;
+      background:rgba(0,0,0,0.97); z-index:300;
+      flex-direction:column; align-items:center;
+      justify-content:center; padding:24px;
+    }
+    .pin-panel.visible{ display:flex; }
+    .pin-content{ width:100%; max-width:340px; text-align:center; }
+    .pin-title{ font-size:20px; font-weight:900; color:#fff; margin-bottom:8px; }
+    .pin-sub{ font-size:13px; color:#888; margin-bottom:24px; line-height:1.5; }
+    .pin-intentos{ font-size:12px; color:#e74c3c; margin-top:8px; min-height:16px; font-weight:700; }
+    .pin-btn{
+      width:100%; background:#c0392b; color:white;
+      border:none; border-radius:14px; padding:18px;
+      font-weight:800; font-size:16px; cursor:pointer;
+      margin-bottom:10px; transition:0.2s;
+    }
+    .pin-btn:active{ transform:scale(0.98); background:#96281b; }
+    .pin-cerrar{ color:#555; font-size:13px; cursor:pointer; margin-top:6px; }
+ 
     /* ── BADGE OFFLINE ── */
     .offline-badge{
       position:fixed; top:16px; right:16px;
@@ -213,27 +255,30 @@
   </style>
 </head>
 <body>
-
+ 
 <div class="offline-badge" id="offline-badge">SIN CONEXIÓN</div>
-
-<!-- ── SETUP ── -->
+ 
+<!-- ── SETUP (primera vez, pide PIN) ── -->
 <div class="pantalla" id="pantalla-setup">
   <div class="logo">NEXOS · VECINOS</div>
   <div class="form-box">
     <div class="setup-title">⚙️ CONFIGURACIÓN</div>
-    <div class="setup-subtitle">Ingresá tu ubicación una sola vez</div>
+    <div class="setup-subtitle">Ingresá tu ubicación y el PIN que te dio la administración</div>
     <input class="campo" id="setup-mza"  type="number" placeholder="N° Manzana" inputmode="numeric">
     <input class="campo" id="setup-casa" type="number" placeholder="N° Casa"    inputmode="numeric">
+    <div style="height:1px;background:#2e2e38;margin:8px 0 16px;"></div>
+    <div class="pin-hint">🔑 PIN de administrador</div>
+    <input class="pin-campo" id="setup-pin" type="password" inputmode="numeric" maxlength="6" placeholder="····">
     <div class="error-msg" id="setup-error"></div>
   </div>
   <button class="btn-setup" onclick="guardarSetup()">✅&nbsp;&nbsp;CONFIRMAR</button>
 </div>
-
+ 
 <!-- ── PÁNICO ── -->
 <div class="pantalla-panico" id="pantalla-panico">
   <div class="logo">NEXOS · VECINOS</div>
   <div class="info-config">Configurado: <strong id="config-display"></strong></div>
-
+ 
   <div class="boton-redondo-container">
     <svg class="cooldown-ring" viewBox="0 0 280 280">
       <circle cx="140" cy="140" r="126" id="cooldown-circle"/>
@@ -244,15 +289,15 @@
       <span class="boton-cooldown-txt" id="btn-cooldown-txt"></span>
     </button>
   </div>
-
+ 
   <div class="aviso-cooldown" id="aviso-cooldown">
     ✅ Alerta recibida por el vigilador.<br>
     Podés volver a enviar en <span id="cooldown-restante">30:00</span>
   </div>
-
-  <button class="btn-cfg-main" onclick="abrirCfg()">📍 Cambiar ubicación</button>
+ 
+  <button class="btn-cfg-main" onclick="pedirPinParaCambiar()">📍 Cambiar ubicación</button>
 </div>
-
+ 
 <!-- ── CONFIRMACIÓN ── -->
 <div class="enviado" id="pantalla-enviado">
   <div class="enviado-icono">✅</div>
@@ -260,7 +305,19 @@
   <div class="enviado-sub">El vigilador fue notificado.<br>Quedate tranquilo, ya están al tanto.</div>
   <button class="btn-volver" onclick="volverAlPanico()">Volver</button>
 </div>
-
+ 
+<!-- ── PIN PARA CAMBIAR UBICACIÓN ── -->
+<div class="pin-panel" id="pin-panel">
+  <div class="pin-content">
+    <div class="pin-title">🔑 PIN de administrador</div>
+    <div class="pin-sub">Para cambiar la ubicación necesitás el PIN.<br>Pedíselo a la administración del barrio.</div>
+    <input class="pin-campo" id="pin-input" type="password" inputmode="numeric" maxlength="6" placeholder="····">
+    <div class="pin-intentos" id="pin-intentos"></div>
+    <button class="pin-btn" onclick="verificarPin()">CONFIRMAR</button>
+    <div class="pin-cerrar" onclick="cerrarPin()">Cancelar</div>
+  </div>
+</div>
+ 
 <!-- ── CAMBIAR UBICACIÓN ── -->
 <div class="cfg-panel" id="cfg-panel">
   <div class="cfg-content">
@@ -273,40 +330,63 @@
     <div class="cfg-cerrar" onclick="cerrarCfg()">Cancelar</div>
   </div>
 </div>
-
+ 
 <script>
-  // ── URL INTERNA ───────────────────────────────────────────
-  const PANIC_URL  = 'https://script.google.com/macros/s/AKfycbxWEByhah2myGd-UmQgeeEezLmByVU1cpF8uliYOFQJSetnzMZWu1UGyrKqVx1oMSWlEQ/exec';
+  // ── CONFIGURACIÓN ─────────────────────────────────────────
+  const PANIC_URL   = 'https://script.google.com/macros/s/AKfycbxWEByhah2myGd-UmQgeeEezLmByVU1cpF8uliYOFQJSetnzMZWu1UGyrKqVx1oMSWlEQ/exec';
   const COOLDOWN_MS = 30 * 60 * 1000;
-
+ 
+  // ── PIN ───────────────────────────────────────────────────
+  // Cambiá este número para definir el PIN del barrio.
+  // Se guarda hasheado en el dispositivo, no en texto plano.
+  const PIN_CORRECTO = '1234'; // ← CAMBIÁ ESTE NÚMERO
+ 
   let cooldownInterval = null;
-
+  let intentosFallidos = 0;
+  const MAX_INTENTOS   = 5;
+ 
+  // Hash simple del PIN (no necesita criptografía fuerte, solo dificulta verlo en código)
+  function hashPin(pin) {
+    let h = 0;
+    for (let i = 0; i < pin.length; i++) {
+      h = ((h << 5) - h) + pin.charCodeAt(i);
+      h |= 0;
+    }
+    return String(h);
+  }
+ 
+  const PIN_HASH = hashPin(PIN_CORRECTO);
+ 
+  function pinEsCorrecto(pin) {
+    return hashPin(pin.trim()) === PIN_HASH;
+  }
+ 
   // ── SERVICE WORKER ────────────────────────────────────────
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(()=>{});
+    navigator.serviceWorker.register('sw.js').catch(() => {});
   }
-
-  // ── OFFLINE DETECTION ─────────────────────────────────────
+ 
+  // ── OFFLINE ───────────────────────────────────────────────
   function actualizarOffline() {
     document.getElementById('offline-badge').classList.toggle('visible', !navigator.onLine);
   }
   window.addEventListener('online',  actualizarOffline);
   window.addEventListener('offline', actualizarOffline);
   actualizarOffline();
-
+ 
   // ── INIT ──────────────────────────────────────────────────
   function inicializar() {
     const mza  = localStorage.getItem('nx_manzana');
     const casa = localStorage.getItem('nx_casa');
     if (mza && casa) { mostrarPantallaPanico(); } else { mostrarSetup(); }
   }
-
+ 
   function mostrarSetup() {
     document.getElementById('pantalla-setup').classList.add('visible');
     document.getElementById('pantalla-panico').classList.remove('visible');
     document.getElementById('pantalla-enviado').classList.remove('visible');
   }
-
+ 
   function mostrarPantallaPanico() {
     const mza  = localStorage.getItem('nx_manzana');
     const casa = localStorage.getItem('nx_casa');
@@ -316,18 +396,81 @@
     document.getElementById('pantalla-enviado').classList.remove('visible');
     verificarCooldown();
   }
-
+ 
+  // ── SETUP CON PIN ─────────────────────────────────────────
   function guardarSetup() {
     const mza  = document.getElementById('setup-mza').value.trim();
     const casa = document.getElementById('setup-casa').value.trim();
+    const pin  = document.getElementById('setup-pin').value.trim();
     const err  = document.getElementById('setup-error');
     err.innerText = '';
+ 
     if (!mza || !casa) { err.innerText = 'Completá manzana y casa'; return; }
+    if (!pin)          { err.innerText = 'Ingresá el PIN de administrador'; return; }
+    if (!pinEsCorrecto(pin)) {
+      err.innerText = '❌ PIN incorrecto. Pedíselo a la administración.';
+      document.getElementById('setup-pin').value = '';
+      return;
+    }
+ 
     localStorage.setItem('nx_manzana', mza);
     localStorage.setItem('nx_casa', casa);
+    document.getElementById('setup-pin').value = '';
     mostrarPantallaPanico();
   }
-
+ 
+  // ── PIN PARA CAMBIAR UBICACIÓN ────────────────────────────
+  function pedirPinParaCambiar() {
+    intentosFallidos = 0;
+    document.getElementById('pin-input').value = '';
+    document.getElementById('pin-intentos').innerText = '';
+    document.getElementById('pin-panel').classList.add('visible');
+    setTimeout(() => document.getElementById('pin-input').focus(), 100);
+  }
+ 
+  function verificarPin() {
+    const pin = document.getElementById('pin-input').value.trim();
+    const msg = document.getElementById('pin-intentos');
+ 
+    if (!pin) { msg.innerText = 'Ingresá el PIN'; return; }
+ 
+    if (!pinEsCorrecto(pin)) {
+      intentosFallidos++;
+      document.getElementById('pin-input').value = '';
+      const restantes = MAX_INTENTOS - intentosFallidos;
+      if (restantes <= 0) {
+        // Bloquea 5 minutos tras 5 intentos fallidos
+        localStorage.setItem('nx_pin_block', String(Date.now() + 5 * 60 * 1000));
+        cerrarPin();
+        alert('Demasiados intentos incorrectos. Intentá en 5 minutos.');
+        return;
+      }
+      msg.innerText = `❌ PIN incorrecto. ${restantes} intento${restantes > 1 ? 's' : ''} restante${restantes > 1 ? 's' : ''}.`;
+      return;
+    }
+ 
+    // PIN correcto → abrir panel de cambio
+    cerrarPin();
+    abrirCfg();
+  }
+ 
+  function cerrarPin() {
+    document.getElementById('pin-input').value = '';
+    document.getElementById('pin-intentos').innerText = '';
+    document.getElementById('pin-panel').classList.remove('visible');
+  }
+ 
+  // Permite Enter para confirmar PIN
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('pin-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') verificarPin();
+    });
+    document.getElementById('setup-pin').addEventListener('keydown', e => {
+      if (e.key === 'Enter') guardarSetup();
+    });
+    inicializar();
+  });
+ 
   // ── COOLDOWN ──────────────────────────────────────────────
   function verificarCooldown() {
     const ts   = parseInt(localStorage.getItem('nx_last_panico') || '0');
@@ -335,17 +478,17 @@
     if (ts && diff < COOLDOWN_MS) { activarUI_Cooldown(COOLDOWN_MS - diff); }
     else { desactivarUI_Cooldown(); }
   }
-
+ 
   function activarUI_Cooldown(msRestantes) {
     document.getElementById('btn-panico-redondo').disabled = true;
     document.getElementById('btn-emoji').innerText = '✅';
     document.getElementById('btn-cooldown-txt').style.display = 'block';
     document.getElementById('aviso-cooldown').classList.add('visible');
-
+ 
     const circ   = 2 * Math.PI * 126;
     const circle = document.getElementById('cooldown-circle');
     if (cooldownInterval) clearInterval(cooldownInterval);
-
+ 
     function actualizar() {
       const ts       = parseInt(localStorage.getItem('nx_last_panico') || '0');
       const restante = COOLDOWN_MS - (Date.now() - ts);
@@ -362,7 +505,7 @@
     actualizar();
     cooldownInterval = setInterval(actualizar, 1000);
   }
-
+ 
   function desactivarUI_Cooldown() {
     document.getElementById('btn-panico-redondo').disabled = false;
     document.getElementById('btn-emoji').innerText = '🆘';
@@ -372,7 +515,7 @@
     document.getElementById('aviso-cooldown').classList.remove('visible');
     document.getElementById('cooldown-circle').style.strokeDashoffset = '791';
   }
-
+ 
   // ── GEOLOCALIZACIÓN ───────────────────────────────────────
   function obtenerUbicacion() {
     return new Promise((resolve) => {
@@ -384,58 +527,65 @@
       );
     });
   }
-
+ 
   // ── ENVÍO ─────────────────────────────────────────────────
   async function enviarPanico() {
+    // Chequea bloqueo por intentos fallidos de PIN
+    const block = parseInt(localStorage.getItem('nx_pin_block') || '0');
+    if (block && Date.now() < block) {
+      const min = Math.ceil((block - Date.now()) / 60000);
+      alert(`Acceso temporalmente bloqueado. Intentá en ${min} minuto${min > 1 ? 's' : ''}.`);
+      return;
+    }
+ 
     const mza  = localStorage.getItem('nx_manzana');
     const casa = localStorage.getItem('nx_casa');
     const btn  = document.getElementById('btn-panico-redondo');
-
+ 
     btn.disabled = true;
     document.getElementById('btn-emoji').innerText = '📍';
     document.getElementById('btn-texto').innerText = 'Ubicando...';
-
-    const geo = await obtenerUbicacion();
+ 
+    const geo     = await obtenerUbicacion();
     const mapsUrl = geo ? `https://maps.google.com/?q=${geo.lat},${geo.lng}` : null;
-
+ 
     document.getElementById('btn-emoji').innerText = '⏳';
     document.getElementById('btn-texto').innerText = 'Enviando...';
-
-    const payload = { accion:'panico', mza, casa, lat: geo?.lat, lng: geo?.lng, mapsUrl };
-
+ 
+    const payload = { accion: 'panico', mza, casa, lat: geo?.lat, lng: geo?.lng, mapsUrl };
+ 
     try {
       await fetch(PANIC_URL, {
-        method:'POST', mode:'no-cors',
-        headers:{ 'Content-Type':'application/json' },
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
       localStorage.setItem('nx_last_panico', String(Date.now()));
       document.getElementById('pantalla-panico').classList.remove('visible');
       document.getElementById('pantalla-enviado').classList.add('visible');
     } catch(e) {
-      // Si no hay conexión, guardar en cola offline
       guardarOffline(payload);
       localStorage.setItem('nx_last_panico', String(Date.now()));
       document.getElementById('pantalla-panico').classList.remove('visible');
       document.getElementById('pantalla-enviado').classList.add('visible');
     }
   }
-
-  // ── COLA OFFLINE ─────────────────────────────────────────
+ 
+  // ── COLA OFFLINE ──────────────────────────────────────────
   function guardarOffline(payload) {
     const cola = JSON.parse(localStorage.getItem('nx_offline_queue') || '[]');
     cola.push({ payload, ts: Date.now() });
     localStorage.setItem('nx_offline_queue', JSON.stringify(cola));
   }
-
+ 
   async function enviarColaOffline() {
     const cola = JSON.parse(localStorage.getItem('nx_offline_queue') || '[]');
     if (!cola.length || !navigator.onLine) return;
     for (const item of cola) {
       try {
         await fetch(PANIC_URL, {
-          method:'POST', mode:'no-cors',
-          headers:{ 'Content-Type':'application/json' },
+          method: 'POST', mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(item.payload)
         });
       } catch(e) { return; }
@@ -443,13 +593,13 @@
     localStorage.removeItem('nx_offline_queue');
   }
   window.addEventListener('online', enviarColaOffline);
-
+ 
   function volverAlPanico() {
     document.getElementById('pantalla-enviado').classList.remove('visible');
     mostrarPantallaPanico();
   }
-
-  // ── CAMBIAR UBICACIÓN ────────────────────────────────────
+ 
+  // ── CAMBIAR UBICACIÓN ─────────────────────────────────────
   function abrirCfg() {
     document.getElementById('cfg-mza').value  = localStorage.getItem('nx_manzana') || '';
     document.getElementById('cfg-casa').value = localStorage.getItem('nx_casa')    || '';
@@ -468,8 +618,7 @@
     cerrarCfg();
     mostrarPantallaPanico();
   }
-
-  window.addEventListener('DOMContentLoaded', inicializar);
 </script>
 </body>
 </html>
+ 
