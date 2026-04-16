@@ -72,7 +72,7 @@
     .sync-ok{color:var(--green);}
     .sync-err{color:var(--red);}
     .sync-loading{color:var(--gold);}
-    
+ 
     /* ── BARRA SUPERIOR CON LOGOUT ── */
     .header-bar{
       background:var(--bg2);border-bottom:1px solid var(--border);
@@ -89,6 +89,13 @@
       transition:0.2s;
     }
     .btn-logout:active{transform:scale(0.95);}
+ 
+    /* ── LABEL DE CAMPO ── */
+    .campo-label{
+      font-size:11px;color:#666;letter-spacing:1px;
+      font-weight:700;margin-bottom:4px;margin-top:4px;
+      padding-left:4px;
+    }
  
     /* ── OVERLAY EMERGENCIA ── */
     .panico-overlay{
@@ -155,7 +162,7 @@
     <div class="pin-key borra" onclick="pinBorrar()">⌫</div>
   </div>
   <div class="pin-error" id="pin-error"></div>
-  <div class="pin-info">⚠️ Cada carga de página requiere autenticación<br>La sesión expira después de 15 minutos sin actividad</div>
+  <div class="pin-info">⚠️ La sesión expira después de 15 minutos sin actividad</div>
 </div>
  
 <!-- ── OVERLAY EMERGENCIA ── -->
@@ -180,6 +187,7 @@
     <div class="mon-card" style="color:var(--green)"><span class="mon-val" id="mon-v">0</span><span style="font-size:10px">VISITAS</span></div>
     <div class="mon-card" style="color:var(--red)"><span class="mon-val" id="mon-a">0</span><span style="font-size:10px">ALERTAS</span></div>
   </div>
+ 
   <div class="search-box">
     <input class="search-input" id="buscador" placeholder="PATENTE O DNI..." oninput="this.value=this.value.toUpperCase()">
     <div class="action-btns">
@@ -187,20 +195,27 @@
       <div class="btn-main salida"  onclick="registrarRapido('salida')">📤 SALIDA</div>
     </div>
   </div>
+ 
   <div class="menu-nav">
     <div class="nav-item active" id="btn-lista"    onclick="ver('lista')">📋 LISTA</div>
     <div class="nav-item"        id="btn-manual"   onclick="ver('manual')">➕ MANUAL</div>
     <div class="nav-item"        id="btn-delivery" onclick="ver('delivery')">🛵 DELY</div>
     <div class="nav-item"        id="btn-config"   onclick="ver('config')">⚙️ CONFIG</div>
   </div>
+ 
   <div id="p-lista" class="panel active">
     <div class="sync-status" id="sync-status"></div>
     <button class="btn-sync" onclick="sincronizar(true)">🔄 SINCRONIZAR CON LA NUBE</button>
     <div class="section" id="cont-lista"></div>
   </div>
+ 
+  <!-- ── MANUAL: PATENTE + DNI + MZA + CASA ── -->
   <div id="p-manual" class="panel">
     <div class="section">
+      <div class="campo-label">PATENTE / VEHÍCULO</div>
       <input id="m-pat" class="giant" placeholder="PATENTE" oninput="this.value=this.value.toUpperCase()">
+      <div class="campo-label">DNI (opcional)</div>
+      <input id="m-dni" class="giant" placeholder="DNI" inputmode="numeric">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <input id="m-mza"  class="giant" placeholder="MZA">
         <input id="m-casa" class="giant" placeholder="CASA">
@@ -208,9 +223,14 @@
       <button class="btn-save" onclick="guardarForm('manual')">REGISTRAR INGRESO</button>
     </div>
   </div>
+ 
+  <!-- ── DELIVERY: MOTO + DNI + MZA + CASA ── -->
   <div id="p-delivery" class="panel">
     <div class="section">
+      <div class="campo-label">PATENTE / MOTO</div>
       <input id="d-pat" class="giant" placeholder="MOTO" oninput="this.value=this.value.toUpperCase()">
+      <div class="campo-label">DNI (opcional)</div>
+      <input id="d-dni" class="giant" placeholder="DNI" inputmode="numeric">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <input id="d-mza"  class="giant" placeholder="MZA">
         <input id="d-casa" class="giant" placeholder="CASA">
@@ -218,6 +238,7 @@
       <button class="btn-save" style="background:var(--gold);color:black;" onclick="guardarForm('delivery')">DELIVERY</button>
     </div>
   </div>
+ 
   <div id="p-config" class="panel">
     <div class="section">
       <input id="cfg-url" class="giant" placeholder="URL /exec del Google Script">
@@ -263,8 +284,7 @@
   // ── APP ───────────────────────────────────────────────────
   let DB = JSON.parse(localStorage.getItem('nx_db') || '[]');
   let sincronizando=false, panicosPendientes=[], audioCtx=null, sirenInterval=null;
-  let timeoutSeguridad = null;
-  let tiempoRestante = 15 * 60; // 15 minutos en segundos
+  let timeoutSeguridad=null, tiempoRestante=15*60;
  
   function initAudio() {
     if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
@@ -294,71 +314,52 @@
   document.addEventListener('touchstart',initAudio,{once:true});
   document.addEventListener('click',initAudio,{once:true});
  
+  // ── TIMEOUT DE SESIÓN ────────────────────────────────────
+  function resetearTimeoutSeguridad() {
+    if (timeoutSeguridad) clearTimeout(timeoutSeguridad);
+    tiempoRestante = 15*60;
+    actualizarTimerSesion();
+    timeoutSeguridad = setTimeout(cerrarSesion, 15*60*1000);
+    if (window.timerIntervalo) clearInterval(window.timerIntervalo);
+    window.timerIntervalo = setInterval(() => {
+      tiempoRestante--;
+      actualizarTimerSesion();
+      if (tiempoRestante <= 0) cerrarSesion();
+    }, 1000);
+  }
+  function actualizarTimerSesion() {
+    const m=Math.floor(tiempoRestante/60), s=tiempoRestante%60;
+    document.getElementById('timer-sesion').innerText = String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  }
+  function cerrarSesion() {
+    if (window.timerIntervalo) clearInterval(window.timerIntervalo);
+    if (timeoutSeguridad) clearTimeout(timeoutSeguridad);
+    sessionStorage.removeItem('nx_auth');
+    pinActual=''; actualizarPuntos();
+    document.getElementById('pin-screen').classList.remove('oculto');
+    document.getElementById('header-bar').style.display='none';
+    document.getElementById('pin-error').innerText='SESIÓN EXPIRADA - Volvé a ingresar';
+  }
+  ['click','touchstart','keypress','mousemove'].forEach(ev => {
+    document.addEventListener(ev, () => {
+      if (sessionStorage.getItem('nx_auth')==='1') resetearTimeoutSeguridad();
+    });
+  });
+ 
+  // ── HELPERS ───────────────────────────────────────────────
   function showToast(msg){ const t=document.getElementById('toast'); t.innerText=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
   function setSyncStatus(msg,cls){ const el=document.getElementById('sync-status'); el.innerText=msg; el.className='sync-status '+(cls||''); }
   function horaActual(){ return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
   function limpiarHora(h){ if(!h)return''; const s=String(h); if(s.includes('T'))return s.split('T')[1].substring(0,5); if(s.includes('\n'))return s.split('\n')[1]||''; return s; }
   function escapeHtml(str){ if(!str)return''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
- 
   function ver(n){ document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); document.getElementById('p-'+n).classList.add('active'); document.getElementById('btn-'+n).classList.add('active'); }
- 
-  // ── TIMEOUT DE SESIÓN (pedir clave cada 15 minutos) ────────
-  function resetearTimeoutSeguridad() {
-    if (timeoutSeguridad) clearTimeout(timeoutSeguridad);
-    tiempoRestante = 15 * 60;
-    actualizarTimerSesion();
-    
-    timeoutSeguridad = setTimeout(() => {
-      cerrarSesion();
-    }, 15 * 60 * 1000); // 15 minutos
-    
-    // Actualizar timer cada segundo
-    if (window.timerIntervalo) clearInterval(window.timerIntervalo);
-    window.timerIntervalo = setInterval(() => {
-      tiempoRestante--;
-      actualizarTimerSesion();
-      if (tiempoRestante <= 0) {
-        cerrarSesion();
-      }
-    }, 1000);
-  }
-  
-  function actualizarTimerSesion() {
-    const minutos = Math.floor(tiempoRestante / 60);
-    const segundos = tiempoRestante % 60;
-    const display = String(minutos).padStart(2, '0') + ':' + String(segundos).padStart(2, '0');
-    document.getElementById('timer-sesion').innerText = display;
-  }
-  
-  function cerrarSesion() {
-    if (window.timerIntervalo) clearInterval(window.timerIntervalo);
-    if (timeoutSeguridad) clearTimeout(timeoutSeguridad);
-    sessionStorage.removeItem('nx_auth');
-    pinActual = '';
-    actualizarPuntos();
-    document.getElementById('pin-screen').classList.remove('oculto');
-    document.getElementById('header-bar').style.display = 'none';
-    document.getElementById('pin-error').innerText = 'SESIÓN EXPIRADA - Vuelve a ingresar';
-  }
-  
-  // Detectar actividad para resetear timeout
-  ['click', 'touchstart', 'keypress', 'mousemove'].forEach(event => {
-    document.addEventListener(event, () => {
-      if (sessionStorage.getItem('nx_auth') === '1') {
-        resetearTimeoutSeguridad();
-      }
-    });
-  });
  
   // ── PÁNICO ────────────────────────────────────────────────
   function mostrarPanico(alertas) {
     const lista = document.getElementById('panico-lista');
     lista.innerHTML = alertas.map(a => {
-      // Reconstruir URL desde lat/lng si el campo mapsUrl llegó vacío
-      let mapUrl = (a.mapsUrl || '').trim();
-      if (!mapUrl && a.lat && a.lng && String(a.lat).length > 3) {
-        mapUrl = 'https://maps.google.com/?q=' + a.lat + ',' + a.lng;
-      }
+      let mapUrl=(a.mapsUrl||'').trim();
+      if(!mapUrl&&a.lat&&a.lng&&String(a.lat).length>3) mapUrl='https://maps.google.com/?q='+a.lat+','+a.lng;
       const mapsHtml = mapUrl
         ? `<a class="panico-maps-btn" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener">📍 Ver ubicación en Google Maps</a>`
         : `<div class="panico-no-maps">📍 Ubicación GPS no disponible</div>`;
@@ -371,18 +372,18 @@
     document.getElementById('panico-overlay').classList.add('visible');
     initAudio(); iniciarSirena();
   }
- 
   function cerrarPanico() {
     detenerSirena();
-    const url = localStorage.getItem('nx_url');
-    panicosPendientes.forEach(a => {
-      if (!url) return;
+    const url=localStorage.getItem('nx_url');
+    panicosPendientes.forEach(a=>{
+      if(!url)return;
       fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({accion:'ack_panico',panicoId:a.panicoId})});
     });
     panicosPendientes=[];
     document.getElementById('panico-overlay').classList.remove('visible');
   }
  
+  // ── SINCRONIZACIÓN ────────────────────────────────────────
   async function sincronizar(manual=false) {
     const url=localStorage.getItem('nx_url');
     if(!url){if(manual)showToast("⚙️ Configurá la URL primero");return;}
@@ -411,9 +412,32 @@
  
   function enviar(datos){ const url=localStorage.getItem('nx_url'); if(!url)return; fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)}).then(()=>setTimeout(()=>sincronizar(),1500)).catch(()=>showToast("⚠️ No se pudo subir")); }
  
-  function registrarRapido(tipo){ const val=document.getElementById('buscador').value.trim(); if(!val)return; const hora=horaActual(); let item; if(tipo==='ingreso'){item={id:Date.now(),pat:val,tipo:'VISITA',hE:hora,hS:'',tsE:Date.now(),mza:'',casa:''}; DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}else{const c=DB.filter(x=>x.pat===val&&!x.hS).sort((a,b)=>(b.tsE||0)-(a.tsE||0));item=c[0];if(item){item.hE=limpiarHora(item.hE);item.hS=hora;DB=DB.filter(x=>x.id!==item.id);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}else{showToast("❌ NO ENCONTRADO");return;}} document.getElementById('buscador').value=''; }
+  function registrarRapido(tipo){ const val=document.getElementById('buscador').value.trim(); if(!val)return; const hora=horaActual(); let item; if(tipo==='ingreso'){item={id:Date.now(),pat:val,tipo:'VISITA',hE:hora,hS:'',tsE:Date.now(),mza:'',casa:'',dni:''}; DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}else{const c=DB.filter(x=>x.pat===val&&!x.hS).sort((a,b)=>(b.tsE||0)-(a.tsE||0));item=c[0];if(item){item.hE=limpiarHora(item.hE);item.hS=hora;DB=DB.filter(x=>x.id!==item.id);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}else{showToast("❌ NO ENCONTRADO");return;}} document.getElementById('buscador').value=''; }
  
-  function guardarForm(modo){ const pre=modo==='manual'?'m-':'d-'; const p=document.getElementById(pre+'pat').value.trim(); if(!p)return; const item={id:Date.now(),pat:p,mza:document.getElementById(pre+'mza').value.trim(),casa:document.getElementById(pre+'casa').value.trim(),tipo:modo==='manual'?'MANUAL':'DELIVERY',hE:horaActual(),hS:'',tsE:Date.now()}; DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));['pat','mza','casa'].forEach(f=>document.getElementById(pre+f).value='');showToast("✅ REGISTRADO");ver('lista');render();enviar(item); }
+  // ── GUARDAR FORMULARIO (con DNI → col K) ──────────────────
+  function guardarForm(modo) {
+    const pre = modo==='manual' ? 'm-' : 'd-';
+    const p   = document.getElementById(pre+'pat').value.trim();
+    if (!p) return;
+    const item = {
+      id:   Date.now(),
+      pat:  p,
+      dni:  document.getElementById(pre+'dni').value.trim(),   // → col K
+      mza:  document.getElementById(pre+'mza').value.trim(),
+      casa: document.getElementById(pre+'casa').value.trim(),
+      tipo: modo==='manual' ? 'MANUAL' : 'DELIVERY',
+      hE:   horaActual(), hS:'', tsE:Date.now()
+    };
+    DB.push(item);
+    localStorage.setItem('nx_db', JSON.stringify(DB));
+    // Limpiar campos incluyendo DNI
+    ['pat','dni','mza','casa'].forEach(f => {
+      const el = document.getElementById(pre+f);
+      if (el) el.value = '';
+    });
+    showToast("✅ REGISTRADO");
+    ver('lista'); render(); enviar(item);
+  }
  
   function darSalida(id){ const item=DB.find(x=>x.id===id); if(!item)return; item.hE=limpiarHora(item.hE);item.hS=horaActual();DB=DB.filter(x=>x.id!==id);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item); }
  
@@ -425,7 +449,9 @@
       const hE=limpiarHora(r.hE); const tsE=r.tsE||0; const isA=(r.tipo==='DELIVERY'&&(ahora-tsE>900000));
       if(r.tipo==='DELIVERY'){if(isA)a++;else d++;}else v++;
       let cls='adentro'; if(isA)cls='alerta'; else if(r.tipo==='DELIVERY')cls='dely-adentro';
-      return `<div class="reg-item ${cls}"><div><strong>${escapeHtml(r.pat)}</strong><br><small>Mza: ${escapeHtml(r.mza||'-')} - Lote: ${escapeHtml(r.casa||'-')}<br>${escapeHtml(r.tipo)} | ${hE}${isA?' ⚠️ +15min':''}</small></div><button onclick="darSalida(${r.id})" style="background:var(--red);color:white;border:none;padding:10px 15px;border-radius:10px;font-weight:800;cursor:pointer;flex-shrink:0;">SALIDA</button></div>`;
+      // Mostrar DNI en la lista si existe
+      const dniInfo = r.dni ? ` · DNI: ${escapeHtml(r.dni)}` : '';
+      return `<div class="reg-item ${cls}"><div><strong>${escapeHtml(r.pat)}</strong><br><small>Mza: ${escapeHtml(r.mza||'-')} - Lote: ${escapeHtml(r.casa||'-')}${dniInfo}<br>${escapeHtml(r.tipo)} | ${hE}${isA?' ⚠️ +15min':''}</small></div><button onclick="darSalida(${r.id})" style="background:var(--red);color:white;border:none;padding:10px 15px;border-radius:10px;font-weight:800;cursor:pointer;flex-shrink:0;">SALIDA</button></div>`;
     }).join('')||'<p style="opacity:0.3;text-align:center;padding:20px;">SIN ACTIVIDAD</p>';
     cont.innerHTML=html;
     document.getElementById('mon-d').innerText=d;
@@ -440,9 +466,10 @@
     setInterval(render,30000);
   }
  
-  // ── INIT: Siempre mostrar PIN al cargar ───────────────────
+  // ── INIT: siempre pedir PIN al cargar ────────────────────
   document.getElementById('pin-screen').classList.remove('oculto');
-  document.getElementById('header-bar').style.display = 'none';
+  document.getElementById('header-bar').style.display='none';
 </script>
 </body>
 </html>
+
