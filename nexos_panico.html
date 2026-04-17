@@ -345,37 +345,14 @@
   const PANIC_URL  = 'https://script.google.com/macros/s/AKfycbzSKCmYVg0bOOq1Uedl5MpiN9hYnRpJ8d5IbLFCyIjqL7pyYvcc4dBfrvo58HOvrz-8/exec';
   const COOLDOWN_MS = 15 * 60 * 1000;
  
-  // ── PIN ───────────────────────────────────────────────────
-  // Cambiá este número para definir el PIN del barrio.
-  // Se guarda hasheado en el dispositivo, no en texto plano.
-  const PIN_CORRECTO = '1342'; // ← CAMBIÁ ESTE NÚMERO
- 
   let cooldownInterval = null;
-  let intentosFallidos = 0;
-  const MAX_INTENTOS   = 5;
- 
-  // Hash simple del PIN (no necesita criptografía fuerte, solo dificulta verlo en código)
-  function hashPin(pin) {
-    let h = 0;
-    for (let i = 0; i < pin.length; i++) {
-      h = ((h << 5) - h) + pin.charCodeAt(i);
-      h |= 0;
-    }
-    return String(h);
-  }
- 
-  const PIN_HASH = hashPin(PIN_CORRECTO);
- 
-  function pinEsCorrecto(pin) {
-    return hashPin(pin.trim()) === PIN_HASH;
-  }
  
   // ── SERVICE WORKER ────────────────────────────────────────
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
   }
  
-  // ── OFFLINE ───────────────────────────────────────────────
+  // ── OFFLINE DETECTION ─────────────────────────────────────
   function actualizarOffline() {
     document.getElementById('offline-badge').classList.toggle('visible', !navigator.onLine);
   }
@@ -406,79 +383,16 @@
     verificarCooldown();
   }
  
-  // ── SETUP CON PIN ─────────────────────────────────────────
   function guardarSetup() {
     const mza  = document.getElementById('setup-mza').value.trim();
     const casa = document.getElementById('setup-casa').value.trim();
-    const pin  = document.getElementById('setup-pin').value.trim();
     const err  = document.getElementById('setup-error');
     err.innerText = '';
- 
     if (!mza || !casa) { err.innerText = 'Completá manzana y casa'; return; }
-    if (!pin)          { err.innerText = 'Ingresá el PIN de administrador'; return; }
-    if (!pinEsCorrecto(pin)) {
-      err.innerText = '❌ PIN incorrecto. Pedíselo a la administración.';
-      document.getElementById('setup-pin').value = '';
-      return;
-    }
- 
     localStorage.setItem('nx_manzana', mza);
     localStorage.setItem('nx_casa', casa);
-    document.getElementById('setup-pin').value = '';
     mostrarPantallaPanico();
   }
- 
-  // ── PIN PARA CAMBIAR UBICACIÓN ────────────────────────────
-  function pedirPinParaCambiar() {
-    intentosFallidos = 0;
-    document.getElementById('pin-input').value = '';
-    document.getElementById('pin-intentos').innerText = '';
-    document.getElementById('pin-panel').classList.add('visible');
-    setTimeout(() => document.getElementById('pin-input').focus(), 100);
-  }
- 
-  function verificarPin() {
-    const pin = document.getElementById('pin-input').value.trim();
-    const msg = document.getElementById('pin-intentos');
- 
-    if (!pin) { msg.innerText = 'Ingresá el PIN'; return; }
- 
-    if (!pinEsCorrecto(pin)) {
-      intentosFallidos++;
-      document.getElementById('pin-input').value = '';
-      const restantes = MAX_INTENTOS - intentosFallidos;
-      if (restantes <= 0) {
-        // Bloquea 5 minutos tras 5 intentos fallidos
-        localStorage.setItem('nx_pin_block', String(Date.now() + 5 * 60 * 1000));
-        cerrarPin();
-        alert('Demasiados intentos incorrectos. Intentá en 5 minutos.');
-        return;
-      }
-      msg.innerText = `❌ PIN incorrecto. ${restantes} intento${restantes > 1 ? 's' : ''} restante${restantes > 1 ? 's' : ''}.`;
-      return;
-    }
- 
-    // PIN correcto → abrir panel de cambio
-    cerrarPin();
-    abrirCfg();
-  }
- 
-  function cerrarPin() {
-    document.getElementById('pin-input').value = '';
-    document.getElementById('pin-intentos').innerText = '';
-    document.getElementById('pin-panel').classList.remove('visible');
-  }
- 
-  // Permite Enter para confirmar PIN
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('pin-input').addEventListener('keydown', e => {
-      if (e.key === 'Enter') verificarPin();
-    });
-    document.getElementById('setup-pin').addEventListener('keydown', e => {
-      if (e.key === 'Enter') guardarSetup();
-    });
-    inicializar();
-  });
  
   // ── COOLDOWN ──────────────────────────────────────────────
   function verificarCooldown() {
@@ -508,15 +422,24 @@
       document.getElementById('cooldown-restante').innerText = txt;
       document.getElementById('btn-cooldown-txt').innerText  = txt;
       document.getElementById('btn-texto').innerText = 'ALERTA RECIBIDA';
-      const progreso = 1 - (restante / COOLDOWN_MS);
+      const progreso = 1 - (restante / COOLDOWN_MS); // 0=inicio, 1=lleno
       circle.style.strokeDashoffset = circ * (1 - progreso);
+      // Mover el liquido neon: empieza abajo (-105%) y sube hasta 0% al completarse
+      const liquidY = -105 + (progreso * 108); // de -105% a +3%
+      const waveY   = liquidY + 8;
+      const btn = document.getElementById('btn-panico-redondo');
+      btn.style.setProperty('--liquid-y',      liquidY.toFixed(1) + '%');
+      btn.style.setProperty('--liquid-wave-y', waveY.toFixed(1)   + '%');
     }
     actualizar();
     cooldownInterval = setInterval(actualizar, 1000);
   }
  
   function desactivarUI_Cooldown() {
-    document.getElementById('btn-panico-redondo').disabled = false;
+    const btn = document.getElementById('btn-panico-redondo');
+    btn.disabled = false;
+    btn.style.setProperty('--liquid-y',      '-105%');
+    btn.style.setProperty('--liquid-wave-y', '-97%');
     document.getElementById('btn-emoji').innerText = '🆘';
     document.getElementById('btn-texto').innerText = 'EMERGENCIA';
     document.getElementById('btn-cooldown-txt').style.display = 'none';
@@ -539,14 +462,6 @@
  
   // ── ENVÍO ─────────────────────────────────────────────────
   async function enviarPanico() {
-    // Chequea bloqueo por intentos fallidos de PIN
-    const block = parseInt(localStorage.getItem('nx_pin_block') || '0');
-    if (block && Date.now() < block) {
-      const min = Math.ceil((block - Date.now()) / 60000);
-      alert(`Acceso temporalmente bloqueado. Intentá en ${min} minuto${min > 1 ? 's' : ''}.`);
-      return;
-    }
- 
     const mza  = localStorage.getItem('nx_manzana');
     const casa = localStorage.getItem('nx_casa');
     const btn  = document.getElementById('btn-panico-redondo');
@@ -555,24 +470,25 @@
     document.getElementById('btn-emoji').innerText = '📍';
     document.getElementById('btn-texto').innerText = 'Ubicando...';
  
-    const geo     = await obtenerUbicacion();
-    const mapsUrl = geo ? `https://www.google.com/maps?q=${geo.lat},${geo.lng}` : null;
+    const geo = await obtenerUbicacion();
+    const mapsUrl = geo ? `https://maps.google.com/?q=${geo.lat},${geo.lng}` : null;
  
     document.getElementById('btn-emoji').innerText = '⏳';
     document.getElementById('btn-texto').innerText = 'Enviando...';
  
-    const payload = { accion: 'panico', mza, casa, lat: geo?.lat, lng: geo?.lng, mapsUrl };
+    const payload = { accion:'panico', mza, casa, lat: geo?.lat, lng: geo?.lng, mapsUrl };
  
     try {
       await fetch(PANIC_URL, {
-        method: 'POST', mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
+        method:'POST', mode:'no-cors',
+        headers:{ 'Content-Type':'application/json' },
         body: JSON.stringify(payload)
       });
       localStorage.setItem('nx_last_panico', String(Date.now()));
       document.getElementById('pantalla-panico').classList.remove('visible');
       document.getElementById('pantalla-enviado').classList.add('visible');
     } catch(e) {
+      // Si no hay conexión, guardar en cola offline
       guardarOffline(payload);
       localStorage.setItem('nx_last_panico', String(Date.now()));
       document.getElementById('pantalla-panico').classList.remove('visible');
@@ -580,7 +496,7 @@
     }
   }
  
-  // ── COLA OFFLINE ──────────────────────────────────────────
+  // ── COLA OFFLINE ─────────────────────────────────────────
   function guardarOffline(payload) {
     const cola = JSON.parse(localStorage.getItem('nx_offline_queue') || '[]');
     cola.push({ payload, ts: Date.now() });
@@ -593,8 +509,8 @@
     for (const item of cola) {
       try {
         await fetch(PANIC_URL, {
-          method: 'POST', mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
+          method:'POST', mode:'no-cors',
+          headers:{ 'Content-Type':'application/json' },
           body: JSON.stringify(item.payload)
         });
       } catch(e) { return; }
@@ -608,7 +524,7 @@
     mostrarPantallaPanico();
   }
  
-  // ── CAMBIAR UBICACIÓN ─────────────────────────────────────
+  // ── CAMBIAR UBICACIÓN ────────────────────────────────────
   function abrirCfg() {
     document.getElementById('cfg-mza').value  = localStorage.getItem('nx_manzana') || '';
     document.getElementById('cfg-casa').value = localStorage.getItem('nx_casa')    || '';
@@ -627,7 +543,8 @@
     cerrarCfg();
     mostrarPantallaPanico();
   }
+ 
+  window.addEventListener('DOMContentLoaded', inicializar);
 </script>
 </body>
 </html>
- 
