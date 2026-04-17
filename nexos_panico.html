@@ -524,27 +524,6 @@
     document.getElementById('pantalla-enviado').classList.remove('visible');
     mostrarPantallaPanico();
   }
-  // ── PIN ───────────────────────────────────────────────────
-  const PIN_CORRECTO = '1342';
- 
-  let cooldownInterval = null;
-  let intentosFallidos = 0;
-  const MAX_INTENTOS   = 5;
- 
-  function hashPin(pin) {
-    let h = 0;
-    for (let i = 0; i < pin.length; i++) {
-      h = ((h << 5) - h) + pin.charCodeAt(i);
-      h |= 0;
-    }
-    return String(h);
-  }
- 
-  const PIN_HASH = hashPin(PIN_CORRECTO);
- 
-  function pinEsCorrecto(pin) {
-    return hashPin(pin.trim()) === PIN_HASH;
-  }
  
   // ── CAMBIAR UBICACIÓN ────────────────────────────────────
   function abrirCfg() {
