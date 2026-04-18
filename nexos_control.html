@@ -56,11 +56,36 @@
     /* ── HEADER ── */
     .header-bar{background:var(--bg2);border:1px solid transparent;border-radius:16px;padding:8px 12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;position:relative;background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(90deg,#00d4d4,#a855f7,#ff3190,#00d4d4);background-origin:border-box;background-clip:padding-box,border-box;box-shadow:0 0 18px rgba(0,212,212,0.25),0 0 32px rgba(168,85,247,0.15);}
     .logo-btn{display:flex;align-items:center;gap:10px;cursor:pointer;background:none;border:none;padding:0;position:relative;}
-    .logo-img{height:38px;border-radius:8px;filter:drop-shadow(0 0 8px rgba(0,212,212,0.6));}
+    /* FIX: logo más grande — de 38px a 52px */
+    .logo-img{height:52px;border-radius:10px;filter:drop-shadow(0 0 8px rgba(0,212,212,0.6));}
     .logo-arrow{font-size:10px;color:#555;margin-left:4px;transition:0.2s;}
-    .header-right{display:flex;align-items:center;gap:8px;}
-    .header-timer{font-size:11px;color:#555;font-weight:600;letter-spacing:1px;}
-    .btn-logout{background:transparent;color:#555;border:1px solid #333;border-radius:8px;padding:6px 10px;font-size:10px;font-weight:800;cursor:pointer;transition:0.2s;}
+    .header-right{display:flex;align-items:center;gap:10px;}
+ 
+    /* FIX: hora + clima en neón cyan en vez del contador */
+    .header-clock{display:flex;align-items:center;gap:6px;}
+    .header-hora{font-size:18px;font-weight:900;letter-spacing:2px;color:var(--cyan);text-shadow:0 0 8px rgba(0,212,212,0.9),0 0 20px rgba(0,212,212,0.5);font-family:monospace;}
+    .header-clima{font-size:22px;line-height:1;}
+ 
+    /* FIX: botón SALIR con borde y texto neón rojo */
+    .btn-logout{
+      background:transparent;
+      color:#ff2020;
+      border:1.5px solid #ff2020;
+      border-radius:8px;
+      padding:6px 10px;
+      font-size:10px;
+      font-weight:900;
+      cursor:pointer;
+      transition:0.2s;
+      text-shadow:0 0 6px rgba(255,30,30,0.8),0 0 14px rgba(255,30,30,0.4);
+      box-shadow:0 0 8px rgba(255,30,30,0.4),inset 0 0 6px rgba(255,30,30,0.05);
+      animation:neonRed 2.5s ease-in-out infinite;
+      letter-spacing:1px;
+    }
+    @keyframes neonRed{
+      0%,100%{box-shadow:0 0 6px rgba(255,30,30,0.4),inset 0 0 4px rgba(255,30,30,0.05);text-shadow:0 0 6px rgba(255,30,30,0.8);}
+      50%{box-shadow:0 0 14px rgba(255,30,30,0.8),inset 0 0 10px rgba(255,30,30,0.1);text-shadow:0 0 12px rgba(255,30,30,1),0 0 24px rgba(255,30,30,0.6);}
+    }
     .btn-logout:active{background:var(--red);color:white;border-color:var(--red);}
  
     /* ── MENÚ LOGO ── */
@@ -99,6 +124,7 @@
     /* ── PIN GENÉRICO ── */
     .gpin-puntos{display:flex;gap:12px;justify-content:center;margin:14px 0;}
     .gpin-punto{width:14px;height:14px;border-radius:50%;background:var(--border);transition:0.2s;}
+    .gpin-punto.lleno{background:var(--cyan);}
     .gpin-teclado{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
     .gpin-key{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:15px;font-size:20px;font-weight:700;color:#fff;text-align:center;cursor:pointer;transition:0.15s;}
     .gpin-key:active{background:var(--border);transform:scale(0.95);}
@@ -161,10 +187,10 @@
     <div class="pin-key" onclick="pinTecla('1')">1</div><div class="pin-key" onclick="pinTecla('2')">2</div><div class="pin-key" onclick="pinTecla('3')">3</div>
     <div class="pin-key" onclick="pinTecla('4')">4</div><div class="pin-key" onclick="pinTecla('5')">5</div><div class="pin-key" onclick="pinTecla('6')">6</div>
     <div class="pin-key" onclick="pinTecla('7')">7</div><div class="pin-key" onclick="pinTecla('8')">8</div><div class="pin-key" onclick="pinTecla('9')">9</div>
-    <div class="pin-key vacio"></div><div class="pin-key" onclick="pinTecla('0')">0</div><div class="pin-key borra" onclick="pinBorrar()">⌫</div>
+    <div class="pin-key vacio"></div><div class="pin-key" onclick="pinTecla('0')">0</div><div class="pin-key borra" onclick="pinBorrar()">&#x232B;</div>
   </div>
   <div class="pin-error" id="pin-error"></div>
-  <div class="pin-info">⚠️ La sesión expira después de 15 minutos sin actividad</div>
+  <div class="pin-info">&#x26A0;&#xFE0F; La sesión expira después de 15 minutos sin actividad</div>
 </div>
  
 <!-- ── OVERLAY EMERGENCIA ── -->
@@ -196,13 +222,12 @@
   </div>
 </div>
  
-<!-- BÚSQUEDA HISTORIAL (busca en Sheet) -->
+<!-- HISTORIAL DEL DÍA (reemplaza búsqueda historial completo) -->
 <div class="modal-overlay" id="modal-busqueda">
   <div class="modal-box">
     <button class="modal-close" onclick="cerrarModal('modal-busqueda')">✕</button>
-    <div class="modal-title">🔍 BUSCAR HISTORIAL COMPLETO</div>
-    <input class="modal-search" id="busqueda-input" placeholder="Patente o DNI..." oninput="this.value=this.value.toUpperCase()">
-    <button class="btn-modal-action btn-cyan" onclick="ejecutarBusquedaSheet()">BUSCAR EN HISTORIAL</button>
+    <div class="modal-title">📋 HISTORIAL DEL DÍA</div>
+    <input class="modal-search" id="busqueda-input" placeholder="Filtrar por patente o DNI..." oninput="this.value=this.value.toUpperCase();filtrarHistorialDia()">
     <div id="busqueda-status" style="font-size:11px;color:#888;text-align:center;margin-bottom:8px;min-height:14px;"></div>
     <div id="busqueda-resultados"></div>
   </div>
@@ -233,13 +258,11 @@
   <div class="modal-box">
     <button class="modal-close" onclick="cerrarModal('modal-ln')">✕</button>
     <div class="modal-title">🚫 LISTA NEGRA</div>
-    <!-- Vista consulta -->
     <div id="ln-vista-consulta">
       <input class="modal-search" id="ln-buscar" placeholder="Buscar patente o DNI..." oninput="renderListaNegra()">
       <div id="ln-lista-contenido"></div>
       <button class="btn-modal-action btn-red no-print" style="margin-top:8px;" onclick="mostrarAgregarLN()">+ AGREGAR A LISTA NEGRA</button>
     </div>
-    <!-- Vista agregar (con PIN) -->
     <div id="ln-vista-agregar" style="display:none;">
       <p class="gpin-label">🔒 Ingresá la clave para agregar</p>
       <div class="gpin-puntos" id="ln-pin-puntos">
@@ -252,12 +275,11 @@
         <div class="gpin-key" onclick="lnPinTecla('1')">1</div><div class="gpin-key" onclick="lnPinTecla('2')">2</div><div class="gpin-key" onclick="lnPinTecla('3')">3</div>
         <div class="gpin-key" onclick="lnPinTecla('4')">4</div><div class="gpin-key" onclick="lnPinTecla('5')">5</div><div class="gpin-key" onclick="lnPinTecla('6')">6</div>
         <div class="gpin-key" onclick="lnPinTecla('7')">7</div><div class="gpin-key" onclick="lnPinTecla('8')">8</div><div class="gpin-key" onclick="lnPinTecla('9')">9</div>
-        <div class="gpin-key vacio"></div><div class="gpin-key" onclick="lnPinTecla('0')">0</div><div class="gpin-key borra" onclick="lnPinBorrar()">⌫</div>
+        <div class="gpin-key vacio"></div><div class="gpin-key" onclick="lnPinTecla('0')">0</div><div class="gpin-key borra" onclick="lnPinBorrar()">&#x232B;</div>
       </div>
       <div class="gpin-error" id="ln-pin-error"></div>
       <button class="btn-modal-action" style="background:var(--border);color:#888;margin-top:10px;" onclick="ocultarAgregarLN()">Cancelar</button>
     </div>
-    <!-- Formulario agregar (post PIN) -->
     <div id="ln-vista-form" style="display:none;">
       <input class="modal-search" id="ln-form-pat" placeholder="PATENTE" oninput="this.value=this.value.toUpperCase()">
       <input class="modal-search" id="ln-form-dni" placeholder="DNI (opcional)" inputmode="numeric">
@@ -268,7 +290,7 @@
   </div>
 </div>
  
-<!-- RESET (borra lista del día) -->
+<!-- RESET -->
 <div class="modal-overlay" id="modal-reset">
   <div class="modal-box">
     <button class="modal-close" onclick="cerrarModal('modal-reset')">✕</button>
@@ -282,7 +304,7 @@
       <div class="gpin-key" onclick="resetTecla('1')">1</div><div class="gpin-key" onclick="resetTecla('2')">2</div><div class="gpin-key" onclick="resetTecla('3')">3</div>
       <div class="gpin-key" onclick="resetTecla('4')">4</div><div class="gpin-key" onclick="resetTecla('5')">5</div><div class="gpin-key" onclick="resetTecla('6')">6</div>
       <div class="gpin-key" onclick="resetTecla('7')">7</div><div class="gpin-key" onclick="resetTecla('8')">8</div><div class="gpin-key" onclick="resetTecla('9')">9</div>
-      <div class="gpin-key vacio"></div><div class="gpin-key" onclick="resetTecla('0')">0</div><div class="gpin-key borra" onclick="resetBorrar()">⌫</div>
+      <div class="gpin-key vacio"></div><div class="gpin-key" onclick="resetTecla('0')">0</div><div class="gpin-key borra" onclick="resetBorrar()">&#x232B;</div>
     </div>
     <div class="gpin-error" id="reset-pin-error"></div>
   </div>
@@ -294,7 +316,7 @@
     <div style="position:relative;">
       <button class="logo-btn" id="logo-btn" onclick="toggleMenu()">
         <img class="logo-img" id="logo-img" src="" alt="NEXOS">
-        <span class="logo-arrow" id="logo-arrow">▼</span>
+        <span class="logo-arrow" id="logo-arrow">&#x25BC;</span>
       </button>
       <div class="logo-menu" id="logo-menu">
         <div class="menu-section-label">INFORMACIÓN</div>
@@ -302,7 +324,7 @@
         <div class="menu-item" onclick="abrirVehiculos()"><span class="menu-item-icon">🚗</span>Vehículos en el barrio</div>
         <div class="menu-item" onclick="abrirAlertas()"><span class="menu-item-icon">🚨</span>Alertas del día</div>
         <div class="menu-section-label">OPERACIONES</div>
-        <div class="menu-item" onclick="abrirBusqueda()"><span class="menu-item-icon">🔍</span>Buscar historial completo</div>
+        <div class="menu-item" onclick="abrirBusqueda()"><span class="menu-item-icon">📋</span>Historial del día</div>
         <div class="menu-item gold-item" onclick="abrirTurno()"><span class="menu-item-icon">🖨️</span>Cierre de turno / PDF</div>
         <div class="menu-item purple-item" onclick="abrirListaNegra()"><span class="menu-item-icon">🚫</span>Lista negra</div>
         <div class="menu-section-label">SISTEMA</div>
@@ -310,7 +332,10 @@
       </div>
     </div>
     <div class="header-right">
-      <span class="header-timer" id="timer-sesion">15:00</span>
+      <div class="header-clock">
+        <span class="header-clima" id="header-clima">🌤️</span>
+        <span class="header-hora" id="header-hora">--:--</span>
+      </div>
       <button class="btn-logout" onclick="cerrarSesion()">SALIR</button>
     </div>
   </div>
@@ -385,8 +410,43 @@ const LOGO_SRC = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgc
 document.getElementById('logo-img').src = LOGO_SRC;
  
 // ── CONSTANTES ────────────────────────────────────────────
-const PIN_CORRECTO   = '2401';
-const PIN_LN         = '13421342';  // Lista negra
+const PIN_CORRECTO = '2401';
+const PIN_LN       = '13421342';
+ 
+// ── RELOJ + CLIMA ─────────────────────────────────────────
+// Iconos de clima por código WMO (Open-Meteo, sin API key)
+const CLIMA_ICONS = {
+  0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️',
+  45:'🌫️', 48:'🌫️',
+  51:'🌦️', 53:'🌦️', 55:'🌧️',
+  61:'🌧️', 63:'🌧️', 65:'🌧️',
+  71:'❄️', 73:'❄️', 75:'❄️',
+  80:'🌦️', 81:'🌧️', 82:'⛈️',
+  95:'⛈️', 96:'⛈️', 99:'⛈️'
+};
+let climaIcon = '🌤️';
+ 
+async function obtenerClima() {
+  try {
+    // Buenos Aires por defecto — se puede cambiar lat/lon
+    const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-34.61&longitude=-58.37&current_weather=true');
+    const d = await r.json();
+    const code = d.current_weather?.weathercode ?? 1;
+    climaIcon = CLIMA_ICONS[code] || '🌤️';
+    document.getElementById('header-clima').innerText = climaIcon;
+  } catch(e) {}
+}
+ 
+function actualizarReloj() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('header-hora').innerText = h + ':' + m;
+}
+setInterval(actualizarReloj, 1000);
+actualizarReloj();
+obtenerClima();
+setInterval(obtenerClima, 10 * 60 * 1000); // actualiza clima cada 10 min
  
 // ── PIN ACCESO ────────────────────────────────────────────
 let pinActual = '';
@@ -414,9 +474,7 @@ function toggleMenu(){
 }
 document.addEventListener('click',e=>{
   const btn=document.getElementById('logo-btn'),menu=document.getElementById('logo-menu');
-  if(!btn.contains(e.target)&&!menu.contains(e.target)){
-    menuAbierto=false;menu.classList.remove('visible');document.getElementById('logo-arrow').innerText='▼';
-  }
+  if(!btn.contains(e.target)&&!menu.contains(e.target)){menuAbierto=false;menu.classList.remove('visible');document.getElementById('logo-arrow').innerText='▼';}
 });
 function cerrarMenu(){menuAbierto=false;document.getElementById('logo-menu').classList.remove('visible');document.getElementById('logo-arrow').innerText='▼';}
  
@@ -426,15 +484,11 @@ function cerrarModal(id){document.getElementById(id).classList.remove('visible')
  
 // 1. RESUMEN DEL DÍA
 function abrirResumen(){
-  const ahora=Date.now(), hoyStr=new Date().toLocaleDateString('es-AR');
+  const ahora=Date.now(),hoyStr=new Date().toLocaleDateString('es-AR');
   let del=0,vis=0,ale=0,sal=0,tot=0;
-  DB.forEach(r=>{
-    const f=new Date(r.tsE||0).toLocaleDateString('es-AR');
-    if(f!==hoyStr)return; tot++;
+  DB.forEach(r=>{const f=new Date(r.tsE||0).toLocaleDateString('es-AR');if(f!==hoyStr)return;tot++;
     const isA=r.tipo==='DELIVERY'&&(ahora-(r.tsE||0)>900000);
-    if(r.tipo==='DELIVERY'){if(isA)ale++;else del++;}else vis++;
-    if(r.hS)sal++;
-  });
+    if(r.tipo==='DELIVERY'){if(isA)ale++;else del++;}else vis++;if(r.hS)sal++;});
   document.getElementById('resumen-contenido').innerHTML=`
     <div class="modal-stat"><span class="modal-stat-label">🛵 Delivery activos</span><span class="modal-stat-val" style="color:var(--gold)">${del}</span></div>
     <div class="modal-stat"><span class="modal-stat-label">🚗 Visitas activas</span><span class="modal-stat-val" style="color:var(--green)">${vis}</span></div>
@@ -449,8 +503,7 @@ function abrirResumen(){
  
 // 2. VEHÍCULOS EN EL BARRIO
 function abrirVehiculos(){
-  const adentro=DB.filter(r=>!r.hS);
-  let html='';
+  const adentro=DB.filter(r=>!r.hS);let html='';
   if(!adentro.length){html='<div class="empty-msg">Sin vehículos activos en este momento</div>';}
   else{
     html=`<div style="font-size:12px;color:#666;text-align:center;margin-bottom:10px;">${adentro.length} vehículo(s) dentro del barrio</div>`;
@@ -464,62 +517,32 @@ function abrirVehiculos(){
   abrirModal('modal-vehiculos');
 }
  
-// 3. BÚSQUEDA EN HISTORIAL COMPLETO (consulta el Sheet)
+// 3. HISTORIAL DEL DÍA (todos los registros de hoy, con filtro)
 function abrirBusqueda(){
   document.getElementById('busqueda-input').value='';
-  document.getElementById('busqueda-resultados').innerHTML='';
   document.getElementById('busqueda-status').innerText='';
+  filtrarHistorialDia();
   abrirModal('modal-busqueda');
-  setTimeout(()=>document.getElementById('busqueda-input').focus(),200);
 }
-async function ejecutarBusquedaSheet(){
-  const q=document.getElementById('busqueda-input').value.trim();
-  if(!q){document.getElementById('busqueda-resultados').innerHTML='<div class="empty-msg">Ingresá una patente o DNI</div>';return;}
-  const url=localStorage.getItem('nx_url');
-  if(!url){
-    // Sin URL configurada: busca solo local
-    busquedaLocal(q); return;
-  }
-  document.getElementById('busqueda-status').innerText='🔍 Buscando en el historial...';
-  document.getElementById('busqueda-resultados').innerHTML='';
-  try{
-    const r=await fetch(`${url}?accion=buscar&q=${encodeURIComponent(q)}&t=${Date.now()}`);
-    const data=await r.json();
-    document.getElementById('busqueda-status').innerText='';
-    if(data.resultados&&data.resultados.length>0){
-      document.getElementById('busqueda-resultados').innerHTML=
-        `<div style="font-size:11px;color:#666;text-align:center;margin-bottom:8px">${data.resultados.length} resultado(s) encontrado(s)</div>`+
-        data.resultados.map(r=>`<div class="modal-row">
-          <strong>${escHtml(r.pat||'')}</strong>${r.dni?` · DNI: ${escHtml(r.dni)}`:''}<br>
-          <span style="font-size:11px;color:#888">Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')} · ${escHtml(r.tipo||'')} · ${escHtml(r.hE||'')}</span>
-          <span style="float:right;font-size:11px;color:${r.hS?'#888':'var(--green)'}">${r.hS?'Salió '+escHtml(r.hS):'Adentro'}</span>
-          ${r.fecha?`<br><span style="font-size:10px;color:#555">${escHtml(r.fecha)}</span>`:''}
-        </div>`).join('');
-    } else {
-      document.getElementById('busqueda-resultados').innerHTML='<div class="empty-msg">Sin resultados para "'+escHtml(q)+'"</div>';
-    }
-  } catch(e){
-    document.getElementById('busqueda-status').innerText='';
-    // Fallback: busca en local
-    busquedaLocal(q);
-  }
-}
-function busquedaLocal(q){
-  const res=DB.filter(r=>(r.pat||'').toUpperCase().includes(q)||(r.dni||'').includes(q)).sort((a,b)=>(b.tsE||0)-(a.tsE||0));
-  if(!res.length){document.getElementById('busqueda-resultados').innerHTML='<div class="empty-msg">Sin resultados locales para "'+escHtml(q)+'"</div>';return;}
-  document.getElementById('busqueda-resultados').innerHTML=
-    `<div style="font-size:11px;color:#555;text-align:center;margin-bottom:8px">⚠️ Mostrando resultados locales (sin conexión al Sheet)</div>`+
-    res.map(r=>`<div class="modal-row"><strong>${escHtml(r.pat)}</strong>${r.dni?` · DNI: ${escHtml(r.dni)}`:''}<br>
+function filtrarHistorialDia(){
+  const q=(document.getElementById('busqueda-input').value||'').trim();
+  const hoyStr=new Date().toLocaleDateString('es-AR');
+  let deDia=DB.filter(r=>{const f=new Date(r.tsE||0).toLocaleDateString('es-AR');return f===hoyStr;});
+  if(q) deDia=deDia.filter(r=>(r.pat||'').toUpperCase().includes(q)||(r.dni||'').includes(q));
+  deDia.sort((a,b)=>(b.tsE||0)-(a.tsE||0));
+  document.getElementById('busqueda-status').innerText=deDia.length+' registro(s) hoy';
+  if(!deDia.length){document.getElementById('busqueda-resultados').innerHTML='<div class="empty-msg">Sin registros hoy'+(q?' para "'+escHtml(q)+'"':'')+'</div>';return;}
+  document.getElementById('busqueda-resultados').innerHTML=deDia.map(r=>`<div class="modal-row">
+    <strong>${escHtml(r.pat)}</strong>${r.dni?` · DNI: ${escHtml(r.dni)}`:''}<br>
     <span style="font-size:11px;color:#888">Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')} · ${escHtml(r.tipo)} · ${escHtml(limpiarHora(r.hE))}</span>
-    <span style="float:right;color:${r.hS?'#888':'var(--green)'};">${r.hS?'Salió':'Adentro'}</span></div>`).join('');
+    <span style="float:right;font-size:11px;color:${r.hS?'#888':'var(--green)'}">${r.hS?'Salió '+escHtml(limpiarHora(r.hS)):'Adentro'}</span>
+  </div>`).join('');
 }
  
 // 4. ALERTAS DEL DÍA
 function abrirAlertas(){
-  const url=localStorage.getItem('nx_url');
-  const panicoGuardados=JSON.parse(localStorage.getItem('nx_alertas_hoy')||'[]');
-  // También mostrar panicosPendientes + guardados
-  const todos=[...panicosPendientes,...panicoGuardados.filter(a=>!panicosPendientes.find(p=>p.panicoId===a.panicoId))];
+  const guardados=JSON.parse(localStorage.getItem('nx_alertas_hoy')||'[]');
+  const todos=[...panicosPendientes,...guardados.filter(a=>!panicosPendientes.find(p=>p.panicoId===a.panicoId))];
   let html='';
   if(!todos.length){html='<div class="empty-msg">Sin alertas registradas hoy 🟢</div>';}
   else{
@@ -535,131 +558,52 @@ function abrirAlertas(){
   abrirModal('modal-alertas');
 }
  
-// 5. CIERRE DE TURNO / PDF
+// 5. CIERRE DE TURNO
 function abrirTurno(){
-  const ahora=new Date();
-  const hoyStr=ahora.toLocaleDateString('es-AR');
-  const horaStr=ahora.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+  const ahora=new Date(),hoyStr=ahora.toLocaleDateString('es-AR'),horaStr=ahora.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
   let del=0,vis=0,ale=0,sal=0,sinSal=[];
   const deDia=DB.filter(r=>{const f=new Date(r.tsE||0).toLocaleDateString('es-AR');return f===hoyStr;});
-  deDia.forEach(r=>{
-    const isA=r.tipo==='DELIVERY'&&(Date.now()-(r.tsE||0)>900000);
-    if(r.tipo==='DELIVERY'){if(isA)ale++;else del++;}else vis++;
-    if(r.hS)sal++;else sinSal.push(r);
-  });
+  deDia.forEach(r=>{const isA=r.tipo==='DELIVERY'&&(Date.now()-(r.tsE||0)>900000);
+    if(r.tipo==='DELIVERY'){if(isA)ale++;else del++;}else vis++;if(r.hS)sal++;else sinSal.push(r);});
   const html=`
     <div class="modal-stat"><span class="modal-stat-label">📅 Fecha</span><span style="font-weight:700;color:#fff">${hoyStr}</span></div>
     <div class="modal-stat"><span class="modal-stat-label">🕐 Hora de cierre</span><span style="font-weight:700;color:#fff">${horaStr}</span></div>
     <div class="modal-stat"><span class="modal-stat-label">📋 Total ingresos</span><span class="modal-stat-val" style="color:var(--cyan)">${deDia.length}</span></div>
     <div class="modal-stat"><span class="modal-stat-label">📤 Con salida</span><span class="modal-stat-val" style="color:var(--green)">${sal}</span></div>
     <div class="modal-stat"><span class="modal-stat-label">🚨 Sin salida</span><span class="modal-stat-val" style="color:${sinSal.length>0?'var(--red)':'#888'}">${sinSal.length}</span></div>
-    ${sinSal.length>0?`<div style="margin-top:10px;font-size:12px;color:#888;font-weight:700">SIN SALIDA REGISTRADA:</div>`+sinSal.map(r=>`<div class="modal-row" style="border-left:3px solid var(--red)"><strong>${escHtml(r.pat)}</strong> · Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')}</div>`).join(''):''}
-  `;
+    ${sinSal.length>0?`<div style="margin-top:10px;font-size:12px;color:#888;font-weight:700">SIN SALIDA REGISTRADA:</div>`+sinSal.map(r=>`<div class="modal-row" style="border-left:3px solid var(--red)"><strong>${escHtml(r.pat)}</strong> · Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')}</div>`).join(''):''}`;
   document.getElementById('turno-resumen').innerHTML=html;
- 
-  // Preparar PDF report
-  const filas=deDia.map(r=>`<tr>
-    <td>${escHtml(r.pat)}</td><td>${escHtml(r.dni||'-')}</td>
-    <td>Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')}</td>
-    <td>${escHtml(r.tipo)}</td><td>${escHtml(limpiarHora(r.hE))}</td>
-    <td style="color:${r.hS?'#27ae60':'#e74c3c'}">${r.hS?escHtml(r.hS):'SIN SALIDA'}</td>
-  </tr>`).join('');
-  document.getElementById('pdf-report').innerHTML=`
-    <h2>NEXOS — Cierre de Turno</h2>
-    <p style="font-size:12px;color:#555">${hoyStr} | Hora: ${horaStr}</p>
-    <p style="font-size:12px;margin-top:4px">Total: ${deDia.length} | Con salida: ${sal} | Sin salida: ${sinSal.length}</p>
-    <table><tr><th>Patente</th><th>DNI</th><th>Destino</th><th>Tipo</th><th>Entrada</th><th>Salida</th></tr>${filas}</table>
-  `;
+  const filas=deDia.map(r=>`<tr><td>${escHtml(r.pat)}</td><td>${escHtml(r.dni||'-')}</td><td>Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')}</td><td>${escHtml(r.tipo)}</td><td>${escHtml(limpiarHora(r.hE))}</td><td style="color:${r.hS?'#27ae60':'#e74c3c'}">${r.hS?escHtml(limpiarHora(r.hS)):'SIN SALIDA'}</td></tr>`).join('');
+  document.getElementById('pdf-report').innerHTML=`<h2>NEXOS — Cierre de Turno</h2><p style="font-size:12px;color:#555">${hoyStr} | Hora: ${horaStr}</p><p style="font-size:12px;margin-top:4px">Total: ${deDia.length} | Con salida: ${sal} | Sin salida: ${sinSal.length}</p><table><tr><th>Patente</th><th>DNI</th><th>Destino</th><th>Tipo</th><th>Entrada</th><th>Salida</th></tr>${filas}</table>`;
   abrirModal('modal-turno');
 }
-function imprimirTurno(){
-  document.getElementById('pdf-report').style.display='block';
-  setTimeout(()=>{window.print();setTimeout(()=>document.getElementById('pdf-report').style.display='none',1000);},100);
-}
+function imprimirTurno(){document.getElementById('pdf-report').style.display='block';setTimeout(()=>{window.print();setTimeout(()=>document.getElementById('pdf-report').style.display='none',1000);},100);}
  
-// 6. LISTA NEGRA ───────────────────────────────────────────
-let LISTA_NEGRA=JSON.parse(localStorage.getItem('nx_lista_negra')||'[]');
-let lnPinActual='';
- 
-function abrirListaNegra(){
-  document.getElementById('ln-buscar').value='';
-  ocultarAgregarLN();
-  renderListaNegra();
-  abrirModal('modal-ln');
-}
+// 6. LISTA NEGRA
+let LISTA_NEGRA=JSON.parse(localStorage.getItem('nx_lista_negra')||'[]'),lnPinActual='';
+function abrirListaNegra(){document.getElementById('ln-buscar').value='';ocultarAgregarLN();renderListaNegra();abrirModal('modal-ln');}
 function renderListaNegra(){
   const q=(document.getElementById('ln-buscar').value||'').toUpperCase();
   const filtrada=LISTA_NEGRA.filter(r=>!q||(r.pat||'').toUpperCase().includes(q)||(r.dni||'').includes(q));
   const cont=document.getElementById('ln-lista-contenido');
   if(!filtrada.length){cont.innerHTML='<div class="empty-msg">Lista negra vacía 🟢</div>';return;}
-  cont.innerHTML=filtrada.sort((a,b)=>b.ts-a.ts).map((r,i)=>`
-    <div class="ln-item">
-      <div class="ln-item-info">
-        <div class="ln-item-pat">🚫 ${escHtml(r.pat||'Sin patente')}</div>
-        ${r.dni?`<div class="ln-item-det">DNI: ${escHtml(r.dni)}</div>`:''}
-        ${r.motivo?`<div class="ln-item-det" style="color:#e74c3c">⚠️ ${escHtml(r.motivo)}</div>`:''}
-        <div class="ln-item-det">${new Date(r.ts).toLocaleDateString('es-AR')}</div>
-      </div>
-    </div>`).join('');
+  cont.innerHTML=filtrada.sort((a,b)=>b.ts-a.ts).map(r=>`<div class="ln-item"><div class="ln-item-info"><div class="ln-item-pat">🚫 ${escHtml(r.pat||'Sin patente')}</div>${r.dni?`<div class="ln-item-det">DNI: ${escHtml(r.dni)}</div>`:''} ${r.motivo?`<div class="ln-item-det" style="color:#e74c3c">⚠️ ${escHtml(r.motivo)}</div>`:''}<div class="ln-item-det">${new Date(r.ts).toLocaleDateString('es-AR')}</div></div></div>`).join('');
 }
-function mostrarAgregarLN(){
-  lnPinActual=''; actualizarLNPuntos();
-  document.getElementById('ln-pin-error').innerText='';
-  document.getElementById('ln-vista-consulta').style.display='none';
-  document.getElementById('ln-vista-agregar').style.display='block';
-  document.getElementById('ln-vista-form').style.display='none';
-}
-function ocultarAgregarLN(){
-  document.getElementById('ln-vista-consulta').style.display='block';
-  document.getElementById('ln-vista-agregar').style.display='none';
-  document.getElementById('ln-vista-form').style.display='none';
-}
+function mostrarAgregarLN(){lnPinActual='';actualizarLNPuntos();document.getElementById('ln-pin-error').innerText='';document.getElementById('ln-vista-consulta').style.display='none';document.getElementById('ln-vista-agregar').style.display='block';document.getElementById('ln-vista-form').style.display='none';}
+function ocultarAgregarLN(){document.getElementById('ln-vista-consulta').style.display='block';document.getElementById('ln-vista-agregar').style.display='none';document.getElementById('ln-vista-form').style.display='none';}
 function actualizarLNPuntos(){for(let i=0;i<8;i++)document.getElementById('lp'+i).classList.toggle('lleno',i<lnPinActual.length);}
-function lnPinTecla(d){
-  if(lnPinActual.length>=8)return;
-  lnPinActual+=d; actualizarLNPuntos();
-  if(lnPinActual.length===8)setTimeout(verificarLNPin,120);
-}
+function lnPinTecla(d){if(lnPinActual.length>=8)return;lnPinActual+=d;actualizarLNPuntos();if(lnPinActual.length===8)setTimeout(verificarLNPin,120);}
 function lnPinBorrar(){lnPinActual=lnPinActual.slice(0,-1);actualizarLNPuntos();document.getElementById('ln-pin-error').innerText='';}
-function verificarLNPin(){
-  if(lnPinActual===PIN_LN){
-    document.getElementById('ln-pin-error').innerText='';
-    document.getElementById('ln-vista-agregar').style.display='none';
-    document.getElementById('ln-vista-form').style.display='block';
-    document.getElementById('ln-form-pat').value='';
-    document.getElementById('ln-form-dni').value='';
-    document.getElementById('ln-form-motivo').value='';
-  } else {
-    document.getElementById('ln-pin-error').innerText='CLAVE INCORRECTA';
-    lnPinActual=''; actualizarLNPuntos();
-  }
-}
-function agregarListaNegra(){
-  const pat=document.getElementById('ln-form-pat').value.trim().toUpperCase();
-  const dni=document.getElementById('ln-form-dni').value.trim();
-  const motivo=document.getElementById('ln-form-motivo').value.trim();
-  if(!pat&&!dni){showToast('⚠️ Ingresá al menos patente o DNI');return;}
-  LISTA_NEGRA.push({pat,dni,motivo,ts:Date.now()});
-  localStorage.setItem('nx_lista_negra',JSON.stringify(LISTA_NEGRA));
-  showToast('🚫 Agregado a lista negra');
-  ocultarAgregarLN(); renderListaNegra();
-}
+function verificarLNPin(){if(lnPinActual===PIN_LN){document.getElementById('ln-pin-error').innerText='';document.getElementById('ln-vista-agregar').style.display='none';document.getElementById('ln-vista-form').style.display='block';document.getElementById('ln-form-pat').value='';document.getElementById('ln-form-dni').value='';document.getElementById('ln-form-motivo').value='';}else{document.getElementById('ln-pin-error').innerText='CLAVE INCORRECTA';lnPinActual='';actualizarLNPuntos();}}
+function agregarListaNegra(){const pat=document.getElementById('ln-form-pat').value.trim().toUpperCase();const dni=document.getElementById('ln-form-dni').value.trim();const motivo=document.getElementById('ln-form-motivo').value.trim();if(!pat&&!dni){showToast('⚠️ Ingresá al menos patente o DNI');return;}LISTA_NEGRA.push({pat,dni,motivo,ts:Date.now()});localStorage.setItem('nx_lista_negra',JSON.stringify(LISTA_NEGRA));showToast('🚫 Agregado a lista negra');ocultarAgregarLN();renderListaNegra();}
  
-// 7. RESET LISTA DEL DÍA ───────────────────────────────────
+// 7. RESET
 let resetPin='';
 function abrirReset(){resetPin='';actualizarResetPuntos();document.getElementById('reset-pin-error').innerText='';abrirModal('modal-reset');}
 function resetTecla(d){if(resetPin.length>=4)return;resetPin+=d;actualizarResetPuntos();if(resetPin.length===4)setTimeout(verificarReset,120);}
 function resetBorrar(){resetPin=resetPin.slice(0,-1);actualizarResetPuntos();document.getElementById('reset-pin-error').innerText='';}
 function actualizarResetPuntos(){for(let i=0;i<4;i++)document.getElementById('r'+i).classList.toggle('lleno',i<resetPin.length);}
-function verificarReset(){
-  if(resetPin===PIN_CORRECTO){
-    DB=[]; localStorage.removeItem('nx_db');
-    cerrarModal('modal-reset'); render(); showToast('✅ Lista del día borrada');
-  } else {
-    document.getElementById('reset-pin-error').innerText='CLAVE INCORRECTA';
-    resetPin=''; actualizarResetPuntos();
-  }
-}
+function verificarReset(){if(resetPin===PIN_CORRECTO){DB=[];localStorage.removeItem('nx_db');cerrarModal('modal-reset');render();showToast('✅ Lista del día borrada');}else{document.getElementById('reset-pin-error').innerText='CLAVE INCORRECTA';resetPin='';actualizarResetPuntos();}}
  
 // ── APP CORE ──────────────────────────────────────────────
 let DB=JSON.parse(localStorage.getItem('nx_db')||'[]');
@@ -672,12 +616,10 @@ function tocarSirena(){
   for(let c=0;c<6;c++){const t=now+c*0.6;
     const oH=audioCtx.createOscillator(),gH=audioCtx.createGain();oH.connect(gH);gH.connect(audioCtx.destination);oH.type='sawtooth';
     oH.frequency.setValueAtTime(1100,t);oH.frequency.linearRampToValueAtTime(900,t+0.28);
-    gH.gain.setValueAtTime(0,t);gH.gain.linearRampToValueAtTime(0.4,t+0.02);gH.gain.setValueAtTime(0.4,t+0.27);gH.gain.linearRampToValueAtTime(0,t+0.30);
-    oH.start(t);oH.stop(t+0.31);
+    gH.gain.setValueAtTime(0,t);gH.gain.linearRampToValueAtTime(0.4,t+0.02);gH.gain.setValueAtTime(0.4,t+0.27);gH.gain.linearRampToValueAtTime(0,t+0.30);oH.start(t);oH.stop(t+0.31);
     const oL=audioCtx.createOscillator(),gL=audioCtx.createGain();oL.connect(gL);gL.connect(audioCtx.destination);oL.type='sawtooth';
     oL.frequency.setValueAtTime(700,t+0.30);oL.frequency.linearRampToValueAtTime(550,t+0.58);
-    gL.gain.setValueAtTime(0,t+0.30);gL.gain.linearRampToValueAtTime(0.4,t+0.32);gL.gain.setValueAtTime(0.4,t+0.57);gL.gain.linearRampToValueAtTime(0,t+0.60);
-    oL.start(t+0.30);oL.stop(t+0.61);}
+    gL.gain.setValueAtTime(0,t+0.30);gL.gain.linearRampToValueAtTime(0.4,t+0.32);gL.gain.setValueAtTime(0.4,t+0.57);gL.gain.linearRampToValueAtTime(0,t+0.60);oL.start(t+0.30);oL.stop(t+0.61);}
 }
 function iniciarSirena(){if(sirenInterval)return;tocarSirena();sirenInterval=setInterval(tocarSirena,3800);}
 function detenerSirena(){clearInterval(sirenInterval);sirenInterval=null;}
@@ -685,12 +627,11 @@ document.addEventListener('touchstart',initAudio,{once:true});
 document.addEventListener('click',initAudio,{once:true});
  
 function resetearTimeoutSeguridad(){
-  if(timeoutSeguridad)clearTimeout(timeoutSeguridad);tiempoRestante=15*60;actualizarTimerSesion();
+  if(timeoutSeguridad)clearTimeout(timeoutSeguridad);tiempoRestante=15*60;
   timeoutSeguridad=setTimeout(cerrarSesion,15*60*1000);
   if(window.timerIntervalo)clearInterval(window.timerIntervalo);
-  window.timerIntervalo=setInterval(()=>{tiempoRestante--;actualizarTimerSesion();if(tiempoRestante<=0)cerrarSesion();},1000);
+  window.timerIntervalo=setInterval(()=>{tiempoRestante--;if(tiempoRestante<=0)cerrarSesion();},1000);
 }
-function actualizarTimerSesion(){const m=Math.floor(tiempoRestante/60),s=tiempoRestante%60;document.getElementById('timer-sesion').innerText=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
 function cerrarSesion(){
   if(window.timerIntervalo)clearInterval(window.timerIntervalo);if(timeoutSeguridad)clearTimeout(timeoutSeguridad);
   sessionStorage.removeItem('nx_auth');pinActual='';actualizarPuntos();
@@ -705,19 +646,12 @@ function horaActual(){return new Date().toLocaleTimeString([],{hour:'2-digit',mi
 function limpiarHora(h){if(!h)return'';const s=String(h);if(s.includes('T'))return s.split('T')[1].substring(0,5);if(s.includes('\n'))return s.split('\n')[1]||'';return s;}
 function escHtml(str){if(!str)return'';return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function ver(n){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));document.getElementById('p-'+n).classList.add('active');document.getElementById('btn-'+n).classList.add('active');}
- 
-// Alerta de lista negra al registrar
-function verificarListaNegra(pat, dni){
-  const match=LISTA_NEGRA.find(r=>(r.pat&&r.pat===pat)||(r.dni&&r.dni===dni&&dni));
-  if(match){showToast(`🚫 LISTA NEGRA: ${match.pat||match.dni}${match.motivo?' — '+match.motivo:''}`);}
-}
+function verificarListaNegra(pat,dni){const match=LISTA_NEGRA.find(r=>(r.pat&&r.pat===pat)||(r.dni&&r.dni===dni&&dni));if(match)showToast('🚫 LISTA NEGRA: '+(match.pat||match.dni)+(match.motivo?' — '+match.motivo:''));}
  
 function mostrarPanico(alertas){
-  // Guardar en historial del día
   const guardados=JSON.parse(localStorage.getItem('nx_alertas_hoy')||'[]');
   alertas.forEach(a=>{if(!guardados.find(g=>g.panicoId===a.panicoId))guardados.push(a);});
   localStorage.setItem('nx_alertas_hoy',JSON.stringify(guardados));
- 
   const lista=document.getElementById('panico-lista');
   lista.innerHTML=alertas.map(a=>{
     let mapUrl=(a.mapsUrl||'').trim();if(!mapUrl&&a.lat&&a.lng&&String(a.lat).length>3)mapUrl='https://maps.google.com/?q='+a.lat+','+a.lng;
@@ -744,28 +678,17 @@ async function sincronizar(manual=false){
   }catch(e){setSyncStatus('⚠ Sin conexión','sync-err');if(manual)showToast("⚠️ Error al sincronizar");}
   finally{sincronizando=false;}
 }
- 
 function enviar(datos){const url=localStorage.getItem('nx_url');if(!url)return;fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)}).then(()=>setTimeout(()=>sincronizar(),1500)).catch(()=>showToast("⚠️ No se pudo subir"));}
  
 function registrarRapido(tipo){
-  const val=document.getElementById('buscador').value.trim();if(!val)return;
-  const hora=horaActual();let item;
-  if(tipo==='ingreso'){
-    verificarListaNegra(val,val);
-    item={id:Date.now(),pat:val,tipo:'VISITA',hE:hora,hS:'',tsE:Date.now(),mza:'',casa:'',dni:''};
-    DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);
-  }else{
-    const c=DB.filter(x=>x.pat===val&&!x.hS).sort((a,b)=>(b.tsE||0)-(a.tsE||0));item=c[0];
-    if(item){item.hE=limpiarHora(item.hE);item.hS=hora;DB=DB.filter(x=>x.id!==item.id);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}
-    else{showToast("❌ NO ENCONTRADO");return;}
-  }
+  const val=document.getElementById('buscador').value.trim();if(!val)return;const hora=horaActual();let item;
+  if(tipo==='ingreso'){verificarListaNegra(val,val);item={id:Date.now(),pat:val,tipo:'VISITA',hE:hora,hS:'',tsE:Date.now(),mza:'',casa:'',dni:''};DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}
+  else{const c=DB.filter(x=>x.pat===val&&!x.hS).sort((a,b)=>(b.tsE||0)-(a.tsE||0));item=c[0];if(item){item.hE=limpiarHora(item.hE);item.hS=hora;DB=DB.filter(x=>x.id!==item.id);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}else{showToast("❌ NO ENCONTRADO");return;}}
   document.getElementById('buscador').value='';
 }
- 
 function guardarForm(modo){
   const pre=modo==='manual'?'m-':'d-';const p=document.getElementById(pre+'pat').value.trim();if(!p)return;
-  const d=document.getElementById(pre+'dni').value.trim();
-  verificarListaNegra(p,d);
+  const d=document.getElementById(pre+'dni').value.trim();verificarListaNegra(p,d);
   const item={id:Date.now(),pat:p,dni:d,mza:document.getElementById(pre+'mza').value.trim(),casa:document.getElementById(pre+'casa').value.trim(),tipo:modo==='manual'?'MANUAL':'DELIVERY',hE:horaActual(),hS:'',tsE:Date.now()};
   DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));
   ['pat','dni','mza','casa'].forEach(f=>{const el=document.getElementById(pre+f);if(el)el.value='';});
@@ -776,7 +699,7 @@ function guardarConfig(){localStorage.setItem('nx_url',document.getElementById('
  
 function render(){
   const cont=document.getElementById('cont-lista');const ahora=Date.now();let d=0,v=0,a=0;
-  const html=DB.slice().sort((a,b)=>(b.tsE||0)-(a.tsE||0)).map(r=>{
+  const html=DB.slice().sort((x,y)=>(y.tsE||0)-(x.tsE||0)).map(r=>{
     const hE=limpiarHora(r.hE);const tsE=r.tsE||0;const isA=(r.tipo==='DELIVERY'&&(ahora-tsE>900000));
     if(r.tipo==='DELIVERY'){if(isA)a++;else d++;}else v++;
     let cls='adentro';if(isA)cls='alerta';else if(r.tipo==='DELIVERY')cls='dely-adentro';
