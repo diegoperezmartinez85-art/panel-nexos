@@ -59,7 +59,7 @@
     /* FIX: logo más grande — de 38px a 52px */
     .logo-img{height:52px;border-radius:10px;filter:drop-shadow(0 0 8px rgba(0,212,212,0.6));}
     .logo-arrow{font-size:10px;color:#555;margin-left:4px;transition:0.2s;}
-    .header-right{display:flex;align-items:center;gap:10px;padding-right:8px;}
+    .header-right{display:flex;align-items:center;gap:10px;}
 
     /* FIX: hora + clima en neón cyan en vez del contador */
     .header-clock{display:flex;align-items:center;gap:6px;}
@@ -92,11 +92,11 @@
     .logo-menu{display:none;position:absolute;top:calc(100% + 8px);left:0;width:280px;background:var(--bg2);border-radius:16px;overflow:hidden;z-index:500;box-shadow:0 8px 32px rgba(0,0,0,0.7);background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(135deg,#00d4d4,#a855f7,#ff3190);background-origin:border-box;background-clip:padding-box,border-box;border:1px solid transparent;animation:menuIn 0.15s ease;}
     @keyframes menuIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
     .logo-menu.visible{display:block;}
-    .menu-section-label{font-size:10px;letter-spacing:2px;color:#444;padding:12px 20px 4px;font-weight:700;text-transform:uppercase;}
-    .menu-item{display:flex;align-items:center;gap:14px;padding:17px 20px;color:var(--text);font-size:16px;font-weight:700;cursor:pointer;border-bottom:1px solid #1e1e26;transition:0.15s;letter-spacing:0.3px;}
+    .menu-section-label{font-size:9px;letter-spacing:2px;color:#444;padding:10px 16px 4px;font-weight:700;text-transform:uppercase;}
+    .menu-item{display:flex;align-items:center;gap:12px;padding:13px 16px;color:var(--text);font-size:13px;font-weight:700;cursor:pointer;border-bottom:1px solid #1e1e26;transition:0.15s;letter-spacing:0.3px;}
     .menu-item:last-child{border-bottom:none;}
     .menu-item:active{background:var(--bg3);}
-    .menu-item-icon{font-size:22px;width:28px;text-align:center;}
+    .menu-item-icon{font-size:17px;width:24px;text-align:center;}
     .menu-item.danger{color:var(--red);}
     .menu-item.gold-item{color:var(--gold);}
     .menu-item.purple-item{color:var(--purple);}
@@ -139,42 +139,6 @@
     .ln-item-pat{font-weight:900;color:var(--red);font-size:15px;}
     .ln-item-det{font-size:11px;color:#666;margin-top:2px;}
     .ln-badge{display:inline-block;background:rgba(231,76,60,0.15);border:1px solid var(--red);color:var(--red);font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;margin-bottom:6px;}
-
-
-
-    #mon-card-delivery:active{transform:scale(0.96);background:rgba(245,200,66,0.1);}
-    #mon-card-delivery{border:1px solid transparent;transition:border-color 0.2s,transform 0.15s;}
-    #mon-card-delivery:hover{border-color:var(--gold);box-shadow:0 0 10px rgba(245,200,66,0.3);}
-    #mon-card-visitas:active{transform:scale(0.96);background:rgba(46,204,113,0.1);}
-    #mon-card-visitas{border:1px solid transparent;transition:border-color 0.2s,transform 0.15s;}
-    #mon-card-visitas:hover{border-color:var(--green);box-shadow:0 0 10px rgba(46,204,113,0.3);}
-
-
-    /* ── DIRECTORIO SOS ── */
-    .sos-item{
-      display:flex;align-items:center;justify-content:space-between;
-      background:var(--bg3);border-radius:14px;padding:16px 18px;
-      margin-bottom:10px;border-left:5px solid var(--red);
-      text-decoration:none;cursor:pointer;transition:0.15s;
-    }
-    .sos-item:active{transform:scale(0.97);background:rgba(231,76,60,0.15);}
-    .sos-item-left{display:flex;align-items:center;gap:14px;}
-    .sos-item-icon{font-size:26px;line-height:1;}
-    .sos-item-info{}
-    .sos-item-nombre{font-size:15px;font-weight:900;color:white;letter-spacing:0.3px;}
-    .sos-item-desc{font-size:11px;color:#888;margin-top:2px;}
-    .sos-item-num{
-      font-size:22px;font-weight:900;color:var(--red);
-      text-shadow:0 0 8px rgba(231,76,60,0.6);
-      font-family:monospace;letter-spacing:1px;
-      text-decoration:none;
-    }
-    .sos-header{text-align:center;font-size:11px;color:#666;margin-bottom:14px;line-height:1.5;}
-
-    /* Tarjeta ALERTAS clickeable */
-    #mon-card-alertas:active{transform:scale(0.96);background:rgba(231,76,60,0.12);}
-    #mon-card-alertas{border:1px solid transparent;transition:border-color 0.2s,transform 0.15s;}
-    #mon-card-alertas:hover{border-color:var(--red);box-shadow:0 0 10px rgba(231,76,60,0.3);}
 
     /* ── OVERLAY EMERGENCIA ── */
     .panico-overlay{display:none;position:fixed;inset:0;z-index:9999;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;overflow-y:auto;animation:parpadeo 0.7s infinite alternate;}
@@ -347,8 +311,6 @@
 </div>
 
 
-
-
 <!-- DIRECTORIO SOS -->
 <div class="modal-overlay" id="modal-sos">
   <div class="modal-box">
@@ -502,22 +464,50 @@ const CLIMA_ICONS = {
 };
 let climaIcon = '🌤️';
 
+// ── FASE LUNAR (cálculo astronómico sin API) ─────────────
+// Luna nueva de referencia: 6 enero 2000, 18:14 UTC
+// Ciclo sinódico: 29.53058867 días
+function calcularFaseLunar() {
+  const refNueva = new Date(Date.UTC(2000, 0, 6, 18, 14)).getTime();
+  const cicloMs  = 29.53058867 * 86400000;
+  const fase     = ((Date.now() - refNueva) % cicloMs + cicloMs) % cicloMs / cicloMs;
+  // 8 fases: 🌑 nueva → 🌒 creciente → 🌓 cuarto → 🌔 gibosa cre.
+  //          🌕 llena → 🌖 gibosa men. → 🌗 cuarto → 🌘 menguante
+  const fases = ['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘'];
+  return fases[Math.round(fase * 8) % 8];
+}
+
 async function obtenerClima() {
   try {
-    // Buenos Aires por defecto — se puede cambiar lat/lon
+    // Buenos Aires — cambiá lat/lon si el barrio es otro
     const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-34.61&longitude=-58.37&current_weather=true');
     const d = await r.json();
     const code = d.current_weather?.weathercode ?? 1;
     climaIcon = CLIMA_ICONS[code] || '🌤️';
-    document.getElementById('header-clima').innerText = climaIcon;
   } catch(e) {}
 }
 
+// ── RELOJ + ÍCONO ADAPTATIVO ──────────────────────────────
+// 05:00–19:59 → solo clima  (☀️ ⛅ 🌧️ etc.)
+// 20:00–04:59 → luna + clima si hay fenómeno notable
+//   Clima "notable" = lluvia, tormenta, nieve, niebla (no despejado/nublado)
+//   Ejemplos: ⛈️🌒  🌧️🌕  🌨️🌗  🌫️🌔  — si está despejado: solo 🌒
+function iconoNocturno() {
+  const luna = calcularFaseLunar();
+  // Climas notables que se muestran junto a la luna
+  const notables = ['🌦️','🌧️','⛈️','❄️','🌨️','🌫️','🌪️'];
+  const esNotable = notables.includes(climaIcon);
+  return esNotable ? climaIcon + luna : luna;
+}
+
 function actualizarReloj() {
-  const now = new Date();
-  const h = String(now.getHours()).padStart(2,'0');
-  const m = String(now.getMinutes()).padStart(2,'0');
+  const now  = new Date();
+  const h    = String(now.getHours()).padStart(2,'0');
+  const m    = String(now.getMinutes()).padStart(2,'0');
+  const hora = now.getHours();
   document.getElementById('header-hora').innerText = h + ':' + m;
+  const esNoche = hora >= 20 || hora < 5;
+  document.getElementById('header-clima').innerText = esNoche ? iconoNocturno() : climaIcon;
 }
 setInterval(actualizarReloj, 1000);
 actualizarReloj();
@@ -791,113 +781,60 @@ function iniciarApp(){document.getElementById('cfg-url').value=localStorage.getI
 document.getElementById('pin-screen').classList.remove('oculto');
 document.getElementById('header-bar').style.display='none';
 
-
-
 // ── DIRECTORIO SOS ───────────────────────────────────────
 const SOS_NUMEROS = [
-  { icon:'🚔', nombre:'Policía',           desc:'Emergencias policiales',          num:'911' },
-  { icon:'🔥', nombre:'Bomberos',          desc:'Incendios y rescates',            num:'100' },
-  { icon:'🚑', nombre:'Emergencia Médica', desc:'SAME / Ambulancias',              num:'107' },
-  { icon:'🛡️', nombre:'Defensa Civil',     desc:'Inundaciones, desastres',         num:'103' },
+  { icon:'🚔', nombre:'Policía',           desc:'Emergencias policiales',           num:'911' },
+  { icon:'🔥', nombre:'Bomberos',          desc:'Incendios y rescates',             num:'100' },
+  { icon:'🚑', nombre:'Emergencia Médica', desc:'SAME / Ambulancias',               num:'107' },
+  { icon:'🛡️', nombre:'Defensa Civil',     desc:'Inundaciones, desastres',          num:'103' },
   { icon:'⚡', nombre:'Edesur / Edenor',   desc:'Corte de luz / emergencia eléct.', num:'0800-333-3787' },
-  { icon:'💧', nombre:'AySA',              desc:'Emergencia de agua y cloacas',    num:'0800-321-2482' },
-  { icon:'🚨', nombre:'Violencia de Gén.', desc:'Línea gratuita 24h',              num:'144' },
-  { icon:'👶', nombre:'Niñez y Adolesc.',  desc:'Vulneración de derechos',         num:'102' },
+  { icon:'💧', nombre:'AySA',              desc:'Emergencia de agua y cloacas',     num:'0800-321-2482' },
+  { icon:'🚨', nombre:'Violencia de Gén.', desc:'Línea gratuita 24h',               num:'144' },
+  { icon:'👶', nombre:'Niñez y Adolesc.',  desc:'Vulneración de derechos',          num:'102' },
 ];
-
 function abrirSOS(){
   const html = `<div class="sos-header">Tocá el número para llamar directamente</div>` +
-    SOS_NUMEROS.map(s => `
-      <a class="sos-item" href="tel:${s.num}">
-        <div class="sos-item-left">
-          <span class="sos-item-icon">${s.icon}</span>
-          <div class="sos-item-info">
-            <div class="sos-item-nombre">${s.nombre}</div>
-            <div class="sos-item-desc">${s.desc}</div>
-          </div>
-        </div>
-        <span class="sos-item-num">${s.num}</span>
-      </a>`).join('');
+    SOS_NUMEROS.map(s => `<a class="sos-item" href="tel:${s.num}"><div class="sos-item-left"><span class="sos-item-icon">${s.icon}</span><div class="sos-item-info"><div class="sos-item-nombre">${s.nombre}</div><div class="sos-item-desc">${s.desc}</div></div></div><span class="sos-item-num">${s.num}</span></a>`).join('');
   document.getElementById('sos-contenido').innerHTML = html;
   abrirModal('modal-sos');
 }
 
-// ── DELIVERY ACTIVOS (sin alerta) ─────────────────────────
+// ── DELIVERY ACTIVOS ──────────────────────────────────────
 function abrirDeliveryActivos(){
-  const ahora = Date.now();
-  const activos = DB.filter(r => r.tipo === 'DELIVERY' && !r.hS && (ahora - (r.tsE||0) <= 900000))
-                    .sort((a,b) => (a.tsE||0) - (b.tsE||0));
-  let html = '';
-  if(!activos.length){
-    html = '<div class="empty-msg">Sin delivery activos ahora 🟢</div>';
-  } else {
-    html = `<div style="font-size:12px;color:var(--gold);text-align:center;margin-bottom:12px;font-weight:800;">${activos.length} delivery dentro del barrio</div>`;
-    html += activos.map(r => {
-      const mins = Math.floor((ahora - (r.tsE||0)) / 60000);
-      const hE = limpiarHora(r.hE);
-      const restante = 15 - mins;
-      return `<div class="modal-row" style="border-left:4px solid var(--gold);">
-        <strong style="color:var(--gold);font-size:16px;">🛵 ${escHtml(r.pat)}</strong>
-        <span style="float:right;background:var(--gold);color:black;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">${mins} min</span><br>
-        <span style="font-size:12px;color:#aaa;">Mza ${escHtml(r.mza||'-')} — Casa ${escHtml(r.casa||'-')}</span><br>
-        <span style="font-size:11px;color:#666;">Entró: ${hE} · Alerta en ${restante} min${r.dni?' · DNI: '+escHtml(r.dni):''}</span><br>
-        <button onclick="darSalida(${r.id});cerrarModal('modal-delivery-activos');" style="margin-top:10px;background:var(--red);color:white;border:none;padding:10px 20px;border-radius:10px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button>
-      </div>`;
-    }).join('');
-  }
-  document.getElementById('delivery-activos-contenido').innerHTML = html;
+  const ahora=Date.now();
+  const activos=DB.filter(r=>r.tipo==='DELIVERY'&&!r.hS&&(ahora-(r.tsE||0)<=900000)).sort((a,b)=>(a.tsE||0)-(b.tsE||0));
+  let html=activos.length?`<div style="font-size:12px;color:var(--gold);text-align:center;margin-bottom:12px;font-weight:800;">${activos.length} delivery dentro del barrio</div>`+
+    activos.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);const hE=limpiarHora(r.hE);const restante=15-mins;
+      return`<div class="modal-row" style="border-left:4px solid var(--gold);"><strong style="color:var(--gold);font-size:16px;">🛵 ${escHtml(r.pat)}</strong><span style="float:right;background:var(--gold);color:black;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">${mins} min</span><br><span style="font-size:12px;color:#aaa;">Mza ${escHtml(r.mza||'-')} — Casa ${escHtml(r.casa||'-')}</span><br><span style="font-size:11px;color:#666;">Entró: ${hE} · Alerta en ${restante} min${r.dni?' · DNI: '+escHtml(r.dni):''}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-delivery-activos');" style="margin-top:10px;background:var(--red);color:white;border:none;padding:10px 20px;border-radius:10px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;
+    }).join('')
+    :'<div class="empty-msg">Sin delivery activos ahora 🟢</div>';
+  document.getElementById('delivery-activos-contenido').innerHTML=html;
   abrirModal('modal-delivery-activos');
 }
 
 // ── VISITAS ACTIVAS ───────────────────────────────────────
 function abrirVisitasActivas(){
-  const ahora = Date.now();
-  const visitas = DB.filter(r => r.tipo !== 'DELIVERY' && !r.hS)
-                    .sort((a,b) => (a.tsE||0) - (b.tsE||0));
-  let html = '';
-  if(!visitas.length){
-    html = '<div class="empty-msg">Sin visitas activas ahora 🟢</div>';
-  } else {
-    html = `<div style="font-size:12px;color:var(--green);text-align:center;margin-bottom:12px;font-weight:800;">${visitas.length} visita(s) dentro del barrio</div>`;
-    html += visitas.map(r => {
-      const mins = Math.floor((ahora - (r.tsE||0)) / 60000);
-      const hE = limpiarHora(r.hE);
-      return `<div class="modal-row" style="border-left:4px solid var(--green);">
-        <strong style="color:var(--green);font-size:16px;">🚗 ${escHtml(r.pat)}</strong>
-        <span style="float:right;background:var(--green);color:black;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">${mins} min</span><br>
-        <span style="font-size:12px;color:#aaa;">Mza ${escHtml(r.mza||'-')} — Casa ${escHtml(r.casa||'-')}</span><br>
-        <span style="font-size:11px;color:#666;">Entró: ${hE} · Tipo: ${escHtml(r.tipo)}${r.dni?' · DNI: '+escHtml(r.dni):''}</span><br>
-        <button onclick="darSalida(${r.id});cerrarModal('modal-visitas-activas');" style="margin-top:10px;background:var(--red);color:white;border:none;padding:10px 20px;border-radius:10px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button>
-      </div>`;
-    }).join('');
-  }
-  document.getElementById('visitas-activas-contenido').innerHTML = html;
+  const ahora=Date.now();
+  const visitas=DB.filter(r=>r.tipo!=='DELIVERY'&&!r.hS).sort((a,b)=>(a.tsE||0)-(b.tsE||0));
+  let html=visitas.length?`<div style="font-size:12px;color:var(--green);text-align:center;margin-bottom:12px;font-weight:800;">${visitas.length} visita(s) dentro del barrio</div>`+
+    visitas.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);const hE=limpiarHora(r.hE);
+      return`<div class="modal-row" style="border-left:4px solid var(--green);"><strong style="color:var(--green);font-size:16px;">🚗 ${escHtml(r.pat)}</strong><span style="float:right;background:var(--green);color:black;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">${mins} min</span><br><span style="font-size:12px;color:#aaa;">Mza ${escHtml(r.mza||'-')} — Casa ${escHtml(r.casa||'-')}</span><br><span style="font-size:11px;color:#666;">Entró: ${hE} · Tipo: ${escHtml(r.tipo)}${r.dni?' · DNI: '+escHtml(r.dni):''}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-visitas-activas');" style="margin-top:10px;background:var(--red);color:white;border:none;padding:10px 20px;border-radius:10px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;
+    }).join('')
+    :'<div class="empty-msg">Sin visitas activas ahora 🟢</div>';
+  document.getElementById('visitas-activas-contenido').innerHTML=html;
   abrirModal('modal-visitas-activas');
 }
 
-// ── DELIVERY EN ALERTA (+15min) ────────────────────────────
+// ── DELIVERY EN ALERTA (+15min) ───────────────────────────
 function abrirDeliveryAlertas(){
-  const ahora = Date.now();
-  const enAlerta = DB.filter(r => r.tipo === 'DELIVERY' && !r.hS && (ahora - (r.tsE||0) > 900000))
-                     .sort((a,b) => (a.tsE||0) - (b.tsE||0)); // más antiguos primero
-  let html = '';
-  if(!enAlerta.length){
-    html = '<div class="empty-msg">Sin delivery en alerta ahora 🟢</div>';
-  } else {
-    html = `<div style="font-size:12px;color:#e74c3c;text-align:center;margin-bottom:12px;font-weight:800;">${enAlerta.length} delivery lleva(n) más de 15 minutos adentro</div>`;
-    html += enAlerta.map(r => {
-      const mins = Math.floor((ahora - (r.tsE||0)) / 60000);
-      const hE = limpiarHora(r.hE);
-      return `<div class="modal-row" style="border-left:4px solid var(--red);background:rgba(231,76,60,0.08);">
-        <strong style="color:var(--red);font-size:16px;">🛵 ${escHtml(r.pat)}</strong>
-        <span style="float:right;background:var(--red);color:white;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">+${mins} min</span><br>
-        <span style="font-size:12px;color:#aaa;">Mza ${escHtml(r.mza||'-')} — Casa ${escHtml(r.casa||'-')}</span><br>
-        <span style="font-size:11px;color:#666;">Entró: ${hE}${r.dni?' · DNI: '+escHtml(r.dni):''}</span><br>
-        <button onclick="darSalida(${r.id});cerrarModal('modal-delivery-alertas');" style="margin-top:10px;background:var(--red);color:white;border:none;padding:10px 20px;border-radius:10px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button>
-      </div>`;
-    }).join('');
-  }
-  document.getElementById('delivery-alertas-contenido').innerHTML = html;
+  const ahora=Date.now();
+  const enAlerta=DB.filter(r=>r.tipo==='DELIVERY'&&!r.hS&&(ahora-(r.tsE||0)>900000)).sort((a,b)=>(a.tsE||0)-(b.tsE||0));
+  let html=enAlerta.length?`<div style="font-size:12px;color:#e74c3c;text-align:center;margin-bottom:12px;font-weight:800;">${enAlerta.length} delivery lleva(n) más de 15 minutos adentro</div>`+
+    enAlerta.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);const hE=limpiarHora(r.hE);
+      return`<div class="modal-row" style="border-left:4px solid var(--red);background:rgba(231,76,60,0.08);"><strong style="color:var(--red);font-size:16px;">🛵 ${escHtml(r.pat)}</strong><span style="float:right;background:var(--red);color:white;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">+${mins} min</span><br><span style="font-size:12px;color:#aaa;">Mza ${escHtml(r.mza||'-')} — Casa ${escHtml(r.casa||'-')}</span><br><span style="font-size:11px;color:#666;">Entró: ${hE}${r.dni?' · DNI: '+escHtml(r.dni):''}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-delivery-alertas');" style="margin-top:10px;background:var(--red);color:white;border:none;padding:10px 20px;border-radius:10px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;
+    }).join('')
+    :'<div class="empty-msg">Sin delivery en alerta ahora 🟢</div>';
+  document.getElementById('delivery-alertas-contenido').innerHTML=html;
   abrirModal('modal-delivery-alertas');
 }
 
