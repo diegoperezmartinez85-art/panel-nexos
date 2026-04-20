@@ -815,6 +815,22 @@ function render(){
   }).join('')||'<p style="opacity:0.3;text-align:center;padding:20px;">SIN ACTIVIDAD</p>';
   cont.innerHTML=html;document.getElementById('mon-d').innerText=d;document.getElementById('mon-v').innerText=v;document.getElementById('mon-a').innerText=a;
 }
+  function purgarAlertasViejas(){
+  const hoyStr = new Date().toLocaleDateString('es-AR');
+  const guardados = JSON.parse(localStorage.getItem('nx_alertas_hoy')||'[]');
+  const soloHoy = guardados.filter(a => {
+    if (a._tsLocal) return new Date(a._tsLocal).toLocaleDateString('es-AR') === hoyStr;
+    if (!a.fecha) return false;
+    try {
+      const p = String(a.fecha).split(' ')[0].split('/');
+      if (p.length === 3) return new Date(p[2],p[1]-1,p[0]).toLocaleDateString('es-AR') === hoyStr;
+    } catch(e){}
+    return false;
+  });
+  if (soloHoy.length !== guardados.length) {
+    localStorage.setItem('nx_alertas_hoy', JSON.stringify(soloHoy));
+  }
+}
 
 function iniciarApp(){document.getElementById('cfg-url').value=localStorage.getItem('nx_url')||'';render();sincronizar();setInterval(()=>sincronizar(),15000);setInterval(render,30000);}
 document.getElementById('pin-screen').classList.remove('oculto');
