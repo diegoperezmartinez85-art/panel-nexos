@@ -56,14 +56,36 @@
     /* ── HEADER ── */
     .header-bar{background:var(--bg2);border:1px solid transparent;border-radius:16px;padding:8px 12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;position:relative;background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(90deg,#00d4d4,#a855f7,#ff3190,#00d4d4);background-origin:border-box;background-clip:padding-box,border-box;box-shadow:0 0 18px rgba(0,212,212,0.25),0 0 32px rgba(168,85,247,0.15);}
     .logo-btn{display:flex;align-items:center;gap:10px;cursor:pointer;background:none;border:none;padding:0;position:relative;}
+    /* FIX: logo más grande — de 38px a 52px */
     .logo-img{height:52px;border-radius:10px;filter:drop-shadow(0 0 8px rgba(0,212,212,0.6));}
     .logo-arrow{font-size:10px;color:#555;margin-left:4px;transition:0.2s;}
     .header-right{display:flex;align-items:center;gap:10px;}
+
+    /* FIX: hora + clima en neón cyan en vez del contador */
     .header-clock{display:flex;align-items:center;gap:6px;}
     .header-hora{font-size:18px;font-weight:900;letter-spacing:2px;color:var(--cyan);text-shadow:0 0 8px rgba(0,212,212,0.9),0 0 20px rgba(0,212,212,0.5);font-family:monospace;}
     .header-clima{font-size:22px;line-height:1;}
-    .btn-logout{background:transparent;color:#ff2020;border:1.5px solid #ff2020;border-radius:8px;padding:6px 10px;font-size:10px;font-weight:900;cursor:pointer;transition:0.2s;text-shadow:0 0 6px rgba(255,30,30,0.8),0 0 14px rgba(255,30,30,0.4);box-shadow:0 0 8px rgba(255,30,30,0.4),inset 0 0 6px rgba(255,30,30,0.05);animation:neonRed 2.5s ease-in-out infinite;letter-spacing:1px;}
-    @keyframes neonRed{0%,100%{box-shadow:0 0 6px rgba(255,30,30,0.4),inset 0 0 4px rgba(255,30,30,0.05);text-shadow:0 0 6px rgba(255,30,30,0.8);}50%{box-shadow:0 0 14px rgba(255,30,30,0.8),inset 0 0 10px rgba(255,30,30,0.1);text-shadow:0 0 12px rgba(255,30,30,1),0 0 24px rgba(255,30,30,0.6);}}
+
+    /* FIX: botón SALIR con borde y texto neón rojo */
+    .btn-logout{
+      background:transparent;
+      color:#ff2020;
+      border:1.5px solid #ff2020;
+      border-radius:8px;
+      padding:6px 10px;
+      font-size:10px;
+      font-weight:900;
+      cursor:pointer;
+      transition:0.2s;
+      text-shadow:0 0 6px rgba(255,30,30,0.8),0 0 14px rgba(255,30,30,0.4);
+      box-shadow:0 0 8px rgba(255,30,30,0.4),inset 0 0 6px rgba(255,30,30,0.05);
+      animation:neonRed 2.5s ease-in-out infinite;
+      letter-spacing:1px;
+    }
+    @keyframes neonRed{
+      0%,100%{box-shadow:0 0 6px rgba(255,30,30,0.4),inset 0 0 4px rgba(255,30,30,0.05);text-shadow:0 0 6px rgba(255,30,30,0.8);}
+      50%{box-shadow:0 0 14px rgba(255,30,30,0.8),inset 0 0 10px rgba(255,30,30,0.1);text-shadow:0 0 12px rgba(255,30,30,1),0 0 24px rgba(255,30,30,0.6);}
+    }
     .btn-logout:active{background:var(--red);color:white;border-color:var(--red);}
 
     /* ── MENÚ LOGO ── */
@@ -118,24 +140,6 @@
     .ln-item-det{font-size:11px;color:#666;margin-top:2px;}
     .ln-badge{display:inline-block;background:rgba(231,76,60,0.15);border:1px solid var(--red);color:var(--red);font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;margin-bottom:6px;}
 
-    /* ── SOS ── */
-    .sos-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border-radius:14px;padding:16px 18px;margin-bottom:10px;border-left:5px solid var(--red);text-decoration:none;cursor:pointer;transition:0.15s;}
-    .sos-item:active{transform:scale(0.97);background:rgba(231,76,60,0.15);}
-    .sos-item-left{display:flex;align-items:center;gap:14px;}
-    .sos-item-icon{font-size:26px;line-height:1;}
-    .sos-item-nombre{font-size:15px;font-weight:900;color:white;letter-spacing:0.3px;}
-    .sos-item-desc{font-size:11px;color:#888;margin-top:2px;}
-    .sos-item-num{font-size:22px;font-weight:900;color:var(--red);text-shadow:0 0 8px rgba(231,76,60,0.6);font-family:monospace;letter-spacing:1px;text-decoration:none;}
-    .sos-header{text-align:center;font-size:11px;color:#666;margin-bottom:14px;line-height:1.5;}
-
-    /* ── ALERTAS clickeable ── */
-    #mon-card-alertas{border:1px solid transparent;transition:border-color 0.2s,transform 0.15s;}
-    #mon-card-alertas:active{transform:scale(0.96);background:rgba(231,76,60,0.12);}
-    #mon-card-delivery{border:1px solid transparent;transition:border-color 0.2s,transform 0.15s;}
-    #mon-card-delivery:active{transform:scale(0.96);}
-    #mon-card-visitas{border:1px solid transparent;transition:border-color 0.2s,transform 0.15s;}
-    #mon-card-visitas:active{transform:scale(0.96);}
-
     /* ── OVERLAY EMERGENCIA ── */
     .panico-overlay{display:none;position:fixed;inset:0;z-index:9999;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;overflow-y:auto;animation:parpadeo 0.7s infinite alternate;}
     .panico-overlay.visible{display:flex;}
@@ -155,7 +159,11 @@
     .panico-btn:active{transform:scale(0.97);}
 
     /* ── PDF ── */
-    @media print{.no-print{display:none!important;}body{background:white;color:black;padding:0;}.pdf-report{display:block!important;}}
+    @media print{
+      .no-print{display:none!important;}
+      body{background:white;color:black;padding:0;}
+      .pdf-report{display:block!important;}
+    }
     .pdf-report{display:none;background:white;color:#111;padding:24px;font-family:sans-serif;border-radius:12px;margin-top:12px;}
     .pdf-report h2{font-size:18px;margin-bottom:4px;}
     .pdf-report table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px;}
@@ -179,10 +187,10 @@
     <div class="pin-key" onclick="pinTecla('1')">1</div><div class="pin-key" onclick="pinTecla('2')">2</div><div class="pin-key" onclick="pinTecla('3')">3</div>
     <div class="pin-key" onclick="pinTecla('4')">4</div><div class="pin-key" onclick="pinTecla('5')">5</div><div class="pin-key" onclick="pinTecla('6')">6</div>
     <div class="pin-key" onclick="pinTecla('7')">7</div><div class="pin-key" onclick="pinTecla('8')">8</div><div class="pin-key" onclick="pinTecla('9')">9</div>
-    <div class="pin-key vacio"></div><div class="pin-key" onclick="pinTecla('0')">0</div><div class="pin-key borra" onclick="pinBorrar()">⌫</div>
+    <div class="pin-key vacio"></div><div class="pin-key" onclick="pinTecla('0')">0</div><div class="pin-key borra" onclick="pinBorrar()">&#x232B;</div>
   </div>
   <div class="pin-error" id="pin-error"></div>
-  <div class="pin-info">⚠️ La sesión expira después de 15 minutos sin actividad</div>
+  <div class="pin-info">&#x26A0;&#xFE0F; La sesión expira después de 15 minutos sin actividad</div>
 </div>
 
 <!-- ── OVERLAY EMERGENCIA ── -->
@@ -194,12 +202,58 @@
   <button class="panico-btn" onclick="cerrarPanico()">✔ ATENDIDO</button>
 </div>
 
-<!-- ══ MODALES ══ -->
-<div class="modal-overlay" id="modal-resumen"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-resumen')">✕</button><div class="modal-title">📊 RESUMEN DEL DÍA</div><div id="resumen-contenido"></div></div></div>
-<div class="modal-overlay" id="modal-vehiculos"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-vehiculos')">✕</button><div class="modal-title">🚗 VEHÍCULOS EN EL BARRIO</div><div id="vehiculos-contenido"></div></div></div>
-<div class="modal-overlay" id="modal-busqueda"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-busqueda')">✕</button><div class="modal-title">📋 HISTORIAL DEL DÍA</div><input class="modal-search" id="busqueda-input" placeholder="Filtrar por patente o DNI..." oninput="this.value=this.value.toUpperCase();filtrarHistorialDia()"><div id="busqueda-status" style="font-size:11px;color:#888;text-align:center;margin-bottom:8px;min-height:14px;"></div><div id="busqueda-resultados"></div></div></div>
-<div class="modal-overlay" id="modal-alertas"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-alertas')">✕</button><div class="modal-title">🚨 ALERTAS DE EMERGENCIA DE HOY</div><div id="alertas-contenido"></div></div></div>
-<div class="modal-overlay" id="modal-turno"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-turno')">✕</button><div class="modal-title">🔐 CIERRE DE TURNO</div><div id="turno-resumen"></div><button class="btn-modal-action btn-gold no-print" style="margin-top:12px;" onclick="imprimirTurno()">🖨️ IMPRIMIR / GUARDAR PDF</button><div class="pdf-report" id="pdf-report"></div></div></div>
+<!-- ══════════════ MODALES ══════════════ -->
+
+<!-- RESUMEN -->
+<div class="modal-overlay" id="modal-resumen">
+  <div class="modal-box">
+    <button class="modal-close" onclick="cerrarModal('modal-resumen')">✕</button>
+    <div class="modal-title">📊 RESUMEN DEL DÍA</div>
+    <div id="resumen-contenido"></div>
+  </div>
+</div>
+
+<!-- VEHÍCULOS -->
+<div class="modal-overlay" id="modal-vehiculos">
+  <div class="modal-box">
+    <button class="modal-close" onclick="cerrarModal('modal-vehiculos')">✕</button>
+    <div class="modal-title">🚗 VEHÍCULOS EN EL BARRIO</div>
+    <div id="vehiculos-contenido"></div>
+  </div>
+</div>
+
+<!-- HISTORIAL DEL DÍA (reemplaza búsqueda historial completo) -->
+<div class="modal-overlay" id="modal-busqueda">
+  <div class="modal-box">
+    <button class="modal-close" onclick="cerrarModal('modal-busqueda')">✕</button>
+    <div class="modal-title">📋 HISTORIAL DEL DÍA</div>
+    <input class="modal-search" id="busqueda-input" placeholder="Filtrar por patente o DNI..." oninput="this.value=this.value.toUpperCase();filtrarHistorialDia()">
+    <div id="busqueda-status" style="font-size:11px;color:#888;text-align:center;margin-bottom:8px;min-height:14px;"></div>
+    <div id="busqueda-resultados"></div>
+  </div>
+</div>
+
+<!-- ALERTAS DEL DÍA -->
+<div class="modal-overlay" id="modal-alertas">
+  <div class="modal-box">
+    <button class="modal-close" onclick="cerrarModal('modal-alertas')">✕</button>
+    <div class="modal-title">🚨 HISTORIAL DE ALERTAS DE HOY</div>
+    <div id="alertas-contenido"></div>
+  </div>
+</div>
+
+<!-- CIERRE DE TURNO / PDF -->
+<div class="modal-overlay" id="modal-turno">
+  <div class="modal-box">
+    <button class="modal-close" onclick="cerrarModal('modal-turno')">✕</button>
+    <div class="modal-title">🔐 CIERRE DE TURNO</div>
+    <div id="turno-resumen"></div>
+    <button class="btn-modal-action btn-gold no-print" style="margin-top:12px;" onclick="imprimirTurno()">🖨️ IMPRIMIR / GUARDAR PDF</button>
+    <div class="pdf-report" id="pdf-report"></div>
+  </div>
+</div>
+
+<!-- LISTA NEGRA -->
 <div class="modal-overlay" id="modal-ln">
   <div class="modal-box">
     <button class="modal-close" onclick="cerrarModal('modal-ln')">✕</button>
@@ -211,12 +265,17 @@
     </div>
     <div id="ln-vista-agregar" style="display:none;">
       <p class="gpin-label">🔒 Ingresá la clave para agregar</p>
-      <div class="gpin-puntos"><div class="gpin-punto" id="lp0"></div><div class="gpin-punto" id="lp1"></div><div class="gpin-punto" id="lp2"></div><div class="gpin-punto" id="lp3"></div><div class="gpin-punto" id="lp4"></div><div class="gpin-punto" id="lp5"></div><div class="gpin-punto" id="lp6"></div><div class="gpin-punto" id="lp7"></div></div>
+      <div class="gpin-puntos" id="ln-pin-puntos">
+        <div class="gpin-punto" id="lp0"></div><div class="gpin-punto" id="lp1"></div>
+        <div class="gpin-punto" id="lp2"></div><div class="gpin-punto" id="lp3"></div>
+        <div class="gpin-punto" id="lp4"></div><div class="gpin-punto" id="lp5"></div>
+        <div class="gpin-punto" id="lp6"></div><div class="gpin-punto" id="lp7"></div>
+      </div>
       <div class="gpin-teclado">
         <div class="gpin-key" onclick="lnPinTecla('1')">1</div><div class="gpin-key" onclick="lnPinTecla('2')">2</div><div class="gpin-key" onclick="lnPinTecla('3')">3</div>
         <div class="gpin-key" onclick="lnPinTecla('4')">4</div><div class="gpin-key" onclick="lnPinTecla('5')">5</div><div class="gpin-key" onclick="lnPinTecla('6')">6</div>
         <div class="gpin-key" onclick="lnPinTecla('7')">7</div><div class="gpin-key" onclick="lnPinTecla('8')">8</div><div class="gpin-key" onclick="lnPinTecla('9')">9</div>
-        <div class="gpin-key vacio"></div><div class="gpin-key" onclick="lnPinTecla('0')">0</div><div class="gpin-key borra" onclick="lnPinBorrar()">⌫</div>
+        <div class="gpin-key vacio"></div><div class="gpin-key" onclick="lnPinTecla('0')">0</div><div class="gpin-key borra" onclick="lnPinBorrar()">&#x232B;</div>
       </div>
       <div class="gpin-error" id="ln-pin-error"></div>
       <button class="btn-modal-action" style="background:var(--border);color:#888;margin-top:10px;" onclick="ocultarAgregarLN()">Cancelar</button>
@@ -230,33 +289,109 @@
     </div>
   </div>
 </div>
+
+<!-- RESET -->
 <div class="modal-overlay" id="modal-reset">
   <div class="modal-box">
     <button class="modal-close" onclick="cerrarModal('modal-reset')">✕</button>
     <div class="modal-title" style="color:var(--red)">🗑️ RESET LISTA DEL DÍA</div>
     <p style="font-size:13px;color:#888;margin-bottom:16px;">Borrará todos los registros locales de hoy. Ingresá la clave para confirmar.</p>
-    <div class="gpin-puntos" style="justify-content:center;"><div class="gpin-punto" id="r0"></div><div class="gpin-punto" id="r1"></div><div class="gpin-punto" id="r2"></div><div class="gpin-punto" id="r3"></div></div>
+    <div class="gpin-puntos" style="justify-content:center;">
+      <div class="gpin-punto" id="r0"></div><div class="gpin-punto" id="r1"></div>
+      <div class="gpin-punto" id="r2"></div><div class="gpin-punto" id="r3"></div>
+    </div>
     <div class="gpin-teclado" style="margin-top:10px;">
       <div class="gpin-key" onclick="resetTecla('1')">1</div><div class="gpin-key" onclick="resetTecla('2')">2</div><div class="gpin-key" onclick="resetTecla('3')">3</div>
       <div class="gpin-key" onclick="resetTecla('4')">4</div><div class="gpin-key" onclick="resetTecla('5')">5</div><div class="gpin-key" onclick="resetTecla('6')">6</div>
       <div class="gpin-key" onclick="resetTecla('7')">7</div><div class="gpin-key" onclick="resetTecla('8')">8</div><div class="gpin-key" onclick="resetTecla('9')">9</div>
-      <div class="gpin-key vacio"></div><div class="gpin-key" onclick="resetTecla('0')">0</div><div class="gpin-key borra" onclick="resetBorrar()">⌫</div>
+      <div class="gpin-key vacio"></div><div class="gpin-key" onclick="resetTecla('0')">0</div><div class="gpin-key borra" onclick="resetBorrar()">&#x232B;</div>
     </div>
     <div class="gpin-error" id="reset-pin-error"></div>
   </div>
 </div>
-<div class="modal-overlay" id="modal-sos"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-sos')">✕</button><div class="modal-title">🆘 DIRECTORIO SOS</div><div id="sos-contenido"></div></div></div>
-<div class="modal-overlay" id="modal-delivery-activos"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-delivery-activos')">✕</button><div class="modal-title">🛵 DELIVERY ACTIVOS</div><div id="delivery-activos-contenido"></div></div></div>
-<div class="modal-overlay" id="modal-visitas-activas"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-visitas-activas')">✕</button><div class="modal-title">🚗 VISITAS ACTIVAS</div><div id="visitas-activas-contenido"></div></div></div>
-<div class="modal-overlay" id="modal-delivery-alertas"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-delivery-alertas')">✕</button><div class="modal-title">⚠️ DELIVERY CON +15 MIN</div><div id="delivery-alertas-contenido"></div></div></div>
 
-<!-- ══ APP ══ -->
+
+<!-- DIRECTORIO SOS -->
+<div class="modal-overlay" id="modal-sos">
+  <div class="modal-box">
+    <button class="modal-close" onclick="cerrarModal('modal-sos')">&#x2715;</button>
+    <div class="modal-title">🆘 DIRECTORIO SOS</div>
+    <div id="sos-contenido"></div>
+  </div>
+</div>
+
+<!-- DELIVERY ACTIVOS -->
+<div class="modal-overlay" id="modal-delivery-activos">
+  <div class="modal-box">
+    <button class="modal-close" onclick="cerrarModal('modal-delivery-activos')">&#x2715;</button>
+    <div class="modal-title">🛵 DELIVERY ACTIVOS</div>
+    <div id="delivery-activos-contenido"></div>
+  </div>
+</div>
+
+<!-- VISITAS ACTIVAS -->
+<div class="modal-overlay" id="modal-visitas-activas">
+  <div class="modal-box">
+    <button class="modal-close" onclick="cerrarModal('modal-visitas-activas')">&#x2715;</button>
+    <div class="modal-title">🚗 VISITAS ACTIVAS</div>
+    <div id="visitas-activas-contenido"></div>
+  </div>
+</div>
+
+<!-- DELIVERY EN ALERTA -->
+<div class="modal-overlay" id="modal-delivery-alertas">
+  <div class="modal-box">
+    <button class="modal-close" onclick="cerrarModal('modal-delivery-alertas')">&#x2715;</button>
+    <div class="modal-title">&#x26A0;&#xFE0F; DELIVERY CON +15 MIN</div>
+    <div id="delivery-alertas-contenido"></div>
+  </div>
+</div>
+
+
+<!-- HISTORIAL SHEET -->
+<div class="modal-overlay" id="modal-historial-sheet">
+  <div class="modal-box" style="max-width:500px;">
+    <button class="modal-close" onclick="cerrarModal('modal-historial-sheet')">&#x2715;</button>
+    <div class="modal-title">🗂️ CONSULTA HISTORIAL SHEET</div>
+
+    <!-- Tabs -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+      <button id="hs-tab-fecha" onclick="hsTabs('fecha')"
+        style="padding:10px;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;border:2px solid var(--cyan);background:var(--cyan);color:#000;">
+        📅 Por fecha
+      </button>
+      <button id="hs-tab-patente" onclick="hsTabs('patente')"
+        style="padding:10px;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;border:2px solid var(--border);background:var(--bg3);color:#888;">
+        🔍 Por patente/DNI
+      </button>
+    </div>
+
+    <!-- Panel fecha -->
+    <div id="hs-panel-fecha">
+      <input type="date" id="hs-fecha-input"
+        style="width:100%;background:var(--bg3);border:2px solid var(--border);border-radius:12px;padding:14px;color:white;font-size:16px;outline:none;margin-bottom:10px;text-align:center;color-scheme:dark;">
+      <button class="btn-modal-action btn-cyan" onclick="buscarPorFecha()">BUSCAR</button>
+    </div>
+
+    <!-- Panel patente/DNI -->
+    <div id="hs-panel-patente" style="display:none;">
+      <input class="modal-search" id="hs-pat-input" placeholder="PATENTE o DNI..."
+        oninput="this.value=this.value.toUpperCase()">
+      <button class="btn-modal-action btn-cyan" onclick="buscarPorPatente()">BUSCAR</button>
+    </div>
+
+    <div id="hs-status" style="font-size:11px;color:#888;text-align:center;margin:8px 0;min-height:14px;"></div>
+    <div id="hs-resultados" style="max-height:55vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- ══════════ APP ══════════ -->
 <div class="app">
   <div class="header-bar" id="header-bar" style="display:none;">
     <div style="position:relative;">
       <button class="logo-btn" id="logo-btn" onclick="toggleMenu()">
         <img class="logo-img" id="logo-img" src="" alt="NEXOS">
-        <span class="logo-arrow" id="logo-arrow">▼</span>
+        <span class="logo-arrow" id="logo-arrow">&#x25BC;</span>
       </button>
       <div class="logo-menu" id="logo-menu">
         <div class="menu-section-label">INFORMACIÓN</div>
@@ -267,6 +402,7 @@
         <div class="menu-item" onclick="abrirBusqueda()"><span class="menu-item-icon">📋</span>Historial del día</div>
         <div class="menu-item gold-item" onclick="abrirTurno()"><span class="menu-item-icon">🖨️</span>Cierre de turno / PDF</div>
         <div class="menu-item purple-item" onclick="abrirListaNegra()"><span class="menu-item-icon">🚫</span>Lista negra</div>
+        <div class="menu-item" style="color:#00d4d4;" onclick="abrirHistorialSheet()"><span class="menu-item-icon">🗂️</span>Consulta historial Sheet</div>
         <div class="menu-item" style="color:#ff4444;" onclick="abrirSOS()"><span class="menu-item-icon">🆘</span>Directorio SOS</div>
         <div class="menu-section-label">SISTEMA</div>
         <div class="menu-item danger" onclick="abrirReset()"><span class="menu-item-icon">🗑️</span>Borrar lista del día</div>
@@ -282,9 +418,9 @@
   </div>
 
   <div class="monitor">
-    <div class="mon-card" id="mon-card-delivery" style="color:var(--gold);cursor:pointer;" onclick="abrirDeliveryActivos()"><span class="mon-val" id="mon-d">0</span><span style="font-size:10px">DELIVERY ▶</span></div>
-    <div class="mon-card" id="mon-card-visitas" style="color:var(--green);cursor:pointer;" onclick="abrirVisitasActivas()"><span class="mon-val" id="mon-v">0</span><span style="font-size:10px">VISITAS ▶</span></div>
-    <div class="mon-card" id="mon-card-alertas" style="color:var(--red);cursor:pointer;" onclick="abrirDeliveryAlertas()"><span class="mon-val" id="mon-a">0</span><span style="font-size:10px">ALERTAS ▶</span></div>
+    <div class="mon-card" id="mon-card-delivery" style="color:var(--gold);cursor:pointer;transition:0.15s;" onclick="abrirDeliveryActivos()"><span class="mon-val" id="mon-d">0</span><span style="font-size:10px">DELIVERY ▶</span></div>
+    <div class="mon-card" id="mon-card-visitas" style="color:var(--green);cursor:pointer;transition:0.15s;" onclick="abrirVisitasActivas()"><span class="mon-val" id="mon-v">0</span><span style="font-size:10px">VISITAS ▶</span></div>
+    <div class="mon-card" id="mon-card-alertas" style="color:var(--red);cursor:pointer;transition:0.15s;" onclick="abrirDeliveryAlertas()"><span class="mon-val" id="mon-a">0</span><span style="font-size:10px">ALERTAS ▶</span></div>
   </div>
 
   <div class="search-box">
@@ -307,6 +443,7 @@
     <button class="btn-sync" onclick="sincronizar(true)">🔄 SINCRONIZAR CON LA NUBE</button>
     <div class="section" id="cont-lista"></div>
   </div>
+
   <div id="p-manual" class="panel">
     <div class="section">
       <div class="campo-label">PATENTE / VEHÍCULO</div>
@@ -320,6 +457,7 @@
       <button class="btn-save" onclick="guardarForm('manual')">REGISTRAR INGRESO</button>
     </div>
   </div>
+
   <div id="p-delivery" class="panel">
     <div class="section">
       <div class="campo-label">PATENTE / MOTO</div>
@@ -333,6 +471,7 @@
       <button class="btn-save" style="background:var(--gold);color:black;" onclick="guardarForm('delivery')">DELIVERY</button>
     </div>
   </div>
+
   <div id="p-config" class="panel">
     <div class="section">
       <input id="cfg-url" class="giant" placeholder="URL /exec del Google Script">
@@ -351,74 +490,74 @@ document.getElementById('logo-img').src = LOGO_SRC;
 const PIN_CORRECTO = '2401';
 const PIN_LN       = '13421342';
 
-// ── HELPERS DE FECHA ─────────────────────────────────────
-// Retorna "dd/MM/yyyy" en zona AR para comparar fechas
-function hoyStr() {
-  return new Date().toLocaleDateString('es-AR');
-}
-
-// ── LIMPIEZA AUTOMÁTICA DE DATOS DE DÍAS ANTERIORES ──────
-// Ejecutado al iniciar: elimina alertas y reset-flag de días pasados
-function limpiarDatosAntiguos() {
-  const hoy = hoyStr();
-
-  // 1. Alertas del día: conservar sólo las de hoy
-  try {
-    const alertas = JSON.parse(localStorage.getItem('nx_alertas_hoy') || '[]');
-    const alertasHoy = alertas.filter(a => {
-      if (!a.fecha) return false;
-      // a.fecha es "HH:MM", no tiene fecha — usamos ts si existe
-      if (a.ts) return new Date(a.ts).toLocaleDateString('es-AR') === hoy;
-      return false; // sin ts no podemos saber, descartamos
-    });
-    localStorage.setItem('nx_alertas_hoy', JSON.stringify(alertasHoy));
-  } catch(e) { localStorage.removeItem('nx_alertas_hoy'); }
-
-  // 2. Reset flag: sólo vale para hoy
-  const resetFecha = localStorage.getItem('nx_reset_fecha');
-  if (resetFecha && resetFecha !== hoy) {
-    localStorage.removeItem('nx_reset_fecha');
-    localStorage.removeItem('nx_reset_activo');
-  }
-}
-
 // ── RELOJ + CLIMA ─────────────────────────────────────────
-const CLIMA_ICONS = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'❄️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',95:'⛈️',96:'⛈️',99:'⛈️'};
+// Iconos de clima por código WMO (Open-Meteo, sin API key)
+const CLIMA_ICONS = {
+  0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️',
+  45:'🌫️', 48:'🌫️',
+  51:'🌦️', 53:'🌦️', 55:'🌧️',
+  61:'🌧️', 63:'🌧️', 65:'🌧️',
+  71:'❄️', 73:'❄️', 75:'❄️',
+  80:'🌦️', 81:'🌧️', 82:'⛈️',
+  95:'⛈️', 96:'⛈️', 99:'⛈️'
+};
 let climaIcon = '🌤️';
 
+// ── FASE LUNAR (cálculo astronómico sin API) ─────────────
+// Luna nueva de referencia: 6 enero 2000, 18:14 UTC
+// Ciclo sinódico: 29.53058867 días
 function calcularFaseLunar() {
-  const ref = new Date(Date.UTC(2000,0,6,18,14)).getTime();
-  const ciclo = 29.53058867 * 86400000;
-  const fase = ((Date.now()-ref)%ciclo+ciclo)%ciclo/ciclo;
-  return ['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘'][Math.round(fase*8)%8];
+  const refNueva = new Date(Date.UTC(2000, 0, 6, 18, 14)).getTime();
+  const cicloMs  = 29.53058867 * 86400000;
+  const fase     = ((Date.now() - refNueva) % cicloMs + cicloMs) % cicloMs / cicloMs;
+  // 8 fases: 🌑 nueva → 🌒 creciente → 🌓 cuarto → 🌔 gibosa cre.
+  //          🌕 llena → 🌖 gibosa men. → 🌗 cuarto → 🌘 menguante
+  const fases = ['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘'];
+  return fases[Math.round(fase * 8) % 8];
 }
 
 async function obtenerClima() {
   try {
+    // Buenos Aires — cambiá lat/lon si el barrio es otro
     const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-34.61&longitude=-58.37&current_weather=true');
     const d = await r.json();
-    climaIcon = CLIMA_ICONS[d.current_weather?.weathercode??1] || '🌤️';
+    const code = d.current_weather?.weathercode ?? 1;
+    climaIcon = CLIMA_ICONS[code] || '🌤️';
   } catch(e) {}
 }
 
-function actualizarReloj() {
-  const now = new Date();
-  const h = String(now.getHours()).padStart(2,'0'), m = String(now.getMinutes()).padStart(2,'0');
-  document.getElementById('header-hora').innerText = h+':'+m;
-  const noche = now.getHours()>=20||now.getHours()<5;
-  const notables = ['🌦️','🌧️','⛈️','❄️','🌨️','🌫️'];
-  document.getElementById('header-clima').innerText = noche
-    ? (notables.includes(climaIcon)?climaIcon+calcularFaseLunar():calcularFaseLunar())
-    : climaIcon;
+// ── RELOJ + ÍCONO ADAPTATIVO ──────────────────────────────
+// 05:00–19:59 → solo clima  (☀️ ⛅ 🌧️ etc.)
+// 20:00–04:59 → luna + clima si hay fenómeno notable
+//   Clima "notable" = lluvia, tormenta, nieve, niebla (no despejado/nublado)
+//   Ejemplos: ⛈️🌒  🌧️🌕  🌨️🌗  🌫️🌔  — si está despejado: solo 🌒
+function iconoNocturno() {
+  const luna = calcularFaseLunar();
+  // Climas notables que se muestran junto a la luna
+  const notables = ['🌦️','🌧️','⛈️','❄️','🌨️','🌫️','🌪️'];
+  const esNotable = notables.includes(climaIcon);
+  return esNotable ? climaIcon + luna : luna;
 }
-setInterval(actualizarReloj,1000); actualizarReloj();
-obtenerClima(); setInterval(obtenerClima,600000);
 
-// ── PIN ───────────────────────────────────────────────────
-let pinActual='';
-function pinTecla(d){if(pinActual.length>=4)return;pinActual+=d;actP();if(pinActual.length===4)setTimeout(verificarPin,120);}
-function pinBorrar(){pinActual=pinActual.slice(0,-1);actP();document.getElementById('pin-error').innerText='';}
-function actP(){for(let i=0;i<4;i++)document.getElementById('p'+i).classList.toggle('lleno',i<pinActual.length);}
+function actualizarReloj() {
+  const now  = new Date();
+  const h    = String(now.getHours()).padStart(2,'0');
+  const m    = String(now.getMinutes()).padStart(2,'0');
+  const hora = now.getHours();
+  document.getElementById('header-hora').innerText = h + ':' + m;
+  const esNoche = hora >= 20 || hora < 5;
+  document.getElementById('header-clima').innerText = esNoche ? iconoNocturno() : climaIcon;
+}
+setInterval(actualizarReloj, 1000);
+actualizarReloj();
+obtenerClima();
+setInterval(obtenerClima, 10 * 60 * 1000); // actualiza clima cada 10 min
+
+// ── PIN ACCESO ────────────────────────────────────────────
+let pinActual = '';
+function pinTecla(d){if(pinActual.length>=4)return;pinActual+=d;actualizarPuntos();if(pinActual.length===4)setTimeout(verificarPin,120);}
+function pinBorrar(){pinActual=pinActual.slice(0,-1);actualizarPuntos();document.getElementById('pin-error').innerText='';}
+function actualizarPuntos(){for(let i=0;i<4;i++)document.getElementById('p'+i).classList.toggle('lleno',i<pinActual.length);}
 function verificarPin(){
   if(pinActual===PIN_CORRECTO){
     sessionStorage.setItem('nx_auth','1');
@@ -427,139 +566,149 @@ function verificarPin(){
     iniciarApp(); resetearTimeoutSeguridad();
   } else {
     document.getElementById('pin-error').innerText='CLAVE INCORRECTA';
-    pinActual=''; actP();
+    pinActual=''; actualizarPuntos();
   }
 }
 
-// ── MENÚ ─────────────────────────────────────────────────
+// ── MENÚ LOGO ─────────────────────────────────────────────
 let menuAbierto=false;
-function toggleMenu(){menuAbierto=!menuAbierto;document.getElementById('logo-menu').classList.toggle('visible',menuAbierto);document.getElementById('logo-arrow').innerText=menuAbierto?'▲':'▼';}
-document.addEventListener('click',e=>{const b=document.getElementById('logo-btn'),m=document.getElementById('logo-menu');if(!b.contains(e.target)&&!m.contains(e.target)){menuAbierto=false;m.classList.remove('visible');document.getElementById('logo-arrow').innerText='▼';}});
+function toggleMenu(){
+  menuAbierto=!menuAbierto;
+  document.getElementById('logo-menu').classList.toggle('visible',menuAbierto);
+  document.getElementById('logo-arrow').innerText=menuAbierto?'▲':'▼';
+}
+document.addEventListener('click',e=>{
+  const btn=document.getElementById('logo-btn'),menu=document.getElementById('logo-menu');
+  if(!btn.contains(e.target)&&!menu.contains(e.target)){menuAbierto=false;menu.classList.remove('visible');document.getElementById('logo-arrow').innerText='▼';}
+});
 function cerrarMenu(){menuAbierto=false;document.getElementById('logo-menu').classList.remove('visible');document.getElementById('logo-arrow').innerText='▼';}
 
+// ── MODALES ───────────────────────────────────────────────
 function abrirModal(id){document.getElementById(id).classList.add('visible');cerrarMenu();}
 function cerrarModal(id){document.getElementById(id).classList.remove('visible');}
 
-// ── RESUMEN ───────────────────────────────────────────────
+// 1. RESUMEN DEL DÍA
 function abrirResumen(){
-  const ahora=Date.now(),hoy=hoyStr();let del=0,vis=0,ale=0,sal=0,tot=0;
-  DB.forEach(r=>{if(new Date(r.tsE||0).toLocaleDateString('es-AR')!==hoy)return;tot++;
+  const ahora=Date.now(),hoyStr=new Date().toLocaleDateString('es-AR');
+  let del=0,vis=0,ale=0,sal=0,tot=0;
+  DB.forEach(r=>{const f=new Date(r.tsE||0).toLocaleDateString('es-AR');if(f!==hoyStr)return;tot++;
     const isA=r.tipo==='DELIVERY'&&(ahora-(r.tsE||0)>900000);
     if(r.tipo==='DELIVERY'){if(isA)ale++;else del++;}else vis++;if(r.hS)sal++;});
   document.getElementById('resumen-contenido').innerHTML=`
     <div class="modal-stat"><span class="modal-stat-label">🛵 Delivery activos</span><span class="modal-stat-val" style="color:var(--gold)">${del}</span></div>
     <div class="modal-stat"><span class="modal-stat-label">🚗 Visitas activas</span><span class="modal-stat-val" style="color:var(--green)">${vis}</span></div>
     <div class="modal-stat"><span class="modal-stat-label">⚠️ Alertas +15min</span><span class="modal-stat-val" style="color:var(--red)">${ale}</span></div>
-    <div class="modal-stat"><span class="modal-stat-label">📤 Con salida</span><span class="modal-stat-val" style="color:#888">${sal}</span></div>
+    <div class="modal-stat"><span class="modal-stat-label">📤 Con salida registrada</span><span class="modal-stat-val" style="color:#888">${sal}</span></div>
     <div class="modal-stat" style="border-top:2px solid var(--cyan);margin-top:6px;padding-top:12px;">
       <span class="modal-stat-label" style="font-weight:800;color:#fff">📋 Total del día</span>
-      <span class="modal-stat-val" style="color:var(--cyan)">${tot}</span></div>`;
+      <span class="modal-stat-val" style="color:var(--cyan)">${tot}</span>
+    </div>`;
   abrirModal('modal-resumen');
 }
 
-// ── VEHÍCULOS ─────────────────────────────────────────────
+// 2. VEHÍCULOS EN EL BARRIO
 function abrirVehiculos(){
-  const adentro=DB.filter(r=>!r.hS);
-  let html=!adentro.length?'<div class="empty-msg">Sin vehículos activos</div>':
-    `<div style="font-size:12px;color:#666;text-align:center;margin-bottom:10px;">${adentro.length} vehículo(s) dentro del barrio</div>`+
-    adentro.sort((a,b)=>(b.tsE||0)-(a.tsE||0)).map(r=>{
+  const adentro=DB.filter(r=>!r.hS);let html='';
+  if(!adentro.length){html='<div class="empty-msg">Sin vehículos activos en este momento</div>';}
+  else{
+    html=`<div style="font-size:12px;color:#666;text-align:center;margin-bottom:10px;">${adentro.length} vehículo(s) dentro del barrio</div>`;
+    html+=adentro.sort((a,b)=>(b.tsE||0)-(a.tsE||0)).map(r=>{
       const mins=Math.floor((Date.now()-(r.tsE||0))/60000);
       const col=r.tipo==='DELIVERY'&&mins>=15?'var(--red)':r.tipo==='DELIVERY'?'var(--gold)':'var(--green)';
-      return`<div class="modal-row"><strong style="color:${col}">${escH(r.pat)}</strong>${r.dni?` · DNI: ${escH(r.dni)}`:''}<span style="float:right;color:#666;font-size:11px">${mins}min</span><br><span style="font-size:11px;color:#888">Mza ${escH(r.mza||'-')} Casa ${escH(r.casa||'-')} · ${escH(r.tipo)}</span></div>`;
+      return`<div class="modal-row"><strong style="color:${col}">${escHtml(r.pat)}</strong>${r.dni?` · DNI: ${escHtml(r.dni)}`:''}<span style="float:right;color:#666;font-size:11px">${mins}min</span><br><span style="font-size:11px;color:#888">Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')} · ${escHtml(r.tipo)}</span></div>`;
     }).join('');
+  }
   document.getElementById('vehiculos-contenido').innerHTML=html;
   abrirModal('modal-vehiculos');
 }
 
-// ── HISTORIAL DEL DÍA ────────────────────────────────────
-function abrirBusqueda(){document.getElementById('busqueda-input').value='';filtrarHistorialDia();abrirModal('modal-busqueda');}
+// 3. HISTORIAL DEL DÍA (todos los registros de hoy, con filtro)
+function abrirBusqueda(){
+  document.getElementById('busqueda-input').value='';
+  document.getElementById('busqueda-status').innerText='';
+  filtrarHistorialDia();
+  abrirModal('modal-busqueda');
+}
 function filtrarHistorialDia(){
-  const q=(document.getElementById('busqueda-input').value||'').trim(),hoy=hoyStr();
-  let arr=DB.filter(r=>new Date(r.tsE||0).toLocaleDateString('es-AR')===hoy);
-  if(q)arr=arr.filter(r=>(r.pat||'').toUpperCase().includes(q)||(r.dni||'').includes(q));
-  arr.sort((a,b)=>(b.tsE||0)-(a.tsE||0));
-  document.getElementById('busqueda-status').innerText=arr.length+' registro(s) hoy';
-  document.getElementById('busqueda-resultados').innerHTML=!arr.length?
-    `<div class="empty-msg">Sin registros hoy${q?' para "'+escH(q)+'"':''}</div>`:
-    arr.map(r=>`<div class="modal-row"><strong>${escH(r.pat)}</strong>${r.dni?` · DNI: ${escH(r.dni)}`:''}<br><span style="font-size:11px;color:#888">Mza ${escH(r.mza||'-')} Casa ${escH(r.casa||'-')} · ${escH(r.tipo)} · ${escH(limpH(r.hE))}</span><span style="float:right;font-size:11px;color:${r.hS?'#888':'var(--green)'}">${r.hS?'Salió '+escH(limpH(r.hS)):'Adentro'}</span></div>`).join('');
+  const q=(document.getElementById('busqueda-input').value||'').trim();
+  const hoyStr=new Date().toLocaleDateString('es-AR');
+  let deDia=DB.filter(r=>{const f=new Date(r.tsE||0).toLocaleDateString('es-AR');return f===hoyStr;});
+  if(q) deDia=deDia.filter(r=>(r.pat||'').toUpperCase().includes(q)||(r.dni||'').includes(q));
+  deDia.sort((a,b)=>(b.tsE||0)-(a.tsE||0));
+  document.getElementById('busqueda-status').innerText=deDia.length+' registro(s) hoy';
+  if(!deDia.length){document.getElementById('busqueda-resultados').innerHTML='<div class="empty-msg">Sin registros hoy'+(q?' para "'+escHtml(q)+'"':'')+'</div>';return;}
+  document.getElementById('busqueda-resultados').innerHTML=deDia.map(r=>`<div class="modal-row">
+    <strong>${escHtml(r.pat)}</strong>${r.dni?` · DNI: ${escHtml(r.dni)}`:''}<br>
+    <span style="font-size:11px;color:#888">Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')} · ${escHtml(r.tipo)} · ${escHtml(limpiarHora(r.hE))}</span>
+    <span style="float:right;font-size:11px;color:${r.hS?'#888':'var(--green)'}">${r.hS?'Salió '+escHtml(limpiarHora(r.hS)):'Adentro'}</span>
+  </div>`).join('');
 }
 
-// ── ALERTAS DEL DÍA (FIX: sólo muestra alertas de HOY) ──
+// 4. ALERTAS DEL DÍA
 function abrirAlertas(){
-  const hoy = hoyStr();
-  const guardados = JSON.parse(localStorage.getItem('nx_alertas_hoy')||'[]');
-  // Filtrar: sólo alertas con ts de hoy
-  const alertasHoy = guardados.filter(a => a.ts && new Date(a.ts).toLocaleDateString('es-AR')===hoy);
-  // Incluir también pendientes activos de hoy
-  const todos = [...alertasHoy];
-  panicosPendientes.forEach(a=>{if(!todos.find(x=>x.panicoId===a.panicoId))todos.push(a);});
-
-  let html=!todos.length?'<div class="empty-msg">Sin alertas de emergencia hoy 🟢</div>':
-    `<div style="font-size:12px;color:#666;text-align:center;margin-bottom:10px">${todos.length} alerta(s) de emergencia hoy</div>`+
-    todos.map(a=>{
-      let mu=(a.mapsUrl||'').trim();if(!mu&&a.lat&&a.lng&&String(a.lat).length>3)mu='https://maps.google.com/?q='+a.lat+','+a.lng;
-      return`<div class="modal-row" style="border-left:4px solid var(--red)"><strong style="color:var(--red)">🚨 EMERGENCIA</strong><span style="float:right;font-size:11px;color:#888">${escH(a.fecha||'')}</span><br><span style="font-size:14px;font-weight:800">🏠 Mza ${escH(a.mza||'')} — Casa ${escH(a.casa||'')}</span><br>${mu?`<a href="${escH(mu)}" target="_blank" style="color:var(--green);font-size:12px;text-decoration:none">📍 Ver en Maps</a>`:'<span style="font-size:11px;color:#555">Sin GPS</span>'}</div>`;
-    }).join('');
+  const guardados=JSON.parse(localStorage.getItem('nx_alertas_hoy')||'[]');
+  const todos=[...panicosPendientes,...guardados.filter(a=>!panicosPendientes.find(p=>p.panicoId===a.panicoId))];
+  let html='';
+  if(!todos.length){html='<div class="empty-msg">Sin alertas registradas hoy 🟢</div>';}
+  else{
+    html=`<div style="font-size:12px;color:#666;text-align:center;margin-bottom:10px">${todos.length} alerta(s) de emergencia hoy</div>`;
+    html+=todos.map(a=>`<div class="modal-row" style="border-left:4px solid var(--red)">
+      <strong style="color:var(--red)">🚨 EMERGENCIA</strong>
+      <span style="float:right;font-size:11px;color:#888">${escHtml(a.fecha||'')}</span><br>
+      <span style="font-size:14px;font-weight:800">🏠 Mza ${escHtml(a.mza||'')} — Casa ${escHtml(a.casa||'')}</span><br>
+      ${a.mapsUrl?`<a href="${escHtml(a.mapsUrl)}" target="_blank" style="color:var(--green);font-size:12px;text-decoration:none">📍 Ver en Maps</a>`:'<span style="font-size:11px;color:#555">Sin GPS</span>'}
+    </div>`).join('');
+  }
   document.getElementById('alertas-contenido').innerHTML=html;
   abrirModal('modal-alertas');
 }
 
-// ── CIERRE DE TURNO ───────────────────────────────────────
+// 5. CIERRE DE TURNO
 function abrirTurno(){
-  const ahora=new Date(),hoy=hoyStr(),hora=ahora.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
-  let sal=0,sinSal=[];
-  const deDia=DB.filter(r=>new Date(r.tsE||0).toLocaleDateString('es-AR')===hoy);
-  deDia.forEach(r=>{const isA=r.tipo==='DELIVERY'&&(Date.now()-(r.tsE||0)>900000);if(r.hS)sal++;else sinSal.push(r);});
-  document.getElementById('turno-resumen').innerHTML=`
-    <div class="modal-stat"><span class="modal-stat-label">📅 Fecha</span><span style="font-weight:700;color:#fff">${hoy}</span></div>
-    <div class="modal-stat"><span class="modal-stat-label">🕐 Cierre</span><span style="font-weight:700;color:#fff">${hora}</span></div>
+  const ahora=new Date(),hoyStr=ahora.toLocaleDateString('es-AR'),horaStr=ahora.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+  let del=0,vis=0,ale=0,sal=0,sinSal=[];
+  const deDia=DB.filter(r=>{const f=new Date(r.tsE||0).toLocaleDateString('es-AR');return f===hoyStr;});
+  deDia.forEach(r=>{const isA=r.tipo==='DELIVERY'&&(Date.now()-(r.tsE||0)>900000);
+    if(r.tipo==='DELIVERY'){if(isA)ale++;else del++;}else vis++;if(r.hS)sal++;else sinSal.push(r);});
+  const html=`
+    <div class="modal-stat"><span class="modal-stat-label">📅 Fecha</span><span style="font-weight:700;color:#fff">${hoyStr}</span></div>
+    <div class="modal-stat"><span class="modal-stat-label">🕐 Hora de cierre</span><span style="font-weight:700;color:#fff">${horaStr}</span></div>
     <div class="modal-stat"><span class="modal-stat-label">📋 Total ingresos</span><span class="modal-stat-val" style="color:var(--cyan)">${deDia.length}</span></div>
     <div class="modal-stat"><span class="modal-stat-label">📤 Con salida</span><span class="modal-stat-val" style="color:var(--green)">${sal}</span></div>
-    <div class="modal-stat"><span class="modal-stat-label">🚨 Sin salida</span><span class="modal-stat-val" style="color:${sinSal.length?'var(--red)':'#888'}">${sinSal.length}</span></div>
-    ${sinSal.length?'<div style="margin-top:10px;font-size:12px;color:#888;font-weight:700">SIN SALIDA:</div>'+sinSal.map(r=>`<div class="modal-row" style="border-left:3px solid var(--red)"><strong>${escH(r.pat)}</strong> · Mza ${escH(r.mza||'-')} Casa ${escH(r.casa||'-')}</div>`).join(''):''}`;
-  const filas=deDia.map(r=>`<tr><td>${escH(r.pat)}</td><td>${escH(r.dni||'-')}</td><td>Mza ${escH(r.mza||'-')} Casa ${escH(r.casa||'-')}</td><td>${escH(r.tipo)}</td><td>${escH(limpH(r.hE))}</td><td style="color:${r.hS?'#27ae60':'#e74c3c'}">${r.hS?escH(limpH(r.hS)):'SIN SALIDA'}</td></tr>`).join('');
-  document.getElementById('pdf-report').innerHTML=`<h2>NEXOS — Cierre de Turno</h2><p>${hoy} | ${hora}</p><p>Total: ${deDia.length} | Con salida: ${sal} | Sin salida: ${sinSal.length}</p><table><tr><th>Patente</th><th>DNI</th><th>Destino</th><th>Tipo</th><th>Entrada</th><th>Salida</th></tr>${filas}</table>`;
+    <div class="modal-stat"><span class="modal-stat-label">🚨 Sin salida</span><span class="modal-stat-val" style="color:${sinSal.length>0?'var(--red)':'#888'}">${sinSal.length}</span></div>
+    ${sinSal.length>0?`<div style="margin-top:10px;font-size:12px;color:#888;font-weight:700">SIN SALIDA REGISTRADA:</div>`+sinSal.map(r=>`<div class="modal-row" style="border-left:3px solid var(--red)"><strong>${escHtml(r.pat)}</strong> · Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')}</div>`).join(''):''}`;
+  document.getElementById('turno-resumen').innerHTML=html;
+  const filas=deDia.map(r=>`<tr><td>${escHtml(r.pat)}</td><td>${escHtml(r.dni||'-')}</td><td>Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')}</td><td>${escHtml(r.tipo)}</td><td>${escHtml(limpiarHora(r.hE))}</td><td style="color:${r.hS?'#27ae60':'#e74c3c'}">${r.hS?escHtml(limpiarHora(r.hS)):'SIN SALIDA'}</td></tr>`).join('');
+  document.getElementById('pdf-report').innerHTML=`<h2>NEXOS — Cierre de Turno</h2><p style="font-size:12px;color:#555">${hoyStr} | Hora: ${horaStr}</p><p style="font-size:12px;margin-top:4px">Total: ${deDia.length} | Con salida: ${sal} | Sin salida: ${sinSal.length}</p><table><tr><th>Patente</th><th>DNI</th><th>Destino</th><th>Tipo</th><th>Entrada</th><th>Salida</th></tr>${filas}</table>`;
   abrirModal('modal-turno');
 }
 function imprimirTurno(){document.getElementById('pdf-report').style.display='block';setTimeout(()=>{window.print();setTimeout(()=>document.getElementById('pdf-report').style.display='none',1000);},100);}
 
-// ── LISTA NEGRA ───────────────────────────────────────────
+// 6. LISTA NEGRA
 let LISTA_NEGRA=JSON.parse(localStorage.getItem('nx_lista_negra')||'[]'),lnPinActual='';
 function abrirListaNegra(){document.getElementById('ln-buscar').value='';ocultarAgregarLN();renderListaNegra();abrirModal('modal-ln');}
 function renderListaNegra(){
   const q=(document.getElementById('ln-buscar').value||'').toUpperCase();
-  const f=LISTA_NEGRA.filter(r=>!q||(r.pat||'').toUpperCase().includes(q)||(r.dni||'').includes(q));
-  document.getElementById('ln-lista-contenido').innerHTML=!f.length?'<div class="empty-msg">Lista negra vacía 🟢</div>':
-    f.sort((a,b)=>b.ts-a.ts).map(r=>`<div class="ln-item"><div class="ln-item-info"><div class="ln-item-pat">🚫 ${escH(r.pat||'Sin patente')}</div>${r.dni?`<div class="ln-item-det">DNI: ${escH(r.dni)}</div>`:''} ${r.motivo?`<div class="ln-item-det" style="color:#e74c3c">⚠️ ${escH(r.motivo)}</div>`:''}<div class="ln-item-det">${new Date(r.ts).toLocaleDateString('es-AR')}</div></div></div>`).join('');
+  const filtrada=LISTA_NEGRA.filter(r=>!q||(r.pat||'').toUpperCase().includes(q)||(r.dni||'').includes(q));
+  const cont=document.getElementById('ln-lista-contenido');
+  if(!filtrada.length){cont.innerHTML='<div class="empty-msg">Lista negra vacía 🟢</div>';return;}
+  cont.innerHTML=filtrada.sort((a,b)=>b.ts-a.ts).map(r=>`<div class="ln-item"><div class="ln-item-info"><div class="ln-item-pat">🚫 ${escHtml(r.pat||'Sin patente')}</div>${r.dni?`<div class="ln-item-det">DNI: ${escHtml(r.dni)}</div>`:''} ${r.motivo?`<div class="ln-item-det" style="color:#e74c3c">⚠️ ${escHtml(r.motivo)}</div>`:''}<div class="ln-item-det">${new Date(r.ts).toLocaleDateString('es-AR')}</div></div></div>`).join('');
 }
-function mostrarAgregarLN(){lnPinActual='';updLNP();document.getElementById('ln-pin-error').innerText='';document.getElementById('ln-vista-consulta').style.display='none';document.getElementById('ln-vista-agregar').style.display='block';document.getElementById('ln-vista-form').style.display='none';}
+function mostrarAgregarLN(){lnPinActual='';actualizarLNPuntos();document.getElementById('ln-pin-error').innerText='';document.getElementById('ln-vista-consulta').style.display='none';document.getElementById('ln-vista-agregar').style.display='block';document.getElementById('ln-vista-form').style.display='none';}
 function ocultarAgregarLN(){document.getElementById('ln-vista-consulta').style.display='block';document.getElementById('ln-vista-agregar').style.display='none';document.getElementById('ln-vista-form').style.display='none';}
-function updLNP(){for(let i=0;i<8;i++)document.getElementById('lp'+i).classList.toggle('lleno',i<lnPinActual.length);}
-function lnPinTecla(d){if(lnPinActual.length>=8)return;lnPinActual+=d;updLNP();if(lnPinActual.length===8)setTimeout(()=>{if(lnPinActual===PIN_LN){document.getElementById('ln-pin-error').innerText='';document.getElementById('ln-vista-agregar').style.display='none';document.getElementById('ln-vista-form').style.display='block';}else{document.getElementById('ln-pin-error').innerText='CLAVE INCORRECTA';lnPinActual='';updLNP();}},120);}
-function lnPinBorrar(){lnPinActual=lnPinActual.slice(0,-1);updLNP();document.getElementById('ln-pin-error').innerText='';}
-function agregarListaNegra(){const pat=document.getElementById('ln-form-pat').value.trim().toUpperCase(),dni=document.getElementById('ln-form-dni').value.trim(),mot=document.getElementById('ln-form-motivo').value.trim();if(!pat&&!dni){showToast('Ingresá patente o DNI');return;}LISTA_NEGRA.push({pat,dni,motivo:mot,ts:Date.now()});localStorage.setItem('nx_lista_negra',JSON.stringify(LISTA_NEGRA));showToast('🚫 Agregado a lista negra');ocultarAgregarLN();renderListaNegra();}
+function actualizarLNPuntos(){for(let i=0;i<8;i++)document.getElementById('lp'+i).classList.toggle('lleno',i<lnPinActual.length);}
+function lnPinTecla(d){if(lnPinActual.length>=8)return;lnPinActual+=d;actualizarLNPuntos();if(lnPinActual.length===8)setTimeout(verificarLNPin,120);}
+function lnPinBorrar(){lnPinActual=lnPinActual.slice(0,-1);actualizarLNPuntos();document.getElementById('ln-pin-error').innerText='';}
+function verificarLNPin(){if(lnPinActual===PIN_LN){document.getElementById('ln-pin-error').innerText='';document.getElementById('ln-vista-agregar').style.display='none';document.getElementById('ln-vista-form').style.display='block';document.getElementById('ln-form-pat').value='';document.getElementById('ln-form-dni').value='';document.getElementById('ln-form-motivo').value='';}else{document.getElementById('ln-pin-error').innerText='CLAVE INCORRECTA';lnPinActual='';actualizarLNPuntos();}}
+function agregarListaNegra(){const pat=document.getElementById('ln-form-pat').value.trim().toUpperCase();const dni=document.getElementById('ln-form-dni').value.trim();const motivo=document.getElementById('ln-form-motivo').value.trim();if(!pat&&!dni){showToast('⚠️ Ingresá al menos patente o DNI');return;}LISTA_NEGRA.push({pat,dni,motivo,ts:Date.now()});localStorage.setItem('nx_lista_negra',JSON.stringify(LISTA_NEGRA));showToast('🚫 Agregado a lista negra');ocultarAgregarLN();renderListaNegra();}
 
-// ── RESET (FIX: guarda flag con fecha para bloquear sync) ─
+// 7. RESET
 let resetPin='';
-function abrirReset(){resetPin='';updRP();document.getElementById('reset-pin-error').innerText='';abrirModal('modal-reset');}
-function resetTecla(d){if(resetPin.length>=4)return;resetPin+=d;updRP();if(resetPin.length===4)setTimeout(verificarReset,120);}
-function resetBorrar(){resetPin=resetPin.slice(0,-1);updRP();document.getElementById('reset-pin-error').innerText='';}
-function updRP(){for(let i=0;i<4;i++)document.getElementById('r'+i).classList.toggle('lleno',i<resetPin.length);}
-function verificarReset(){
-  if(resetPin===PIN_CORRECTO){
-    DB=[];
-    localStorage.removeItem('nx_db');
-    // Guardar flag: "se hizo reset hoy" → sincronizar() no va a sobreescribir con cloud
-    localStorage.setItem('nx_reset_activo','1');
-    localStorage.setItem('nx_reset_fecha', hoyStr());
-    cerrarModal('modal-reset');
-    render();
-    showToast('✅ Lista del día borrada');
-  } else {
-    document.getElementById('reset-pin-error').innerText='CLAVE INCORRECTA';
-    resetPin=''; updRP();
-  }
-}
+function abrirReset(){resetPin='';actualizarResetPuntos();document.getElementById('reset-pin-error').innerText='';abrirModal('modal-reset');}
+function resetTecla(d){if(resetPin.length>=4)return;resetPin+=d;actualizarResetPuntos();if(resetPin.length===4)setTimeout(verificarReset,120);}
+function resetBorrar(){resetPin=resetPin.slice(0,-1);actualizarResetPuntos();document.getElementById('reset-pin-error').innerText='';}
+function actualizarResetPuntos(){for(let i=0;i<4;i++)document.getElementById('r'+i).classList.toggle('lleno',i<resetPin.length);}
+function verificarReset(){if(resetPin===PIN_CORRECTO){DB=[];localStorage.removeItem('nx_db');cerrarModal('modal-reset');render();showToast('✅ Lista del día borrada');}else{document.getElementById('reset-pin-error').innerText='CLAVE INCORRECTA';resetPin='';actualizarResetPuntos();}}
 
 // ── APP CORE ──────────────────────────────────────────────
 let DB=JSON.parse(localStorage.getItem('nx_db')||'[]');
@@ -590,7 +739,7 @@ function resetearTimeoutSeguridad(){
 }
 function cerrarSesion(){
   if(window.timerIntervalo)clearInterval(window.timerIntervalo);if(timeoutSeguridad)clearTimeout(timeoutSeguridad);
-  sessionStorage.removeItem('nx_auth');pinActual='';actP();
+  sessionStorage.removeItem('nx_auth');pinActual='';actualizarPuntos();
   document.getElementById('pin-screen').classList.remove('oculto');document.getElementById('header-bar').style.display='none';
   document.getElementById('pin-error').innerText='SESIÓN EXPIRADA - Volvé a ingresar';
 }
@@ -599,26 +748,20 @@ function cerrarSesion(){
 function showToast(msg){const t=document.getElementById('toast');t.innerText=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
 function setSyncStatus(msg,cls){const el=document.getElementById('sync-status');el.innerText=msg;el.className='sync-status '+(cls||'');}
 function horaActual(){return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
-function limpH(h){if(!h)return'';const s=String(h);if(s.includes('T'))return s.split('T')[1].substring(0,5);if(s.includes('\n'))return s.split('\n')[1]||'';return s;}
-function escH(str){if(!str)return'';return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function limpiarHora(h){if(!h)return'';const s=String(h);if(s.includes('T'))return s.split('T')[1].substring(0,5);if(s.includes('\n'))return s.split('\n')[1]||'';return s;}
+function escHtml(str){if(!str)return'';return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function ver(n){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));document.getElementById('p-'+n).classList.add('active');document.getElementById('btn-'+n).classList.add('active');}
-function verificarLN(pat,dni){const m=LISTA_NEGRA.find(r=>(r.pat&&r.pat===pat)||(r.dni&&r.dni===dni&&dni));if(m)showToast('🚫 LISTA NEGRA: '+(m.pat||m.dni)+(m.motivo?' — '+m.motivo:''));}
+function verificarListaNegra(pat,dni){const match=LISTA_NEGRA.find(r=>(r.pat&&r.pat===pat)||(r.dni&&r.dni===dni&&dni));if(match)showToast('🚫 LISTA NEGRA: '+(match.pat||match.dni)+(match.motivo?' — '+match.motivo:''));}
 
-// ── PÁNICO (FIX: guarda con timestamp ts para filtrar por día) ──
 function mostrarPanico(alertas){
-  const hoy=hoyStr();
   const guardados=JSON.parse(localStorage.getItem('nx_alertas_hoy')||'[]');
-  alertas.forEach(a=>{
-    if(!guardados.find(g=>g.panicoId===a.panicoId)){
-      guardados.push({...a, ts: Date.now()}); // ← ts de cuando llegó
-    }
-  });
+  alertas.forEach(a=>{if(!guardados.find(g=>g.panicoId===a.panicoId))guardados.push(a);});
   localStorage.setItem('nx_alertas_hoy',JSON.stringify(guardados));
   const lista=document.getElementById('panico-lista');
   lista.innerHTML=alertas.map(a=>{
-    let mu=(a.mapsUrl||'').trim();if(!mu&&a.lat&&a.lng&&String(a.lat).length>3)mu='https://maps.google.com/?q='+a.lat+','+a.lng;
-    const mh=mu?`<a class="panico-maps-btn" href="${escH(mu)}" target="_blank" rel="noopener">📍 Ver ubicación en Google Maps</a>`:`<div class="panico-no-maps">📍 Ubicación GPS no disponible</div>`;
-    return`<div class="panico-item"><div class="panico-hora">${escH(a.fecha||'')}</div><div class="panico-loc">🏠 Mza <strong>${escH(a.mza)}</strong> — Casa <strong>${escH(a.casa)}</strong></div>${mh}</div>`;
+    let mapUrl=(a.mapsUrl||'').trim();if(!mapUrl&&a.lat&&a.lng&&String(a.lat).length>3)mapUrl='https://maps.google.com/?q='+a.lat+','+a.lng;
+    const mapsHtml=mapUrl?`<a class="panico-maps-btn" href="${escHtml(mapUrl)}" target="_blank" rel="noopener">📍 Ver ubicación en Google Maps</a>`:`<div class="panico-no-maps">📍 Ubicación GPS no disponible</div>`;
+    return`<div class="panico-item"><div class="panico-hora">${escHtml(a.fecha||'')}</div><div class="panico-loc">🏠 Mza <strong>${escHtml(a.mza)}</strong> — Casa <strong>${escHtml(a.casa)}</strong></div>${mapsHtml}</div>`;
   }).join('');
   document.getElementById('panico-overlay').classList.add('visible');initAudio();iniciarSirena();
 }
@@ -628,149 +771,209 @@ function cerrarPanico(){
   panicosPendientes=[];document.getElementById('panico-overlay').classList.remove('visible');
 }
 
-// ── SINCRONIZAR (FIX: respeta el reset del día) ───────────
 async function sincronizar(manual=false){
-  const url=localStorage.getItem('nx_url');
-  if(!url){if(manual)showToast("⚙️ Configurá la URL primero");return;}
+  const url=localStorage.getItem('nx_url');if(!url){if(manual)showToast("⚙️ Configurá la URL primero");return;}
   if(sincronizando)return;sincronizando=true;setSyncStatus('Sincronizando...','sync-loading');
   try{
     const r=await fetch(url+'?t='+Date.now());if(!r.ok)throw new Error();const data=await r.json();
-    const cloudData=Array.isArray(data)?data:(data.activos||[]);
-    const panico=Array.isArray(data)?[]:(data.panico||[]);
-
-    // ── FIX RESET: si se hizo reset hoy, NO reemplazar DB con datos cloud ──
-    const resetActivo = localStorage.getItem('nx_reset_activo')==='1'
-                     && localStorage.getItem('nx_reset_fecha')===hoyStr();
-
-    if(!resetActivo){
-      // Comportamiento normal: mezcla cloud + pendientes locales
-      const cloudIds=new Set(cloudData.map(x=>String(x.id)));
-      const pend=DB.filter(x=>!cloudIds.has(String(x.id))&&(Date.now()-(x.tsE||0)<60000));
-      DB=[...cloudData,...pend];
-      localStorage.setItem('nx_db',JSON.stringify(DB));
-    } else {
-      // Reset activo: sólo actualizar pendientes locales que subamos nosotros
-      // (no traer nada del cloud)
-      setSyncStatus('✔ Reset activo — cloud no importado','sync-ok');
-    }
-
-    render();
-    setSyncStatus('✔ Sincronizado '+horaActual(),'sync-ok');
-
-    // Alertas de pánico siguen funcionando igual
-    if(panico.length>0){
-      const ids=new Set(panicosPendientes.map(x=>String(x.panicoId)));
-      const nuevas=panico.filter(a=>!ids.has(String(a.panicoId)));
-      if(nuevas.length>0){panicosPendientes=panico;mostrarPanico(panico);}
-      else panicosPendientes=panico;
-    }
+    const cloudData=Array.isArray(data)?data:(data.activos||[]);const panico=Array.isArray(data)?[]:(data.panico||[]);
+    const cloudIds=new Set(cloudData.map(x=>String(x.id)));const pend=DB.filter(x=>!cloudIds.has(String(x.id))&&(Date.now()-(x.tsE||0)<60000));
+    DB=[...cloudData,...pend];localStorage.setItem('nx_db',JSON.stringify(DB));render();setSyncStatus('✔ Sincronizado '+horaActual(),'sync-ok');
+    if(panico.length>0){const ids=new Set(panicosPendientes.map(x=>String(x.panicoId)));const nuevas=panico.filter(a=>!ids.has(String(a.panicoId)));if(nuevas.length>0){panicosPendientes=panico;mostrarPanico(panico);}else panicosPendientes=panico;}
   }catch(e){setSyncStatus('⚠ Sin conexión','sync-err');if(manual)showToast("⚠️ Error al sincronizar");}
   finally{sincronizando=false;}
 }
-
 function enviar(datos){const url=localStorage.getItem('nx_url');if(!url)return;fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)}).then(()=>setTimeout(()=>sincronizar(),1500)).catch(()=>showToast("⚠️ No se pudo subir"));}
 
 function registrarRapido(tipo){
   const val=document.getElementById('buscador').value.trim();if(!val)return;const hora=horaActual();let item;
-  if(tipo==='ingreso'){
-    // Si hay reset activo y el usuario registra uno nuevo, levantarlo
-    if(localStorage.getItem('nx_reset_activo')==='1'){
-      localStorage.removeItem('nx_reset_activo');
-      localStorage.removeItem('nx_reset_fecha');
-    }
-    verificarLN(val,val);
-    item={id:Date.now(),pat:val,tipo:'VISITA',hE:hora,hS:'',tsE:Date.now(),mza:'',casa:'',dni:''};
-    DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);
-  }else{
-    const c=DB.filter(x=>x.pat===val&&!x.hS).sort((a,b)=>(b.tsE||0)-(a.tsE||0));item=c[0];
-    if(item){item.hE=limpH(item.hE);item.hS=hora;DB=DB.filter(x=>x.id!==item.id);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}
-    else{showToast("❌ NO ENCONTRADO");return;}
-  }
+  if(tipo==='ingreso'){verificarListaNegra(val,val);item={id:Date.now(),pat:val,tipo:'VISITA',hE:hora,hS:'',tsE:Date.now(),mza:'',casa:'',dni:''};DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}
+  else{const c=DB.filter(x=>x.pat===val&&!x.hS).sort((a,b)=>(b.tsE||0)-(a.tsE||0));item=c[0];if(item){item.hE=limpiarHora(item.hE);item.hS=hora;DB=DB.filter(x=>x.id!==item.id);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}else{showToast("❌ NO ENCONTRADO");return;}}
   document.getElementById('buscador').value='';
 }
-
 function guardarForm(modo){
-  const pre=modo==='manual'?'m-':'d-',p=document.getElementById(pre+'pat').value.trim();if(!p)return;
-  // Levantar reset al registrar nuevo ingreso manual
-  if(localStorage.getItem('nx_reset_activo')==='1'){localStorage.removeItem('nx_reset_activo');localStorage.removeItem('nx_reset_fecha');}
-  const d=document.getElementById(pre+'dni').value.trim();verificarLN(p,d);
+  const pre=modo==='manual'?'m-':'d-';const p=document.getElementById(pre+'pat').value.trim();if(!p)return;
+  const d=document.getElementById(pre+'dni').value.trim();verificarListaNegra(p,d);
   const item={id:Date.now(),pat:p,dni:d,mza:document.getElementById(pre+'mza').value.trim(),casa:document.getElementById(pre+'casa').value.trim(),tipo:modo==='manual'?'MANUAL':'DELIVERY',hE:horaActual(),hS:'',tsE:Date.now()};
   DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));
   ['pat','dni','mza','casa'].forEach(f=>{const el=document.getElementById(pre+f);if(el)el.value='';});
   showToast("✅ REGISTRADO");ver('lista');render();enviar(item);
 }
-function darSalida(id){const item=DB.find(x=>x.id===id);if(!item)return;item.hE=limpH(item.hE);item.hS=horaActual();DB=DB.filter(x=>x.id!==id);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}
+function darSalida(id){const item=DB.find(x=>x.id===id);if(!item)return;item.hE=limpiarHora(item.hE);item.hS=horaActual();DB=DB.filter(x=>x.id!==id);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}
 function guardarConfig(){localStorage.setItem('nx_url',document.getElementById('cfg-url').value.trim());showToast("⚙️ GUARDADO");sincronizar();}
 
 function render(){
   const cont=document.getElementById('cont-lista');const ahora=Date.now();let d=0,v=0,a=0;
   const html=DB.slice().sort((x,y)=>(y.tsE||0)-(x.tsE||0)).map(r=>{
-    const hE=limpH(r.hE),tsE=r.tsE||0,isA=(r.tipo==='DELIVERY'&&(ahora-tsE>900000));
+    const hE=limpiarHora(r.hE);const tsE=r.tsE||0;const isA=(r.tipo==='DELIVERY'&&(ahora-tsE>900000));
     if(r.tipo==='DELIVERY'){if(isA)a++;else d++;}else v++;
     let cls='adentro';if(isA)cls='alerta';else if(r.tipo==='DELIVERY')cls='dely-adentro';
     const isLN=LISTA_NEGRA.find(ln=>(ln.pat&&ln.pat===r.pat)||(ln.dni&&ln.dni===r.dni&&r.dni));
-    const lnB=isLN?`<span class="ln-badge">🚫 LISTA NEGRA</span><br>`:'';
-    const dniI=r.dni?` · DNI: ${escH(r.dni)}`:'';
-    return`<div class="reg-item ${cls}"><div>${lnB}<strong>${escH(r.pat)}</strong><br><small>Mza: ${escH(r.mza||'-')} - Lote: ${escH(r.casa||'-')}${dniI}<br>${escH(r.tipo)} | ${hE}${isA?' ⚠️ +15min':''}</small></div><button onclick="darSalida(${r.id})" style="background:var(--red);color:white;border:none;padding:10px 15px;border-radius:10px;font-weight:800;cursor:pointer;flex-shrink:0;">SALIDA</button></div>`;
+    const lnBadge=isLN?`<span class="ln-badge">🚫 LISTA NEGRA</span><br>`:'';
+    const dniInfo=r.dni?` · DNI: ${escHtml(r.dni)}`:'';
+    return`<div class="reg-item ${cls}"><div>${lnBadge}<strong>${escHtml(r.pat)}</strong><br><small>Mza: ${escHtml(r.mza||'-')} - Lote: ${escHtml(r.casa||'-')}${dniInfo}<br>${escHtml(r.tipo)} | ${hE}${isA?' ⚠️ +15min':''}</small></div><button onclick="darSalida(${r.id})" style="background:var(--red);color:white;border:none;padding:10px 15px;border-radius:10px;font-weight:800;cursor:pointer;flex-shrink:0;">SALIDA</button></div>`;
   }).join('')||'<p style="opacity:0.3;text-align:center;padding:20px;">SIN ACTIVIDAD</p>';
   cont.innerHTML=html;document.getElementById('mon-d').innerText=d;document.getElementById('mon-v').innerText=v;document.getElementById('mon-a').innerText=a;
 }
 
-function iniciarApp(){
-  document.getElementById('cfg-url').value=localStorage.getItem('nx_url')||'';
-  limpiarDatosAntiguos(); // ← limpia alertas viejas y reset-flag expirado
-  render();sincronizar();
-  setInterval(()=>sincronizar(),15000);setInterval(render,30000);
-}
-
+function iniciarApp(){document.getElementById('cfg-url').value=localStorage.getItem('nx_url')||'';render();sincronizar();setInterval(()=>sincronizar(),15000);setInterval(render,30000);}
 document.getElementById('pin-screen').classList.remove('oculto');
 document.getElementById('header-bar').style.display='none';
 
-// ── SOS ───────────────────────────────────────────────────
-const SOS_NUMEROS=[
-  {icon:'🚔',nombre:'Policía',desc:'Emergencias policiales',num:'911'},
-  {icon:'🔥',nombre:'Bomberos',desc:'Incendios y rescates',num:'100'},
-  {icon:'🚑',nombre:'SAME',desc:'Emergencia médica / ambulancias',num:'107'},
-  {icon:'🛡️',nombre:'Defensa Civil',desc:'Inundaciones, desastres',num:'103'},
-  {icon:'⚡',nombre:'Edesur / Edenor',desc:'Emergencia eléctrica',num:'0800-333-3787'},
-  {icon:'💧',nombre:'AySA',desc:'Emergencia de agua y cloacas',num:'0800-321-2482'},
-  {icon:'🚨',nombre:'Violencia de Gén.',desc:'Línea gratuita 24h',num:'144'},
-  {icon:'👶',nombre:'Niñez y Adolesc.',desc:'Vulneración de derechos',num:'102'},
+// ── DIRECTORIO SOS ───────────────────────────────────────
+const SOS_NUMEROS = [
+  { icon:'🚔', nombre:'Policía',           desc:'Emergencias policiales',           num:'911' },
+  { icon:'🔥', nombre:'Bomberos',          desc:'Incendios y rescates',             num:'100' },
+  { icon:'🚑', nombre:'Emergencia Médica', desc:'SAME / Ambulancias',               num:'107' },
+  { icon:'🛡️', nombre:'Defensa Civil',     desc:'Inundaciones, desastres',          num:'103' },
+  { icon:'⚡', nombre:'Edesur / Edenor',   desc:'Corte de luz / emergencia eléct.', num:'0800-333-3787' },
+  { icon:'💧', nombre:'AySA',              desc:'Emergencia de agua y cloacas',     num:'0800-321-2482' },
+  { icon:'🚨', nombre:'Violencia de Gén.', desc:'Línea gratuita 24h',               num:'144' },
+  { icon:'👶', nombre:'Niñez y Adolesc.',  desc:'Vulneración de derechos',          num:'102' },
 ];
 function abrirSOS(){
-  document.getElementById('sos-contenido').innerHTML=`<div class="sos-header">Tocá el número para llamar directamente</div>`+
-    SOS_NUMEROS.map(s=>`<a class="sos-item" href="tel:${s.num}"><div class="sos-item-left"><span class="sos-item-icon">${s.icon}</span><div><div class="sos-item-nombre">${s.nombre}</div><div class="sos-item-desc">${s.desc}</div></div></div><span class="sos-item-num">${s.num}</span></a>`).join('');
+  const html = `<div class="sos-header">Tocá el número para llamar directamente</div>` +
+    SOS_NUMEROS.map(s => `<a class="sos-item" href="tel:${s.num}"><div class="sos-item-left"><span class="sos-item-icon">${s.icon}</span><div class="sos-item-info"><div class="sos-item-nombre">${s.nombre}</div><div class="sos-item-desc">${s.desc}</div></div></div><span class="sos-item-num">${s.num}</span></a>`).join('');
+  document.getElementById('sos-contenido').innerHTML = html;
   abrirModal('modal-sos');
 }
 
-// ── DELIVERY / VISITAS / ALERTAS clickeables ─────────────
+// ── DELIVERY ACTIVOS ──────────────────────────────────────
 function abrirDeliveryActivos(){
-  const ahora=Date.now(),activos=DB.filter(r=>r.tipo==='DELIVERY'&&!r.hS&&(ahora-(r.tsE||0)<=900000)).sort((a,b)=>(a.tsE||0)-(b.tsE||0));
-  document.getElementById('delivery-activos-contenido').innerHTML=!activos.length?'<div class="empty-msg">Sin delivery activos 🟢</div>':
-    `<div style="font-size:12px;color:var(--gold);text-align:center;margin-bottom:12px;font-weight:800;">${activos.length} delivery dentro del barrio</div>`+
-    activos.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);
-      return`<div class="modal-row" style="border-left:4px solid var(--gold);"><strong style="color:var(--gold);font-size:16px;">🛵 ${escH(r.pat)}</strong><span style="float:right;background:var(--gold);color:black;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">${mins}min</span><br><span style="font-size:12px;color:#aaa;">Mza ${escH(r.mza||'-')} — Casa ${escH(r.casa||'-')}</span><br><span style="font-size:11px;color:#666;">Entró: ${escH(limpH(r.hE))} · Alerta en ${15-mins}min${r.dni?' · DNI: '+escH(r.dni):''}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-delivery-activos');" style="margin-top:8px;background:var(--red);color:white;border:none;padding:10px;border-radius:8px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;
-    }).join('');
+  const ahora=Date.now();
+  const activos=DB.filter(r=>r.tipo==='DELIVERY'&&!r.hS&&(ahora-(r.tsE||0)<=900000)).sort((a,b)=>(a.tsE||0)-(b.tsE||0));
+  let html=activos.length?`<div style="font-size:12px;color:var(--gold);text-align:center;margin-bottom:12px;font-weight:800;">${activos.length} delivery dentro del barrio</div>`+
+    activos.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);const hE=limpiarHora(r.hE);const restante=15-mins;
+      return`<div class="modal-row" style="border-left:4px solid var(--gold);"><strong style="color:var(--gold);font-size:16px;">🛵 ${escHtml(r.pat)}</strong><span style="float:right;background:var(--gold);color:black;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">${mins} min</span><br><span style="font-size:12px;color:#aaa;">Mza ${escHtml(r.mza||'-')} — Casa ${escHtml(r.casa||'-')}</span><br><span style="font-size:11px;color:#666;">Entró: ${hE} · Alerta en ${restante} min${r.dni?' · DNI: '+escHtml(r.dni):''}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-delivery-activos');" style="margin-top:10px;background:var(--red);color:white;border:none;padding:10px 20px;border-radius:10px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;
+    }).join('')
+    :'<div class="empty-msg">Sin delivery activos ahora 🟢</div>';
+  document.getElementById('delivery-activos-contenido').innerHTML=html;
   abrirModal('modal-delivery-activos');
 }
+
+// ── VISITAS ACTIVAS ───────────────────────────────────────
 function abrirVisitasActivas(){
-  const ahora=Date.now(),vis=DB.filter(r=>r.tipo!=='DELIVERY'&&!r.hS).sort((a,b)=>(a.tsE||0)-(b.tsE||0));
-  document.getElementById('visitas-activas-contenido').innerHTML=!vis.length?'<div class="empty-msg">Sin visitas activas 🟢</div>':
-    `<div style="font-size:12px;color:var(--green);text-align:center;margin-bottom:12px;font-weight:800;">${vis.length} visita(s) dentro del barrio</div>`+
-    vis.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);
-      return`<div class="modal-row" style="border-left:4px solid var(--green);"><strong style="color:var(--green);font-size:16px;">🚗 ${escH(r.pat)}</strong><span style="float:right;background:var(--green);color:black;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">${mins}min</span><br><span style="font-size:12px;color:#aaa;">Mza ${escH(r.mza||'-')} — Casa ${escH(r.casa||'-')}</span><br><span style="font-size:11px;color:#666;">Tipo: ${escH(r.tipo)}${r.dni?' · DNI: '+escH(r.dni):''}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-visitas-activas');" style="margin-top:8px;background:var(--red);color:white;border:none;padding:10px;border-radius:8px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;
-    }).join('');
+  const ahora=Date.now();
+  const visitas=DB.filter(r=>r.tipo!=='DELIVERY'&&!r.hS).sort((a,b)=>(a.tsE||0)-(b.tsE||0));
+  let html=visitas.length?`<div style="font-size:12px;color:var(--green);text-align:center;margin-bottom:12px;font-weight:800;">${visitas.length} visita(s) dentro del barrio</div>`+
+    visitas.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);const hE=limpiarHora(r.hE);
+      return`<div class="modal-row" style="border-left:4px solid var(--green);"><strong style="color:var(--green);font-size:16px;">🚗 ${escHtml(r.pat)}</strong><span style="float:right;background:var(--green);color:black;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">${mins} min</span><br><span style="font-size:12px;color:#aaa;">Mza ${escHtml(r.mza||'-')} — Casa ${escHtml(r.casa||'-')}</span><br><span style="font-size:11px;color:#666;">Entró: ${hE} · Tipo: ${escHtml(r.tipo)}${r.dni?' · DNI: '+escHtml(r.dni):''}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-visitas-activas');" style="margin-top:10px;background:var(--red);color:white;border:none;padding:10px 20px;border-radius:10px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;
+    }).join('')
+    :'<div class="empty-msg">Sin visitas activas ahora 🟢</div>';
+  document.getElementById('visitas-activas-contenido').innerHTML=html;
   abrirModal('modal-visitas-activas');
 }
+
+// ── DELIVERY EN ALERTA (+15min) ───────────────────────────
 function abrirDeliveryAlertas(){
-  const ahora=Date.now(),en=DB.filter(r=>r.tipo==='DELIVERY'&&!r.hS&&(ahora-(r.tsE||0)>900000)).sort((a,b)=>(a.tsE||0)-(b.tsE||0));
-  document.getElementById('delivery-alertas-contenido').innerHTML=!en.length?'<div class="empty-msg">Sin delivery en alerta 🟢</div>':
-    `<div style="font-size:12px;color:var(--red);text-align:center;margin-bottom:12px;font-weight:800;">${en.length} delivery superaron los 15 min</div>`+
-    en.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);
-      return`<div class="modal-row" style="border-left:4px solid var(--red);background:rgba(231,76,60,0.07);"><strong style="color:var(--red);font-size:16px;">🛵 ${escH(r.pat)}</strong><span style="float:right;background:var(--red);color:white;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">+${mins}min</span><br><span style="font-size:12px;color:#aaa;">Mza ${escH(r.mza||'-')} — Casa ${escH(r.casa||'-')}${r.dni?' · DNI: '+escH(r.dni):''}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-delivery-alertas');" style="margin-top:8px;background:var(--red);color:white;border:none;padding:10px;border-radius:8px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;
-    }).join('');
+  const ahora=Date.now();
+  const enAlerta=DB.filter(r=>r.tipo==='DELIVERY'&&!r.hS&&(ahora-(r.tsE||0)>900000)).sort((a,b)=>(a.tsE||0)-(b.tsE||0));
+  let html=enAlerta.length?`<div style="font-size:12px;color:#e74c3c;text-align:center;margin-bottom:12px;font-weight:800;">${enAlerta.length} delivery lleva(n) más de 15 minutos adentro</div>`+
+    enAlerta.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);const hE=limpiarHora(r.hE);
+      return`<div class="modal-row" style="border-left:4px solid var(--red);background:rgba(231,76,60,0.08);"><strong style="color:var(--red);font-size:16px;">🛵 ${escHtml(r.pat)}</strong><span style="float:right;background:var(--red);color:white;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">+${mins} min</span><br><span style="font-size:12px;color:#aaa;">Mza ${escHtml(r.mza||'-')} — Casa ${escHtml(r.casa||'-')}</span><br><span style="font-size:11px;color:#666;">Entró: ${hE}${r.dni?' · DNI: '+escHtml(r.dni):''}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-delivery-alertas');" style="margin-top:10px;background:var(--red);color:white;border:none;padding:10px 20px;border-radius:10px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;
+    }).join('')
+    :'<div class="empty-msg">Sin delivery en alerta ahora 🟢</div>';
+  document.getElementById('delivery-alertas-contenido').innerHTML=html;
   abrirModal('modal-delivery-alertas');
 }
+
+
+// ── HISTORIAL SHEET ───────────────────────────────────────
+let hsTabActual = 'fecha';
+
+function abrirHistorialSheet() {
+  document.getElementById('hs-resultados').innerHTML = '';
+  document.getElementById('hs-status').innerText = '';
+  // Default: fecha de hoy
+  const hoy = new Date().toISOString().split('T')[0];
+  document.getElementById('hs-fecha-input').value = hoy;
+  document.getElementById('hs-pat-input').value = '';
+  hsTabs('fecha');
+  abrirModal('modal-historial-sheet');
+}
+
+function hsTabs(tab) {
+  hsTabActual = tab;
+  const esFecha = tab === 'fecha';
+  document.getElementById('hs-panel-fecha').style.display   = esFecha ? 'block' : 'none';
+  document.getElementById('hs-panel-patente').style.display = esFecha ? 'none'  : 'block';
+  // Estilos tabs
+  const tabFecha   = document.getElementById('hs-tab-fecha');
+  const tabPatente = document.getElementById('hs-tab-patente');
+  if (esFecha) {
+    tabFecha.style.background   = 'var(--cyan)'; tabFecha.style.color   = '#000'; tabFecha.style.borderColor   = 'var(--cyan)';
+    tabPatente.style.background = 'var(--bg3)';  tabPatente.style.color = '#888'; tabPatente.style.borderColor = 'var(--border)';
+  } else {
+    tabPatente.style.background = 'var(--cyan)'; tabPatente.style.color = '#000'; tabPatente.style.borderColor = 'var(--cyan)';
+    tabFecha.style.background   = 'var(--bg3)';  tabFecha.style.color   = '#888'; tabFecha.style.borderColor   = 'var(--border)';
+  }
+}
+
+async function buscarPorFecha() {
+  const fecha = document.getElementById('hs-fecha-input').value;
+  if (!fecha) return;
+  await hsConsultar({ accion: 'buscar', fecha });
+}
+
+async function buscarPorPatente() {
+  const q = document.getElementById('hs-pat-input').value.trim();
+  if (!q) return;
+  await hsConsultar({ accion: 'buscar', q });
+}
+
+async function hsConsultar(params) {
+  const url = localStorage.getItem('nx_url');
+  if (!url) { showToast('⚙️ Configurá la URL primero'); return; }
+
+  const status = document.getElementById('hs-status');
+  const cont   = document.getElementById('hs-resultados');
+  status.innerText = '🔍 Buscando en el Sheet...';
+  cont.innerHTML   = '';
+
+  try {
+    const qs = Object.entries(params).map(([k,v]) => k+'='+encodeURIComponent(v)).join('&');
+    const r  = await fetch(url + '?' + qs + '&t=' + Date.now());
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+
+    // Soporte para respuesta { activos, panico } o { resultados } o array
+    const resultados = data.resultados || (Array.isArray(data) ? data : null);
+
+    if (!resultados) {
+      status.innerText = '⚠️ El Script no soporta búsqueda histórica aún. Actualizá el GS.';
+      return;
+    }
+
+    status.innerText = resultados.length + ' resultado(s) encontrado(s)';
+    if (!resultados.length) {
+      cont.innerHTML = '<div class="empty-msg">Sin resultados</div>';
+      return;
+    }
+
+    cont.innerHTML = resultados.map(r => {
+      const hE  = limpiarHora(r.hE  || r.entrada || '');
+      const hS  = limpiarHora(r.hS  || r.salida  || '');
+      const pat = escHtml(r.pat     || r.patente  || '-');
+      const dni = escHtml(r.dni     || '');
+      const mza = escHtml(r.mza     || '-');
+      const cas = escHtml(r.casa    || r.lote     || '-');
+      const tip = escHtml(r.tipo    || '');
+      const fec = escHtml(r.fecha   || '');
+      const col = hS ? '#888' : 'var(--green)';
+      return `<div class="modal-row" style="border-left:4px solid ${hS ? 'var(--border)' : 'var(--green)'};">
+        <strong style="font-size:15px;">${pat}</strong>${dni ? ' · DNI: ' + dni : ''}
+        <span style="float:right;font-size:11px;color:${col};font-weight:800;">${hS ? '✔ Salió ' + hS : '⚡ Sin salida'}</span><br>
+        <span style="font-size:11px;color:#888;">Mza ${mza} — Lote ${cas} · ${tip}</span><br>
+        <span style="font-size:11px;color:#555;">${fec ? '📅 ' + fec + ' · ' : ''}Entró: ${hE || '-'}</span>
+      </div>`;
+    }).join('');
+
+  } catch(e) {
+    console.error('hsConsultar error:', e);
+    status.innerText = '⚠️ Error al consultar. Verificá la URL y el GS.';
+  }
+}
+
 </script>
 </body>
 </html>
