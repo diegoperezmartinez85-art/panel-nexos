@@ -1,24 +1,36 @@
 {
-  "name": "NEXOS Control",
-  "short_name": "NEXOS Control",
-  "description": "Panel de Control de Acceso NEXOS",
+  "name": "NEXOS Control de Accesos",
+  "short_name": "NEXOS",
+  "description": "Panel de control de accesos para barrio privado",
   "start_url": "./nexos_control.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#0f0f11",
-  "theme_color": "#0f0f11",
   "orientation": "portrait",
+  "background_color": "#0f0f11",
+  "theme_color": "#00d4d4",
+  "lang": "es-AR",
+  "categories": ["security", "utilities"],
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "./nexos-icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "./nexos-icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Panel de Control",
+      "short_name": "Control",
+      "description": "Abrir panel principal",
+      "url": "./nexos_control.html",
+      "icons": [{ "src": "./nexos-icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
