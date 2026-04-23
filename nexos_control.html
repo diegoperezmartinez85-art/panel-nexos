@@ -725,40 +725,39 @@ function filtrarHistorialDia(){
   </div>`).join('');
 }
 
-// 4. ALERTAS DEL DÍA
-
+// 4. ALERTAS DEL DÍA (VERSIÓN LIMPIEZA POR CAMBIO DE DÍA)
 function abrirAlertas(){
+  // 1. Identificador simple del día de hoy (ej: "23/4/2026")
+  const hoy = new Date().toLocaleDateString('es-AR');
+  const ultimaRevision = localStorage.getItem('nx_ultimo_reinicio');
 
-  const guardados=JSON.parse(localStorage.getItem('nx_alertas_hoy')||'[]');
-
-  const todos=[...panicosPendientes,...guardados.filter(a=>!panicosPendientes.find(p=>p.panicoId===a.panicoId))];
-
-  let html='';
-
-  if(!todos.length){html='<div class="empty-msg">Sin alertas registradas hoy 🟢</div>';}
-
-  else{
-
-    html=`<div style="font-size:12px;color:#666;text-align:center;margin-bottom:10px">${todos.length} alerta(s) de emergencia hoy</div>`;
-
-    html+=todos.map(a=>`<div class="modal-row" style="border-left:4px solid var(--red)">
-
-      <strong style="color:var(--red)">🚨 EMERGENCIA</strong>
-
-      <span style="float:right;font-size:11px;color:#888">${escHtml(a.fecha||'')}</span><br>
-
-      <span style="font-size:14px;font-weight:800">🏠 Mza ${escHtml(a.mza||'')} — Casa ${escHtml(a.casa||'')}</span><br>
-
-      ${a.mapsUrl?`<a href="${escHtml(a.mapsUrl)}" target="_blank" style="color:var(--green);font-size:12px;text-decoration:none">📍 Ver en Maps</a>`:'<span style="font-size:11px;color:#555">Sin GPS</span>'}
-
-    </div>`).join('');
-
+  // 2. Si el día guardado es distinto a hoy, vaciamos la memoria local
+  if (ultimaRevision !== hoy) {
+    localStorage.setItem('nx_alertas_hoy', '[]'); 
+    localStorage.setItem('nx_ultimo_reinicio', hoy);
   }
 
-  document.getElementById('alertas-contenido').innerHTML=html;
-
+  // 3. Cargamos los datos (ahora estarán limpios si es un nuevo día)
+  const guardados = JSON.parse(localStorage.getItem('nx_alertas_hoy') || '[]');
+  
+  // 4. Combinamos con pánicos pendientes en memoria
+  const todos = [...panicosPendientes, ...guardados.filter(a => !panicosPendientes.find(p => p.panicoId === a.panicoId))];
+  
+  let html = '';
+  if(!todos.length){
+    html = '<div class="empty-msg">Sin alertas registradas hoy 🟢</div>';
+  } else {
+    html = `<div style="font-size:12px;color:#666;text-align:center;margin-bottom:10px">${todos.length} alerta(s) de emergencia hoy</div>`;
+    html += todos.map(a => `<div class="modal-row" style="border-left:4px solid var(--red)">
+      <strong style="color:var(--red)">🚨 EMERGENCIA</strong>
+      <span style="float:right;font-size:11px;color:#888">${escHtml(a.fecha || '')}</span><br>
+      <span style="font-size:14px;font-weight:800">🏠 Mza ${escHtml(a.mza || '')} — Casa ${escHtml(a.casa || '')}</span><br>
+      ${a.mapsUrl ? `<a href="${escHtml(a.mapsUrl)}" target="_blank" style="color:var(--green);font-size:12px;text-decoration:none">📍 Ver en Maps</a>` : '<span style="font-size:11px;color:#555">Sin GPS</span>'}
+    </div>`).join('');
+  }
+  
+  document.getElementById('alertas-contenido').innerHTML = html;
   abrirModal('modal-alertas');
-
 }
 // 5. CIERRE DE TURNO
 function abrirTurno(){
