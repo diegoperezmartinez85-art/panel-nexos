@@ -375,8 +375,8 @@
 <div class="modal-overlay" id="modal-reset">
   <div class="modal-box">
     <button class="modal-close" onclick="cerrarModal('modal-reset')">✕</button>
-    <div class="modal-title" style="color:var(--red)">🗑️ RESET LISTA DEL DÍA</div>
-    <p style="font-size:13px;color:#888;margin-bottom:16px;">Borrará todos los registros locales de hoy. Ingresá la clave para confirmar.</p>
+    <div class="modal-title" style="color:var(--red)">📤 SALIDA GENERAL</div>
+<p style="font-size:13px;color:#888;margin-bottom:16px;">Dará salida a todos los vehículos activos de la lista. Ingresá la clave para confirmar.</p>
     <div class="gpin-puntos" style="justify-content:center;">
       <div class="gpin-punto" id="r0"></div><div class="gpin-punto" id="r1"></div>
       <div class="gpin-punto" id="r2"></div><div class="gpin-punto" id="r3"></div>
@@ -486,7 +486,7 @@
         <div class="menu-item" style="color:#00d4d4;" onclick="abrirHistorialSheet()"><span class="menu-item-icon">🗂️</span>Consulta historial Sheet</div>
         <div class="menu-item" style="color:#ff4444;" onclick="abrirSOS()"><span class="menu-item-icon">🆘</span>Directorio SOS</div>
         <div class="menu-section-label">SISTEMA</div>
-        <div class="menu-item danger" onclick="abrirReset()"><span class="menu-item-icon">🗑️</span>Borrar lista del día</div>
+        <div class="menu-item danger" onclick="abrirReset()"><span class="menu-item-icon">📤</span>Dar salida general</div>
       </div>
     </div>
    <div class="header-right">
@@ -789,7 +789,41 @@ function abrirReset(){resetPin='';actualizarResetPuntos();document.getElementByI
 function resetTecla(d){if(resetPin.length>=4)return;resetPin+=d;actualizarResetPuntos();if(resetPin.length===4)setTimeout(verificarReset,120);}
 function resetBorrar(){resetPin=resetPin.slice(0,-1);actualizarResetPuntos();document.getElementById('reset-pin-error').innerText='';}
 function actualizarResetPuntos(){for(let i=0;i<4;i++)document.getElementById('r'+i).classList.toggle('lleno',i<resetPin.length);}
-function verificarReset(){if(resetPin===PIN_CORRECTO){DB=[];localStorage.removeItem('nx_db');cerrarModal('modal-reset');render();showToast('✅ Lista del día borrada');}else{document.getElementById('reset-pin-error').innerText='CLAVE INCORRECTA';resetPin='';actualizarResetPuntos();}}
+function verificarReset(){
+  if(resetPin===PIN_CORRECTO){
+    const activos = DB.filter(x => !x.hS);
+
+    if(!activos.length){
+      cerrarModal('modal-reset');
+      showToast('⚠️ No hay vehículos activos');
+      resetPin='';
+      actualizarResetPuntos();
+      return;
+    }
+
+    const horaSalida = horaActual();
+
+    activos.forEach(item => {
+      item.hE = limpiarHora(item.hE);
+      item.hS = horaSalida;
+      enviar(item);
+    });
+
+    DB = [];
+    localStorage.setItem('nx_db', JSON.stringify(DB));
+    cerrarModal('modal-reset');
+    render();
+    showToast('✅ Salida general aplicada a ' + activos.length + ' vehículo(s)');
+
+    resetPin='';
+    actualizarResetPuntos();
+  } else {
+    document.getElementById('reset-pin-error').innerText='CLAVE INCORRECTA';
+    resetPin='';
+    actualizarResetPuntos();
+  }
+}
+
 
 // ── APP CORE ──────────────────────────────────────────────
 let DB=JSON.parse(localStorage.getItem('nx_db')||'[]');
