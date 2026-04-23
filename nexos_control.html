@@ -711,18 +711,53 @@ function abrirBusqueda(){
   abrirModal('modal-busqueda');
 }
 function filtrarHistorialDia(){
-  const q=(document.getElementById('busqueda-input').value||'').trim();
-  const hoyStr=new Date().toLocaleDateString('es-AR');
-  let deDia=DB.filter(r=>{const f=new Date(r.tsE||0).toLocaleDateString('es-AR');return f===hoyStr;});
-  if(q) deDia=deDia.filter(r=>(r.pat||'').toUpperCase().includes(q)||(r.dni||'').includes(q));
-  deDia.sort((a,b)=>(b.tsE||0)-(a.tsE||0));
-  document.getElementById('busqueda-status').innerText=deDia.length+' registro(s) hoy';
-  if(!deDia.length){document.getElementById('busqueda-resultados').innerHTML='<div class="empty-msg">Sin registros hoy'+(q?' para "'+escHtml(q)+'"':'')+'</div>';return;}
-  document.getElementById('busqueda-resultados').innerHTML=deDia.map(r=>`<div class="modal-row">
-    <strong>${escHtml(r.pat)}</strong>${r.dni?` · DNI: ${escHtml(r.dni)}`:''}<br>
-    <span style="font-size:11px;color:#888">Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')} · ${escHtml(r.tipo)} · ${escHtml(limpiarHora(r.hE))}</span>
-    <span style="float:right;font-size:11px;color:${r.hS?'#888':'var(--green)'}">${r.hS?'Salió '+escHtml(limpiarHora(r.hS)):'Adentro'}</span>
-  </div>`).join('');
+  const q = (document.getElementById('busqueda-input').value || '').trim().toUpperCase();
+  const hoyStr = new Date().toLocaleDateString('es-AR');
+
+  // Filtramos la base de datos completa (DB) buscando solo lo de hoy
+  let deDia = DB.filter(r => {
+    if (!r.tsE) return false;
+    const f = new Date(r.tsE).toLocaleDateString('es-AR');
+    return f === hoyStr;
+  });
+
+  // Aplicamos el filtro de búsqueda si el guardia escribió algo
+  if (q) {
+    deDia = deDia.filter(r => 
+      (r.pat || '').toUpperCase().includes(q) || 
+      (r.dni || '').includes(q) ||
+      (r.propietario || '').toUpperCase().includes(q)
+    );
+  }
+
+  // Ordenar: primero los más recientes
+  deDia.sort((a, b) => (b.tsE || 0) - (a.tsE || 0));
+
+  document.getElementById('busqueda-status').innerText = deDia.length + ' registro(s) hoy';
+
+  if (!deDia.length) {
+    document.getElementById('busqueda-resultados').innerHTML = '<div class="empty-msg">Sin registros hoy' + (q ? ' para "' + escHtml(q) + '"' : '') + '</div>';
+    return;
+  }
+
+  // Dibujamos los resultados
+  document.getElementById('busqueda-resultados').innerHTML = deDia.map(r => {
+    // Si tiene hora de salida (hS), le ponemos un estilo más tenue (gris)
+    const tieneSalida = r.hS ? true : false;
+    const estiloFila = tieneSalida ? 'opacity: 0.7; border-left: 4px solid #888;' : 'border-left: 4px solid var(--green);';
+    const textoEstado = tieneSalida ? `✅ Salió ${escHtml(limpiarHora(r.hS))}` : '🟢 Adentro';
+    const colorEstado = tieneSalida ? '#888' : 'var(--green)';
+
+    return `
+      <div class="modal-row" style="${estiloFila}">
+        <strong>${escHtml(r.pat)}</strong> ${r.dni ? ` · DNI: ${escHtml(r.dni)}` : ''}<br>
+        <span style="font-size:11px;color:#666">
+          Mza ${escHtml(r.mza || '-')} Casa ${escHtml(r.casa || '-')} · ${escHtml(r.tipo)}
+        </span><br>
+        <span style="font-size:11px;color:#888">Entró: ${escHtml(limpiarHora(r.hE))}</span>
+        <span style="float:right;font-size:12px;font-weight:bold;color:${colorEstado}">${textoEstado}</span>
+      </div>`;
+  }).join('');
 }
 
 // 4. ALERTAS DEL DÍA (VERSIÓN LIMPIEZA POR CAMBIO DE DÍA)
