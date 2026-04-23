@@ -4,31 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>NEXOS CONTROL</title>
+  <link rel="manifest" href="manifest_control.json">
+  <meta name="theme-color" content="#0f0f11">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="NEXOS">
-  <meta name="theme-color" content="#00d4d4">
-  <link rel="manifest" href="./manifest_control.json">
-  <link rel="apple-touch-icon" href="./nexos-icon-192.png">
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
     :root{--bg:#0f0f11;--bg2:#1a1a1e;--bg3:#24242a;--border:#2e2e38;--text:#e8e8ec;--cyan:#00d4d4;--gold:#f5c842;--green:#2ecc71;--red:#e74c3c;--blue:#4a90e2;--purple:#a855f7;}
-    body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:-apple-system,system-ui,sans-serif;
-  padding:
-    calc(env(safe-area-inset-top, 0px) + 10px)
-    10px
-    10px
-    10px;
-  user-select:none;
-}
-
+    body{background:var(--bg);color:var(--text);font-family:-apple-system,system-ui,sans-serif;padding:10px;user-select:none;overflow-x:hidden;padding-top:max(10px,env(safe-area-inset-top,10px));}
 
     /* ── PIN SCREEN ── */
-    .pin-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10000;padding:30px;}
+    .pin-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10000;padding:30px;padding-top:max(30px,calc(env(safe-area-inset-top,0px) + 30px));}
     .pin-screen.oculto{display:none;}
     .pin-logo{font-size:12px;letter-spacing:4px;color:#555;margin-bottom:36px;}
     .pin-titulo{font-size:20px;font-weight:900;color:#fff;margin-bottom:6px;}
@@ -45,7 +33,7 @@
     .pin-info{color:#666;font-size:11px;margin-top:24px;text-align:center;}
 
     /* ── APP ── */
-    .app{max-width:500px;margin:0 auto;}
+    .app{max-width:500px;margin:0 auto;overflow-x:hidden;}
     .monitor{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
     .mon-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:15px 5px;text-align:center;}
     .mon-val{font-size:32px;font-weight:800;display:block;transition:0.3s;}
@@ -72,33 +60,19 @@
     .campo-label{font-size:11px;color:#666;letter-spacing:1px;font-weight:700;margin-bottom:4px;margin-top:4px;padding-left:4px;}
 
     /* ── HEADER ── */
-    .header-bar{
-  background:var(--bg2);
-  border:1px solid transparent;
-  border-radius:16px;
-  padding:8px 12px;
-  margin-top:0;
-  margin-bottom:12px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  position:relative;
-  background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(90deg,#00d4d4,#a855f7,#ff3190,#00d4d4);
-  background-origin:border-box;
-  background-clip:padding-box,border-box;
-  box-shadow:0 0 18px rgba(0,212,212,0.25),0 0 32px rgba(168,85,247,0.15);
-}
-
-    .logo-btn{display:flex;align-items:center;gap:10px;cursor:pointer;background:none;border:none;padding:0;position:relative;}
+    .header-bar{background:var(--bg2);border:1px solid transparent;border-radius:16px;padding:8px 10px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;position:relative;overflow:hidden;min-width:0;width:100%;box-sizing:border-box;background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(90deg,#00d4d4,#a855f7,#ff3190,#00d4d4);background-origin:border-box;background-clip:padding-box,border-box;box-shadow:0 0 18px rgba(0,212,212,0.25),0 0 32px rgba(168,85,247,0.15);}
+    .logo-btn{display:flex;align-items:center;gap:6px;cursor:pointer;background:none;border:none;padding:0;position:relative;min-width:0;overflow:hidden;flex-shrink:1;}
     /* FIX: logo más grande — de 38px a 52px */
-    .logo-img{height:52px;border-radius:10px;filter:drop-shadow(0 0 8px rgba(0,212,212,0.6));}
+    .logo-img{height:44px;max-width:160px;width:auto;object-fit:contain;border-radius:10px;filter:drop-shadow(0 0 8px rgba(0,212,212,0.6));}
     .logo-arrow{font-size:10px;color:#555;margin-left:4px;transition:0.2s;}
-    .header-right{display:flex;align-items:center;gap:10px;}
+    .header-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 
     /* FIX: hora + clima en neón cyan en vez del contador */
     .header-clock{display:flex;align-items:center;gap:6px;}
     .header-hora{font-size:18px;font-weight:900;letter-spacing:2px;color:var(--cyan);text-shadow:0 0 8px rgba(0,212,212,0.9),0 0 20px rgba(0,212,212,0.5);font-family:monospace;}
     .header-clima{font-size:22px;line-height:1;}
+
+    /* btn-logout removed */
 
     /* ── MENÚ LOGO ── */
     .logo-menu{display:none;position:absolute;top:calc(100% + 8px);left:0;width:280px;background:var(--bg2);border-radius:16px;overflow:hidden;z-index:500;box-shadow:0 8px 32px rgba(0,0,0,0.7);background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(135deg,#00d4d4,#a855f7,#ff3190);background-origin:border-box;background-clip:padding-box,border-box;border:1px solid transparent;animation:menuIn 0.15s ease;}
@@ -223,7 +197,7 @@
       display:flex;align-items:center;justify-content:center;
     }
     .pin-logo-img{
-      width:260px;height:auto;
+      width:min(260px, 80vw);height:auto;
       border-radius:22px;
       box-shadow:
         0 0 0 2px rgba(0,212,212,0.8),
@@ -248,6 +222,36 @@
           0 0 100px rgba(168,85,247,0.5);
       }
     }
+
+
+  /* ── PWA INSTALL BANNER ── */
+  #pwa-install-banner{
+    display:none;
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    width:calc(100% - 32px);max-width:420px;
+    background:var(--bg2);
+    border:1px solid var(--cyan);
+    box-shadow:0 0 24px rgba(0,212,212,0.35),0 4px 24px rgba(0,0,0,0.6);
+    border-radius:18px;padding:16px 18px;
+    z-index:9990;align-items:center;gap:14px;
+    animation:slideUp 0.3s ease;
+  }
+  @keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+  #pwa-install-banner .ib-icon{font-size:32px;flex-shrink:0;}
+  #pwa-install-banner .ib-text{flex:1;}
+  #pwa-install-banner .ib-title{font-size:14px;font-weight:900;color:#fff;margin-bottom:3px;}
+  #pwa-install-banner .ib-sub{font-size:11px;color:#888;line-height:1.4;}
+  #pwa-install-banner .ib-btn{
+    background:var(--cyan);color:#000;border:none;
+    border-radius:12px;padding:10px 18px;
+    font-weight:900;font-size:13px;cursor:pointer;
+    white-space:nowrap;flex-shrink:0;
+  }
+  #pwa-install-banner .ib-close{
+    background:none;border:none;color:#555;
+    font-size:20px;cursor:pointer;padding:4px;flex-shrink:0;
+    line-height:1;
+  }
 
   </style>
 </head>
@@ -376,7 +380,7 @@
   <div class="modal-box">
     <button class="modal-close" onclick="cerrarModal('modal-reset')">✕</button>
     <div class="modal-title" style="color:var(--red)">📤 SALIDA GENERAL</div>
-<p style="font-size:13px;color:#888;margin-bottom:16px;">Dará salida a todos los vehículos activos de la lista. Ingresá la clave para confirmar.</p>
+    <p style="font-size:13px;color:#888;margin-bottom:16px;">Dará salida a todos los vehículos activos de la lista. Ingresá la clave para confirmar.</p>
     <div class="gpin-puntos" style="justify-content:center;">
       <div class="gpin-punto" id="r0"></div><div class="gpin-punto" id="r1"></div>
       <div class="gpin-punto" id="r2"></div><div class="gpin-punto" id="r3"></div>
@@ -489,13 +493,12 @@
         <div class="menu-item danger" onclick="abrirReset()"><span class="menu-item-icon">📤</span>Dar salida general</div>
       </div>
     </div>
-   <div class="header-right">
-  <div class="header-clock">
-    <span class="header-clima" id="header-clima">🌤️</span>
-    <span class="header-hora" id="header-hora">--:--</span>
-  </div>
-</div>
-
+    <div class="header-right">
+      <div class="header-clock">
+        <span class="header-clima" id="header-clima">🌤️</span>
+        <span class="header-hora" id="header-hora">--:--</span>
+      </div>
+    </div>
   </div>
 
   <div class="monitor">
@@ -725,70 +728,25 @@ function filtrarHistorialDia(){
   </div>`).join('');
 }
 
-  // Ordenar: primero los más recientes
-  deDia.sort((a, b) => (b.tsE || 0) - (a.tsE || 0));
-
-  document.getElementById('busqueda-status').innerText = deDia.length + ' registro(s) hoy';
-
-  if (!deDia.length) {
-    document.getElementById('busqueda-resultados').innerHTML = '<div class="empty-msg">Sin registros hoy' + (q ? ' para "' + escHtml(q) + '"' : '') + '</div>';
-    return;
-  }
-
-  // Dibujamos los resultados
-  document.getElementById('busqueda-resultados').innerHTML = deDia.map(r => {
-    // Si tiene hora de salida (hS), le ponemos un estilo más tenue (gris)
-    const tieneSalida = r.hS ? true : false;
-    const estiloFila = tieneSalida ? 'opacity: 0.7; border-left: 4px solid #888;' : 'border-left: 4px solid var(--green);';
-    const textoEstado = tieneSalida ? `✅ Salió ${escHtml(limpiarHora(r.hS))}` : '🟢 Adentro';
-    const colorEstado = tieneSalida ? '#888' : 'var(--green)';
-
-    return `
-      <div class="modal-row" style="${estiloFila}">
-        <strong>${escHtml(r.pat)}</strong> ${r.dni ? ` · DNI: ${escHtml(r.dni)}` : ''}<br>
-        <span style="font-size:11px;color:#666">
-          Mza ${escHtml(r.mza || '-')} Casa ${escHtml(r.casa || '-')} · ${escHtml(r.tipo)}
-        </span><br>
-        <span style="font-size:11px;color:#888">Entró: ${escHtml(limpiarHora(r.hE))}</span>
-        <span style="float:right;font-size:12px;font-weight:bold;color:${colorEstado}">${textoEstado}</span>
-      </div>`;
-  }).join('');
-}
-
-// 4. ALERTAS DEL DÍA (VERSIÓN LIMPIEZA POR CAMBIO DE DÍA)
+// 4. ALERTAS DEL DÍA
 function abrirAlertas(){
-  // 1. Identificador simple del día de hoy (ej: "23/4/2026")
-  const hoy = new Date().toLocaleDateString('es-AR');
-  const ultimaRevision = localStorage.getItem('nx_ultimo_reinicio');
-
-  // 2. Si el día guardado es distinto a hoy, vaciamos la memoria local
-  if (ultimaRevision !== hoy) {
-    localStorage.setItem('nx_alertas_hoy', '[]'); 
-    localStorage.setItem('nx_ultimo_reinicio', hoy);
-  }
-
-  // 3. Cargamos los datos (ahora estarán limpios si es un nuevo día)
-  const guardados = JSON.parse(localStorage.getItem('nx_alertas_hoy') || '[]');
-  
-  // 4. Combinamos con pánicos pendientes en memoria
-  const todos = [...panicosPendientes, ...guardados.filter(a => !panicosPendientes.find(p => p.panicoId === a.panicoId))];
-  
-  let html = '';
-  if(!todos.length){
-    html = '<div class="empty-msg">Sin alertas registradas hoy 🟢</div>';
-  } else {
-    html = `<div style="font-size:12px;color:#666;text-align:center;margin-bottom:10px">${todos.length} alerta(s) de emergencia hoy</div>`;
-    html += todos.map(a => `<div class="modal-row" style="border-left:4px solid var(--red)">
+  const guardados=JSON.parse(localStorage.getItem('nx_alertas_hoy')||'[]');
+  const todos=[...panicosPendientes,...guardados.filter(a=>!panicosPendientes.find(p=>p.panicoId===a.panicoId))];
+  let html='';
+  if(!todos.length){html='<div class="empty-msg">Sin alertas registradas hoy 🟢</div>';}
+  else{
+    html=`<div style="font-size:12px;color:#666;text-align:center;margin-bottom:10px">${todos.length} alerta(s) de emergencia hoy</div>`;
+    html+=todos.map(a=>`<div class="modal-row" style="border-left:4px solid var(--red)">
       <strong style="color:var(--red)">🚨 EMERGENCIA</strong>
-      <span style="float:right;font-size:11px;color:#888">${escHtml(a.fecha || '')}</span><br>
-      <span style="font-size:14px;font-weight:800">🏠 Mza ${escHtml(a.mza || '')} — Casa ${escHtml(a.casa || '')}</span><br>
-      ${a.mapsUrl ? `<a href="${escHtml(a.mapsUrl)}" target="_blank" style="color:var(--green);font-size:12px;text-decoration:none">📍 Ver en Maps</a>` : '<span style="font-size:11px;color:#555">Sin GPS</span>'}
+      <span style="float:right;font-size:11px;color:#888">${escHtml(a.fecha||'')}</span><br>
+      <span style="font-size:14px;font-weight:800">🏠 Mza ${escHtml(a.mza||'')} — Casa ${escHtml(a.casa||'')}</span><br>
+      ${a.mapsUrl?`<a href="${escHtml(a.mapsUrl)}" target="_blank" style="color:var(--green);font-size:12px;text-decoration:none">📍 Ver en Maps</a>`:'<span style="font-size:11px;color:#555">Sin GPS</span>'}
     </div>`).join('');
   }
-  
-  document.getElementById('alertas-contenido').innerHTML = html;
+  document.getElementById('alertas-contenido').innerHTML=html;
   abrirModal('modal-alertas');
 }
+
 // 5. CIERRE DE TURNO
 function abrirTurno(){
   const ahora=new Date(),hoyStr=ahora.toLocaleDateString('es-AR'),horaStr=ahora.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
@@ -836,39 +794,29 @@ function resetBorrar(){resetPin=resetPin.slice(0,-1);actualizarResetPuntos();doc
 function actualizarResetPuntos(){for(let i=0;i<4;i++)document.getElementById('r'+i).classList.toggle('lleno',i<resetPin.length);}
 function verificarReset(){
   if(resetPin===PIN_CORRECTO){
+    // Dar salida a todos los activos (sin hS)
     const activos = DB.filter(x => !x.hS);
-
     if(!activos.length){
       cerrarModal('modal-reset');
       showToast('⚠️ No hay vehículos activos');
-      resetPin='';
-      actualizarResetPuntos();
-      return;
+      resetPin=''; actualizarResetPuntos(); return;
     }
-
     const horaSalida = horaActual();
-
     activos.forEach(item => {
       item.hE = limpiarHora(item.hE);
       item.hS = horaSalida;
       enviar(item);
     });
-
-    DB = [];
     localStorage.setItem('nx_db', JSON.stringify(DB));
     cerrarModal('modal-reset');
     render();
-    showToast('✅ Salida general aplicada a ' + activos.length + ' vehículo(s)');
-
-    resetPin='';
-    actualizarResetPuntos();
+    showToast('✅ Salida general: ' + activos.length + ' vehículo(s)');
+    resetPin=''; actualizarResetPuntos();
   } else {
     document.getElementById('reset-pin-error').innerText='CLAVE INCORRECTA';
-    resetPin='';
-    actualizarResetPuntos();
+    resetPin=''; actualizarResetPuntos();
   }
 }
-
 
 // ── APP CORE ──────────────────────────────────────────────
 let DB=JSON.parse(localStorage.getItem('nx_db')||'[]');
@@ -959,12 +907,14 @@ function guardarForm(modo){
   ['pat','dni','mza','casa'].forEach(f=>{const el=document.getElementById(pre+f);if(el)el.value='';});
   showToast("✅ REGISTRADO");ver('lista');render();enviar(item);
 }
-function darSalida(id){const item=DB.find(x=>x.id===id);if(!item)return;item.hE=limpiarHora(item.hE);item.hS=horaActual();DB=DB.filter(x=>x.id!==id);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}
+function darSalida(id){const item=DB.find(x=>x.id===id);if(!item)return;item.hE=limpiarHora(item.hE);item.hS=horaActual();/* item queda en DB para historial del día */localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}
 function guardarConfig(){localStorage.setItem('nx_url',document.getElementById('cfg-url').value.trim());showToast("⚙️ GUARDADO");sincronizar();}
 
 function render(){
   const cont=document.getElementById('cont-lista');const ahora=Date.now();let d=0,v=0,a=0;
-  const html=DB.slice().sort((x,y)=>(y.tsE||0)-(x.tsE||0)).map(r=>{
+  // Solo mostramos activos en la lista principal; los con hS quedan en DB para historial
+  const activos=DB.filter(r=>!r.hS);
+  const html=activos.slice().sort((x,y)=>(y.tsE||0)-(x.tsE||0)).map(r=>{
     const hE=limpiarHora(r.hE);const tsE=r.tsE||0;const isA=(r.tipo==='DELIVERY'&&(ahora-tsE>900000));
     if(r.tipo==='DELIVERY'){if(isA)a++;else d++;}else v++;
     let cls='adentro';if(isA)cls='alerta';else if(r.tipo==='DELIVERY')cls='dely-adentro';
@@ -976,7 +926,34 @@ function render(){
   cont.innerHTML=html;document.getElementById('mon-d').innerText=d;document.getElementById('mon-v').innerText=v;document.getElementById('mon-a').innerText=a;
 }
 
-function iniciarApp(){document.getElementById('cfg-url').value=localStorage.getItem('nx_url')||'';render();sincronizar();setInterval(()=>sincronizar(),15000);setInterval(render,30000);}
+function iniciarApp(){
+  document.getElementById('cfg-url').value=localStorage.getItem('nx_url')||'';
+  // ── Limpieza automática al cambiar de día ─────────────
+  const hoy = new Date().toLocaleDateString('es-AR');
+  const ultimoDia = localStorage.getItem('nx_ultimo_dia');
+  if(ultimoDia && ultimoDia !== hoy){
+    // Nuevo día: limpiar DB local, alertas y reiniciar
+    DB = [];
+    localStorage.setItem('nx_db', '[]');
+    localStorage.setItem('nx_alertas_hoy', '[]');
+    showToast('🗓️ Nuevo día — lista reiniciada');
+  }
+  localStorage.setItem('nx_ultimo_dia', hoy);
+  render();sincronizar();
+  setInterval(()=>sincronizar(),15000);
+  setInterval(render,30000);
+  // Verificar cambio de día cada minuto
+  setInterval(()=>{
+    const diaActual=new Date().toLocaleDateString('es-AR');
+    const guardado=localStorage.getItem('nx_ultimo_dia');
+    if(guardado && guardado!==diaActual){
+      DB=[];localStorage.setItem('nx_db','[]');
+      localStorage.setItem('nx_alertas_hoy','[]');
+      localStorage.setItem('nx_ultimo_dia',diaActual);
+      render();showToast('🗓️ Nuevo día — lista reiniciada');
+    }
+  },60000);
+}
 document.getElementById('pin-screen').classList.remove('oculto');
 document.getElementById('header-bar').style.display='none';
 
@@ -1135,46 +1112,59 @@ async function hsConsultar(params) {
 }
 
 
-// ── PWA: Service Worker + Manifest ───────────────────────
+// ── PWA: SERVICE WORKER + INSTALL ────────────────────────
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw_control.js', { scope: './' })
-      .then(reg => {
-        console.log('[NEXOS] SW registrado:', reg.scope);
-        // Escuchar mensaje de sync desde el SW (background sync)
-        navigator.serviceWorker.addEventListener('message', event => {
-          if (event.data && event.data.type === 'NEXOS_SYNC_NOW') {
-            sincronizar();
-          }
-        });
-        // Pedir background sync cuando haya conexión
-        if ('sync' in reg) {
-          window.addEventListener('online', () => {
-            reg.sync.register('nexos-sync-pendientes').catch(() => {});
-          });
-        }
-      })
-      .catch(err => console.warn('[NEXOS] SW error:', err));
+    navigator.serviceWorker.register('sw_control.js')
+      .then(reg => console.log('SW registrado:', reg.scope))
+      .catch(err => console.warn('SW error:', err));
   });
 }
 
-// ── PWA: Mostrar prompt "Agregar a pantalla de inicio" ───
-let deferredPrompt = null;
+// Banner de instalación para Android/Chrome
+let _deferredPrompt = null;
+
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
-  deferredPrompt = e;
-  // Muestra un toast invitando a instalar (solo 1 vez)
-  if (!localStorage.getItem('nx_pwa_installed')) {
-    setTimeout(() => {
-      showToast('📲 Instalá NEXOS como app — andá al menú ⋮ del navegador');
-    }, 3000);
-  }
+  _deferredPrompt = e;
+  // Mostrar banner custom
+  const banner = document.getElementById('pwa-install-banner');
+  if (banner) banner.style.display = 'flex';
 });
+
 window.addEventListener('appinstalled', () => {
-  localStorage.setItem('nx_pwa_installed', '1');
-  deferredPrompt = null;
-  showToast('✅ NEXOS instalado como app');
+  _deferredPrompt = null;
+  const banner = document.getElementById('pwa-install-banner');
+  if (banner) banner.style.display = 'none';
 });
+
+function instalarPWA() {
+  if (!_deferredPrompt) return;
+  _deferredPrompt.prompt();
+  _deferredPrompt.userChoice.then(() => {
+    _deferredPrompt = null;
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner) banner.style.display = 'none';
+  });
+}
+
+function cerrarBannerPWA() {
+  const banner = document.getElementById('pwa-install-banner');
+  if (banner) banner.style.display = 'none';
+}
+
 </script>
+
+<!-- ── PWA INSTALL BANNER ── -->
+<div id="pwa-install-banner">
+  <span class="ib-icon">📲</span>
+  <div class="ib-text">
+    <div class="ib-title">Instalar NEXOS Control</div>
+    <div class="ib-sub">Agregá la app a tu pantalla de inicio para acceso rápido sin browser</div>
+  </div>
+  <button class="ib-btn" onclick="instalarPWA()">INSTALAR</button>
+  <button class="ib-close" onclick="cerrarBannerPWA()">✕</button>
+</div>
+
 </body>
 </html>
