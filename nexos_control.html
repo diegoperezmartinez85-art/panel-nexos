@@ -725,20 +725,28 @@ function filtrarHistorialDia(){
   </div>`).join('');
 }
 
-// 4. ALERTAS DEL DÍA
+// 4. ALERTAS DEL DÍA (VERSIÓN CORREGIDA)
 function abrirAlertas(){
   let guardados = JSON.parse(localStorage.getItem('nx_alertas_hoy') || '[]');
 
-  // --- INICIO CÓDIGO NUEVO (FILTRO DE LIMPIEZA) ---
-  // 1. Obtenemos la fecha de hoy en formato local de Argentina (ej: "23/4/2026")
-  const fechaHoy = new Date().toLocaleDateString('es-AR');
+  // --- FILTRO FLEXIBLE ---
+  const ahora = new Date();
+  const d = ahora.getDate();
+  const m = ahora.getMonth() + 1;
+  const y = ahora.getFullYear();
 
-  // 2. Filtramos la lista: nos quedamos SOLO con las alertas que contengan la fecha de hoy
-  guardados = guardados.filter(a => a.fecha && a.fecha.includes(fechaHoy));
+  // Filtramos comparando día, mes y año por separado para evitar errores de formato
+  guardados = guardados.filter(a => {
+    if (!a.fecha) return false;
+    // Intentamos crear un objeto fecha desde el texto guardado
+    const fAlerta = new Date(a.fecha);
+    // Si la fecha es válida, comparamos día, mes y año
+    return fAlerta.getDate() === d && (fAlerta.getMonth() + 1) === m && fAlerta.getFullYear() === y;
+  });
 
-  // 3. Sobrescribimos el localStorage con la lista ya limpia para que no se acumule basura
+  // Guardamos la lista limpia
   localStorage.setItem('nx_alertas_hoy', JSON.stringify(guardados));
-  // --- FIN CÓDIGO NUEVO ---
+  // --- FIN FILTRO ---
 
   const todos = [...panicosPendientes, ...guardados.filter(a => !panicosPendientes.find(p => p.panicoId === a.panicoId))];
   
