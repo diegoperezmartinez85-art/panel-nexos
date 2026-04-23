@@ -96,9 +96,33 @@
     .header-right{display:flex;align-items:center;gap:10px;}
 
     /* FIX: hora + clima en neón cyan en vez del contador */
-    .header-clock{display:flex;align-items:center;gap:6px;}
-    .header-hora{font-size:18px;font-weight:900;letter-spacing:2px;color:var(--cyan);text-shadow:0 0 8px rgba(0,212,212,0.9),0 0 20px rgba(0,212,212,0.5);font-family:monospace;}
-    .header-clima{font-size:22px;line-height:1;}
+  .header-clock{display:flex;align-items:center;gap:6px;}
+
+.header-temp{
+  font-size:18px;
+  font-weight:900;
+  letter-spacing:1px;
+  color:var(--cyan);
+  text-shadow:0 0 8px rgba(0,212,212,0.9),0 0 20px rgba(0,212,212,0.5);
+  font-family:monospace;
+  min-width:48px;
+  text-align:right;
+}
+
+.header-hora{
+  font-size:18px;
+  font-weight:900;
+  letter-spacing:2px;
+  color:var(--cyan);
+  text-shadow:0 0 8px rgba(0,212,212,0.9),0 0 20px rgba(0,212,212,0.5);
+  font-family:monospace;
+}
+
+.header-clima{
+  font-size:22px;
+  line-height:1;
+}
+
 
     /* ── MENÚ LOGO ── */
     .logo-menu{display:none;position:absolute;top:calc(100% + 8px);left:0;width:280px;background:var(--bg2);border-radius:16px;overflow:hidden;z-index:500;box-shadow:0 8px 32px rgba(0,0,0,0.7);background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(135deg,#00d4d4,#a855f7,#ff3190);background-origin:border-box;background-clip:padding-box,border-box;border:1px solid transparent;animation:menuIn 0.15s ease;}
@@ -490,10 +514,12 @@
       </div>
     </div>
    <div class="header-right">
-  <div class="header-clock">
-    <span class="header-clima" id="header-clima">🌤️</span>
-    <span class="header-hora" id="header-hora">--:--</span>
-  </div>
+ <div class="header-clock">
+  <span class="header-temp" id="header-temp">--°</span>
+  <span class="header-clima" id="header-clima">🌤️</span>
+  <span class="header-hora" id="header-hora">--:--</span>
+</div>
+
 </div>
 
   </div>
@@ -583,6 +609,8 @@ const CLIMA_ICONS = {
   95:'⛈️', 96:'⛈️', 99:'⛈️'
 };
 let climaIcon = '🌤️';
+let temperaturaActual = '--°';
+
 
 // ── FASE LUNAR (cálculo astronómico sin API) ─────────────
 // Luna nueva de referencia: 6 enero 2000, 18:14 UTC
@@ -602,10 +630,19 @@ async function obtenerClima() {
     // Buenos Aires — cambiá lat/lon si el barrio es otro
     const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-34.61&longitude=-58.37&current_weather=true');
     const d = await r.json();
+
     const code = d.current_weather?.weathercode ?? 1;
+    const temp = d.current_weather?.temperature;
+
     climaIcon = CLIMA_ICONS[code] || '🌤️';
-  } catch(e) {}
+    temperaturaActual = (typeof temp === 'number') ? Math.round(temp) + '°' : '--°';
+
+    actualizarReloj();
+  } catch(e) {
+    temperaturaActual = '--°';
+  }
 }
+
 
 // ── RELOJ + ÍCONO ADAPTATIVO ──────────────────────────────
 // 05:00–19:59 → solo clima  (☀️ ⛅ 🌧️ etc.)
@@ -625,10 +662,14 @@ function actualizarReloj() {
   const h    = String(now.getHours()).padStart(2,'0');
   const m    = String(now.getMinutes()).padStart(2,'0');
   const hora = now.getHours();
+
   document.getElementById('header-hora').innerText = h + ':' + m;
+  document.getElementById('header-temp').innerText = temperaturaActual;
+
   const esNoche = hora >= 20 || hora < 5;
   document.getElementById('header-clima').innerText = esNoche ? iconoNocturno() : climaIcon;
 }
+
 setInterval(actualizarReloj, 1000);
 actualizarReloj();
 obtenerClima();
