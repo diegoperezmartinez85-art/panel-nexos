@@ -179,6 +179,52 @@
     #mon-card-alertas:active{transform:scale(0.96);background:rgba(231,76,60,0.12);}
     #mon-card-alertas{border:1px solid transparent;transition:border-color 0.2s,transform 0.15s;}
     #mon-card-alertas:hover{border-color:var(--red);box-shadow:0 0 10px rgba(231,76,60,0.3);}
+
+    /* ── CALENDARIO ── */
+    .cal-modal-box{background:var(--bg2);border-radius:20px;width:100%;max-width:480px;padding:20px;margin:auto;background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(135deg,#00d4d4,#a855f7);background-origin:border-box;background-clip:padding-box,border-box;border:1px solid transparent;position:relative;}
+    .cal-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+    .cal-nav-btn{background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:#fff;font-size:18px;font-weight:800;cursor:pointer;padding:8px 16px;transition:0.15s;}
+    .cal-nav-btn:active{background:var(--border);}
+    .cal-mes-titulo{font-size:16px;font-weight:900;color:#fff;letter-spacing:1px;text-align:center;flex:1;}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:14px;}
+    .cal-dia-nombre{text-align:center;font-size:10px;font-weight:700;color:#666;padding:4px 0;letter-spacing:0.5px;}
+    .cal-dia{border-radius:10px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:5px 2px 3px;cursor:pointer;border:1px solid transparent;transition:0.15s;position:relative;}
+    .cal-dia:active{transform:scale(0.93);}
+    .cal-dia.vacio{cursor:default;pointer-events:none;}
+    .cal-dia.hoy{border-color:var(--cyan);background:rgba(0,212,212,0.1);}
+    .cal-dia.feriado{background:rgba(231,76,60,0.12);border-color:rgba(231,76,60,0.4);}
+    .cal-dia.feriado-puente{background:rgba(245,200,66,0.1);border-color:rgba(245,200,66,0.35);}
+    .cal-dia.con-nota{background:rgba(168,85,247,0.12);border-color:rgba(168,85,247,0.4);}
+    .cal-dia.hoy.feriado{border-color:var(--red);background:rgba(231,76,60,0.18);}
+    .cal-num{font-size:14px;font-weight:700;color:#ddd;line-height:1;}
+    .cal-dia.hoy .cal-num{color:var(--cyan);}
+    .cal-dia.feriado .cal-num{color:var(--red);}
+    .cal-dia.feriado-puente .cal-num{color:var(--gold);}
+    .cal-dot-row{display:flex;gap:2px;margin-top:2px;flex-wrap:wrap;justify-content:center;}
+    .cal-dot{width:5px;height:5px;border-radius:50%;}
+    .cal-dot-nota{background:var(--purple);}
+    .cal-dot-feriado{background:var(--red);}
+    .cal-dot-hoy{background:var(--cyan);}
+    .cal-leyenda{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+    .cal-ley-item{display:flex;align-items:center;gap:5px;font-size:10px;color:#888;}
+    .cal-ley-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+    .cal-detalle{background:var(--bg3);border-radius:14px;padding:14px;margin-top:6px;min-height:80px;}
+    .cal-detalle-fecha{font-size:13px;font-weight:900;color:var(--cyan);margin-bottom:8px;letter-spacing:0.5px;}
+    .cal-feriado-tag{display:inline-block;background:rgba(231,76,60,0.2);border:1px solid var(--red);color:var(--red);font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;margin-bottom:10px;}
+    .cal-feriado-tag.puente{background:rgba(245,200,66,0.15);border-color:var(--gold);color:var(--gold);}
+    .cal-nota-area{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:#e8e8ec;font-size:14px;padding:10px;resize:vertical;min-height:70px;outline:none;font-family:inherit;transition:border-color 0.2s;}
+    .cal-nota-area:focus{border-color:var(--purple);}
+    .cal-nota-acciones{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
+    .cal-btn-guardar{background:var(--purple);color:#fff;border:none;border-radius:10px;padding:11px;font-weight:800;font-size:13px;cursor:pointer;transition:0.15s;}
+    .cal-btn-guardar:active{opacity:0.8;}
+    .cal-btn-borrar{background:var(--bg2);border:1px solid var(--border);color:#888;border-radius:10px;padding:11px;font-weight:700;font-size:13px;cursor:pointer;transition:0.15s;}
+    .cal-btn-borrar:active{background:var(--bg3);}
+    .cal-notas-lista{margin-top:10px;}
+    .cal-nota-item{background:rgba(168,85,247,0.1);border-left:3px solid var(--purple);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;color:#ccc;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+    .cal-nota-texto{flex:1;line-height:1.4;}
+    .cal-nota-del{background:none;border:none;color:#555;font-size:14px;cursor:pointer;padding:0;flex-shrink:0;}
+    .cal-nota-del:hover{color:var(--red);}
+    .cal-mini-nota{font-size:9px;color:var(--purple);font-weight:700;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px;line-height:1.1;}
   </style>
 </head>
 <body>
@@ -443,6 +489,7 @@
         <div class="menu-item gold-item" onclick="abrirTurno()"><span class="menu-item-icon">🖨️</span>Cierre de turno / PDF</div>
         <div class="menu-item purple-item" onclick="abrirListaNegra()"><span class="menu-item-icon">🚫</span>Lista negra</div>
         <div class="menu-item" style="color:#00d4d4;" onclick="abrirHistorialSheet()"><span class="menu-item-icon">🗂️</span>Consulta historial Sheet</div>
+        <div class="menu-item" style="color:#a855f7;" onclick="abrirCalendario()"><span class="menu-item-icon">📅</span>Calendario</div>
         <div class="menu-item" style="color:#ff4444;" onclick="abrirSOS()"><span class="menu-item-icon">🆘</span>Directorio SOS</div>
         <div class="menu-section-label">ADMINISTRACIÓN</div>
         <!-- NUEVO BOTÓN DE BANEO -->
@@ -550,7 +597,7 @@ let pinActual='';
 function pinTecla(d){if(pinActual.length>=4)return;pinActual+=d;actualizarPuntos();if(pinActual.length===4)setTimeout(verificarPin,120);}
 function pinBorrar(){pinActual=pinActual.slice(0,-1);actualizarPuntos();document.getElementById('pin-error').innerText='';}
 function actualizarPuntos(){for(let i=0;i<4;i++)document.getElementById('p'+i).classList.toggle('lleno',i<pinActual.length);}
-function verificarPin(){if(pinActual===PIN_CORRECTO){sessionStorage.setItem('nx_auth','1');document.getElementById('pin-screen').classList.add('oculto');document.getElementById('header-bar').style.display='flex';iniciarApp();resetearTimeoutSeguridad();}else{document.getElementById('pin-error').innerText='CLAVE INCORRECTA';pinActual='';actualizarPuntos();}}
+function verificarPin(){if(pinActual===PIN_CORRECTO){sessionStorage.setItem('nx_auth','1');document.getElementById('pin-screen').classList.add('oculto');document.getElementById('header-bar').style.display='flex';iniciarApp();resetearTimeoutSeguridad();actualizarBadgeHeader();}else{document.getElementById('pin-error').innerText='CLAVE INCORRECTA';pinActual='';actualizarPuntos();}}
 
 // ── MENÚ LOGO ─────────────────────────────────────────────
 let menuAbierto=false;
@@ -850,6 +897,91 @@ if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.s
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;if(!localStorage.getItem('nx_pwa_installed'))setTimeout(()=>{showToast('📲 Instalá NEXOS como app — andá al menú ⋮ del navegador');},3000);});
 window.addEventListener('appinstalled',()=>{localStorage.setItem('nx_pwa_installed','1');deferredPrompt=null;showToast('✅ NEXOS instalado como app');});
+
+// ══════════════════════════════════════════════════════════
+//  CALENDARIO — NEXOS
+// ══════════════════════════════════════════════════════════
+const FERIADOS = {
+  '2025-01-01':{nombre:'Año Nuevo',tipo:'nacional'},'2025-03-03':{nombre:'Carnaval',tipo:'nacional'},'2025-03-04':{nombre:'Carnaval',tipo:'nacional'},'2025-03-24':{nombre:'Día de la Memoria',tipo:'nacional'},'2025-04-02':{nombre:'Veteranos de Malvinas',tipo:'nacional'},'2025-04-18':{nombre:'Viernes Santo',tipo:'nacional'},'2025-05-01':{nombre:'Día del Trabajador',tipo:'nacional'},'2025-05-25':{nombre:'Día de la Patria',tipo:'nacional'},'2025-06-16':{nombre:'Feriado puente',tipo:'puente'},'2025-06-20':{nombre:'Paso a la Inmortalidad de Belgrano',tipo:'nacional'},'2025-07-09':{nombre:'Día de la Independencia',tipo:'nacional'},'2025-08-17':{nombre:'Paso a la Inmortalidad de San Martín',tipo:'nacional'},'2025-08-18':{nombre:'Feriado puente',tipo:'puente'},'2025-10-12':{nombre:'Día del Respeto a la Div. Cultural',tipo:'nacional'},'2025-11-20':{nombre:'Día de la Soberanía Nacional',tipo:'nacional'},'2025-11-21':{nombre:'Feriado puente',tipo:'puente'},'2025-12-08':{nombre:'Inmaculada Concepción de María',tipo:'nacional'},'2025-12-25':{nombre:'Navidad',tipo:'nacional'},
+  '2026-01-01':{nombre:'Año Nuevo',tipo:'nacional'},'2026-02-16':{nombre:'Carnaval',tipo:'nacional'},'2026-02-17':{nombre:'Carnaval',tipo:'nacional'},'2026-03-23':{nombre:'Feriado puente',tipo:'puente'},'2026-03-24':{nombre:'Día de la Memoria',tipo:'nacional'},'2026-04-02':{nombre:'Veteranos de Malvinas',tipo:'nacional'},'2026-04-03':{nombre:'Viernes Santo',tipo:'nacional'},'2026-05-01':{nombre:'Día del Trabajador',tipo:'nacional'},'2026-05-25':{nombre:'Día de la Patria',tipo:'nacional'},'2026-06-19':{nombre:'Feriado puente',tipo:'puente'},'2026-06-20':{nombre:'Paso a la Inmortalidad de Belgrano',tipo:'nacional'},'2026-07-09':{nombre:'Día de la Independencia',tipo:'nacional'},'2026-08-17':{nombre:'Paso a la Inmortalidad de San Martín',tipo:'nacional'},'2026-10-10':{nombre:'Feriado puente',tipo:'puente'},'2026-10-12':{nombre:'Día del Respeto a la Div. Cultural',tipo:'nacional'},'2026-11-20':{nombre:'Día de la Soberanía Nacional',tipo:'nacional'},'2026-12-08':{nombre:'Inmaculada Concepción de María',tipo:'nacional'},'2026-12-25':{nombre:'Navidad',tipo:'nacional'},
+};
+const MESES_ES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DIAS_ES=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+let calAño,calMes,calDiaSeleccionado=null;
+let calNotas=JSON.parse(localStorage.getItem('nx_cal_notas')||'{}');
+function calGuardarNotas(){localStorage.setItem('nx_cal_notas',JSON.stringify(calNotas));}
+function calFechaStr(a,m,d){return`${a}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+function calFechaStrHoy(){const h=new Date();return calFechaStr(h.getFullYear(),h.getMonth(),h.getDate());}
+function abrirCalendario(){const hoy=new Date();calAño=hoy.getFullYear();calMes=hoy.getMonth();calDiaSeleccionado=null;document.getElementById('cal-detalle').innerHTML='<div style="color:#555;font-size:13px;text-align:center;">Tocá un día para ver detalles y agregar notas</div>';renderCalendario();abrirModal('modal-calendario');}
+function calCambiarMes(delta){calMes+=delta;if(calMes>11){calMes=0;calAño++;}if(calMes<0){calMes=11;calAño--;}calDiaSeleccionado=null;document.getElementById('cal-detalle').innerHTML='<div style="color:#555;font-size:13px;text-align:center;">Tocá un día para ver detalles y agregar notas</div>';renderCalendario();}
+function renderCalendario(){
+  document.getElementById('cal-mes-titulo').textContent=MESES_ES[calMes]+' '+calAño;
+  const hoyStr=calFechaStrHoy();
+  const primerDia=new Date(calAño,calMes,1).getDay();
+  const diasEnMes=new Date(calAño,calMes+1,0).getDate();
+  let html=DIAS_ES.map(d=>`<div class="cal-dia-nombre">${d}</div>`).join('');
+  for(let i=0;i<primerDia;i++)html+=`<div class="cal-dia vacio"></div>`;
+  for(let d=1;d<=diasEnMes;d++){
+    const fStr=calFechaStr(calAño,calMes,d);
+    const feriado=FERIADOS[fStr];
+    const notas=calNotas[fStr]||[];
+    const esHoy=fStr===hoyStr;
+    const esSelec=fStr===calDiaSeleccionado;
+    let cls='cal-dia';
+    if(esHoy)cls+=' hoy';
+    if(feriado)cls+=feriado.tipo==='puente'?' feriado-puente':' feriado';
+    if(notas.length)cls+=' con-nota';
+    if(esSelec)cls+=' seleccionado';
+    let dots='';
+    if(esHoy)dots+=`<div class="cal-dot cal-dot-hoy"></div>`;
+    if(feriado)dots+=`<div class="cal-dot cal-dot-feriado"></div>`;
+    if(notas.length)dots+=`<div class="cal-dot cal-dot-nota"></div>`;
+    let miniNota='';
+    if(notas.length){const preview=notas[0].texto.substring(0,18)+(notas[0].texto.length>18?'…':'');miniNota=`<div class="cal-mini-nota">${escHtml(preview)}</div>`;}
+    html+=`<div class="${cls}" onclick="calSeleccionarDia('${fStr}')"><span class="cal-num">${d}</span><div class="cal-dot-row">${dots}</div>${miniNota}</div>`;
+  }
+  document.getElementById('cal-grid').innerHTML=html;
+  actualizarBadgeHeader();
+}
+function calSeleccionarDia(fStr){
+  calDiaSeleccionado=fStr;renderCalendario();
+  const feriado=FERIADOS[fStr];const notas=calNotas[fStr]||[];const hoyStr=calFechaStrHoy();
+  const [a,m,d]=fStr.split('-');
+  const fecha=new Date(parseInt(a),parseInt(m)-1,parseInt(d));
+  const fechaLeg=DIAS_ES[fecha.getDay()]+' '+parseInt(d)+' de '+MESES_ES[parseInt(m)-1]+' '+a;
+  let html=`<div class="cal-detalle-fecha">${fStr===hoyStr?'🟢 HOY — ':''}${fechaLeg}</div>`;
+  if(feriado)html+=`<span class="cal-feriado-tag ${feriado.tipo==='puente'?'puente':''}">${feriado.tipo==='puente'?'🟡':'🔴'} ${escHtml(feriado.nombre)}</span><br>`;
+  if(notas.length){html+=`<div class="cal-notas-lista">`;notas.forEach((n,idx)=>{html+=`<div class="cal-nota-item"><span class="cal-nota-texto">${escHtml(n.texto)}</span><button class="cal-nota-del" onclick="calBorrarNota('${fStr}',${idx})" title="Borrar">✕</button></div>`;});html+=`</div>`;}
+  html+=`<textarea class="cal-nota-area" id="cal-input-nota" placeholder="Escribí una anotación para este día..." maxlength="300"></textarea><div class="cal-nota-acciones"><button class="cal-btn-guardar" onclick="calGuardarNota('${fStr}')">💾 GUARDAR NOTA</button><button class="cal-btn-borrar" onclick="calLimpiarInput()">✕ Cancelar</button></div>`;
+  document.getElementById('cal-detalle').innerHTML=html;
+}
+function calGuardarNota(fStr){const input=document.getElementById('cal-input-nota');if(!input)return;const texto=input.value.trim();if(!texto){showToast('✏️ Escribí algo primero');return;}if(!calNotas[fStr])calNotas[fStr]=[];calNotas[fStr].push({texto,ts:Date.now()});calGuardarNotas();showToast('✅ Nota guardada');calSeleccionarDia(fStr);renderCalendario();}
+function calBorrarNota(fStr,idx){if(!calNotas[fStr])return;calNotas[fStr].splice(idx,1);if(!calNotas[fStr].length)delete calNotas[fStr];calGuardarNotas();showToast('🗑️ Nota eliminada');calSeleccionarDia(fStr);renderCalendario();}
+function calLimpiarInput(){const input=document.getElementById('cal-input-nota');if(input)input.value='';}
+function actualizarBadgeHeader(){const hoy=calFechaStrHoy();const f=FERIADOS[hoy];const badge=document.getElementById('cal-header-badge');if(badge)badge.textContent=f?(f.tipo==='puente'?'🟡':'🔴'):'';}
 </script>
+<!-- MODAL CALENDARIO -->
+<div class="modal-overlay" id="modal-calendario">
+  <div class="cal-modal-box">
+    <button class="modal-close" onclick="cerrarModal('modal-calendario')">&#x2715;</button>
+    <div class="modal-title">📅 CALENDARIO</div>
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="calCambiarMes(-1)">&#8249;</button>
+      <div class="cal-mes-titulo" id="cal-mes-titulo">—</div>
+      <button class="cal-nav-btn" onclick="calCambiarMes(1)">&#8250;</button>
+    </div>
+    <div class="cal-leyenda">
+      <div class="cal-ley-item"><div class="cal-ley-dot" style="background:var(--cyan)"></div>Hoy</div>
+      <div class="cal-ley-item"><div class="cal-ley-dot" style="background:var(--red)"></div>Feriado nacional</div>
+      <div class="cal-ley-item"><div class="cal-ley-dot" style="background:var(--gold)"></div>Feriado puente</div>
+      <div class="cal-ley-item"><div class="cal-ley-dot" style="background:var(--purple)"></div>Con nota</div>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-detalle" id="cal-detalle">
+      <div style="color:#555;font-size:13px;text-align:center;">Tocá un día para ver detalles y agregar notas</div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
