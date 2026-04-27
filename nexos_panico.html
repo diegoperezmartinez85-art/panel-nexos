@@ -403,13 +403,22 @@
     const mza  = localStorage.getItem('nx_manzana');
     const casa = localStorage.getItem('nx_casa');
     if (!mza || !casa) { mostrarSetup(); return; }
-    await cargarBaneados();
-    const ban = esBaneado(mza, casa);
-    if (ban) {
-      mostrarPantallaBaneado(ban);
+
+    // 1. Mostrar pantalla INMEDIATAMENTE con cache local (sin esperar red)
+    const banCache = esBaneado(mza, casa);
+    if (banCache) {
+      mostrarPantallaBaneado(banCache);
     } else {
       mostrarPantallaPanico();
     }
+
+    // 2. Actualizar lista de baneados en segundo plano (sin bloquear UI)
+    cargarBaneados().then(() => {
+      const banFresh = esBaneado(mza, casa);
+      if (banFresh) {
+        mostrarPantallaBaneado(banFresh);
+      }
+    }).catch(() => {});
   }
 
   function mostrarSetup(){
