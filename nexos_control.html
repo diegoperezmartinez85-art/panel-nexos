@@ -91,6 +91,37 @@
     .btn-gold{background:var(--gold);color:#000;}
     .btn-purple{background:var(--purple);color:#fff;}
     .empty-msg{text-align:center;color:#555;padding:24px 0;font-size:13px;}
+    /* QR SCANNER */
+    .qr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:9990;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
+    .qr-overlay.visible{display:flex;}
+    .qr-title{font-size:16px;font-weight:900;color:#fff;margin-bottom:16px;letter-spacing:1px;text-align:center;}
+    .qr-video-wrap{position:relative;width:100%;max-width:340px;border-radius:20px;overflow:hidden;border:3px solid var(--cyan);box-shadow:0 0 30px rgba(0,212,212,0.5);}
+    .qr-video{width:100%;display:block;border-radius:17px;}
+    .qr-canvas{display:none;}
+    .qr-laser{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:qrLaser 2s ease-in-out infinite;box-shadow:0 0 10px var(--cyan);}
+    @keyframes qrLaser{0%{top:5%;}50%{top:92%;}100%{top:5%;}}
+    .qr-corner{position:absolute;width:28px;height:28px;border-color:var(--cyan);border-style:solid;}
+    .qr-corner.tl{top:8px;left:8px;border-width:4px 0 0 4px;}
+    .qr-corner.tr{top:8px;right:8px;border-width:4px 4px 0 0;}
+    .qr-corner.bl{bottom:8px;left:8px;border-width:0 0 4px 4px;}
+    .qr-corner.br{bottom:8px;right:8px;border-width:0 4px 4px 0;}
+    .qr-status{font-size:13px;color:var(--cyan);margin-top:14px;font-weight:700;min-height:18px;text-align:center;letter-spacing:0.5px;}
+    .qr-cerrar{margin-top:20px;background:var(--bg2);color:#888;border:1px solid var(--border);border-radius:50px;padding:12px 36px;font-size:14px;font-weight:800;cursor:pointer;}
+    .qr-cerrar:active{background:var(--bg3);}
+    /* QR PREVIEW CONFIRM */
+    .qr-preview{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:9991;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+    .qr-preview.visible{display:flex;}
+    .qr-preview-box{background:var(--bg2);border-radius:22px;width:100%;max-width:380px;padding:22px;background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(135deg,#00d4d4,#2ecc71);background-origin:border-box;background-clip:padding-box,border-box;border:1px solid transparent;}
+    .qr-preview-title{font-size:15px;font-weight:900;color:#fff;margin-bottom:16px;letter-spacing:1px;display:flex;align-items:center;gap:8px;}
+    .qr-field{background:var(--bg3);border-radius:12px;padding:12px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+    .qr-field-label{font-size:11px;color:#888;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+    .qr-field-val{font-size:17px;font-weight:900;color:#fff;}
+    .qr-confirm-btn{width:100%;background:var(--green);color:#000;border:none;border-radius:14px;padding:20px;font-size:18px;font-weight:900;cursor:pointer;margin-top:6px;letter-spacing:1px;transition:0.15s;}
+    .qr-confirm-btn:active{transform:scale(0.97);opacity:0.85;}
+    .qr-cancel-btn{width:100%;background:var(--bg3);color:#888;border:1px solid var(--border);border-radius:14px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;margin-top:8px;}
+    .qr-cancel-btn:active{background:var(--border);}
+    .btn-qr{background:linear-gradient(135deg,rgba(0,212,212,0.15),rgba(46,204,113,0.15));border:2px solid var(--cyan);color:var(--cyan);border-radius:16px;padding:20px 10px;font-weight:800;font-size:14px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:0.2s;}
+    .btn-qr:active{transform:scale(0.96);background:rgba(0,212,212,0.25);}
     /* GPIN */
     .gpin-puntos{display:flex;gap:12px;justify-content:center;margin:14px 0;}
     .gpin-punto{width:14px;height:14px;border-radius:50%;background:var(--border);transition:0.2s;}
@@ -314,6 +345,13 @@
     <div class="action-btns">
       <div class="btn-main ingreso" onclick="registrarRapido('ingreso')">📥 INGRESO</div>
       <div class="btn-main salida" onclick="registrarRapido('salida')">📤 SALIDA</div>
+    </div>
+    <div style="margin-top:10px;">
+      <div class="btn-qr" onclick="abrirQRScanner()">
+        <span style="font-size:22px;">📷</span>
+        <span style="font-weight:900;font-size:15px;">ESCANEAR QR NEXOS</span>
+        <span style="font-size:10px;opacity:0.7;font-weight:600;">Patente · DNI · Mza · Casa → Ingreso automático</span>
+      </div>
     </div>
   </div>
 
@@ -575,8 +613,305 @@ function calGuardarNota(fStr){const input=document.getElementById('cal-input-not
 function calBorrarNota(fStr,idx){if(!calNotas[fStr])return;calNotas[fStr].splice(idx,1);if(!calNotas[fStr].length)delete calNotas[fStr];calGuardarNotas();showToast('🗑️ Nota eliminada');calSeleccionarDia(fStr);renderCalendario();}
 function calLimpiarInput(){const input=document.getElementById('cal-input-nota');if(input)input.value='';}
 
+
+// ══════════════════════════════════════════════════════════
+// QR SCANNER — Lector de QR NEXOS con cámara
+// Formato QR: text=INGRESO NEXOS\nVisita: X\nPatente: X\nDNI: X\nMza:X Casa:X\nProp:X\nID:X
+// ══════════════════════════════════════════════════════════
+let qrStream = null;
+let qrAnimFrame = null;
+let qrDatos = null;
+let qrScanning = false;
+
+function abrirQRScanner() {
+  document.getElementById('qr-overlay').classList.add('visible');
+  document.getElementById('qr-status').innerText = 'Iniciando cámara...';
+  qrScanning = true;
+  iniciarCamaraQR();
+}
+
+async function iniciarCamaraQR() {
+  try {
+    // Preferir cámara trasera en móvil
+    const constraints = {
+      video: {
+        facingMode: { ideal: 'environment' },
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      }
+    };
+    qrStream = await navigator.mediaDevices.getUserMedia(constraints);
+    const video = document.getElementById('qr-video');
+    video.srcObject = qrStream;
+    video.play();
+    video.addEventListener('loadedmetadata', () => {
+      document.getElementById('qr-status').innerText = 'Apuntá la cámara al código QR';
+      escanearFrameQR();
+    }, { once: true });
+  } catch (e) {
+    document.getElementById('qr-status').innerText = '⚠️ Sin acceso a la cámara. Verificá los permisos.';
+  }
+}
+
+function escanearFrameQR() {
+  if (!qrScanning) return;
+  const video = document.getElementById('qr-video');
+  const canvas = document.getElementById('qr-canvas');
+  if (video.readyState !== video.HAVE_ENOUGH_DATA) {
+    qrAnimFrame = requestAnimationFrame(escanearFrameQR);
+    return;
+  }
+  canvas.width  = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+  // Usar BarcodeDetector si está disponible (Chrome/Android moderno)
+  if (typeof BarcodeDetector !== 'undefined') {
+    const detector = new BarcodeDetector({ formats: ['qr_code'] });
+    detector.detect(canvas).then(codes => {
+      if (codes.length > 0 && qrScanning) {
+        qrScanning = false;
+        procesarTextoQR(codes[0].rawValue);
+      } else {
+        qrAnimFrame = requestAnimationFrame(escanearFrameQR);
+      }
+    }).catch(() => {
+      qrAnimFrame = requestAnimationFrame(escanearFrameQR);
+    });
+  } else {
+    // Fallback: jsQR (cargado dinámicamente)
+    cargarJsQR().then(jsQR => {
+      const code = jsQR(imageData.data, imageData.width, imageData.height, {
+        inversionAttempts: 'dontInvert'
+      });
+      if (code && qrScanning) {
+        qrScanning = false;
+        procesarTextoQR(code.data);
+      } else {
+        qrAnimFrame = requestAnimationFrame(escanearFrameQR);
+      }
+    });
+  }
+}
+
+// Carga jsQR dinámicamente como fallback
+let jsQRLib = null;
+let jsQRLoading = false;
+let jsQRCallbacks = [];
+function cargarJsQR() {
+  return new Promise((resolve) => {
+    if (jsQRLib) { resolve(jsQRLib); return; }
+    jsQRCallbacks.push(resolve);
+    if (jsQRLoading) return;
+    jsQRLoading = true;
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js';
+    script.onload = () => {
+      jsQRLib = window.jsQR;
+      jsQRCallbacks.forEach(cb => cb(jsQRLib));
+      jsQRCallbacks = [];
+    };
+    script.onerror = () => {
+      // Si jsQR falla, seguir intentando con BarcodeDetector
+      jsQRCallbacks.forEach(cb => cb(() => null));
+      jsQRCallbacks = [];
+    };
+    document.head.appendChild(script);
+  });
+}
+
+/**
+ * Parsea el texto del QR NEXOS y extrae los campos.
+ * Formato esperado (como URL de WhatsApp):
+ * https://api.whatsapp.com/send?phone=...&text=INGRESO NEXOS\nVisita: X\nPatente: X\nDNI: X\nMza:X Casa:X\nProp:X\nID:X
+ * O el texto plano directamente.
+ */
+function parsearQRNexos(raw) {
+  let texto = raw;
+
+  // Si es URL de WhatsApp, extraer el parámetro text=
+  if (raw.includes('whatsapp.com') || raw.includes('api.whatsapp')) {
+    try {
+      // Decodificar el parámetro text de la URL
+      const urlObj = new URL(raw);
+      texto = decodeURIComponent(urlObj.searchParams.get('text') || '');
+    } catch(e) {
+      // Si falla el parseo de URL, buscar text= manualmente
+      const match = raw.match(/[?&]text=([^&]+)/);
+      if (match) texto = decodeURIComponent(match[1]);
+    }
+  }
+
+  // Normalizar saltos de línea
+  texto = texto.replace(/\\n/g, '\n').replace(/%0A/gi, '\n');
+
+  const resultado = { nombre: '', pat: '', dni: '', mza: '', casa: '', prop: '', id: '' };
+
+  // Parsear línea por línea
+  const lineas = texto.split('\n');
+  for (const linea of lineas) {
+    const l = linea.trim();
+
+    // Visita: CARLOS
+    const mVisita = l.match(/^Visita:\s*(.+)$/i);
+    if (mVisita) resultado.nombre = mVisita[1].trim();
+
+    // Patente: ad547rf
+    const mPat = l.match(/^Patente:\s*(.+)$/i);
+    if (mPat) resultado.pat = mPat[1].trim().toUpperCase();
+
+    // DNI: 31750210
+    const mDni = l.match(/^DNI:\s*(.+)$/i);
+    if (mDni) resultado.dni = mDni[1].trim();
+
+    // Mza:15 Casa:7  (en la misma línea)
+    const mMza = l.match(/Mza:\s*(\S+)/i);
+    if (mMza) resultado.mza = mMza[1].trim();
+
+    const mCasa = l.match(/Casa:\s*(\S+)/i);
+    if (mCasa) resultado.casa = mCasa[1].trim();
+
+    // Prop: y ID: (opcionales, para referencia)
+    const mProp = l.match(/^Prop:\s*(.+)$/i);
+    if (mProp) resultado.prop = mProp[1].trim();
+
+    const mId = l.match(/^ID:\s*(.+)$/i);
+    if (mId) resultado.id = mId[1].trim();
+  }
+
+  return resultado;
+}
+
+function procesarTextoQR(rawText) {
+  detenerCamaraQR();
+
+  const datos = parsearQRNexos(rawText);
+
+  // Verificar que tenga al menos patente o manzana+casa
+  if (!datos.pat && !datos.mza) {
+    document.getElementById('qr-overlay').classList.remove('visible');
+    showToast('⚠️ QR no reconocido como NEXOS');
+    return;
+  }
+
+  qrDatos = datos;
+
+  // Mostrar preview
+  document.getElementById('qp-nombre').innerText = datos.nombre || '—';
+  document.getElementById('qp-pat').innerText     = datos.pat    || '—';
+  document.getElementById('qp-dni').innerText     = datos.dni    || '—';
+  document.getElementById('qp-mza').innerText     = datos.mza    || '—';
+  document.getElementById('qp-casa').innerText    = datos.casa   || '—';
+
+  document.getElementById('qr-overlay').classList.remove('visible');
+  document.getElementById('qr-preview').classList.add('visible');
+}
+
+function confirmarIngresoQR() {
+  if (!qrDatos) return;
+  document.getElementById('qr-preview').classList.remove('visible');
+
+  const hora = horaActual();
+  const item = {
+    id:   Date.now(),
+    pat:  qrDatos.pat  || ('QR-' + Date.now()),
+    dni:  qrDatos.dni  || '',
+    mza:  qrDatos.mza  || '',
+    casa: qrDatos.casa || '',
+    tipo: 'VISITA',
+    hE:   hora,
+    hS:   '',
+    tsE:  Date.now()
+  };
+
+  // Verificar lista negra
+  verificarListaNegra(item.pat, item.dni);
+
+  DB.push(item);
+  localStorage.setItem('nx_db', JSON.stringify(DB));
+  render();
+  enviar(item);
+
+  showToast('✅ INGRESO QR: ' + (qrDatos.nombre ? qrDatos.nombre + ' — ' : '') + item.pat);
+  qrDatos = null;
+}
+
+function cancelarPreviewQR() {
+  document.getElementById('qr-preview').classList.remove('visible');
+  qrDatos = null;
+  // Reabrir el scanner
+  abrirQRScanner();
+}
+
+function cerrarQRScanner() {
+  qrScanning = false;
+  detenerCamaraQR();
+  document.getElementById('qr-overlay').classList.remove('visible');
+  document.getElementById('qr-preview').classList.remove('visible');
+  qrDatos = null;
+}
+
+function detenerCamaraQR() {
+  qrScanning = false;
+  if (qrAnimFrame) { cancelAnimationFrame(qrAnimFrame); qrAnimFrame = null; }
+  if (qrStream) {
+    qrStream.getTracks().forEach(t => t.stop());
+    qrStream = null;
+  }
+  const video = document.getElementById('qr-video');
+  if (video) { video.srcObject = null; }
+}
+
 // PWA
 if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw_control.js',{scope:'./'}).catch(()=>{});});}
 </script>
+
+<!-- QR SCANNER OVERLAY -->
+<div class="qr-overlay" id="qr-overlay">
+  <div class="qr-title">📷 ESCANEÁ EL QR DEL VECINO</div>
+  <div class="qr-video-wrap">
+    <video class="qr-video" id="qr-video" playsinline autoplay muted></video>
+    <canvas class="qr-canvas" id="qr-canvas"></canvas>
+    <div class="qr-laser"></div>
+    <div class="qr-corner tl"></div>
+    <div class="qr-corner tr"></div>
+    <div class="qr-corner bl"></div>
+    <div class="qr-corner br"></div>
+  </div>
+  <div class="qr-status" id="qr-status">Apuntá la cámara al código QR</div>
+  <button class="qr-cerrar" onclick="cerrarQRScanner()">✕ Cancelar</button>
+</div>
+
+<!-- QR PREVIEW / CONFIRM -->
+<div class="qr-preview" id="qr-preview">
+  <div class="qr-preview-box">
+    <div class="qr-preview-title">✅ QR LEÍDO — CONFIRMÁ EL INGRESO</div>
+    <div class="qr-field">
+      <span class="qr-field-label">NOMBRE</span>
+      <span class="qr-field-val" id="qp-nombre">—</span>
+    </div>
+    <div class="qr-field">
+      <span class="qr-field-label">PATENTE</span>
+      <span class="qr-field-val" id="qp-pat">—</span>
+    </div>
+    <div class="qr-field">
+      <span class="qr-field-label">DNI</span>
+      <span class="qr-field-val" id="qp-dni">—</span>
+    </div>
+    <div class="qr-field">
+      <span class="qr-field-label">MANZANA</span>
+      <span class="qr-field-val" id="qp-mza">—</span>
+    </div>
+    <div class="qr-field">
+      <span class="qr-field-label">CASA</span>
+      <span class="qr-field-val" id="qp-casa">—</span>
+    </div>
+    <button class="qr-confirm-btn" onclick="confirmarIngresoQR()">✅ CONFIRMAR INGRESO</button>
+    <button class="qr-cancel-btn" onclick="cancelarPreviewQR()">↩ Volver a escanear</button>
+  </div>
+</div>
+
 </body>
 </html>
