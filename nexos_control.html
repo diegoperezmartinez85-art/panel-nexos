@@ -764,14 +764,28 @@ function imprimirTurno(){document.getElementById('pdf-report').style.display='bl
 // ── LISTA NEGRA ───────────────────────────────────────────
 let LISTA_NEGRA=JSON.parse(localStorage.getItem('nx_lista_negra')||'[]'),lnPinActual='';
 function abrirListaNegra(){document.getElementById('ln-buscar').value='';ocultarAgregarLN();renderListaNegra();abrirModal('modal-ln');}
-function renderListaNegra(){const q=(document.getElementById('ln-buscar').value||'').toUpperCase();const filtrada=LISTA_NEGRA.filter(r=>!q||(r.pat||'').toUpperCase().includes(q)||(r.dni||'').includes(q));const cont=document.getElementById('ln-lista-contenido');if(!filtrada.length){cont.innerHTML='<div class="empty-msg">Lista negra vacía 🟢</div>';return;}cont.innerHTML=filtrada.sort((a,b)=>b.ts-a.ts).map(r=>`<div class="ln-item"><div class="ln-item-info"><div class="ln-item-pat">🚫 ${escHtml(r.pat||'Sin patente')}</div>${r.dni?`<div class="ln-item-det">DNI: ${escHtml(r.dni)}</div>`:''} ${r.motivo?`<div class="ln-item-det" style="color:#e74c3c">⚠️ ${escHtml(r.motivo)}</div>`:''}<div class="ln-item-det">${new Date(r.ts).toLocaleDateString('es-AR')}</div></div></div>`).join('');}
+function renderListaNegra(){const q=(document.getElementById('ln-buscar').value||'').toUpperCase();const filtrada=LISTA_NEGRA.filter(r=>!q||(r.pat||'').toUpperCase().includes(q)||(r.dni||'').includes(q));const cont=document.getElementById('ln-lista-contenido');if(!filtrada.length){cont.innerHTML='<div class="empty-msg">Lista negra vacía 🟢</div>';return;}cont.innerHTML=filtrada.sort((a,b)=>b.ts-a.ts).map((r,i)=>{const idxReal=LISTA_NEGRA.indexOf(r);return`<div class="ln-item"><div class="ln-item-info"><div class="ln-item-pat">🚫 ${escHtml(r.pat||'Sin patente')}</div>${r.dni?`<div class="ln-item-det">DNI: ${escHtml(r.dni)}</div>`:''} ${r.motivo?`<div class="ln-item-det" style="color:#e74c3c">⚠️ ${escHtml(r.motivo)}</div>`:''}<div class="ln-item-det">${new Date(r.ts).toLocaleDateString('es-AR')}</div></div><button class="ban-unban-btn" style="background:var(--border);color:#aaa;" onclick="pedirPinQuitarLN(${idxReal})">QUITAR</button></div>`;}).join('');}
 function mostrarAgregarLN(){lnPinActual='';actualizarLNPuntos();document.getElementById('ln-pin-error').innerText='';document.getElementById('ln-vista-consulta').style.display='none';document.getElementById('ln-vista-agregar').style.display='block';document.getElementById('ln-vista-form').style.display='none';}
 function ocultarAgregarLN(){document.getElementById('ln-vista-consulta').style.display='block';document.getElementById('ln-vista-agregar').style.display='none';document.getElementById('ln-vista-form').style.display='none';}
 function actualizarLNPuntos(){for(let i=0;i<8;i++)document.getElementById('lp'+i).classList.toggle('lleno',i<lnPinActual.length);}
 function lnPinTecla(d){if(lnPinActual.length>=8)return;lnPinActual+=d;actualizarLNPuntos();if(lnPinActual.length===8)setTimeout(verificarLNPin,120);}
 function lnPinBorrar(){lnPinActual=lnPinActual.slice(0,-1);actualizarLNPuntos();document.getElementById('ln-pin-error').innerText='';}
 function verificarLNPin(){if(lnPinActual===PIN_LN){document.getElementById('ln-pin-error').innerText='';document.getElementById('ln-vista-agregar').style.display='none';document.getElementById('ln-vista-form').style.display='block';document.getElementById('ln-form-pat').value='';document.getElementById('ln-form-dni').value='';document.getElementById('ln-form-motivo').value='';}else{document.getElementById('ln-pin-error').innerText='CLAVE INCORRECTA';lnPinActual='';actualizarLNPuntos();}}
-function agregarListaNegra(){const pat=document.getElementById('ln-form-pat').value.trim().toUpperCase();const dni=document.getElementById('ln-form-dni').value.trim();const motivo=document.getElementById('ln-form-motivo').value.trim();if(!pat&&!dni){showToast('⚠️ Ingresá al menos patente o DNI');return;}LISTA_NEGRA.push({pat,dni,motivo,ts:Date.now()});localStorage.setItem('nx_lista_negra',JSON.stringify(LISTA_NEGRA));showToast('🚫 Agregado a lista negra');ocultarAgregarLN();renderListaNegra();}
+function agregarListaNegra(){const pat=document.getElementById('ln-form-pat').value.trim().toUpperCase();const dni=document.getElementById('ln-form-dni').value.trim();const motivo=document.getElementById('ln-form-motivo').value.trim();if(!pat&&!dni){showToast('⚠️ Ingresá al menos patente o DNI');return;}const nuevo={pat,dni,motivo,ts:Date.now()};LISTA_NEGRA.push(nuevo);localStorage.setItem('nx_lista_negra',JSON.stringify(LISTA_NEGRA));enviarListaNegra({accion:'ln_agregar',pat,dni,motivo});showToast('🚫 Agregado a lista negra');ocultarAgregarLN();renderListaNegra();}
+function enviarListaNegra(datos){const url=localStorage.getItem('nx_url');if(!url)return;fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)}).catch(()=>{});}
+let lnQuitarIdx=-1,lnQuitarPin='';
+function pedirPinQuitarLN(idx){lnQuitarIdx=idx;lnQuitarPin='';actualizarLNQPuntos();document.getElementById('lnq-pin-error').innerText='';document.getElementById('modal-quitar-ln').classList.add('visible');}
+function actualizarLNQPuntos(){for(let i=0;i<8;i++)document.getElementById('lnq'+i).classList.toggle('lleno',i<lnQuitarPin.length);}
+function lnqPinTecla(d){if(lnQuitarPin.length>=8)return;lnQuitarPin+=d;actualizarLNQPuntos();if(lnQuitarPin.length===8)setTimeout(verificarLNQPin,120);}
+function lnqPinBorrar(){lnQuitarPin=lnQuitarPin.slice(0,-1);actualizarLNQPuntos();document.getElementById('lnq-pin-error').innerText='';}
+function verificarLNQPin(){
+  if(lnQuitarPin===PIN_LN){
+    document.getElementById('modal-quitar-ln').classList.remove('visible');
+    const item=LISTA_NEGRA[lnQuitarIdx];
+    if(item){LISTA_NEGRA.splice(lnQuitarIdx,1);localStorage.setItem('nx_lista_negra',JSON.stringify(LISTA_NEGRA));enviarListaNegra({accion:'ln_quitar',pat:item.pat||'',dni:item.dni||''});showToast('✅ Eliminado de lista negra');renderListaNegra();}
+    lnQuitarIdx=-1;
+  }else{document.getElementById('lnq-pin-error').innerText='CLAVE INCORRECTA';lnQuitarPin='';actualizarLNQPuntos();}
+}
 
 // ── RESET ─────────────────────────────────────────────────
 let resetPin='';
@@ -787,8 +801,14 @@ let banPinActual='';
 function guardarBaneados(){localStorage.setItem('nx_baneados',JSON.stringify(BANEADOS));}
 function esBaneado(mza,casa){const mzaN=String(mza||'').trim();const casaN=String(casa||'').trim();if(!mzaN||!casaN)return false;return BANEADOS.some(b=>String(b.mza).trim()===mzaN&&String(b.casa).trim()===casaN);}
 function abrirBaneo(){renderBaneados();document.getElementById('ban-vista-consulta').style.display='block';document.getElementById('ban-vista-pin').style.display='none';document.getElementById('ban-vista-form').style.display='none';abrirModal('modal-baneo');}
-function renderBaneados(){const cont=document.getElementById('ban-lista-contenido');if(!BANEADOS.length){cont.innerHTML='<div class="empty-msg">Sin vecinos baneados 🟢</div>';return;}cont.innerHTML=BANEADOS.slice().sort((a,b)=>b.ts-a.ts).map((b,idx)=>`<div class="ban-item"><div class="ban-item-info"><span class="ban-badge">🚷 BANEADO</span><div class="ban-item-id">Mza ${escHtml(String(b.mza))} — Casa ${escHtml(String(b.casa))}</div>${b.id?`<div class="ban-item-det">ID: ${escHtml(b.id)}</div>`:''} ${b.motivo?`<div class="ban-item-det" style="color:#e74c3c">⚠️ ${escHtml(b.motivo)}</div>`:''}<div class="ban-item-det">${new Date(b.ts).toLocaleDateString('es-AR')}</div></div><button class="ban-unban-btn" onclick="desbanear(${idx})">DESBANEAR</button></div>`).join('');}
+function renderBaneados(){const cont=document.getElementById('ban-lista-contenido');if(!BANEADOS.length){cont.innerHTML='<div class="empty-msg">Sin vecinos baneados 🟢</div>';return;}cont.innerHTML=BANEADOS.slice().sort((a,b)=>b.ts-a.ts).map((b,idx)=>`<div class="ban-item"><div class="ban-item-info"><span class="ban-badge">🚷 BANEADO</span><div class="ban-item-id">Mza ${escHtml(String(b.mza))} — Casa ${escHtml(String(b.casa))}</div>${b.id?`<div class="ban-item-det">ID: ${escHtml(b.id)}</div>`:''} ${b.motivo?`<div class="ban-item-det" style="color:#e74c3c">⚠️ ${escHtml(b.motivo)}</div>`:''}<div class="ban-item-det">${new Date(b.ts).toLocaleDateString('es-AR')}</div></div><button class="ban-unban-btn" onclick="pedirPinDesbanear(${idx})">DESBANEAR</button></div>`).join('');}
 function desbanear(idx){const b=BANEADOS[idx];if(!b)return;BANEADOS.splice(idx,1);guardarBaneados();enviarBaneo({accion:'desbanear',mza:b.mza,casa:b.casa});renderBaneados();showToast(`✅ Mza ${b.mza} Casa ${b.casa} desbaneada`);}
+let desbanearIdx=-1,desPinActual='';
+function pedirPinDesbanear(idx){desbanearIdx=idx;desPinActual='';actualizarDesPuntos();document.getElementById('des-pin-error').innerText='';document.getElementById('modal-desbanear').classList.add('visible');}
+function actualizarDesPuntos(){for(let i=0;i<4;i++)document.getElementById('dp'+i).classList.toggle('lleno',i<desPinActual.length);}
+function desPinTecla(d){if(desPinActual.length>=4)return;desPinActual+=d;actualizarDesPuntos();if(desPinActual.length===4)setTimeout(verificarDesPin,120);}
+function desPinBorrar(){desPinActual=desPinActual.slice(0,-1);actualizarDesPuntos();document.getElementById('des-pin-error').innerText='';}
+function verificarDesPin(){if(desPinActual===PIN_CORRECTO){document.getElementById('modal-desbanear').classList.remove('visible');desbanear(desbanearIdx);desbanearIdx=-1;}else{document.getElementById('des-pin-error').innerText='CLAVE INCORRECTA';desPinActual='';actualizarDesPuntos();}}
 function mostrarPinBaneo(){banPinActual='';actualizarBanPuntos();document.getElementById('ban-pin-error').innerText='';document.getElementById('ban-vista-consulta').style.display='none';document.getElementById('ban-vista-pin').style.display='block';document.getElementById('ban-vista-form').style.display='none';}
 function ocultarPinBaneo(){document.getElementById('ban-vista-consulta').style.display='block';document.getElementById('ban-vista-pin').style.display='none';document.getElementById('ban-vista-form').style.display='none';}
 function actualizarBanPuntos(){for(let i=0;i<4;i++)document.getElementById('bp'+i).classList.toggle('lleno',i<banPinActual.length);}
@@ -858,6 +878,8 @@ async function sincronizar(manual=false){
     const panico=Array.isArray(data)?[]:(data.panico||[]);
     const baneadosCloud=data.baneados||null;
     if(baneadosCloud)cargarBaneadosDesdeCloud(baneadosCloud);
+    const lnCloud=data.listaNegra||null;
+    if(Array.isArray(lnCloud)&&lnCloud.length>0){LISTA_NEGRA=lnCloud;localStorage.setItem('nx_lista_negra',JSON.stringify(LISTA_NEGRA));}
     const cloudIds=new Set(cloudData.map(x=>String(x.id)));
     const pend=DB.filter(x=>!cloudIds.has(String(x.id))&&(Date.now()-(x.tsE||0)<60000));
     DB=[...cloudData,...pend];
@@ -1152,5 +1174,45 @@ window.addEventListener('resize',()=>{
 });
 // ══ FIN QR SCANNER MODULE ══════════════════════════════════
 </script>
+
+<div class="modal-overlay" id="modal-desbanear">
+  <div class="modal-box">
+    <button class="modal-close" onclick="cerrarModal('modal-desbanear')">✕</button>
+    <div class="modal-title" style="color:var(--purple)">🔒 CONFIRMAR DESBANEO</div>
+    <p style="font-size:13px;color:#888;margin-bottom:16px;text-align:center;">Ingresá la clave para desbanear</p>
+    <div class="gpin-puntos" style="justify-content:center;">
+      <div class="gpin-punto" id="dp0"></div><div class="gpin-punto" id="dp1"></div>
+      <div class="gpin-punto" id="dp2"></div><div class="gpin-punto" id="dp3"></div>
+    </div>
+    <div class="gpin-teclado" style="margin-top:10px;">
+      <div class="gpin-key" onclick="desPinTecla('1')">1</div><div class="gpin-key" onclick="desPinTecla('2')">2</div><div class="gpin-key" onclick="desPinTecla('3')">3</div>
+      <div class="gpin-key" onclick="desPinTecla('4')">4</div><div class="gpin-key" onclick="desPinTecla('5')">5</div><div class="gpin-key" onclick="desPinTecla('6')">6</div>
+      <div class="gpin-key" onclick="desPinTecla('7')">7</div><div class="gpin-key" onclick="desPinTecla('8')">8</div><div class="gpin-key" onclick="desPinTecla('9')">9</div>
+      <div class="gpin-key vacio"></div><div class="gpin-key" onclick="desPinTecla('0')">0</div><div class="gpin-key borra" onclick="desPinBorrar()">&#x232B;</div>
+    </div>
+    <div class="gpin-error" id="des-pin-error"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-quitar-ln">
+  <div class="modal-box">
+    <button class="modal-close" onclick="cerrarModal('modal-quitar-ln')">✕</button>
+    <div class="modal-title" style="color:var(--red)">🔒 QUITAR DE LISTA NEGRA</div>
+    <p style="font-size:13px;color:#888;margin-bottom:16px;text-align:center;">Ingresá la clave de administrador</p>
+    <div class="gpin-puntos" style="justify-content:center;flex-wrap:wrap;gap:10px;">
+      <div class="gpin-punto" id="lnq0"></div><div class="gpin-punto" id="lnq1"></div>
+      <div class="gpin-punto" id="lnq2"></div><div class="gpin-punto" id="lnq3"></div>
+      <div class="gpin-punto" id="lnq4"></div><div class="gpin-punto" id="lnq5"></div>
+      <div class="gpin-punto" id="lnq6"></div><div class="gpin-punto" id="lnq7"></div>
+    </div>
+    <div class="gpin-teclado" style="margin-top:10px;">
+      <div class="gpin-key" onclick="lnqPinTecla('1')">1</div><div class="gpin-key" onclick="lnqPinTecla('2')">2</div><div class="gpin-key" onclick="lnqPinTecla('3')">3</div>
+      <div class="gpin-key" onclick="lnqPinTecla('4')">4</div><div class="gpin-key" onclick="lnqPinTecla('5')">5</div><div class="gpin-key" onclick="lnqPinTecla('6')">6</div>
+      <div class="gpin-key" onclick="lnqPinTecla('7')">7</div><div class="gpin-key" onclick="lnqPinTecla('8')">8</div><div class="gpin-key" onclick="lnqPinTecla('9')">9</div>
+      <div class="gpin-key vacio"></div><div class="gpin-key" onclick="lnqPinTecla('0')">0</div><div class="gpin-key borra" onclick="lnqPinBorrar()">&#x232B;</div>
+    </div>
+    <div class="gpin-error" id="lnq-pin-error"></div>
+  </div>
+</div>
 </body>
 </html>
