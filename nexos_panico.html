@@ -37,7 +37,7 @@
     .info-config{text-align:center;color:#888;font-size:13px;margin-bottom:10px;}
     .info-config strong{color:#00d4d4;font-weight:800;}
 
-    .boton-redondo-container{width:280px;height:280px;display:flex;align-items:center;justify-content:center;margin:20px 0;position:relative;}
+    .boton-redondo-container{width:280px;height:280px;display:flex;align-items:center;justify-content:center;margin:20px 0;position:relative;border-radius:50%;overflow:hidden;}
     .cooldown-ring{position:absolute;top:0;left:0;width:100%;height:100%;transform:rotate(-90deg);pointer-events:none;}
     .cooldown-ring circle{fill:none;stroke:#e74c3c;stroke-width:6;stroke-linecap:round;stroke-dasharray:791;stroke-dashoffset:791;transition:stroke-dashoffset 1s linear;opacity:0.6;}
 
@@ -373,7 +373,7 @@
   // Mostrar el deviceId en pantalla baneado (para que el vecino lo pueda comunicar al admin)
   document.getElementById('ban-device-id').innerText = 'ID: ' + DEVICE_ID;
 
-  const PANIC_URL   = 'https://script.google.com/macros/s/AKfycbymM2t7_lnCigAGc0SSv2jP26jEcQuxJcBw-mYVFCF3FFZn2er0CE0ecJrQm8Yfo6YMOw/exec';
+  const PANIC_URL   = 'https://script.google.com/macros/s/AKfycbwCrG8C4I4nQ_HyYLws6wF-Qv4zHVBq-0Um0LZH7zoukEmaT-u-rWkhRyUBXBRf6yXosA/exec';
   const COOLDOWN_MS = 15 * 60 * 1000;
   let cooldownInterval = null;
 
