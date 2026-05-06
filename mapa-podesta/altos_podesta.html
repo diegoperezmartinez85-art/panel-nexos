@@ -278,6 +278,27 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .empty-i{font-size:44px;opacity:0.15;}
 .empty-t{font-size:13px;color:var(--muted);font-weight:300;letter-spacing:1px;}
 
+/* Instagram — sutil pero visible */
+.ig-bar{
+  display:flex;align-items:center;gap:8px;
+  margin:0 18px;
+  padding:8px 14px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(188,24,136,0.2);
+  border-radius:12px;
+  text-decoration:none;
+  transition:all 0.2s;
+  flex-shrink:0;
+}
+.ig-bar:active{background:rgba(220,39,67,0.08);transform:scale(0.98);}
+.ig-icon{
+  width:20px;height:20px;flex-shrink:0;
+  background:linear-gradient(135deg,#f09433,#dc2743,#bc1888);
+  border-radius:6px;display:flex;align-items:center;justify-content:center;
+}
+.ig-handle{font-size:12px;font-weight:400;color:var(--muted2);letter-spacing:0.5px;}
+.ig-arrow{color:var(--muted);font-size:13px;margin-left:auto;opacity:0.6;}
+
 /* ══════════════════════════════════
    MODAL BOTTOM SHEET
 ══════════════════════════════════ */
@@ -426,6 +447,18 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     </div>
   </div>
 
+  <a class="ig-bar" href="https://www.instagram.com/nexosmaps?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener">
+    <div class="ig-icon">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+        <rect x="2" y="2" width="20" height="20" rx="5" stroke="white" stroke-width="2"/>
+        <circle cx="12" cy="12" r="4" stroke="white" stroke-width="2"/>
+        <circle cx="17.5" cy="6.5" r="1.2" fill="white"/>
+      </svg>
+    </div>
+    <span class="ig-handle">@nexosmaps</span>
+    <span class="ig-arrow">›</span>
+  </a>
+
   <div class="stats-row">
     <span class="stats-txt">Mostrando <span id="cnt">86</span> lotes</span>
     <div class="vtoggle">
@@ -440,6 +473,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       <div class="empty-i">📍</div>
       <div class="empty-t">No se encontró el lote</div>
     </div>
+
   </div>
 </main>
 
