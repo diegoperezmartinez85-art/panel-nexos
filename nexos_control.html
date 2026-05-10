@@ -60,12 +60,12 @@ input.giant{width:100%;padding:18px;margin-bottom:10px;border-radius:12px;backgr
 .campo-label{font-size:11px;color:#666;letter-spacing:1px;font-weight:700;margin-bottom:4px;margin-top:4px;padding-left:4px;}
 .header-bar{background:var(--bg2);border:1px solid transparent;border-radius:16px;padding:8px 12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;position:relative;background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(90deg,#00d4d4,#a855f7,#ff3190,#00d4d4);background-origin:border-box;background-clip:padding-box,border-box;box-shadow:0 0 18px rgba(0,212,212,0.25),0 0 32px rgba(168,85,247,0.15);}
 .logo-btn{display:flex;align-items:center;gap:10px;cursor:pointer;background:none;border:none;padding:0;}
-.logo-img{height:52px;border-radius:10px;filter:drop-shadow(0 0 8px rgba(0,212,212,0.6));}
+.logo-img{height:40px;border-radius:8px;filter:drop-shadow(0 0 8px rgba(0,212,212,0.6));}
 .logo-arrow{font-size:10px;color:#555;margin-left:4px;transition:0.2s;}
-.header-temp{font-size:18px;font-weight:900;letter-spacing:1px;color:var(--cyan);font-family:monospace;min-width:48px;text-align:right;text-shadow:0 0 8px rgba(0,212,212,0.9);}
-.header-hora{font-size:18px;font-weight:900;letter-spacing:2px;color:var(--cyan);font-family:monospace;text-shadow:0 0 8px rgba(0,212,212,0.9);}
-.header-clima{font-size:22px;line-height:1;}
-.header-clock{display:flex;align-items:center;gap:6px;padding-right:6px;}
+.header-temp{font-size:15px;font-weight:900;letter-spacing:1px;color:var(--cyan);font-family:monospace;min-width:40px;text-align:right;text-shadow:0 0 8px rgba(0,212,212,0.9);}
+.header-hora{font-size:15px;font-weight:900;letter-spacing:2px;color:var(--cyan);font-family:monospace;text-shadow:0 0 8px rgba(0,212,212,0.9);}
+.header-clima{font-size:18px;line-height:1;}
+.header-clock{display:flex;align-items:center;gap:6px;padding-right:12px;}
 .logo-menu{display:none;position:absolute;top:calc(100% + 8px);left:0;width:285px;background:var(--bg2);border-radius:16px;overflow-y:auto;max-height:80vh;z-index:500;box-shadow:0 8px 32px rgba(0,0,0,0.7);background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(135deg,#00d4d4,#a855f7,#ff3190);background-origin:border-box;background-clip:padding-box,border-box;border:1px solid transparent;animation:menuIn 0.15s ease;}
 @keyframes menuIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 .logo-menu.visible{display:block;}
@@ -490,7 +490,13 @@ input.modal-search:focus{border-color:var(--cyan);}
       </div>
     </div>
     <button class="qr-torch-btn" id="pat-torch-btn" onclick="patToggleTorch()">💡</button>
-    <div class="qr-status-scan scanning" id="pat-status">Apuntá a la patente del vehículo...</div>
+    <!-- Botón de captura manual -->
+    <div style="position:absolute;bottom:60px;left:50%;transform:translateX(-50%);z-index:50;">
+      <button onclick="patCapturar()" id="pat-btn-capturar" style="background:var(--gold);color:#000;border:none;border-radius:50px;padding:16px 36px;font-size:16px;font-weight:900;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.5);letter-spacing:1px;">
+        📸 CAPTURAR
+      </button>
+    </div>
+    <div class="qr-status-scan scanning" id="pat-status">Apuntá a la patente y presioná 📸</div>
   </div>
 </div>
 
@@ -767,14 +773,14 @@ function verificarQPPin(){
 function enviarPropietario(datos){const url=localStorage.getItem('nx_url');if(!url)return;fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)}).catch(()=>{});}
 function cargarPropietariosDesdeCloud(lista){if(!Array.isArray(lista)||!lista.length)return;PROPIETARIOS=lista.map(p=>({pat:String(p.pat||'').trim().toUpperCase(),nombre:p.nombre||'',mza:p.mza||'',casa:p.casa||'',obs:p.obs||'',ts:p.ts||Date.now()}));guardarPropietarios();}
 
-// ── LECTOR PATENTE OCR ────────────────────────────────────
+// ── LECTOR PATENTE OCR ────────────────────────────────
 let patStream=null,patInterval=null,patTrack=null,patTorchOn=false,patProcesando=false,patUltimaPatente='';
 
 function cargarTesseract(cb){
   if(window.Tesseract){cb();return;}
   const s=document.createElement('script');
   s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
-  s.onload=cb;
+  s.onload=()=>{console.log('Tesseract cargado');cb();};
   s.onerror=()=>setPatStatus('⚠️ No se pudo cargar el OCR','error');
   document.head.appendChild(s);
 }
@@ -783,344 +789,212 @@ function abrirLectorPatente(){
   cerrarMenu();
   document.getElementById('pat-overlay').classList.add('visible');
   document.getElementById('pat-resultado-flotante').style.display='none';
+  patTorchOn=false;
+  const tb=document.getElementById('pat-torch-btn');
+  if(tb){tb.classList.remove('on');tb.innerText='💡';}
   setPatStatus('Cargando cámara...','');
   cargarTesseract(()=>patIniciarCamara());
 }
 
 function patIniciarCamara(){
-  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}}})
-    .then(stream=>{
-      patStream=stream;patTrack=stream.getVideoTracks()[0];
-      const video=document.getElementById('pat-video');
-      video.srcObject=stream;video.play();
-      video.addEventListener('loadedmetadata',()=>{setPatStatus('Apuntá a la patente del vehículo...','scanning');patIniciarOCR();},{once:true});
-    })
-    .catch(()=>setPatStatus('⚠️ Sin acceso a la cámara. Verificá permisos.','error'));
+  if(patStream)patDetenerCamara();
+  navigator.mediaDevices.getUserMedia({
+    video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}}
+  }).then(stream=>{
+    patStream=stream;
+    patTrack=stream.getVideoTracks()[0];
+    const video=document.getElementById('pat-video');
+    video.srcObject=stream;
+    video.play().then(()=>{
+      setPatStatus('Apuntá a la patente y presioná 📸','scanning');
+    }).catch(()=>setPatStatus('⚠️ Error al iniciar video','error'));
+  }).catch(err=>{
+    console.error('Camera error:',err);
+    setPatStatus('⚠️ Sin acceso a la cámara. Verificá permisos.','error');
+  });
 }
 
-function patIniciarOCR(){
-  const video=document.getElementById('pat-video');
-  const canvas=document.getElementById('pat-canvas');
-  const ctx=canvas.getContext('2d');
-  // Escalar canvas x2 para mejor calidad OCR
-  const SCALE=2;
-  patInterval=setInterval(async()=>{
-    if(patProcesando||video.readyState!==video.HAVE_ENOUGH_DATA||!window.Tesseract)return;
-    const vW=video.videoWidth,vH=video.videoHeight;
-    // Recortar franja central horizontal (donde está la patente)
-    const cropW=Math.round(vW*0.75),cropH=Math.round(vH*0.25);
-    const cropX=Math.round((vW-cropW)/2),cropY=Math.round((vH-cropH)/2);
-    // Escalar x2 para más píxeles → mejor OCR
-    canvas.width=cropW*SCALE;canvas.height=cropH*SCALE;
-    ctx.save();ctx.scale(SCALE,SCALE);
-    ctx.drawImage(video,cropX,cropY,cropW,cropH,0,0,cropW,cropH);
-    ctx.restore();
-    // Preprocesar: escala de grises + umbral adaptativo
-    const iData=ctx.getImageData(0,0,canvas.width,canvas.height);
-    const d=iData.data;
-    for(let i=0;i<d.length;i+=4){
-      const gray=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
-      // Umbral: blancos más blancos, negros más negros
-      const c=gray>140?255:gray<100?0:gray;
-      d[i]=d[i+1]=d[i+2]=c;
-    }
-    ctx.putImageData(iData,0,0);
-    patProcesando=true;
-    try{
-      const result=await Tesseract.recognize(canvas,'eng',{
-        tessedit_char_whitelist:'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
-        tessedit_pageseg_mode:'8', // trata imagen como una sola palabra
-        tessedit_ocr_engine_mode:'1', // LSTM engine
-        logger:()=>{}
-      });
-      const raw=(result.data.text||'').toUpperCase().replace(/[^A-Z0-9\s]/g,'').trim();
-      const patente=extraerPatenteArgentina(raw);
-      if(patente){
-        clearInterval(patInterval);patInterval=null;
-        setPatStatus('✅ '+patente,'ok');
-        try{if(navigator.vibrate)navigator.vibrate([80,40,80]);}catch(e){}
-        setTimeout(()=>mostrarResultadoPatente(patente),350);
-      }else{
-        // Mostrar lo que está viendo para ayudar al usuario a ajustar
-        const preview=raw.replace(/\s/g,'').substring(0,8);
-        setPatStatus(preview?'Viendo: '+preview+'...':'Buscando patente...','scanning');
-      }
-    }catch(e){}
-    patProcesando=false;
-  },1500);
-}
-
-function corregirPos(c, esLetra){
-  if(esLetra){
-    const m={'0':'O','1':'I','8':'B','5':'S','2':'Z','6':'G','7':'T','4':'A','3':'E','9':'G','Q':'Q'};
-    return (/\d/.test(c))?(m[c]||c):c;
-  }else{
-    const m={'O':'0','I':'1','B':'8','S':'5','Z':'2','G':'6','T':'7','A':'4','E':'3','Q':'0','D':'0'};
-    return (/[A-Z]/.test(c))?(m[c]||c):c;
-  }
+// Captura manual con botón — más confiable que modo continuo
+// ── FUNCIONES OCR PATENTE ────────────────────────────────
+function corregirPos(c,esLetra){
+  if(esLetra){const m={'0':'O','1':'I','8':'B','5':'S','2':'Z','6':'G','7':'T','4':'A','3':'E','9':'G'};return(/\d/.test(c))?(m[c]||c):c;}
+  else{const m={'O':'0','I':'1','B':'8','S':'5','Z':'2','G':'6','T':'7','A':'4','E':'3','Q':'0','D':'0'};return(/[A-Z]/.test(c))?(m[c]||c):c;}
 }
 
 function intentarMercosur(s){
-  // AB123CD — exactamente 7 chars
   if(s.length!==7)return null;
   let p=s.split('');
-  // posiciones 0,1 = letra; 2,3,4 = número; 5,6 = letra
-  p[0]=corregirPos(p[0],true);
-  p[1]=corregirPos(p[1],true);
-  p[2]=corregirPos(p[2],false);
-  p[3]=corregirPos(p[3],false);
-  p[4]=corregirPos(p[4],false);
-  p[5]=corregirPos(p[5],true);
-  p[6]=corregirPos(p[6],true);
+  p[0]=corregirPos(p[0],true);p[1]=corregirPos(p[1],true);
+  p[2]=corregirPos(p[2],false);p[3]=corregirPos(p[3],false);p[4]=corregirPos(p[4],false);
+  p[5]=corregirPos(p[5],true);p[6]=corregirPos(p[6],true);
   const r=p.join('');
-  // Validación estricta: DEBE cumplir el patrón exacto
   return /^[A-Z]{2}\d{3}[A-Z]{2}$/.test(r)?r:null;
 }
 
 function intentarViejo(s){
-  // ABC123 — exactamente 6 chars
   if(s.length!==6)return null;
   let p=s.split('');
-  // posiciones 0,1,2 = letra; 3,4,5 = número
-  p[0]=corregirPos(p[0],true);
-  p[1]=corregirPos(p[1],true);
-  p[2]=corregirPos(p[2],true);
-  p[3]=corregirPos(p[3],false);
-  p[4]=corregirPos(p[4],false);
-  p[5]=corregirPos(p[5],false);
+  p[0]=corregirPos(p[0],true);p[1]=corregirPos(p[1],true);p[2]=corregirPos(p[2],true);
+  p[3]=corregirPos(p[3],false);p[4]=corregirPos(p[4],false);p[5]=corregirPos(p[5],false);
   const r=p.join('');
   return /^[A-Z]{3}\d{3}$/.test(r)?r:null;
 }
 
 function extraerPatenteArgentina(texto){
-  // Limpiar: solo letras y números, sin espacios
   const limpio=texto.toUpperCase().replace(/[^A-Z0-9]/g,' ').trim();
-
-  // ── Pasada 1: match exacto en tokens separados por espacio ──
   const tokens=limpio.split(/\s+/).filter(t=>t.length>=6&&t.length<=7);
+  // 1. Match exacto
   for(const tok of tokens){
     if(/^[A-Z]{2}\d{3}[A-Z]{2}$/.test(tok))return tok;
     if(/^[A-Z]{3}\d{3}$/.test(tok))return tok;
   }
-
-  // ── Pasada 2: corrección en tokens ──
-  // Mercosur primero (más específico)
-  for(const tok of tokens){
-    if(tok.length===7){const r=intentarMercosur(tok);if(r)return r;}
-  }
-  // Viejo
-  for(const tok of tokens){
-    if(tok.length===6){const r=intentarViejo(tok);if(r)return r;}
-  }
-
-  // ── Pasada 3: ventana deslizante sobre el texto sin espacios ──
-  // Solo si hay al menos 50% de confianza (más chars correctos que incorrectos)
+  // 2. Corrección en tokens (Mercosur primero)
+  for(const tok of tokens){if(tok.length===7){const r=intentarMercosur(tok);if(r)return r;}}
+  for(const tok of tokens){if(tok.length===6){const r=intentarViejo(tok);if(r)return r;}}
+  // 3. Ventana deslizante con límite de 2 correcciones
   const sin=limpio.replace(/\s/g,'');
-
-  // Buscar Mercosur (7)
   for(let i=0;i<=sin.length-7;i++){
     const sub=sin.substring(i,i+7);
-    // Pre-filtro: al menos los chars clave deben ser alfanuméricos válidos
     const r=intentarMercosur(sub);
-    if(r){
-      // Contar cuántos chars cambiaron (corrección aplicada)
-      let cambios=0;for(let j=0;j<7;j++)if(sub[j]!==r[j])cambios++;
-      // Solo aceptar si corregimos 2 chars o menos (más de 2 = probablemente basura)
-      if(cambios<=2)return r;
-    }
+    if(r){let cambios=0;for(let j=0;j<7;j++)if(sub[j]!==r[j])cambios++;if(cambios<=2)return r;}
   }
-
-  // Buscar viejo (6)
   for(let i=0;i<=sin.length-6;i++){
     const sub=sin.substring(i,i+6);
     const r=intentarViejo(sub);
-    if(r){
-      let cambios=0;for(let j=0;j<6;j++)if(sub[j]!==r[j])cambios++;
-      if(cambios<=2)return r;
-    }
+    if(r){let cambios=0;for(let j=0;j<6;j++)if(sub[j]!==r[j])cambios++;if(cambios<=2)return r;}
   }
-
   return null;
 }
-function setPatStatus(msg,cls){const el=document.getElementById('pat-status');el.innerText=msg;el.className='qr-status-scan '+(cls||'');}
 
-// ── SINCRONIZAR ───────────────────────────────────────────
-async function sincronizar(manual=false){
-  const url=localStorage.getItem('nx_url');
-  if(!url){if(manual)showToast('⚙️ Configurá la URL primero');return;}
-  if(sincronizando)return;
-  sincronizando=true;setSyncStatus('Sincronizando...','sync-loading');
-  try{
-    const r=await fetch(url+'?t='+Date.now());
-    if(!r.ok)throw new Error();
-    const data=await r.json();
-    const cloudData=Array.isArray(data)?data:(data.activos||[]);
-    const panico=Array.isArray(data)?[]:(data.panico||[]);
-    const baneadosCloud=data.baneados||null;
-    if(baneadosCloud)cargarBaneadosDesdeCloud(baneadosCloud);
-    const lnCloud=data.listaNegra||null;
-    if(Array.isArray(lnCloud)&&lnCloud.length>0){LISTA_NEGRA=lnCloud;localStorage.setItem('nx_lista_negra',JSON.stringify(LISTA_NEGRA));}
-    const propCloud=data.propietarios||null;
-    if(Array.isArray(propCloud)&&propCloud.length>0)cargarPropietariosDesdeCloud(propCloud);
-    const cloudIds=new Set(cloudData.map(x=>String(x.id)));
-    const pend=DB.filter(x=>!cloudIds.has(String(x.id))&&(Date.now()-(x.tsE||0)<60000));
-    DB=[...cloudData,...pend];localStorage.setItem('nx_db',JSON.stringify(DB));
-    render();setSyncStatus('✔ Sincronizado '+horaActual(),'sync-ok');
-    if(panico.length>0){const ids=new Set(panicosPendientes.map(x=>String(x.panicoId)));const nuevas=panico.filter(a=>!ids.has(String(a.panicoId)));if(nuevas.length>0){panicosPendientes=panico;mostrarPanico(panico);}else panicosPendientes=panico;}
-  }catch(e){setSyncStatus('⚠ Sin conexión','sync-err');if(manual)showToast('⚠️ Error al sincronizar');}
-  finally{sincronizando=false;}
-}
-
-function enviar(datos){const url=localStorage.getItem('nx_url');if(!url)return;fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)}).then(()=>setTimeout(()=>sincronizar(),1500)).catch(()=>showToast('⚠️ No se pudo subir'));}
-
-function registrarRapido(tipo){
-  const val=document.getElementById('buscador').value.trim();if(!val)return;
-  const hora=horaActual();let item;
-  if(tipo==='ingreso'){
-    verificarListaNegra(val,val);
-    const prop=esPropietario(val);
-    item={id:Date.now(),pat:val,tipo:prop?'PROPIETARIO':'VISITA',hE:hora,hS:'',tsE:Date.now(),mza:prop?(prop.mza||''):'',casa:prop?(prop.casa||''):'',dni:''};
-    DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);
-    if(prop)showToast('🏠 PROPIETARIO: '+prop.nombre);
-  }else{
-    const c=DB.filter(x=>x.pat===val&&!x.hS).sort((a,b)=>(b.tsE||0)-(a.tsE||0));item=c[0];
-    if(item){item.hE=limpiarHora(item.hE);item.hS=hora;DB=DB.filter(x=>x.id!==item.id);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}
-    else{showToast('❌ NO ENCONTRADO');return;}
+function patCapturar(){
+  const video=document.getElementById('pat-video');
+  if(!video.srcObject||video.readyState<2){showToast('⚠️ Cámara no lista');return;}
+  if(patProcesando){return;}
+  if(!window.Tesseract){showToast('⚠️ OCR cargando, esperá un momento');return;}
+  setPatStatus('🔍 Procesando...','scanning');
+  patProcesando=true;
+  const canvas=document.getElementById('pat-canvas');
+  const ctx=canvas.getContext('2d');
+  const vW=video.videoWidth,vH=video.videoHeight;
+  // Recortar zona central donde está la patente
+  const cropW=Math.round(vW*0.8),cropH=Math.round(vH*0.35);
+  const cropX=Math.round((vW-cropW)/2),cropY=Math.round((vH-cropH)/2);
+  // Escalar x2 para mejor calidad
+  canvas.width=cropW*2;canvas.height=cropH*2;
+  ctx.save();ctx.scale(2,2);
+  ctx.drawImage(video,cropX,cropY,cropW,cropH,0,0,cropW,cropH);
+  ctx.restore();
+  // Convertir a escala de grises con alto contraste
+  const iData=ctx.getImageData(0,0,canvas.width,canvas.height);
+  const d=iData.data;
+  for(let i=0;i<d.length;i+=4){
+    const gray=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
+    const c=gray>130?255:gray<80?0:Math.round(gray);
+    d[i]=d[i+1]=d[i+2]=c;d[i+3]=255;
   }
-  document.getElementById('buscador').value='';
+  ctx.putImageData(iData,0,0);
+
+  Tesseract.recognize(canvas,'eng',{
+    tessedit_char_whitelist:'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+    tessedit_pageseg_mode:'8',
+    tessedit_ocr_engine_mode:'1',
+    logger:()=>{}
+  }).then(result=>{
+    const raw=(result.data.text||'').toUpperCase().replace(/[^A-Z0-9\s]/g,'').trim();
+    console.log('OCR raw:',raw);
+    const patente=extraerPatenteArgentina(raw);
+    if(patente){
+      setPatStatus('✅ '+patente,'ok');
+      try{if(navigator.vibrate)navigator.vibrate([80,40,80]);}catch(e){}
+      setTimeout(()=>mostrarResultadoPatente(patente),300);
+    }else{
+      setPatStatus('❌ No se reconoció patente. Intentá de nuevo.','error');
+      setTimeout(()=>setPatStatus('Apuntá a la patente y presioná 📸','scanning'),2000);
+    }
+    patProcesando=false;
+  }).catch(err=>{
+    console.error('OCR error:',err);
+    setPatStatus('❌ Error OCR. Intentá de nuevo.','error');
+    setTimeout(()=>setPatStatus('Apuntá a la patente y presioná 📸','scanning'),2000);
+    patProcesando=false;
+  });
 }
 
-function guardarForm(modo){
-  const pre=modo==='manual'?'m-':'d-';
-  const p=document.getElementById(pre+'pat').value.trim();if(!p)return;
-  const d=document.getElementById(pre+'dni').value.trim();
-  verificarListaNegra(p,d);
-  const prop=esPropietario(p);
-  const item={id:Date.now(),pat:p,dni:d,mza:document.getElementById(pre+'mza').value.trim()||( prop?prop.mza:''),casa:document.getElementById(pre+'casa').value.trim()||(prop?prop.casa:''),tipo:modo==='manual'?(prop?'PROPIETARIO':'MANUAL'):'DELIVERY',hE:horaActual(),hS:'',tsE:Date.now()};
-  DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));
-  ['pat','dni','mza','casa'].forEach(f=>{const el=document.getElementById(pre+f);if(el)el.value='';});
-  showToast('✅ REGISTRADO'+(prop?' — PROPIETARIO: '+prop.nombre:''));ver('lista');render();enviar(item);
+function patDetenerCamara(){
+  if(patInterval){clearInterval(patInterval);patInterval=null;}
+  if(patStream){patStream.getTracks().forEach(t=>{try{t.stop();}catch(e){}});patStream=null;}
+  patTrack=null;patProcesando=false;
 }
 
-function darSalida(id){const item=DB.find(x=>x.id===id);if(!item)return;item.hE=limpiarHora(item.hE);item.hS=horaActual();DB=DB.filter(x=>x.id!==id);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}
-function guardarConfig(){localStorage.setItem('nx_url',document.getElementById('cfg-url').value.trim());showToast('⚙️ GUARDADO');sincronizar();}
-
-function render(){
-  const cont=document.getElementById('cont-lista');
-  const ahora=Date.now();
-  let d=0,v=0,a=0;
-  const html=DB.slice().sort((x,y)=>(y.tsE||0)-(x.tsE||0)).map(r=>{
-    const hE=limpiarHora(r.hE);const tsE=r.tsE||0;
-    const isA=(r.tipo==='DELIVERY'&&(ahora-tsE>900000));
-    if(r.tipo==='DELIVERY'){if(isA)a++;else d++;}else v++;
-    let cls='adentro';
-    if(isA)cls='alerta';
-    else if(r.tipo==='DELIVERY')cls='dely-adentro';
-    else if(r.tipo==='PROPIETARIO')cls='propietario-adentro';
-    const isLN=LISTA_NEGRA.find(ln=>(ln.pat&&ln.pat===r.pat)||(ln.dni&&ln.dni===r.dni&&r.dni));
-    const lnBadge=isLN?`<span class="ln-badge">🚫 LISTA NEGRA</span><br>`:'';
-    const propBadge=r.tipo==='PROPIETARIO'?`<span class="prop-badge">🏠 PROPIETARIO</span><br>`:'';
-    const dniInfo=r.dni?` · DNI: ${escHtml(r.dni)}`:'';
-    return`<div class="reg-item ${cls}"><div>${lnBadge}${propBadge}<strong>${escHtml(r.pat)}</strong><br><small>Mza: ${escHtml(r.mza||'-')} - Lote: ${escHtml(r.casa||'-')}${dniInfo}<br>${escHtml(r.tipo)} | ${hE}${isA?' ⚠️ +15min':''}</small></div><button onclick="darSalida(${r.id})" style="background:var(--red);color:white;border:none;padding:10px 15px;border-radius:10px;font-weight:800;cursor:pointer;flex-shrink:0;">SALIDA</button></div>`;
-  }).join('')||'<p style="opacity:0.3;text-align:center;padding:20px;">SIN ACTIVIDAD</p>';
-  cont.innerHTML=html;
-  document.getElementById('mon-d').innerText=d;
-  document.getElementById('mon-v').innerText=v;
-  document.getElementById('mon-a').innerText=a;
+function mostrarResultadoPatente(patente){
+  patUltimaPatente=patente;
+  const prop=esPropietario(patente);
+  const enLN=LISTA_NEGRA.find(r=>r.pat===patente);
+  document.getElementById('pat-flot-patente').innerText=patente;
+  let estadoHTML,infoHTML;
+  if(enLN){
+    estadoHTML=`<span style="color:var(--red);">🚫 LISTA NEGRA${enLN.motivo?' — '+escHtml(enLN.motivo):''}</span>`;
+    infoHTML='⚠️ Proceder con precaución';
+    document.getElementById('pat-btn-ingreso').style.background='var(--red)';
+    document.getElementById('pat-btn-ingreso').innerText='⚠️ INGRESAR CON ALERTA';
+  }else if(prop){
+    estadoHTML=`<span style="color:var(--green);">✅ PROPIETARIO — ${escHtml(prop.nombre)}</span>`;
+    infoHTML=`Mza ${escHtml(prop.mza||'-')} — Casa ${escHtml(prop.casa||'-')}${prop.obs?' · '+escHtml(prop.obs):''}`;
+    document.getElementById('pat-btn-ingreso').style.background='var(--green)';
+    document.getElementById('pat-btn-ingreso').innerText='📥 INGRESO PROPIETARIO';
+  }else{
+    estadoHTML=`<span style="color:var(--gold);">🔍 No registrado como propietario</span>`;
+    infoHTML='Se registrará como VISITA';
+    document.getElementById('pat-btn-ingreso').style.background='var(--blue)';
+    document.getElementById('pat-btn-ingreso').innerText='📥 REGISTRAR COMO VISITA';
+  }
+  document.getElementById('pat-flot-estado').innerHTML=estadoHTML;
+  document.getElementById('pat-flot-info').innerText=infoHTML;
+  document.getElementById('pat-resultado-flotante').style.display='block';
 }
 
-function iniciarApp(){document.getElementById('cfg-url').value=localStorage.getItem('nx_url')||'';render();sincronizar();setInterval(()=>sincronizar(),15000);setInterval(render,30000);}
-
-// ── LISTA NEGRA ───────────────────────────────────────────
-let LISTA_NEGRA=JSON.parse(localStorage.getItem('nx_lista_negra')||'[]'),lnPinActual='';
-function abrirListaNegra(){document.getElementById('ln-buscar').value='';ocultarAgregarLN();renderListaNegra();abrirModal('modal-ln');}
-function renderListaNegra(){
-  const q=(document.getElementById('ln-buscar').value||'').toUpperCase();
-  const filtrada=LISTA_NEGRA.filter(r=>!q||(r.pat||'').toUpperCase().includes(q)||(r.dni||'').includes(q));
-  const cont=document.getElementById('ln-lista-contenido');
-  if(!filtrada.length){cont.innerHTML='<div class="empty-msg">Lista negra vacía 🟢</div>';return;}
-  cont.innerHTML=filtrada.sort((a,b)=>b.ts-a.ts).map((r,i)=>{
-    const idxReal=LISTA_NEGRA.indexOf(r);
-    return`<div class="ln-item"><div class="ln-item-info"><div class="ln-item-pat">🚫 ${escHtml(r.pat||'Sin patente')}</div>${r.dni?`<div class="ln-item-det">DNI: ${escHtml(r.dni)}</div>`:''} ${r.motivo?`<div class="ln-item-det" style="color:#e74c3c">⚠️ ${escHtml(r.motivo)}</div>`:''}<div class="ln-item-det">${new Date(r.ts).toLocaleDateString('es-AR')}</div></div><button class="ban-unban-btn" style="background:var(--border);color:#aaa;" onclick="pedirPinQuitarLN(${idxReal})">QUITAR</button></div>`;
-  }).join('');
+function patConfirmarIngreso(){
+  if(!patUltimaPatente)return;
+  const prop=esPropietario(patUltimaPatente);
+  const tipo=prop?'PROPIETARIO':'VISITA';
+  const item={id:Date.now(),pat:patUltimaPatente,dni:'',mza:prop?(prop.mza||''):'',casa:prop?(prop.casa||''):'',tipo,hE:horaActual(),hS:'',tsE:Date.now()};
+  DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);
+  cerrarLectorPatente();
+  showToast('📥 '+patUltimaPatente+' — INGRESO '+tipo+' OK');
 }
-function mostrarAgregarLN(){lnPinActual='';actualizarLNPuntos();document.getElementById('ln-pin-error').innerText='';document.getElementById('ln-vista-consulta').style.display='none';document.getElementById('ln-vista-agregar').style.display='block';document.getElementById('ln-vista-form').style.display='none';}
-function ocultarAgregarLN(){document.getElementById('ln-vista-consulta').style.display='block';document.getElementById('ln-vista-agregar').style.display='none';document.getElementById('ln-vista-form').style.display='none';}
-function actualizarLNPuntos(){for(let i=0;i<8;i++)document.getElementById('lp'+i).classList.toggle('lleno',i<lnPinActual.length);}
-function lnPinTecla(d){if(lnPinActual.length>=8)return;lnPinActual+=d;actualizarLNPuntos();if(lnPinActual.length===8)setTimeout(verificarLNPin,120);}
-function lnPinBorrar(){lnPinActual=lnPinActual.slice(0,-1);actualizarLNPuntos();document.getElementById('ln-pin-error').innerText='';}
-function verificarLNPin(){if(lnPinActual===PIN_LN){document.getElementById('ln-pin-error').innerText='';document.getElementById('ln-vista-agregar').style.display='none';document.getElementById('ln-vista-form').style.display='block';document.getElementById('ln-form-pat').value='';document.getElementById('ln-form-dni').value='';document.getElementById('ln-form-motivo').value='';}else{document.getElementById('ln-pin-error').innerText='CLAVE INCORRECTA';lnPinActual='';actualizarLNPuntos();}}
-function agregarListaNegra(){const pat=document.getElementById('ln-form-pat').value.trim().toUpperCase();const dni=document.getElementById('ln-form-dni').value.trim();const motivo=document.getElementById('ln-form-motivo').value.trim();if(!pat&&!dni){showToast('⚠️ Ingresá al menos patente o DNI');return;}LISTA_NEGRA.push({pat,dni,motivo,ts:Date.now()});localStorage.setItem('nx_lista_negra',JSON.stringify(LISTA_NEGRA));enviarLN({accion:'ln_agregar',pat,dni,motivo});showToast('🚫 Agregado a lista negra');ocultarAgregarLN();renderListaNegra();}
-function enviarLN(datos){const url=localStorage.getItem('nx_url');if(!url)return;fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)}).catch(()=>{});}
-let lnQuitarIdx=-1,lnQuitarPin='';
-function pedirPinQuitarLN(idx){lnQuitarIdx=idx;lnQuitarPin='';actualizarLNQPuntos();document.getElementById('lnq-pin-error').innerText='';document.getElementById('modal-quitar-ln').classList.add('visible');}
-function actualizarLNQPuntos(){for(let i=0;i<8;i++)document.getElementById('lnq'+i).classList.toggle('lleno',i<lnQuitarPin.length);}
-function lnqPinTecla(d){if(lnQuitarPin.length>=8)return;lnQuitarPin+=d;actualizarLNQPuntos();if(lnQuitarPin.length===8)setTimeout(verificarLNQPin,120);}
-function lnqPinBorrar(){lnQuitarPin=lnQuitarPin.slice(0,-1);actualizarLNQPuntos();document.getElementById('lnq-pin-error').innerText='';}
-function verificarLNQPin(){if(lnQuitarPin===PIN_LN){document.getElementById('modal-quitar-ln').classList.remove('visible');const item=LISTA_NEGRA[lnQuitarIdx];if(item){LISTA_NEGRA.splice(lnQuitarIdx,1);localStorage.setItem('nx_lista_negra',JSON.stringify(LISTA_NEGRA));enviarLN({accion:'ln_quitar',pat:item.pat||'',dni:item.dni||''});showToast('✅ Eliminado de lista negra');renderListaNegra();}lnQuitarIdx=-1;}else{document.getElementById('lnq-pin-error').innerText='CLAVE INCORRECTA';lnQuitarPin='';actualizarLNQPuntos();}}
 
-// ── RESET ─────────────────────────────────────────────────
-let resetPin='';
-function abrirReset(){resetPin='';actualizarResetPuntos();document.getElementById('reset-pin-error').innerText='';abrirModal('modal-reset');}
-function resetTecla(d){if(resetPin.length>=4)return;resetPin+=d;actualizarResetPuntos();if(resetPin.length===4)setTimeout(verificarReset,120);}
-function resetBorrar(){resetPin=resetPin.slice(0,-1);actualizarResetPuntos();document.getElementById('reset-pin-error').innerText='';}
-function actualizarResetPuntos(){for(let i=0;i<4;i++)document.getElementById('r'+i).classList.toggle('lleno',i<resetPin.length);}
-function verificarReset(){if(resetPin===PIN_CORRECTO){const activos=DB.filter(x=>!x.hS);if(!activos.length){cerrarModal('modal-reset');showToast('⚠️ No hay vehículos activos');resetPin='';actualizarResetPuntos();return;}const horaSalida=horaActual();activos.forEach(item=>{item.hE=limpiarHora(item.hE);item.hS=horaSalida;enviar(item);});DB=[];localStorage.setItem('nx_db',JSON.stringify(DB));cerrarModal('modal-reset');render();showToast('✅ Salida general aplicada a '+activos.length+' vehículo(s)');resetPin='';actualizarResetPuntos();}else{document.getElementById('reset-pin-error').innerText='CLAVE INCORRECTA';resetPin='';actualizarResetPuntos();}}
+function patReintentar(){
+  document.getElementById('pat-resultado-flotante').style.display='none';
+  patUltimaPatente='';
+  setPatStatus('Apuntá a la patente y presioná 📸','scanning');
+}
 
-// ── BANEO ─────────────────────────────────────────────────
-let BANEADOS=JSON.parse(localStorage.getItem('nx_baneados')||'[]');
-let banPinActual='';
-function guardarBaneados(){localStorage.setItem('nx_baneados',JSON.stringify(BANEADOS));}
-function esBaneado(mza,casa){const mzaN=String(mza||'').trim();const casaN=String(casa||'').trim();if(!mzaN||!casaN)return false;return BANEADOS.some(b=>String(b.mza).trim()===mzaN&&String(b.casa).trim()===casaN);}
-function abrirBaneo(){renderBaneados();document.getElementById('ban-vista-consulta').style.display='block';document.getElementById('ban-vista-pin').style.display='none';document.getElementById('ban-vista-form').style.display='none';abrirModal('modal-baneo');}
-function renderBaneados(){const cont=document.getElementById('ban-lista-contenido');if(!BANEADOS.length){cont.innerHTML='<div class="empty-msg">Sin vecinos baneados 🟢</div>';return;}cont.innerHTML=BANEADOS.slice().sort((a,b)=>b.ts-a.ts).map((b,idx)=>`<div class="ban-item"><div class="ban-item-info"><span class="ban-badge">🚷 BANEADO</span><div class="ban-item-id">Mza ${escHtml(String(b.mza))} — Casa ${escHtml(String(b.casa))}</div>${b.id?`<div class="ban-item-det">ID: ${escHtml(b.id)}</div>`:''} ${b.motivo?`<div class="ban-item-det" style="color:#e74c3c">⚠️ ${escHtml(b.motivo)}</div>`:''}<div class="ban-item-det">${new Date(b.ts).toLocaleDateString('es-AR')}</div></div><button class="ban-unban-btn" onclick="pedirPinDesbanear(${idx})">DESBANEAR</button></div>`).join('');}
-let desbanearIdx=-1,desPinActual='';
-function pedirPinDesbanear(idx){desbanearIdx=idx;desPinActual='';actualizarDesPuntos();document.getElementById('des-pin-error').innerText='';document.getElementById('modal-desbanear').classList.add('visible');}
-function actualizarDesPuntos(){for(let i=0;i<4;i++)document.getElementById('dp'+i).classList.toggle('lleno',i<desPinActual.length);}
-function desPinTecla(d){if(desPinActual.length>=4)return;desPinActual+=d;actualizarDesPuntos();if(desPinActual.length===4)setTimeout(verificarDesPin,120);}
-function desPinBorrar(){desPinActual=desPinActual.slice(0,-1);actualizarDesPuntos();document.getElementById('des-pin-error').innerText='';}
-function verificarDesPin(){if(desPinActual===PIN_CORRECTO){document.getElementById('modal-desbanear').classList.remove('visible');const b=BANEADOS[desbanearIdx];if(b){BANEADOS.splice(desbanearIdx,1);guardarBaneados();enviarBaneo({accion:'desbanear',mza:b.mza,casa:b.casa});renderBaneados();showToast(`✅ Mza ${b.mza} Casa ${b.casa} desbaneada`);}desbanearIdx=-1;}else{document.getElementById('des-pin-error').innerText='CLAVE INCORRECTA';desPinActual='';actualizarDesPuntos();}}
-function mostrarPinBaneo(){banPinActual='';actualizarBanPuntos();document.getElementById('ban-pin-error').innerText='';document.getElementById('ban-vista-consulta').style.display='none';document.getElementById('ban-vista-pin').style.display='block';document.getElementById('ban-vista-form').style.display='none';}
-function ocultarPinBaneo(){document.getElementById('ban-vista-consulta').style.display='block';document.getElementById('ban-vista-pin').style.display='none';document.getElementById('ban-vista-form').style.display='none';}
-function actualizarBanPuntos(){for(let i=0;i<4;i++)document.getElementById('bp'+i).classList.toggle('lleno',i<banPinActual.length);}
-function banPinTecla(d){if(banPinActual.length>=4)return;banPinActual+=d;actualizarBanPuntos();if(banPinActual.length===4)setTimeout(verificarBanPin,120);}
-function banPinBorrar(){banPinActual=banPinActual.slice(0,-1);actualizarBanPuntos();document.getElementById('ban-pin-error').innerText='';}
-function verificarBanPin(){if(banPinActual===PIN_CORRECTO){document.getElementById('ban-pin-error').innerText='';document.getElementById('ban-vista-pin').style.display='none';document.getElementById('ban-vista-form').style.display='block';document.getElementById('ban-mza').value='';document.getElementById('ban-casa').value='';document.getElementById('ban-id').value='';document.getElementById('ban-motivo').value='';document.getElementById('ban-form-error').innerText='';}else{document.getElementById('ban-pin-error').innerText='CLAVE INCORRECTA';banPinActual='';actualizarBanPuntos();}}
-function ocultarFormBaneo(){document.getElementById('ban-vista-consulta').style.display='block';document.getElementById('ban-vista-form').style.display='none';}
-function confirmarBaneo(){const mza=document.getElementById('ban-mza').value.trim();const casa=document.getElementById('ban-casa').value.trim();const id=document.getElementById('ban-id').value.trim();const motivo=document.getElementById('ban-motivo').value.trim();const errEl=document.getElementById('ban-form-error');if(!mza||!casa){errEl.innerText='Manzana y Casa son obligatorios';return;}if(esBaneado(mza,casa)){errEl.innerText='Esta casa ya está baneada';return;}BANEADOS.push({mza,casa,id,motivo,ts:Date.now()});guardarBaneados();enviarBaneo({accion:'banear',mza,casa,id,motivo});showToast(`🚷 Mza ${mza} Casa ${casa} baneada`);ocultarFormBaneo();renderBaneados();}
-function enviarBaneo(datos){const url=localStorage.getItem('nx_url');if(!url)return;fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)}).catch(()=>{});}
-function cargarBaneadosDesdeCloud(lista){if(!Array.isArray(lista))return;BANEADOS=lista.map(b=>({mza:String(b.mza||''),casa:String(b.casa||''),id:b.id||'',motivo:b.motivo||'',ts:b.ts||Date.now()}));guardarBaneados();}
+function cerrarLectorPatente(){
+  patDetenerCamara();
+  patUltimaPatente='';
+  document.getElementById('pat-overlay').classList.remove('visible');
+  document.getElementById('pat-resultado-flotante').style.display='none';
+  patTorchOn=false;
+  const tb=document.getElementById('pat-torch-btn');
+  if(tb){tb.classList.remove('on');tb.innerText='💡';}
+}
 
-// ── RESUMEN ───────────────────────────────────────────────
-function abrirResumen(){const ahora=Date.now(),hoyStr=new Date().toLocaleDateString('es-AR');let del=0,vis=0,ale=0,sal=0,tot=0;DB.forEach(r=>{const f=new Date(r.tsE||0).toLocaleDateString('es-AR');if(f!==hoyStr)return;tot++;const isA=r.tipo==='DELIVERY'&&(ahora-(r.tsE||0)>900000);if(r.tipo==='DELIVERY'){if(isA)ale++;else del++;}else vis++;if(r.hS)sal++;});document.getElementById('resumen-contenido').innerHTML=`<div class="modal-stat"><span class="modal-stat-label">🛵 Delivery activos</span><span class="modal-stat-val" style="color:var(--gold)">${del}</span></div><div class="modal-stat"><span class="modal-stat-label">🚗 Visitas activas</span><span class="modal-stat-val" style="color:var(--green)">${vis}</span></div><div class="modal-stat"><span class="modal-stat-label">⚠️ Alertas +15min</span><span class="modal-stat-val" style="color:var(--red)">${ale}</span></div><div class="modal-stat"><span class="modal-stat-label">📤 Con salida</span><span class="modal-stat-val" style="color:#888">${sal}</span></div><div class="modal-stat" style="border-top:2px solid var(--cyan);margin-top:6px;padding-top:12px;"><span class="modal-stat-label" style="font-weight:800;color:#fff">📋 Total del día</span><span class="modal-stat-val" style="color:var(--cyan)">${tot}</span></div>`;abrirModal('modal-resumen');}
+function patToggleTorch(){
+  if(!patTrack){showToast('⚠️ Cámara no activa');return;}
+  patTorchOn=!patTorchOn;
+  patTrack.applyConstraints({advanced:[{torch:patTorchOn}]})
+    .then(()=>{
+      const btn=document.getElementById('pat-torch-btn');
+      btn.classList.toggle('on',patTorchOn);
+      btn.innerText=patTorchOn?'🔦':'💡';
+    })
+    .catch(()=>{showToast('⚠️ Linterna no disponible en este dispositivo');patTorchOn=false;});
+}
 
-function abrirVehiculos(){const adentro=DB.filter(r=>!r.hS);let html='';if(!adentro.length){html='<div class="empty-msg">Sin vehículos activos</div>';}else{html=adentro.sort((a,b)=>(b.tsE||0)-(a.tsE||0)).map(r=>{const mins=Math.floor((Date.now()-(r.tsE||0))/60000);const col=r.tipo==='PROPIETARIO'?'var(--cyan)':r.tipo==='DELIVERY'&&mins>=15?'var(--red)':r.tipo==='DELIVERY'?'var(--gold)':'var(--green)';return`<div class="modal-row"><strong style="color:${col}">${escHtml(r.pat)}</strong>${r.dni?` · DNI: ${escHtml(r.dni)}`:''}<span style="float:right;color:#666;font-size:11px">${mins}min</span><br><span style="font-size:11px;color:#888">Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')} · ${escHtml(r.tipo)}</span></div>`;}).join('');}document.getElementById('vehiculos-contenido').innerHTML=html;abrirModal('modal-vehiculos');}
-
-function abrirBusqueda(){document.getElementById('busqueda-input').value='';document.getElementById('busqueda-status').innerText='';filtrarHistorialDia();abrirModal('modal-busqueda');}
-function filtrarHistorialDia(){const q=(document.getElementById('busqueda-input').value||'').trim().toUpperCase();const hoyStr=new Date().toLocaleDateString('es-AR');let deDia=DB.filter(r=>{if(!r.tsE)return false;return new Date(r.tsE).toLocaleDateString('es-AR')===hoyStr;});if(q)deDia=deDia.filter(r=>(r.pat||'').toUpperCase().includes(q)||(r.dni||'').includes(q));deDia.sort((a,b)=>(b.tsE||0)-(a.tsE||0));document.getElementById('busqueda-status').innerText=deDia.length+' registro(s) hoy';if(!deDia.length){document.getElementById('busqueda-resultados').innerHTML='<div class="empty-msg">Sin registros hoy'+(q?' para "'+escHtml(q)+'"':'')+' </div>';return;}document.getElementById('busqueda-resultados').innerHTML=deDia.map(r=>{const tieneSalida=r.hS?true:false;const estiloFila=tieneSalida?'opacity:0.7;border-left:4px solid #888;':'border-left:4px solid var(--green);';const textoEstado=tieneSalida?`✅ Salió ${escHtml(limpiarHora(r.hS))}`:'🟢 Adentro';return`<div class="modal-row" style="${estiloFila}"><strong>${escHtml(r.pat)}</strong>${r.dni?` · DNI: ${escHtml(r.dni)}`:''}<br><span style="font-size:11px;color:#666">Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')} · ${escHtml(r.tipo)}</span><br><span style="font-size:11px;color:#888">Entró: ${escHtml(limpiarHora(r.hE))}</span><span style="float:right;font-size:12px;font-weight:bold;color:${tieneSalida?'#888':'var(--green)'}">${textoEstado}</span></div>`;}).join('');}
-
-function abrirAlertas(){const hoy=new Date().toLocaleDateString('es-AR');const guardados=JSON.parse(localStorage.getItem('nx_alertas_hoy')||'[]');const todos=[...panicosPendientes,...guardados.filter(a=>!panicosPendientes.find(p=>p.panicoId===a.panicoId))];let html=!todos.length?'<div class="empty-msg">Sin alertas registradas hoy 🟢</div>':`<div style="font-size:12px;color:#666;text-align:center;margin-bottom:10px">${todos.length} alerta(s) hoy</div>`+todos.map(a=>`<div class="modal-row" style="border-left:4px solid var(--red)"><strong style="color:var(--red)">🚨 EMERGENCIA</strong><span style="float:right;font-size:11px;color:#888">${escHtml(a.fecha||'')}</span><br><span style="font-size:14px;font-weight:800">🏠 Mza ${escHtml(a.mza||'')} — Casa ${escHtml(a.casa||'')}</span><br>${a.mapsUrl?`<a href="${escHtml(a.mapsUrl)}" target="_blank" style="color:var(--green);font-size:12px;">📍 Ver en Maps</a>`:'<span style="font-size:11px;color:#555">Sin GPS</span>'}</div>`).join('');document.getElementById('alertas-contenido').innerHTML=html;abrirModal('modal-alertas');}
-
-function abrirTurno(){const ahora=new Date(),hoyStr=ahora.toLocaleDateString('es-AR'),horaStr=ahora.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});let del=0,vis=0,ale=0,sal=0,sinSal=[];const deDia=DB.filter(r=>new Date(r.tsE||0).toLocaleDateString('es-AR')===hoyStr);deDia.forEach(r=>{const isA=r.tipo==='DELIVERY'&&(Date.now()-(r.tsE||0)>900000);if(r.tipo==='DELIVERY'){if(isA)ale++;else del++;}else vis++;if(r.hS)sal++;else sinSal.push(r);});const html=`<div class="modal-stat"><span class="modal-stat-label">📅 Fecha</span><span style="font-weight:700;color:#fff">${hoyStr}</span></div><div class="modal-stat"><span class="modal-stat-label">🕐 Hora de cierre</span><span style="font-weight:700;color:#fff">${horaStr}</span></div><div class="modal-stat"><span class="modal-stat-label">📋 Total ingresos</span><span class="modal-stat-val" style="color:var(--cyan)">${deDia.length}</span></div><div class="modal-stat"><span class="modal-stat-label">📤 Con salida</span><span class="modal-stat-val" style="color:var(--green)">${sal}</span></div><div class="modal-stat"><span class="modal-stat-label">🚨 Sin salida</span><span class="modal-stat-val" style="color:${sinSal.length>0?'var(--red)':'#888'}">${sinSal.length}</span></div>${sinSal.length>0?`<div style="margin-top:10px;font-size:12px;color:#888;font-weight:700">SIN SALIDA:</div>`+sinSal.map(r=>`<div class="modal-row" style="border-left:3px solid var(--red)"><strong>${escHtml(r.pat)}</strong> · Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')}</div>`).join(''):''}`;document.getElementById('turno-resumen').innerHTML=html;const filas=deDia.map(r=>`<tr><td>${escHtml(r.pat)}</td><td>${escHtml(r.dni||'-')}</td><td>Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')}</td><td>${escHtml(r.tipo)}</td><td>${escHtml(limpiarHora(r.hE))}</td><td style="color:${r.hS?'#27ae60':'#e74c3c'}">${r.hS?escHtml(limpiarHora(r.hS)):'SIN SALIDA'}</td></tr>`).join('');document.getElementById('pdf-report').innerHTML=`<h2>NEXOS — Cierre de Turno</h2><p style="font-size:12px;color:#555">${hoyStr} | Hora: ${horaStr}</p><table><tr><th>Patente</th><th>DNI</th><th>Destino</th><th>Tipo</th><th>Entrada</th><th>Salida</th></tr>${filas}</table>`;abrirModal('modal-turno');}
-function imprimirTurno(){document.getElementById('pdf-report').style.display='block';setTimeout(()=>{window.print();setTimeout(()=>document.getElementById('pdf-report').style.display='none',1000);},100);}
-
-const SOS_NUMEROS=[{icon:'🚔',nombre:'Policía',desc:'Emergencias policiales',num:'911'},{icon:'🔥',nombre:'Bomberos',desc:'Incendios y rescates',num:'100'},{icon:'🚑',nombre:'Emergencia Médica',desc:'SAME / Ambulancias',num:'107'},{icon:'🛡️',nombre:'Defensa Civil',desc:'Inundaciones, desastres',num:'103'},{icon:'⚡',nombre:'Edesur / Edenor',desc:'Emergencia eléctrica',num:'0800-333-3787'},{icon:'💧',nombre:'AySA',desc:'Emergencia de agua y cloacas',num:'0800-321-2482'},{icon:'🚨',nombre:'Violencia de Gén.',desc:'Línea gratuita 24h',num:'144'},{icon:'👶',nombre:'Niñez y Adolesc.',desc:'Vulneración de derechos',num:'102'}];
-function abrirSOS(){document.getElementById('sos-contenido').innerHTML='<div class="sos-header">Tocá el número para llamar directamente</div>'+SOS_NUMEROS.map(s=>`<a class="sos-item" href="tel:${s.num}"><div class="sos-item-left"><span class="sos-item-icon">${s.icon}</span><div><div class="sos-item-nombre">${s.nombre}</div><div class="sos-item-desc">${s.desc}</div></div></div><span class="sos-item-num">${s.num}</span></a>`).join('');abrirModal('modal-sos');}
-
-function abrirDeliveryActivos(){const ahora=Date.now();const activos=DB.filter(r=>r.tipo==='DELIVERY'&&!r.hS&&(ahora-(r.tsE||0)<=900000)).sort((a,b)=>(a.tsE||0)-(b.tsE||0));let html=activos.length?activos.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);return`<div class="modal-row" style="border-left:4px solid var(--gold);"><strong style="color:var(--gold)">🛵 ${escHtml(r.pat)}</strong><span style="float:right;background:var(--gold);color:black;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">${mins} min</span><br><span style="font-size:12px;color:#aaa;">Mza ${escHtml(r.mza||'-')} — Casa ${escHtml(r.casa||'-')}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-delivery-activos');" style="margin-top:10px;background:var(--red);color:white;border:none;padding:10px 20px;border-radius:10px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;}).join(''):'<div class="empty-msg">Sin delivery activos ahora 🟢</div>';document.getElementById('delivery-activos-contenido').innerHTML=html;abrirModal('modal-delivery-activos');}
-function abrirVisitasActivas(){const ahora=Date.now();const visitas=DB.filter(r=>r.tipo!=='DELIVERY'&&!r.hS).sort((a,b)=>(a.tsE||0)-(b.tsE||0));let html=visitas.length?visitas.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);const col=r.tipo==='PROPIETARIO'?'var(--cyan)':'var(--green)';return`<div class="modal-row" style="border-left:4px solid ${col};"><strong style="color:${col}">${r.tipo==='PROPIETARIO'?'🏠':'🚗'} ${escHtml(r.pat)}</strong><span style="float:right;background:${col};color:black;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">${mins} min</span><br><span style="font-size:12px;color:#aaa;">Mza ${escHtml(r.mza||'-')} — Casa ${escHtml(r.casa||'-')} · ${escHtml(r.tipo)}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-visitas-activas');" style="margin-top:10px;background:var(--red);color:white;border:none;padding:10px 20px;border-radius:10px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;}).join(''):'<div class="empty-msg">Sin visitas activas ahora 🟢</div>';document.getElementById('visitas-activas-contenido').innerHTML=html;abrirModal('modal-visitas-activas');}
-function abrirDeliveryAlertas(){const ahora=Date.now();const enAlerta=DB.filter(r=>r.tipo==='DELIVERY'&&!r.hS&&(ahora-(r.tsE||0)>900000)).sort((a,b)=>(a.tsE||0)-(b.tsE||0));let html=enAlerta.length?enAlerta.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);return`<div class="modal-row" style="border-left:4px solid var(--red);background:rgba(231,76,60,0.08);"><strong style="color:var(--red)">🛵 ${escHtml(r.pat)}</strong><span style="float:right;background:var(--red);color:white;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">+${mins} min</span><br><span style="font-size:12px;color:#aaa;">Mza ${escHtml(r.mza||'-')} — Casa ${escHtml(r.casa||'-')}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-delivery-alertas');" style="margin-top:10px;background:var(--red);color:white;border:none;padding:10px 20px;border-radius:10px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;}).join(''):'<div class="empty-msg">Sin delivery en alerta ahora 🟢</div>';document.getElementById('delivery-alertas-contenido').innerHTML=html;abrirModal('modal-delivery-alertas');}
-
-// ── HISTORIAL SHEET ───────────────────────────────────────
-function abrirHistorialSheet(){document.getElementById('hs-resultados').innerHTML='';document.getElementById('hs-status').innerText='';const hoy=new Date().toISOString().split('T')[0];document.getElementById('hs-fecha-input').value=hoy;document.getElementById('hs-pat-input').value='';hsTabs('fecha');abrirModal('modal-historial-sheet');}
-function hsTabs(tab){const esFecha=tab==='fecha';document.getElementById('hs-panel-fecha').style.display=esFecha?'block':'none';document.getElementById('hs-panel-patente').style.display=esFecha?'none':'block';const tF=document.getElementById('hs-tab-fecha');const tP=document.getElementById('hs-tab-patente');if(esFecha){tF.style.background='var(--cyan)';tF.style.color='#000';tF.style.borderColor='var(--cyan)';tP.style.background='var(--bg3)';tP.style.color='#888';tP.style.borderColor='var(--border)';}else{tP.style.background='var(--cyan)';tP.style.color='#000';tP.style.borderColor='var(--cyan)';tF.style.background='var(--bg3)';tF.style.color='#888';tF.style.borderColor='var(--border)';}}
-async function buscarPorFecha(){const fecha=document.getElementById('hs-fecha-input').value;if(!fecha)return;await hsConsultar({accion:'buscar',fecha});}
-async function buscarPorPatente(){const q=document.getElementById('hs-pat-input').value.trim();if(!q)return;await hsConsultar({accion:'buscar',q});}
-async function hsConsultar(params){const url=localStorage.getItem('nx_url');if(!url){showToast('⚙️ Configurá la URL primero');return;}const status=document.getElementById('hs-status');const cont=document.getElementById('hs-resultados');status.innerText='🔍 Buscando...';cont.innerHTML='';try{const qs=Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');const r=await fetch(url+'?'+qs+'&t='+Date.now());if(!r.ok)throw new Error('HTTP '+r.status);const data=await r.json();const resultados=data.resultados||(Array.isArray(data)?data:null);if(!resultados){status.innerText='⚠️ El Script no soporta búsqueda histórica aún.';return;}status.innerText=resultados.length+' resultado(s)';if(!resultados.length){cont.innerHTML='<div class="empty-msg">Sin resultados</div>';return;}cont.innerHTML=resultados.map(r=>{const hE=limpiarHora(r.hE||'');const hS=limpiarHora(r.hS||'');const col=hS?'#888':'var(--green)';return`<div class="modal-row" style="border-left:4px solid ${hS?'var(--border)':'var(--green)'}"><strong>${escHtml(r.pat||'-')}</strong>${r.dni?' · DNI: '+escHtml(r.dni):''}<span style="float:right;font-size:11px;font-weight:800;color:${col}">${hS?'✔ Salió '+hS:'⚡ Sin salida'}</span><br><span style="font-size:11px;color:#888;">Mza ${escHtml(r.mza||'-')} — Casa ${escHtml(r.casa||'-')} · ${escHtml(r.tipo||'')}</span><br><span style="font-size:11px;color:#555;">${r.fecha?'📅 '+r.fecha+' · ':''}Entró: ${hE||'-'}</span></div>`;}).join('');}catch(e){status.innerText='⚠️ Error al consultar. Verificá la URL.';}}
-
-// ── PÁNICO ─────────────────────────────────────────────────
-function mostrarPanico(alertas){const guardados=JSON.parse(localStorage.getItem('nx_alertas_hoy')||'[]');alertas.forEach(a=>{if(!guardados.find(g=>g.panicoId===a.panicoId))guardados.push(a);});localStorage.setItem('nx_alertas_hoy',JSON.stringify(guardados));const lista=document.getElementById('panico-lista');lista.innerHTML=alertas.map(a=>{let mapUrl=(a.mapsUrl||'').trim();if(!mapUrl&&a.lat&&a.lng&&String(a.lat).length>3)mapUrl='https://maps.google.com/?q='+a.lat+','+a.lng;return`<div class="panico-item"><div class="panico-hora">${escHtml(a.fecha||'')}</div><div class="panico-loc">🏠 Mza <strong>${escHtml(a.mza)}</strong> — Casa <strong>${escHtml(a.casa)}</strong></div>${mapUrl?`<a class="panico-maps-btn" href="${escHtml(mapUrl)}" target="_blank">📍 Ver en Google Maps</a>`:'<div class="panico-no-maps">Sin GPS</div>'}</div>`;}).join('');document.getElementById('panico-overlay').classList.add('visible');initAudio();iniciarSirena();}
-function cerrarPanico(){detenerSirena();const url=localStorage.getItem('nx_url');panicosPendientes.forEach(a=>{if(!url)return;fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({accion:'ack_panico',panicoId:a.panicoId})});});panicosPendientes=[];document.getElementById('panico-overlay').classList.remove('visible');}
+function setPatStatus(msg,cls){
+  const el=document.getElementById('pat-status');
+  if(el){el.innerText=msg;el.className='qr-status-scan '+(cls||'');}
+}
 
 // ── QR SCANNER ────────────────────────────────────────────
 let qrStream=null,qrInterval=null,qrTorchOn=false,qrTrack=null,qrLibLoaded=false;
@@ -1134,7 +1008,7 @@ function qrProcesar(raw){qrDetenerCamara();document.getElementById('qr-overlay')
 function confirmarIngresoQR(){const pat=document.getElementById('qr-f-pat').value.trim().toUpperCase();const dni=document.getElementById('qr-f-dni').value.trim();const mza=document.getElementById('qr-f-mza').value.trim();const casa=document.getElementById('qr-f-casa').value.trim();const tipo=document.getElementById('qr-f-tipo').value;if(!pat&&!dni){showToast('⚠️ Ingresá al menos patente o DNI');return;}const btn=document.getElementById('qr-btn-confirm');btn.disabled=true;btn.innerText='⏳ Registrando...';const item={id:Date.now(),pat,dni,mza,casa,tipo,hE:horaActual(),hS:'',tsE:Date.now()};DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);document.getElementById('qr-result-panel').classList.remove('visible');showToast('📥 QR: '+(pat||'DNI '+dni)+' — INGRESO OK');btn.disabled=false;btn.innerText='📥 REGISTRAR INGRESO';}
 function qrReescanear(){document.getElementById('qr-result-panel').classList.remove('visible');abrirEscanerQR();}
 function cerrarEscanerQR(){qrDetenerCamara();document.getElementById('qr-overlay').classList.remove('visible');document.getElementById('qr-result-panel').classList.remove('visible');}
-function qrDetenerCamara(){if(qrInterval){clearInterval(qrInterval);qrInterval=null;}if(qrStream){qrStream.getTracks().forEach(t=>t.stop());qrStream=null;}qrTrack=null;qrTorchOn=false;const tb=document.getElementById('qr-torch-btn');if(tb){tb.classList.remove('on');tb.innerText='💡';}}
+function qrDetenerCamara(){if(qrInterval){clearInterval(qrInterval);qrInterval=null;}if(qrStream){qrStream.getTracks().forEach(t=>{try{t.stop();}catch(e){}});qrStream=null;}qrTrack=null;qrTorchOn=false;const tb=document.getElementById('qr-torch-btn');if(tb){tb.classList.remove('on');tb.innerText='💡';}}
 function qrToggleTorch(){if(!qrTrack)return;qrTorchOn=!qrTorchOn;try{qrTrack.applyConstraints({advanced:[{torch:qrTorchOn}]});}catch(e){}const btn=document.getElementById('qr-torch-btn');btn.classList.toggle('on',qrTorchOn);btn.innerText=qrTorchOn?'🔦':'💡';}
 function setQrStatus(msg,cls){const el=document.getElementById('qr-status');el.innerText=msg;el.className='qr-status-scan '+(cls||'');}
 
