@@ -18,7 +18,7 @@
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
     :root{--bg:#0f0f11;--bg2:#1a1a1e;--bg3:#24242a;--border:#2e2e38;--text:#e8e8ec;--cyan:#00d4d4;--gold:#f5c842;--green:#2ecc71;--red:#e74c3c;--blue:#4a90e2;--purple:#a855f7;}
-    body{background:var(--bg);color:var(--text);font-family:-apple-system,system-ui,sans-serif;padding:calc(env(safe-area-inset-top, 0px) + 10px) 10px 10px 10px;user-select:none;}
+    body{background:var(--bg);color:var(--text);font-family:-apple-system,system-ui,sans-serif;padding:0;user-select:none;overflow:hidden;height:100dvh;}
     .pin-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10000;padding:30px;}
     .pin-screen.oculto{display:none;}
     .pin-titulo{font-size:20px;font-weight:900;color:#fff;margin-bottom:6px;}
@@ -70,7 +70,10 @@
     .bn-badge{position:absolute;top:6px;right:calc(50% - 18px);background:var(--red);color:#fff;font-size:9px;font-weight:900;border-radius:20px;min-width:16px;height:16px;line-height:16px;text-align:center;padding:0 4px;display:none;}
     .bn-badge.visible{display:block;}
     /* Espacio para que el contenido no quede detrás de la nav */
-    .app-wrap{padding-bottom:70px;}
+    .top-bar{position:fixed;top:0;left:0;right:0;z-index:6000;background:var(--bg);padding:calc(env(safe-area-inset-top,0px) + 10px) 10px 0;}
+    .scroll-content{position:fixed;top:0;left:0;right:0;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+    .scroll-inner{padding:10px;max-width:500px;margin:0 auto;padding-bottom:80px;}
+    .app-wrap{max-width:500px;margin:0 auto;}
     .section{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:20px;margin-bottom:10px;}
     input.giant{width:100%;padding:18px;margin-bottom:10px;border-radius:12px;background:var(--bg3);color:white;border:2px solid var(--border);text-align:center;font-size:18px;outline:none;}
     .btn-save{width:100%;padding:22px;background:var(--blue);color:white;border:none;border-radius:15px;font-weight:800;font-size:18px;cursor:pointer;}
@@ -637,7 +640,8 @@
 </div>
 
 <!-- APP -->
-<div class="app app-wrap">
+<div class="app-wrap">
+<div class="top-bar" id="top-bar">
   <div class="header-bar" id="header-bar" style="display:none;">
     <div style="position:relative;">
       <button class="logo-btn" id="logo-btn" onclick="toggleMenu()">
@@ -701,8 +705,10 @@
   </div>
 
   <div class="menu-nav" style="display:none;"></div>
+</div><!-- /top-bar -->
 
-
+<div class="scroll-content" id="scroll-content">
+<div class="scroll-inner">
   <div id="p-lista" class="panel active">
     <div class="sync-status" id="sync-status"></div>
     <button class="btn-sync" onclick="sincronizar(true)">🔄 SINCRONIZAR CON LA NUBE</button>
@@ -731,6 +737,10 @@
     </div>
   </div>
 </div>
+</div><!-- /scroll-inner -->
+</div><!-- /scroll-content -->
+</div><!-- /app-wrap -->
+
 <div id="toast" class="toast"></div>
 
 <!-- ══ NAV INFERIOR ══ -->
@@ -797,6 +807,7 @@ function verificarPin(){
     document.getElementById('header-bar').style.display='flex';
     document.getElementById('turno-bar').classList.add('visible');
     document.getElementById('bottom-nav').classList.add('visible');
+    setTimeout(ajustarScrollTop,150);
     document.getElementById('turno-nombre').innerText = nombre;
     const horaInicioTurno = new Date();
     sessionStorage.setItem('nx_turno_inicio', horaInicioTurno.toISOString());
@@ -804,7 +815,7 @@ function verificarPin(){
     actualizarDuracionTurno();
     if(window._turnoInterval) clearInterval(window._turnoInterval);
     window._turnoInterval = setInterval(actualizarDuracionTurno, 60000);
-    iniciarApp();resetearTimeoutSeguridad();
+    iniciarApp();resetearTimeoutSeguridad();setTimeout(ajustarScrollTop,100);
   }else{document.getElementById('pin-error').innerText='CLAVE INCORRECTA';pinActual='';actualizarPuntos();}
 }
 
@@ -821,7 +832,7 @@ function cerrarModal(id){document.getElementById(id).classList.remove('visible')
 // ── TIMEOUT SEGURIDAD ──────────────────────────────────────
 let timeoutSeguridad=null,tiempoRestante=15*60;
 function resetearTimeoutSeguridad(){if(timeoutSeguridad)clearTimeout(timeoutSeguridad);tiempoRestante=15*60;timeoutSeguridad=setTimeout(cerrarSesion,15*60*1000);}
-function cerrarSesion(){if(timeoutSeguridad)clearTimeout(timeoutSeguridad);sessionStorage.removeItem('nx_auth');sessionStorage.removeItem('nx_vigilador');pinActual='';actualizarPuntos();document.getElementById('pin-screen').classList.remove('oculto');document.getElementById('header-bar').style.display='none';document.getElementById('turno-bar').classList.remove('visible');document.getElementById('bottom-nav').classList.remove('visible');
+function cerrarSesion(){if(timeoutSeguridad)clearTimeout(timeoutSeguridad);sessionStorage.removeItem('nx_auth');sessionStorage.removeItem('nx_vigilador');pinActual='';actualizarPuntos();document.getElementById('pin-screen').classList.remove('oculto');document.getElementById('header-bar').style.display='none';document.getElementById('turno-bar').classList.remove('visible');document.getElementById('bottom-nav').classList.remove('visible');setTimeout(ajustarScrollTop,100);
     document.getElementById('turno-nombre').innerText='—';
     document.getElementById('turno-desde').innerText='';
     document.getElementById('turno-duracion').innerText='';
@@ -1235,6 +1246,13 @@ function iaMic() {
 // ══ FIN ASISTENTE IA ══════════════════════════════════════
 
 // ── INICIAR APP ────────────────────────────────────────────
+function ajustarScrollTop(){
+  const tb=document.getElementById('top-bar');
+  const sc=document.getElementById('scroll-content');
+  if(tb&&sc){sc.style.paddingTop=tb.offsetHeight+'px';}
+}
+window.addEventListener('resize',ajustarScrollTop);
+
 function iniciarApp(){
   document.getElementById('cfg-url').value=localStorage.getItem('nx_url')||'';
   actualizarContadorIncidentes();
