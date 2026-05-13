@@ -65,15 +65,15 @@
     .sync-ok{color:var(--green);} .sync-err{color:var(--red);} .sync-loading{color:var(--gold);}
     .campo-label{font-size:11px;color:#666;letter-spacing:1px;font-weight:700;margin-bottom:4px;margin-top:4px;padding-left:4px;}
     .header-bar{background:var(--bg2);border:1px solid transparent;border-radius:16px;padding:8px 12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;position:relative;background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(90deg,#00d4d4,#a855f7,#ff3190,#00d4d4);background-origin:border-box;background-clip:padding-box,border-box;box-shadow:0 0 18px rgba(0,212,212,0.25),0 0 32px rgba(168,85,247,0.15);}
-    .logo-btn{display:flex;align-items:center;gap:10px;cursor:pointer;background:none;border:none;padding:0;position:relative;}
-    .logo-img{height:52px;border-radius:10px;filter:drop-shadow(0 0 8px rgba(0,212,212,0.6));}
-    .logo-txt{font-size:20px;font-weight:900;color:var(--cyan);letter-spacing:3px;text-shadow:0 0 8px rgba(0,212,212,0.8);}
-    .logo-arrow{font-size:10px;color:#555;margin-left:4px;transition:0.2s;}
-    .header-right{display:flex;align-items:center;gap:10px;}
-    .header-clock{display:flex;align-items:center;gap:6px;}
-    .header-temp{font-size:18px;font-weight:900;letter-spacing:1px;color:var(--cyan);text-shadow:0 0 8px rgba(0,212,212,0.9),0 0 20px rgba(0,212,212,0.5);font-family:monospace;min-width:48px;text-align:right;}
-    .header-hora{font-size:18px;font-weight:900;letter-spacing:2px;color:var(--cyan);text-shadow:0 0 8px rgba(0,212,212,0.9),0 0 20px rgba(0,212,212,0.5);font-family:monospace;}
-    .header-clima{font-size:22px;line-height:1;}
+    .logo-btn{display:flex;align-items:center;gap:7px;cursor:pointer;background:none;border:none;padding:0;position:relative;}
+    .logo-img{height:38px;border-radius:8px;filter:drop-shadow(0 0 8px rgba(0,212,212,0.6));}
+    .logo-txt{font-size:15px;font-weight:900;color:var(--cyan);letter-spacing:2px;text-shadow:0 0 8px rgba(0,212,212,0.8);}
+    .logo-arrow{font-size:10px;color:#555;margin-left:2px;transition:0.2s;}
+    .header-right{display:flex;align-items:center;gap:8px;}
+    .header-clock{display:flex;align-items:center;gap:4px;}
+    .header-temp{font-size:15px;font-weight:900;letter-spacing:1px;color:var(--cyan);text-shadow:0 0 8px rgba(0,212,212,0.9),0 0 20px rgba(0,212,212,0.5);font-family:monospace;min-width:38px;text-align:right;}
+    .header-hora{font-size:15px;font-weight:900;letter-spacing:2px;color:var(--cyan);text-shadow:0 0 8px rgba(0,212,212,0.9),0 0 20px rgba(0,212,212,0.5);font-family:monospace;}
+    .header-clima{font-size:18px;line-height:1;}
     .logo-menu{display:none;position:absolute;top:calc(100% + 8px);left:0;width:280px;background:var(--bg2);border-radius:16px;overflow:hidden;z-index:500;box-shadow:0 8px 32px rgba(0,0,0,0.7);background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(135deg,#00d4d4,#a855f7,#ff3190);background-origin:border-box;background-clip:padding-box,border-box;border:1px solid transparent;animation:menuIn 0.15s ease;}
     @keyframes menuIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
     .logo-menu.visible{display:block;}
@@ -695,7 +695,7 @@
 
 <script>
 // ── CONSTANTES ─────────────────────────────────────────────
-const GEMINI_API_KEY = 'AIzaSyBL4c2_G2Z5U0LsJYVJSY0GiZZc-2u9yaY';
+const GEMINI_API_KEY = 'AIzaSyC72OTJepbk_hvZiQW1Eeo45Ti4SNR_JWo';
 const PIN_CORRECTO = '2401';
 const PIN_LN       = '13421342';
 const PIN_BANEO    = '13421342';
@@ -1027,7 +1027,7 @@ async function iaEnviar() {
   iaMsgs.push({ role: 'user', parts: [{ text: pregunta }] });
   const typingId = 'ia-t-' + Date.now();
   iaAddMsg('bot', '⏳ Consultando datos del barrio...', 'typing', typingId);
-  document.getElementById('ia-status-bar').innerText = 'Gemini 1.5 Flash procesando...';
+  document.getElementById('ia-status-bar').innerText = 'Gemini 2.0 Flash procesando...';
   const contexto = iaObtenerContexto();
   try {
     const historial = iaMsgs.slice(-12).map(m => ({ role: m.role, parts: m.parts }));
@@ -1044,11 +1044,10 @@ Cuando uses listas, usá guiones. Sé conciso pero completo.
 ${contexto}`;
     // Intentar modelos en orden hasta que uno funcione
     const MODELOS = [
-      'gemini-2.5-flash-lite',
-      'gemini-2.5-flash',
-      'gemini-2.0-flash-lite',
       'gemini-2.0-flash',
-      'gemini-1.5-flash-latest'
+      'gemini-2.0-flash-lite',
+      'gemini-2.5-flash-lite',
+      'gemini-2.5-flash'
     ];
     let data = null;
     let lastErr = '';
