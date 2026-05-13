@@ -493,11 +493,14 @@
   <div class="ia-modal-box">
     <div class="ia-header">
       <div class="ia-title">🤖 ASISTENTE NEXOS <span class="ia-badge">GEMINI</span></div>
-      <button class="ia-close" onclick="cerrarModal('modal-ia')">✕</button>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button id="ia-key-toggle" onclick="iaToggleKey()" title="Configurar API Key" style="background:none;border:none;font-size:16px;cursor:pointer;opacity:0.35;padding:2px 4px;transition:opacity 0.2s;border-radius:6px;" onmouseenter="this.style.opacity='0.8'" onmouseleave="this.style.opacity=document.getElementById('ia-key-row').style.display!=='none'?'0.9':'0.35'">🔑</button>
+        <button class="ia-close" onclick="cerrarModal('modal-ia')">✕</button>
+      </div>
     </div>
-    <div class="ia-key-row" style="display:none;">
+    <div class="ia-key-row" id="ia-key-row" style="display:none;">
       <span class="ia-key-label">API KEY:</span>
-      <input class="ia-key-input" id="ia-api-key" type="password" placeholder="Pegá tu Gemini API key (aistudio.google.com)..." oninput="iaGuardarKey()">
+      <input class="ia-key-input" id="ia-api-key" type="password" placeholder="Pegá tu Gemini API key..." oninput="iaGuardarKey()">
       <span id="ia-key-status" style="font-size:14px;min-width:18px;"></span>
     </div>
     <div class="ia-sugerencias">
@@ -632,7 +635,7 @@
         <div class="menu-item" style="color:#00d4d4;" onclick="abrirHistorialSheet()"><span class="menu-item-icon">🗂️</span>Consulta historial Sheet</div>
         <div class="menu-item" style="color:#a855f7;" onclick="abrirCalendario()"><span class="menu-item-icon">📅</span>Calendario</div>
         <div class="menu-item" style="color:#ff4444;" onclick="abrirSOS()"><span class="menu-item-icon">🆘</span>Directorio SOS</div>
-        <div class="menu-item" style="color:var(--gold);" onclick="abrirIncidentes()"><span class="menu-item-icon">🚨</span>Registro de incidentes<span id="inc-menu-badge" style="display:none;margin-left:6px;background:var(--red);color:#fff;font-size:9px;font-weight:900;border-radius:20px;padding:2px 7px;"></span></div>
+        <div class="menu-item" style="color:var(--gold);" onclick="abrirIncidentes()"><span class="menu-item-icon">⚠️</span>Registro de incidentes<span id="inc-menu-badge" style="display:none;margin-left:6px;background:var(--red);color:#fff;font-size:9px;font-weight:900;border-radius:20px;padding:2px 7px;"></span></div>
         <div class="menu-section-label">ADMINISTRACIÓN</div>
         <div class="menu-item" style="color:var(--purple);" onclick="abrirBaneo()"><span class="menu-item-icon">🚷</span>Baneo de vecinos</div>
         <div class="menu-section-label">SISTEMA</div>
@@ -673,7 +676,7 @@
     <div class="nav-item" id="btn-manual" onclick="ver('manual')">➕ MANUAL</div>
     <div class="nav-item" id="btn-delivery" onclick="ver('delivery')">🛵 DELY</div>
     <div class="nav-item" id="btn-incidentes" onclick="abrirIncidentes()" style="color:var(--gold);border-color:var(--gold);opacity:1;position:relative;">
-      🚨 INCID
+      ⚠️ INCID
       <span id="inc-nav-badge" style="display:none;position:absolute;top:4px;right:4px;background:var(--red);color:#fff;font-size:9px;font-weight:900;border-radius:50%;width:16px;height:16px;line-height:16px;text-align:center;"></span>
     </div>
     <div class="nav-item" id="btn-config" onclick="ver('config')">⚙️ CONFIG</div>
@@ -977,6 +980,20 @@ function iaGuardarKey() {
   const k = document.getElementById('ia-api-key').value.trim();
   if (k) { localStorage.setItem('nx_gemini_key', k); document.getElementById('ia-key-status').innerText = '✅'; }
   else { document.getElementById('ia-key-status').innerText = ''; }
+}
+
+function iaToggleKey() {
+  const row = document.getElementById('ia-key-row');
+  const btn = document.getElementById('ia-key-toggle');
+  const visible = row.style.display !== 'none';
+  row.style.display = visible ? 'none' : 'flex';
+  btn.style.opacity = visible ? '0.35' : '0.9';
+  if (!visible) {
+    const k = localStorage.getItem('nx_gemini_key');
+    const input = document.getElementById('ia-api-key');
+    if (k) { input.value = ''; input.placeholder = '••• key guardada — pegá una nueva para cambiar'; document.getElementById('ia-key-status').innerText = '✅'; }
+    setTimeout(() => input.focus(), 80);
+  }
 }
 
 function abrirAsistenteIA() {
