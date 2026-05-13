@@ -290,6 +290,10 @@
     .inc-foto{width:100%;max-height:180px;object-fit:cover;border-radius:10px;margin-top:8px;cursor:pointer;}
     .inc-del-btn{position:absolute;top:10px;right:10px;background:none;border:none;color:#333;font-size:16px;cursor:pointer;padding:2px 6px;border-radius:6px;transition:0.15s;}
     .inc-del-btn:active{background:rgba(231,76,60,0.2);color:var(--red);}
+    .inc-wa-btn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.45);color:#25d366;border-radius:20px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;transition:0.15s;letter-spacing:0.3px;}
+    .inc-wa-btn:active{background:rgba(37,211,102,0.25);}
+    .inc-wa-resumen-btn{width:100%;border:none;border-radius:12px;padding:14px;font-weight:900;font-size:14px;cursor:pointer;margin-bottom:8px;background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.5);color:#25d366;display:flex;align-items:center;justify-content:center;gap:8px;transition:0.15s;}
+    .inc-wa-resumen-btn:active{background:rgba(37,211,102,0.28);}
     .inc-form{background:var(--bg3);border-radius:14px;padding:16px;margin-bottom:12px;border:1px solid var(--border);}
     .inc-textarea{width:100%;background:var(--bg2);border:2px solid var(--border);border-radius:12px;color:#fff;font-size:15px;padding:13px;resize:none;min-height:80px;outline:none;font-family:inherit;line-height:1.5;transition:border-color 0.2s;}
     .inc-textarea:focus{border-color:var(--gold);}
@@ -543,6 +547,7 @@
       <input type="file" id="inc-foto-input" accept="image/*" capture="environment" style="display:none;" onchange="incPreviewFoto(this)">
       <img class="inc-foto-preview" id="inc-foto-preview" onclick="incQuitarFoto()">
       <button class="inc-guardar-btn" onclick="incGuardar()">💾 GUARDAR INCIDENTE</button>
+      <button class="inc-wa-resumen-btn" onclick="incCompartirResumenWA()">📲 Compartir resumen del turno por WhatsApp</button>
     </div>
     <!-- Lista de incidentes -->
     <div id="inc-lista"></div>
@@ -627,6 +632,7 @@
         <div class="menu-item" style="color:#00d4d4;" onclick="abrirHistorialSheet()"><span class="menu-item-icon">🗂️</span>Consulta historial Sheet</div>
         <div class="menu-item" style="color:#a855f7;" onclick="abrirCalendario()"><span class="menu-item-icon">📅</span>Calendario</div>
         <div class="menu-item" style="color:#ff4444;" onclick="abrirSOS()"><span class="menu-item-icon">🆘</span>Directorio SOS</div>
+        <div class="menu-item" style="color:var(--gold);" onclick="abrirIncidentes()"><span class="menu-item-icon">🚨</span>Registro de incidentes<span id="inc-menu-badge" style="display:none;margin-left:6px;background:var(--red);color:#fff;font-size:9px;font-weight:900;border-radius:20px;padding:2px 7px;"></span></div>
         <div class="menu-section-label">ADMINISTRACIÓN</div>
         <div class="menu-item" style="color:var(--purple);" onclick="abrirBaneo()"><span class="menu-item-icon">🚷</span>Baneo de vecinos</div>
         <div class="menu-section-label">SISTEMA</div>
@@ -662,10 +668,14 @@
     </div>
   </div>
 
-  <div class="menu-nav">
+  <div class="menu-nav" style="grid-template-columns:repeat(5,1fr);">
     <div class="nav-item active" id="btn-lista" onclick="ver('lista')">📋 LISTA</div>
     <div class="nav-item" id="btn-manual" onclick="ver('manual')">➕ MANUAL</div>
     <div class="nav-item" id="btn-delivery" onclick="ver('delivery')">🛵 DELY</div>
+    <div class="nav-item" id="btn-incidentes" onclick="abrirIncidentes()" style="color:var(--gold);border-color:var(--gold);opacity:1;position:relative;">
+      🚨 INCID
+      <span id="inc-nav-badge" style="display:none;position:absolute;top:4px;right:4px;background:var(--red);color:#fff;font-size:9px;font-weight:900;border-radius:50%;width:16px;height:16px;line-height:16px;text-align:center;"></span>
+    </div>
     <div class="nav-item" id="btn-config" onclick="ver('config')">⚙️ CONFIG</div>
   </div>
 
@@ -1183,16 +1193,35 @@ function actualizarContadorIncidentes() {
   const hoyStr = new Date().toLocaleDateString('es-AR');
   const hoy = INCIDENTES.filter(i => new Date(i.ts).toLocaleDateString('es-AR') === hoyStr);
   const graves = hoy.filter(i => i.tipo === 'grave').length;
-  const counter = document.getElementById('inc-menu-counter');
-  if (!counter) return;
-  if (hoy.length > 0) {
-    counter.style.display = 'inline-block';
-    counter.innerHTML = graves > 0
-      ? `<span class="inc-counter" style="background:var(--red)">${hoy.length}</span>`
-      : `<span class="inc-counter" style="background:var(--gold);color:#000">${hoy.length}</span>`;
-  } else {
-    counter.style.display = 'none';
+  const color = graves > 0 ? 'var(--red)' : 'var(--gold)';
+  const txtColor = graves > 0 ? '#fff' : '#000';
+  // Badge en barra de navegación
+  const navBadge = document.getElementById('inc-nav-badge');
+  if (navBadge) {
+    if (hoy.length > 0) {
+      navBadge.style.display = 'block';
+      navBadge.style.background = color;
+      navBadge.style.color = txtColor;
+      navBadge.textContent = hoy.length;
+    } else {
+      navBadge.style.display = 'none';
+    }
   }
+  // Badge en menú hamburguesa
+  const menuBadge = document.getElementById('inc-menu-badge');
+  if (menuBadge) {
+    if (hoy.length > 0) {
+      menuBadge.style.display = 'inline-block';
+      menuBadge.style.background = color;
+      menuBadge.style.color = txtColor;
+      menuBadge.textContent = hoy.length + (graves > 0 ? ' 🔴' : '');
+    } else {
+      menuBadge.style.display = 'none';
+    }
+  }
+  // Compatibilidad con elemento anterior si existe
+  const counter = document.getElementById('inc-menu-counter');
+  if (counter) counter.style.display = 'none';
 }
 
 function incSelTipo(tipo) {
@@ -1306,6 +1335,7 @@ function renderIncidentes() {
       <div class="inc-desc">${escHtml(inc.desc)}</div>
       ${inc.vig ? `<div class="inc-vig">👤 ${escHtml(inc.vig)}</div>` : ''}
       ${fotoHtml}
+      <button class="inc-wa-btn" onclick="incCompartirWA(${inc.id})">📲 Compartir por WhatsApp</button>
     </div>`;
   };
 
@@ -1340,6 +1370,50 @@ function incObtenerContextoIA() {
       return `  - [${i.tipo.toUpperCase()}] ${hora}: ${i.desc}${i.vig ? ' (por '+i.vig+')' : ''}`;
     }).join('\n');
 }
+function incCompartirWA(id) {
+  const inc = INCIDENTES.find(i => i.id == id);
+  if (!inc) return;
+  const hora = new Date(inc.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  const fecha = new Date(inc.ts).toLocaleDateString('es-AR');
+  const tipoLabels = {grave:'🔴 GRAVE', normal:'🟡 NOVEDAD', info:'🔵 INFO'};
+  const vig = inc.vig ? `\n👤 Vigilador: ${inc.vig}` : '';
+  const texto = `*NEXOS CONTROL — INCIDENTE*\n` +
+    `${tipoLabels[inc.tipo]}\n` +
+    `📅 ${fecha} ${hora}${vig}\n\n` +
+    `📋 ${inc.desc}` +
+    (inc.foto ? '\n\n📷 _(imagen adjunta en el sistema)_' : '');
+  const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+  window.open(url, '_blank');
+}
+
+function incCompartirResumenWA() {
+  const hoyStr = new Date().toLocaleDateString('es-AR');
+  const hoy = INCIDENTES.filter(i => new Date(i.ts).toLocaleDateString('es-AR') === hoyStr);
+  const vig = sessionStorage.getItem('nx_vigilador') || '';
+  const ahora = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  const tipoLabels = {grave:'🔴 GRAVE', normal:'🟡 NOVEDAD', info:'🔵 INFO'};
+
+  let texto = `*NEXOS CONTROL — RESUMEN DE TURNO*\n`;
+  texto += `📅 ${hoyStr}  🕐 ${ahora}\n`;
+  if (vig) texto += `👤 Vigilador: ${vig}\n`;
+  texto += `\n`;
+
+  if (!hoy.length) {
+    texto += `✅ Sin incidentes en el turno.`;
+  } else {
+    texto += `📋 *${hoy.length} INCIDENTE(S) DEL DÍA:*\n`;
+    hoy.forEach((inc, idx) => {
+      const hora = new Date(inc.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      texto += `\n${idx + 1}. ${tipoLabels[inc.tipo]} — ${hora}\n`;
+      texto += `   ${inc.desc}`;
+      if (inc.vig) texto += `\n   👤 ${inc.vig}`;
+      if (inc.foto) texto += `\n   📷 _(con foto)_`;
+    });
+  }
+  const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+  window.open(url, '_blank');
+}
+
 // ══ FIN INCIDENTES ══════════════════════════════════════
 
 </script>
