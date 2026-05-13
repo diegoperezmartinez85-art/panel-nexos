@@ -714,7 +714,7 @@
 
 <script>
 // ── CONSTANTES ─────────────────────────────────────────────
-const GEMINI_API_KEY = 'AIzaSyC72OTJepbk_hvZiQW1Eeo45Ti4SNR_JWo';
+const GEMINI_API_KEY_DEFAULT = 'AIzaSyC72OTJepbk_hvZiQW1Eeo45Ti4SNR_JWo';
 const PIN_CORRECTO = '2401';
 const PIN_LN       = '13421342';
 const PIN_BANEO    = '13421342';
@@ -1054,7 +1054,7 @@ async function iaEnviar() {
   const input = document.getElementById('ia-input');
   const pregunta = input.value.trim();
   if (!pregunta) return;
-  const apiKey = GEMINI_API_KEY;
+  const apiKey = localStorage.getItem('nx_gemini_key') || GEMINI_API_KEY_DEFAULT;
   input.value = ''; input.style.height = 'auto';
   iaAddMsg('user', pregunta);
   iaMsgs.push({ role: 'user', parts: [{ text: pregunta }] });
@@ -1077,10 +1077,9 @@ Cuando uses listas, usá guiones. Sé conciso pero completo.
 ${contexto}`;
     // Intentar modelos en orden hasta que uno funcione
     const MODELOS = [
-      'gemini-2.0-flash',
-      'gemini-2.0-flash-lite',
+      'gemini-2.5-flash',
       'gemini-2.5-flash-lite',
-      'gemini-2.5-flash'
+      'gemini-2.0-flash'
     ];
     let data = null;
     let lastErr = '';
