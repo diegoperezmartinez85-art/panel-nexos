@@ -535,9 +535,11 @@
 
 <!-- ══ INCIDENTES MODAL ══ -->
 <div class="modal-overlay" id="modal-incidentes">
-  <div class="modal-box" style="max-width:480px;">
-    <button class="modal-close" onclick="cerrarModal('modal-incidentes')">✕</button>
-    <div class="modal-title">📋 REGISTRO DE INCIDENTES</div>
+  <div class="modal-box" style="max-width:480px;padding-top:0;">
+    <div style="position:sticky;top:0;background:var(--bg2);z-index:10;padding:18px 22px 10px;margin:0 -22px;border-radius:20px 20px 0 0;display:flex;align-items:center;justify-content:space-between;">
+      <div class="modal-title" style="margin:0;">📋 REGISTRO DE INCIDENTES</div>
+      <button class="modal-close" style="position:static;" onclick="cerrarModal('modal-incidentes')">✕</button>
+    </div>
     <!-- Formulario nuevo incidente -->
     <div class="inc-form">
       <textarea class="inc-textarea" id="inc-texto" placeholder="Describí la novedad del turno..." maxlength="500"></textarea>
@@ -559,7 +561,8 @@
 
 <!-- Foto fullscreen -->
 <div class="foto-overlay" id="foto-overlay" onclick="this.classList.remove('visible')">
-  <img id="foto-overlay-img" src="" alt="">
+  <button onclick="event.stopPropagation();document.getElementById('foto-overlay').classList.remove('visible')" style="position:fixed;top:18px;right:18px;background:rgba(0,0,0,0.7);border:2px solid #fff;color:#fff;font-size:22px;font-weight:900;border-radius:50%;width:44px;height:44px;cursor:pointer;z-index:30001;line-height:1;">✕</button>
+  <img id="foto-overlay-img" src="" alt="" onclick="event.stopPropagation()">
 </div>
 
 <!-- QR SCANNER -->
@@ -1397,7 +1400,7 @@ function incCompartirWA(id) {
     `${tipoLabels[inc.tipo]}\n` +
     `📅 ${fecha} ${hora}${vig}\n\n` +
     `📋 ${inc.desc}` +
-    (inc.foto ? '\n\n📷 _(imagen adjunta en el sistema)_' : '');
+    (inc.foto ? '\n\n📷 Hay foto adjunta — abrí la app NEXOS para verla' : '');
   const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
   window.open(url, '_blank');
 }
