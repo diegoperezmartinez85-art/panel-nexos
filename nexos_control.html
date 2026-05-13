@@ -288,8 +288,19 @@
     .inc-desc{font-size:14px;color:#e8e8ec;line-height:1.5;margin-bottom:6px;word-break:break-word;}
     .inc-vig{font-size:11px;color:#555;font-weight:600;}
     .inc-foto{width:100%;max-height:180px;object-fit:cover;border-radius:10px;margin-top:8px;cursor:pointer;}
-    .inc-del-btn{position:absolute;top:10px;right:10px;background:none;border:none;color:#333;font-size:16px;cursor:pointer;padding:2px 6px;border-radius:6px;transition:0.15s;}
-    .inc-del-btn:active{background:rgba(231,76,60,0.2);color:var(--red);}
+    .inc-del-btn{display:flex;align-items:center;gap:5px;background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;border-radius:10px;padding:7px 13px;font-size:12px;font-weight:800;cursor:pointer;transition:0.15s;letter-spacing:0.3px;}
+    .inc-del-btn:active{background:rgba(231,76,60,0.28);border-color:var(--red);}
+    .inc-actions-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+    /* Modal confirmación borrar */
+    .confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9500;align-items:center;justify-content:center;padding:20px;}
+    .confirm-overlay.visible{display:flex;}
+    .confirm-box{background:var(--bg2);border-radius:20px;width:100%;max-width:340px;padding:26px 22px;text-align:center;background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(135deg,#e74c3c,#a855f7);background-origin:border-box;background-clip:padding-box,border-box;border:1px solid transparent;}
+    .confirm-icon{font-size:44px;margin-bottom:10px;}
+    .confirm-title{font-size:16px;font-weight:900;color:#fff;margin-bottom:6px;}
+    .confirm-desc{font-size:13px;color:#888;margin-bottom:22px;line-height:1.5;}
+    .confirm-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .confirm-btn-cancel{padding:14px;background:var(--bg3);border:1px solid var(--border);color:#aaa;border-radius:12px;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;}
+    .confirm-btn-delete{padding:14px;background:var(--red);border:none;color:#fff;border-radius:12px;font-weight:900;font-size:14px;cursor:pointer;font-family:inherit;}
     .inc-wa-btn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.45);color:#25d366;border-radius:20px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;transition:0.15s;letter-spacing:0.3px;}
     .inc-wa-btn:active{background:rgba(37,211,102,0.25);}
     .inc-wa-resumen-btn{width:100%;border:none;border-radius:12px;padding:14px;font-weight:900;font-size:14px;cursor:pointer;margin-bottom:8px;background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.5);color:#25d366;display:flex;align-items:center;justify-content:center;gap:8px;transition:0.15s;}
@@ -534,11 +545,11 @@
 
 
 <!-- ══ INCIDENTES MODAL ══ -->
-<div class="modal-overlay" id="modal-incidentes">
-  <div class="modal-box" style="max-width:480px;padding-top:0;">
+<div class="modal-overlay" id="modal-incidentes" style="align-items:center;">
+  <div class="modal-box" style="max-width:480px;padding-top:0;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;">
     <div style="position:sticky;top:0;background:var(--bg2);z-index:10;padding:18px 22px 10px;margin:0 -22px;border-radius:20px 20px 0 0;display:flex;align-items:center;justify-content:space-between;">
       <div class="modal-title" style="margin:0;">📋 REGISTRO DE INCIDENTES</div>
-      <button class="modal-close" style="position:static;" onclick="cerrarModal('modal-incidentes')">✕</button>
+      <button onclick="cerrarModal('modal-incidentes')" style="background:none;border:none;color:#888;font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;border-radius:8px;flex-shrink:0;">✕</button>
     </div>
     <!-- Formulario nuevo incidente -->
     <div class="inc-form">
@@ -1314,6 +1325,34 @@ function incEliminar(id) {
   renderIncidentes();
 }
 
+let incPendienteEliminar = null;
+
+function incPedirConfirmacion(id) {
+  const inc = INCIDENTES.find(i => i.id === id);
+  if (!inc) return;
+  incPendienteEliminar = id;
+  const hora = new Date(inc.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  const tipoLabels = {grave:'🔴 GRAVE', normal:'🟡 NOVEDAD', info:'🔵 INFO'};
+  const preview = inc.desc.length > 60 ? inc.desc.substring(0, 60) + '…' : inc.desc;
+  document.getElementById('confirm-del-desc').innerHTML =
+    `<strong style="color:#fff">${tipoLabels[inc.tipo]}</strong> · ${hora}<br><span style="font-size:12px;color:#666;margin-top:4px;display:block">"${preview}"</span><br><span style="color:#e74c3c;font-size:12px;font-weight:800;">Esta acción no se puede deshacer.</span>`;
+  document.getElementById('confirm-del-overlay').classList.add('visible');
+}
+
+function incCancelarBorrar() {
+  incPendienteEliminar = null;
+  document.getElementById('confirm-del-overlay').classList.remove('visible');
+}
+
+function incConfirmarBorrar() {
+  if (incPendienteEliminar !== null) {
+    incEliminar(incPendienteEliminar);
+    incPendienteEliminar = null;
+    showToast('🗑️ Incidente eliminado');
+  }
+  document.getElementById('confirm-del-overlay').classList.remove('visible');
+}
+
 function abrirIncidentes() {
   renderIncidentes();
   incSelTipo('grave');
@@ -1346,7 +1385,6 @@ function renderIncidentes() {
       ? `<img class="inc-foto" src="${inc.foto}" onclick="verFotoFullscreen('${inc.id}')" title="Tocá para ampliar">`
       : '';
     return `<div class="inc-item ${inc.tipo}" id="inc-${inc.id}">
-      <button class="inc-del-btn" onclick="incEliminar(${inc.id})" title="Eliminar">✕</button>
       <div class="inc-header">
         <span class="inc-tipo-badge ${tipoCls[inc.tipo]}">${tipoLabels[inc.tipo]}</span>
         <span class="inc-hora">${fechaLabel}</span>
@@ -1354,7 +1392,10 @@ function renderIncidentes() {
       <div class="inc-desc">${escHtml(inc.desc)}</div>
       ${inc.vig ? `<div class="inc-vig">👤 ${escHtml(inc.vig)}</div>` : ''}
       ${fotoHtml}
-      <button class="inc-wa-btn" onclick="incCompartirWA(${inc.id})">📲 Compartir por WhatsApp</button>
+      <div class="inc-actions-row">
+        <button class="inc-wa-btn" onclick="incCompartirWA(${inc.id})">📲 Compartir por WhatsApp</button>
+        <button class="inc-del-btn" onclick="incPedirConfirmacion(${inc.id})">🗑️ Borrar</button>
+      </div>
     </div>`;
   };
 
@@ -1437,8 +1478,21 @@ function incCompartirResumenWA() {
 
 </script>
 
+<!-- ══ MODAL CONFIRMACIÓN BORRAR INCIDENTE ══ -->
+<div class="confirm-overlay" id="confirm-del-overlay">
+  <div class="confirm-box">
+    <div class="confirm-icon">🗑️</div>
+    <div class="confirm-title">¿Borrar incidente?</div>
+    <div class="confirm-desc" id="confirm-del-desc">Esta acción no se puede deshacer.</div>
+    <div class="confirm-btns">
+      <button class="confirm-btn-cancel" onclick="incCancelarBorrar()">Cancelar</button>
+      <button class="confirm-btn-delete" onclick="incConfirmarBorrar()">🗑️ Borrar</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// ── PWA: Registro del Service Worker ──────────────────────
+// ── REGISTRO DEL SERVICE WORKER ──────────────────────────
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw_control.js', { scope: './' })
