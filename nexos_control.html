@@ -98,7 +98,7 @@
     .header-temp{font-size:15px;font-weight:900;letter-spacing:1px;color:var(--cyan);text-shadow:0 0 8px rgba(0,212,212,0.9),0 0 20px rgba(0,212,212,0.5);font-family:monospace;min-width:38px;text-align:right;}
     .header-hora{font-size:15px;font-weight:900;letter-spacing:2px;color:var(--cyan);text-shadow:0 0 8px rgba(0,212,212,0.9),0 0 20px rgba(0,212,212,0.5);font-family:monospace;}
     .header-clima{font-size:18px;line-height:1;}
-    .logo-menu{display:none;position:absolute;top:calc(100% + 8px);left:0;width:280px;background:var(--bg2);border-radius:16px;overflow-y:auto;overflow-x:hidden;max-height:calc(100dvh - 165px);padding-bottom:12px;z-index:8000;box-shadow:0 8px 32px rgba(0,0,0,0.7);background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(135deg,#00d4d4,#a855f7,#ff3190);background-origin:border-box;background-clip:padding-box,border-box;border:1px solid transparent;animation:menuIn 0.15s ease;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}
+    .logo-menu{display:none;position:absolute;top:calc(100% + 8px);left:0;width:280px;background:var(--bg2);border-radius:16px;overflow-y:auto;overflow-x:hidden;max-height:calc(100dvh - 230px);padding-bottom:12px;z-index:8000;box-shadow:0 8px 32px rgba(0,0,0,0.7);background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(135deg,#00d4d4,#a855f7,#ff3190);background-origin:border-box;background-clip:padding-box,border-box;border:1px solid transparent;animation:menuIn 0.15s ease;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}
     @keyframes menuIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
     .logo-menu.visible{display:block;}
     .menu-section-label{font-size:9px;letter-spacing:2px;color:#444;padding:10px 16px 4px;font-weight:700;text-transform:uppercase;}
@@ -162,6 +162,28 @@
     .panico-maps-btn{display:flex;align-items:center;gap:8px;background:rgba(46,204,113,0.25);border:1px solid rgba(46,204,113,0.6);border-radius:12px;padding:14px 16px;color:white;font-size:15px;font-weight:800;text-decoration:none;width:100%;justify-content:center;}
     .panico-no-maps{font-size:12px;opacity:0.45;margin-top:8px;}
     .panico-btn{margin-top:24px;background:white;color:#c0392b;border:none;border-radius:50px;padding:18px 50px;font-size:20px;font-weight:900;cursor:pointer;width:100%;max-width:360px;}
+    /* PRONÓSTICO EXTENDIDO */
+    .clima-modal-box{background:var(--bg2);border-radius:20px;width:100%;max-width:360px;padding:22px;margin:auto;background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(135deg,#00d4d4,#4a90e2);background-origin:border-box;background-clip:padding-box,border-box;border:1px solid transparent;position:relative;}
+    .clima-current{display:flex;align-items:center;justify-content:center;gap:14px;padding:16px 0 20px;border-bottom:1px solid var(--border);}
+    .clima-current-icon{font-size:52px;line-height:1;}
+    .clima-current-temp{font-size:52px;font-weight:900;color:var(--cyan);font-family:monospace;text-shadow:0 0 16px rgba(0,212,212,0.6);}
+    .clima-current-info{display:flex;flex-direction:column;gap:4px;}
+    .clima-current-desc{font-size:13px;color:#aaa;font-weight:700;}
+    .clima-current-sensacion{font-size:12px;color:#666;}
+    .clima-dias{display:flex;flex-direction:column;gap:6px;padding-top:16px;}
+    .clima-dia-row{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border-radius:12px;padding:11px 14px;}
+    .clima-dia-nombre{font-size:13px;font-weight:800;color:#ddd;min-width:60px;}
+    .clima-dia-icon{font-size:22px;line-height:1;}
+    .clima-dia-temps{display:flex;gap:10px;align-items:center;}
+    .clima-dia-max{font-size:15px;font-weight:900;color:var(--cyan);}
+    .clima-dia-min{font-size:13px;font-weight:700;color:#666;}
+    .clima-dia-lluvia{font-size:11px;color:#4a90e2;font-weight:700;min-width:36px;text-align:right;}
+    .clima-loading{text-align:center;padding:28px 0;color:#555;font-size:13px;}
+    .header-temp{cursor:pointer;transition:transform 0.15s;}
+    .header-temp:active{transform:scale(0.88);}
+    .dely-countdown{display:inline-block;font-size:10px;font-weight:900;font-family:monospace;background:rgba(0,212,212,0.15);color:var(--cyan);border:1px solid rgba(0,212,212,0.35);padding:2px 7px;border-radius:20px;letter-spacing:0.5px;}
+    .dely-countdown.alerta-cd{background:rgba(231,76,60,0.2);color:#ff7070;border-color:rgba(231,76,60,0.5);animation:titilarCd 1s ease-in-out infinite alternate;}
+    @keyframes titilarCd{from{opacity:1}to{opacity:0.55}}
     @media print{.no-print{display:none!important;}body{background:white;color:black;padding:0;}.pdf-report{display:block!important;}}
     .pdf-report{display:none;background:white;color:#111;padding:24px;font-family:sans-serif;border-radius:12px;margin-top:12px;}
     .pdf-report h2{font-size:18px;margin-bottom:4px;}
@@ -684,8 +706,8 @@
     </div>
     <div class="header-right">
       <div class="header-clock">
-        <span class="header-temp" id="header-temp">--°</span>
-        <span class="header-clima" id="header-clima">🌤️</span>
+        <span class="header-temp" id="header-temp" onclick="abrirPronostico()" title="Ver pronóstico">--°</span>
+        <span class="header-clima" id="header-clima" onclick="abrirPronostico()" style="cursor:pointer;">🌤️</span>
         <span class="header-hora" id="header-hora">--:--</span>
       </div>
     </div>
@@ -748,6 +770,15 @@
 </div><!-- /scroll-content -->
 </div><!-- /app-wrap -->
 
+<!-- MODAL PRONÓSTICO EXTENDIDO -->
+<div class="modal-overlay" id="modal-clima">
+  <div class="clima-modal-box">
+    <button class="modal-close" onclick="cerrarModal('modal-clima')">✕</button>
+    <div class="modal-title">🌤️ PRONÓSTICO — BUENOS AIRES</div>
+    <div id="clima-contenido"><div class="clima-loading">Cargando pronóstico...</div></div>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <!-- ══ NAV INFERIOR ══ -->
@@ -789,6 +820,60 @@ let VIGILADORES = JSON.parse(localStorage.getItem('nx_vigiladores') || '[]');
 const CLIMA_ICONS = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'❄️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',95:'⛈️',96:'⛈️',99:'⛈️'};
 let climaIcon='🌤️',temperaturaActual='--°';
 async function obtenerClima(){try{const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=-34.61&longitude=-58.37&current_weather=true');const d=await r.json();const code=d.current_weather?.weathercode??1;const temp=d.current_weather?.temperature;climaIcon=CLIMA_ICONS[code]||'🌤️';temperaturaActual=(typeof temp==='number')?Math.round(temp)+'°':'--°';actualizarReloj();}catch(e){}}
+const CLIMA_DESC = {0:'Cielo despejado',1:'Principalmente despejado',2:'Parcialmente nublado',3:'Cubierto',45:'Niebla',48:'Niebla con escarcha',51:'Llovizna leve',53:'Llovizna moderada',55:'Llovizna intensa',61:'Lluvia leve',63:'Lluvia moderada',65:'Lluvia intensa',71:'Nieve leve',73:'Nieve moderada',75:'Nieve intensa',80:'Lluvia débil',81:'Lluvia moderada',82:'Lluvia fuerte',95:'Tormenta',96:'Tormenta con granizo',99:'Tormenta con granizo fuerte'};
+
+async function abrirPronostico() {
+  abrirModal('modal-clima');
+  document.getElementById('clima-contenido').innerHTML = '<div class="clima-loading">⏳ Cargando pronóstico...</div>';
+  try {
+    const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-34.61&longitude=-58.37&current_weather=true&current=apparent_temperature,wind_speed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max&forecast_days=6&timezone=America%2FArgentina%2FBuenos_Aires');
+    const d = await r.json();
+    const cw = d.current_weather;
+    const icon = CLIMA_ICONS[cw.weathercode] || '🌤️';
+    const temp = Math.round(cw.temperature);
+    const desc = CLIMA_DESC[cw.weathercode] || '—';
+    const sensacion = d.current?.apparent_temperature != null ? Math.round(d.current.apparent_temperature) : null;
+    const viento = d.current?.wind_speed_10m != null ? Math.round(d.current.wind_speed_10m) : null;
+
+    const daily = d.daily;
+    const hoy = new Date();
+    let diasHtml = '';
+    for (let i = 1; i < daily.time.length; i++) {
+      const fecha = new Date(daily.time[i] + 'T12:00:00');
+      const nombreDia = (typeof DIAS_ES !== 'undefined' ? DIAS_ES : ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'])[fecha.getDay()];
+      const dicon = CLIMA_ICONS[daily.weathercode[i]] || '🌤️';
+      const max = Math.round(daily.temperature_2m_max[i]);
+      const min = Math.round(daily.temperature_2m_min[i]);
+      const lluvia = daily.precipitation_probability_max[i];
+      const vMax = daily.wind_speed_10m_max ? Math.round(daily.wind_speed_10m_max[i]) : null;
+      diasHtml += `<div class="clima-dia-row">
+        <span class="clima-dia-nombre">${nombreDia}</span>
+        <span class="clima-dia-icon">${dicon}</span>
+        <div class="clima-dia-temps">
+          <span class="clima-dia-max">${max}°</span>
+          <span class="clima-dia-min">${min}°</span>
+        </div>
+        <span class="clima-dia-lluvia">${lluvia > 0 ? '💧' + lluvia + '%' : ''}${vMax != null && vMax > 20 ? ' 💨' + vMax : ''}</span>
+      </div>`;
+    }
+
+    const sensHtml = sensacion != null ? `<span class="clima-current-sensacion">ST: ${sensacion}°${viento != null ? ' · 💨 ' + viento + ' km/h' : ''}</span>` : `<span class="clima-current-sensacion">Buenos Aires</span>`;
+
+    document.getElementById('clima-contenido').innerHTML = `
+      <div class="clima-current">
+        <span class="clima-current-icon">${icon}</span>
+        <span class="clima-current-temp">${temp}°</span>
+        <div class="clima-current-info">
+          <span class="clima-current-desc">${desc}</span>
+          ${sensHtml}
+        </div>
+      </div>
+      <div class="clima-dias">${diasHtml}</div>`;
+  } catch(e) {
+    document.getElementById('clima-contenido').innerHTML = '<div class="clima-loading" style="color:var(--red)">❌ No se pudo cargar el pronóstico</div>';
+  }
+}
+
 function actualizarDuracionTurno(){
   const inicio = localStorage.getItem('nx_turno_inicio');
   if(!inicio) return;
@@ -800,6 +885,34 @@ function actualizarDuracionTurno(){
 }
 function actualizarReloj(){const now=new Date();const h=String(now.getHours()).padStart(2,'0');const m=String(now.getMinutes()).padStart(2,'0');document.getElementById('header-hora').innerText=h+':'+m;document.getElementById('header-temp').innerText=temperaturaActual;document.getElementById('header-clima').innerText=climaIcon;}
 setInterval(actualizarReloj,1000);actualizarReloj();obtenerClima();setInterval(obtenerClima,10*60*1000);
+
+// ── CONTADOR REGRESIVO DELIVERY (tick cada segundo) ────────
+setInterval(function tickContadores(){
+  const ahora=Date.now();
+  document.querySelectorAll('.dely-countdown[data-tse]').forEach(el=>{
+    const tsE=parseInt(el.dataset.tse)||0;
+    const elapsed=Math.floor((ahora-tsE)/1000);
+    const eraAlerta=el.dataset.alerta==='1';
+    const esAlerta=elapsed>=900;
+    if(esAlerta){
+      if(!eraAlerta){el.dataset.alerta='1';el.classList.add('alerta-cd');}
+      const over=elapsed-900;const oM=Math.floor(over/60),oS=over%60;
+      el.textContent=`+${oM}m${String(oS).padStart(2,'0')}s ⚠️`;
+    } else {
+      const resta=900-elapsed;const rM=Math.floor(resta/60),rS=resta%60;
+      el.textContent=`${rM}:${String(rS).padStart(2,'0')}`;
+    }
+  });
+  // Chequear nuevas alertas sin hacer full render
+  DB.filter(r=>!r.hS&&r.tipo==='DELIVERY'&&(ahora-(r.tsE||0))>900000).forEach(r=>{
+    if(!_alertasNotificadas.has(String(r.id))){
+      _alertasNotificadas.add(String(r.id));
+      sessionStorage.setItem('nx_alertas_notif',JSON.stringify([..._alertasNotificadas]));
+      initAudio();tocarAlertaDelivery();
+      render(); // refresh visual state (color change)
+    }
+  });
+},1000);
 
 // ── PIN ACCESO ──────────────────────────────────────────────
 let pinActual='';
@@ -888,6 +1001,8 @@ function verificarListaNegra(pat,dni){const match=LISTA_NEGRA.find(r=>(r.pat&&r.
 // ── AUDIO ──────────────────────────────────────────────────
 function initAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();}
 function tocarSirena(){if(!audioCtx)return;const now=audioCtx.currentTime;for(let c=0;c<6;c++){const t=now+c*0.6;const oH=audioCtx.createOscillator(),gH=audioCtx.createGain();oH.connect(gH);gH.connect(audioCtx.destination);oH.type='sawtooth';oH.frequency.setValueAtTime(1100,t);oH.frequency.linearRampToValueAtTime(900,t+0.28);gH.gain.setValueAtTime(0,t);gH.gain.linearRampToValueAtTime(0.4,t+0.02);gH.gain.setValueAtTime(0.4,t+0.27);gH.gain.linearRampToValueAtTime(0,t+0.30);oH.start(t);oH.stop(t+0.31);}}
+function tocarAlertaDelivery(){if(!audioCtx)return;const now=audioCtx.currentTime;[0,0.22,0.44].forEach((t,i)=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type='square';o.frequency.value=i===1?880:660;g.gain.setValueAtTime(0,now+t);g.gain.linearRampToValueAtTime(0.25,now+t+0.02);g.gain.setValueAtTime(0.25,now+t+0.12);g.gain.linearRampToValueAtTime(0,now+t+0.18);o.start(now+t);o.stop(now+t+0.19);});}
+let _alertasNotificadas=new Set(JSON.parse(sessionStorage.getItem('nx_alertas_notif')||'[]'));
 function iniciarSirena(){if(sirenInterval)return;tocarSirena();sirenInterval=setInterval(tocarSirena,3800);}
 function detenerSirena(){clearInterval(sirenInterval);sirenInterval=null;}
 document.addEventListener('touchstart',initAudio,{once:true});
@@ -949,7 +1064,26 @@ function render(){
     const timeTxt=mins<60?`${mins}m`:`${Math.floor(mins/60)}h${String(mins%60).padStart(2,'0')}`;
     const isNew=!prevIds.has(String(r.id));
     const animStyle=isNew?`animation:regSlideIn 0.35s cubic-bezier(0.22,1,0.36,1) ${idx*50}ms both`:'';
-    return`<div class="reg-item ${cls}" data-id="${r.id}" style="${animStyle}"><div style="flex:1;min-width:0;">${lnBadge}<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;"><span style="font-size:18px;line-height:1;">${tipoIcon}</span><strong style="font-size:15px;">${escHtml(r.pat)}</strong><span style="background:${timeBg};color:${timeColor};font-size:10px;font-weight:900;padding:2px 7px;border-radius:20px;margin-left:2px;">${timeTxt}${isA?' ⚠️':''}</span></div><small style="color:#666;">Mza: ${escHtml(r.mza||'-')} · Lote: ${escHtml(r.casa||'-')}${dniInfo}<br>${escHtml(r.tipo)} · ${hE}${vigInfo}</small></div><button onclick="darSalida(${r.id})" style="background:var(--red);color:white;border:none;padding:10px 15px;border-radius:10px;font-weight:800;cursor:pointer;flex-shrink:0;">SALIDA</button></div>`;
+    // Countdown for delivery: show remaining seconds until 15min alert, or overtime
+    let countdownHtml='';
+    if(r.tipo==='DELIVERY'){
+      if(isA){
+        const overSecs=Math.floor((ahora-tsE)/1000)-900;
+        const overM=Math.floor(overSecs/60),overS=overSecs%60;
+        countdownHtml=`<span class="dely-countdown alerta-cd" data-tse="${tsE}" data-alerta="1">+${overM}m${String(overS).padStart(2,'0')}s ⚠️</span>`;
+      } else {
+        const restaSecs=900-Math.floor((ahora-tsE)/1000);
+        const rM=Math.floor(restaSecs/60),rS=restaSecs%60;
+        countdownHtml=`<span class="dely-countdown" data-tse="${tsE}" data-alerta="0">${rM}:${String(rS).padStart(2,'0')}</span>`;
+      }
+    }
+    // Notify sound for new alerts
+    if(isA&&!_alertasNotificadas.has(String(r.id))){
+      _alertasNotificadas.add(String(r.id));
+      sessionStorage.setItem('nx_alertas_notif',JSON.stringify([..._alertasNotificadas]));
+      setTimeout(()=>{initAudio();tocarAlertaDelivery();},200);
+    }
+    return`<div class="reg-item ${cls}" data-id="${r.id}" style="${animStyle}"><div style="flex:1;min-width:0;">${lnBadge}<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;flex-wrap:wrap;"><span style="font-size:18px;line-height:1;">${tipoIcon}</span><strong style="font-size:15px;">${escHtml(r.pat)}</strong><span style="background:${timeBg};color:${timeColor};font-size:10px;font-weight:900;padding:2px 7px;border-radius:20px;margin-left:2px;">${timeTxt}${isA?' ⚠️':''}</span>${countdownHtml}</div><small style="color:#666;">Mza: ${escHtml(r.mza||'-')} · Lote: ${escHtml(r.casa||'-')}${dniInfo}<br>${escHtml(r.tipo)} · ${hE}${vigInfo}</small></div><button onclick="darSalida(${r.id})" style="background:var(--red);color:white;border:none;padding:10px 15px;border-radius:10px;font-weight:800;cursor:pointer;flex-shrink:0;">SALIDA</button></div>`;
   }).join('')||'<p style="opacity:0.3;text-align:center;padding:20px;">SIN ACTIVIDAD</p>';
   cont.innerHTML=html;
   document.getElementById('mon-d').innerText=d;
@@ -959,7 +1093,44 @@ function render(){
 }
 
 // ── MODALES CONTENIDO ─────────────────────────────────────
-function abrirResumen(){const ahora=Date.now(),hoyStr=new Date().toLocaleDateString('es-AR');let del=0,vis=0,ale=0,sal=0,tot=0;DB.forEach(r=>{const f=new Date(r.tsE||0).toLocaleDateString('es-AR');if(f!==hoyStr)return;tot++;const isA=r.tipo==='DELIVERY'&&(ahora-(r.tsE||0)>900000);if(r.tipo==='DELIVERY'){if(isA)ale++;else del++;}else vis++;if(r.hS)sal++;});document.getElementById('resumen-contenido').innerHTML=`<div class="modal-stat"><span class="modal-stat-label">🛵 Delivery activos</span><span class="modal-stat-val" style="color:var(--gold)">${del}</span></div><div class="modal-stat"><span class="modal-stat-label">🚗 Visitas activas</span><span class="modal-stat-val" style="color:var(--green)">${vis}</span></div><div class="modal-stat"><span class="modal-stat-label">⚠️ Alertas +15min</span><span class="modal-stat-val" style="color:var(--red)">${ale}</span></div><div class="modal-stat"><span class="modal-stat-label">📤 Con salida</span><span class="modal-stat-val" style="color:#888">${sal}</span></div><div class="modal-stat"><span class="modal-stat-label" style="font-weight:800;color:#fff">📋 Total del día</span><span class="modal-stat-val" style="color:var(--cyan)">${tot}</span></div>`;abrirModal('modal-resumen');}
+function abrirResumen(){
+  const ahora=Date.now(),hoyStr=new Date().toLocaleDateString('es-AR');
+  let del=0,vis=0,ale=0,sal=0,tot=0;
+  const porHora=new Array(24).fill(0);
+  DB.forEach(r=>{
+    const f=new Date(r.tsE||0).toLocaleDateString('es-AR');
+    if(f!==hoyStr)return;
+    tot++;
+    const h=new Date(r.tsE||0).getHours();
+    porHora[h]++;
+    const isA=r.tipo==='DELIVERY'&&(ahora-(r.tsE||0)>900000);
+    if(r.tipo==='DELIVERY'){if(isA)ale++;else del++;}else vis++;
+    if(r.hS)sal++;
+  });
+  // Build mini bar chart (SVG)
+  const maxVal=Math.max(...porHora,1);
+  const chartH=48,barW=8,gap=2,totalW=24*(barW+gap);
+  let bars='';
+  const now=new Date().getHours();
+  for(let h=0;h<24;h++){
+    const v=porHora[h];
+    const bh=Math.max(2,Math.round((v/maxVal)*chartH));
+    const x=h*(barW+gap);
+    const y=chartH-bh;
+    const col=h===now?'#00d4d4':v>0?'rgba(0,212,212,0.5)':'rgba(255,255,255,0.07)';
+    bars+=`<rect x="${x}" y="${y}" width="${barW}" height="${bh}" rx="2" fill="${col}"/>`;
+    if(v>0)bars+=`<text x="${x+barW/2}" y="${y-2}" text-anchor="middle" fill="#aaa" font-size="7">${v}</text>`;
+  }
+  const chartSvg=`<div style="margin-top:12px;margin-bottom:2px;"><div style="font-size:10px;color:#555;font-weight:700;letter-spacing:1px;margin-bottom:6px;">INGRESOS POR HORA</div><svg width="${totalW}" height="${chartH+14}" viewBox="0 0 ${totalW} ${chartH+14}" style="width:100%;max-width:${totalW}px;display:block;overflow:visible;">${bars}<text x="0" y="${chartH+13}" fill="#444" font-size="7">0h</text><text x="${6*(barW+gap)}" y="${chartH+13}" fill="#444" font-size="7">6h</text><text x="${12*(barW+gap)}" y="${chartH+13}" fill="#444" font-size="7">12h</text><text x="${18*(barW+gap)}" y="${chartH+13}" fill="#444" font-size="7">18h</text><text x="${23*(barW+gap)+2}" y="${chartH+13}" fill="#444" font-size="7">23h</text></svg></div>`;
+  document.getElementById('resumen-contenido').innerHTML=
+    `<div class="modal-stat"><span class="modal-stat-label">🛵 Delivery activos</span><span class="modal-stat-val" style="color:var(--gold)">${del}</span></div>`+
+    `<div class="modal-stat"><span class="modal-stat-label">🚗 Visitas activas</span><span class="modal-stat-val" style="color:var(--green)">${vis}</span></div>`+
+    `<div class="modal-stat"><span class="modal-stat-label">⚠️ Alertas +15min</span><span class="modal-stat-val" style="color:var(--red)">${ale}</span></div>`+
+    `<div class="modal-stat"><span class="modal-stat-label">📤 Con salida</span><span class="modal-stat-val" style="color:#888">${sal}</span></div>`+
+    `<div class="modal-stat"><span class="modal-stat-label" style="font-weight:800;color:#fff">📋 Total del día</span><span class="modal-stat-val" style="color:var(--cyan)">${tot}</span></div>`+
+    chartSvg;
+  abrirModal('modal-resumen');
+}
 function abrirVehiculos(){const adentro=DB.filter(r=>!r.hS);let html='';if(!adentro.length){html='<div class="empty-msg">Sin vehículos activos 🟢</div>';}else{html=adentro.sort((a,b)=>(b.tsE||0)-(a.tsE||0)).map(r=>{const mins=Math.floor((Date.now()-(r.tsE||0))/60000);const col=r.tipo==='DELIVERY'&&mins>=15?'var(--red)':r.tipo==='DELIVERY'?'var(--gold)':'var(--green)';return`<div class="modal-row"><strong style="color:${col}">${escHtml(r.pat)}</strong>${r.dni?` · DNI: ${escHtml(r.dni)}`:''}<span style="float:right;color:#666;font-size:11px">${mins}min</span><br><span style="font-size:11px;color:#888">Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')} · ${escHtml(r.tipo)}</span></div>`;}).join('');}document.getElementById('vehiculos-contenido').innerHTML=html;abrirModal('modal-vehiculos');}
 function abrirBusqueda(){document.getElementById('busqueda-input').value='';filtrarHistorialDia();abrirModal('modal-busqueda');}
 function filtrarHistorialDia(){const q=(document.getElementById('busqueda-input').value||'').trim().toUpperCase();const hoyStr=new Date().toLocaleDateString('es-AR');let deDia=DB.filter(r=>new Date(r.tsE||0).toLocaleDateString('es-AR')===hoyStr);if(q)deDia=deDia.filter(r=>(r.pat||'').toUpperCase().includes(q)||(r.dni||'').includes(q));deDia.sort((a,b)=>(b.tsE||0)-(a.tsE||0));document.getElementById('busqueda-status').innerText=deDia.length+' registro(s) hoy';if(!deDia.length){document.getElementById('busqueda-resultados').innerHTML='<div class="empty-msg">Sin registros hoy</div>';return;}document.getElementById('busqueda-resultados').innerHTML=deDia.map(r=>{const tS=r.hS?true:false;return`<div class="modal-row" style="${tS?'opacity:0.7;border-left:4px solid #888':'border-left:4px solid var(--green)'}"><strong>${escHtml(r.pat)}</strong>${r.dni?` · DNI: ${escHtml(r.dni)}`:''}<br><span style="font-size:11px;color:#666">Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')} · ${escHtml(r.tipo)}</span><br><span style="font-size:11px;color:#888">Entró: ${escHtml(limpiarHora(r.hE))}</span><span style="float:right;font-size:12px;font-weight:bold;color:${tS?'#888':'var(--green)'}">${tS?'✅ Salió '+escHtml(limpiarHora(r.hS)):'🟢 Adentro'}</span></div>`;}).join('');}
