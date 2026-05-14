@@ -27,7 +27,7 @@
     .pin-punto{width:18px;height:18px;border-radius:50%;background:var(--border);transition:0.2s;}
     .pin-punto.lleno{background:var(--cyan);}
     .pin-teclado{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:280px;}
-    .pin-key{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:22px 10px;font-size:26px;font-weight:700;color:#fff;text-align:center;cursor:pointer;transition:0.15s;}
+    .pin-key{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:22px 10px;font-size:26px;font-weight:700;color:#fff;text-align:center;cursor:pointer;transition:0.15s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
     .pin-key:active{background:var(--bg3);transform:scale(0.95);}
     .pin-key.borra{font-size:18px;color:#888;}
     .pin-key.vacio{background:transparent;border-color:transparent;pointer-events:none;}
@@ -37,7 +37,7 @@
     .pin-nombre-input{width:100%;background:var(--bg2);border:2px solid var(--border);border-radius:14px;padding:16px 18px;color:#fff;font-size:16px;font-weight:700;outline:none;text-align:center;font-family:inherit;transition:border-color 0.2s,box-shadow 0.2s;letter-spacing:0.5px;}
     .pin-nombre-input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,212,212,0.15);}
     .pin-nombre-input::placeholder{color:#444;font-weight:400;}
-    .turno-bar{display:none;background:var(--bg2);border:1px solid rgba(168,85,247,0.3);border-radius:12px;padding:8px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(90deg,rgba(168,85,247,0.4),rgba(0,212,212,0.2));background-origin:border-box;background-clip:padding-box,border-box;}
+    .turno-bar{display:none;background:var(--bg2);border:1px solid rgba(168,85,247,0.3);border-radius:12px;padding:8px 14px;margin-bottom:10px;align-items:center;justify-content:space-between;gap:10px;background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(90deg,rgba(168,85,247,0.4),rgba(0,212,212,0.2));background-origin:border-box;background-clip:padding-box,border-box;}
     .turno-bar.visible{display:flex;}
     .turno-vig{font-size:13px;font-weight:900;color:var(--purple);text-shadow:0 0 8px rgba(168,85,247,0.5);letter-spacing:0.5px;display:flex;align-items:center;gap:6px;}
     .turno-desde{font-size:11px;color:#555;font-weight:600;margin-left:4px;}
@@ -52,7 +52,7 @@
     .search-box{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:15px;margin-bottom:12px;}
     .search-input{width:100%;background:var(--bg3);border:2px solid var(--border);border-radius:12px;padding:18px;color:white;font-size:22px;margin-bottom:15px;outline:none;text-align:center;}
     .action-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-    .btn-main{border-radius:16px;padding:20px 10px;font-weight:800;border:2px solid transparent;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;}
+    .btn-main{border-radius:16px;padding:20px 10px;font-weight:800;border:2px solid transparent;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
     .ingreso{background:rgba(46,204,113,0.1);border-color:var(--green);color:var(--green);}
     .salida{background:rgba(231,76,60,0.1);border-color:var(--red);color:var(--red);}
     .menu-nav{display:none;}
@@ -98,7 +98,7 @@
     .header-temp{font-size:15px;font-weight:900;letter-spacing:1px;color:var(--cyan);text-shadow:0 0 8px rgba(0,212,212,0.9),0 0 20px rgba(0,212,212,0.5);font-family:monospace;min-width:38px;text-align:right;}
     .header-hora{font-size:15px;font-weight:900;letter-spacing:2px;color:var(--cyan);text-shadow:0 0 8px rgba(0,212,212,0.9),0 0 20px rgba(0,212,212,0.5);font-family:monospace;}
     .header-clima{font-size:18px;line-height:1;}
-    .logo-menu{display:none;position:absolute;top:calc(100% + 8px);left:0;width:280px;background:var(--bg2);border-radius:16px;overflow-y:auto;overflow-x:hidden;max-height:calc(100dvh - 120px);z-index:8000;box-shadow:0 8px 32px rgba(0,0,0,0.7);background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(135deg,#00d4d4,#a855f7,#ff3190);background-origin:border-box;background-clip:padding-box,border-box;border:1px solid transparent;animation:menuIn 0.15s ease;}
+    .logo-menu{display:none;position:absolute;top:calc(100% + 8px);left:0;width:280px;background:var(--bg2);border-radius:16px;overflow-y:auto;overflow-x:hidden;max-height:calc(100dvh - 180px);padding-bottom:12px;z-index:8000;box-shadow:0 8px 32px rgba(0,0,0,0.7);background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(135deg,#00d4d4,#a855f7,#ff3190);background-origin:border-box;background-clip:padding-box,border-box;border:1px solid transparent;animation:menuIn 0.15s ease;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}
     @keyframes menuIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
     .logo-menu.visible{display:block;}
     .menu-section-label{font-size:9px;letter-spacing:2px;color:#444;padding:10px 16px 4px;font-weight:700;text-transform:uppercase;}
@@ -132,7 +132,7 @@
     .gpin-punto{width:14px;height:14px;border-radius:50%;background:var(--border);transition:0.2s;}
     .gpin-punto.lleno{background:var(--cyan);}
     .gpin-teclado{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-    .gpin-key{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:15px;font-size:20px;font-weight:700;color:#fff;text-align:center;cursor:pointer;transition:0.15s;}
+    .gpin-key{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:15px;font-size:20px;font-weight:700;color:#fff;text-align:center;cursor:pointer;transition:0.15s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
     .gpin-key:active{background:var(--border);transform:scale(0.95);}
     .gpin-key.borra{font-size:14px;color:#888;}
     .gpin-key.vacio{background:transparent;border-color:transparent;pointer-events:none;}
@@ -670,7 +670,7 @@
         <div class="menu-item" style="color:#00d4d4;" onclick="abrirHistorialSheet()"><span class="menu-item-icon">🗂️</span>Consulta historial Sheet</div>
         <div class="menu-item" style="color:#a855f7;" onclick="abrirCalendario()"><span class="menu-item-icon">📅</span>Calendario</div>
         <div class="menu-item" style="color:#ff4444;" onclick="abrirSOS()"><span class="menu-item-icon">🆘</span>Directorio SOS</div>
-        <div class="menu-item" style="color:var(--gold);" onclick="abrirIncidentes()"><span class="menu-item-icon">⚠️</span>Registro de incidentes<span id="inc-menu-badge" style="display:none;margin-left:6px;background:var(--red);color:#fff;font-size:9px;font-weight:900;border-radius:20px;padding:2px 7px;"></span></div>
+        <div class="menu-item" style="color:var(--gold);" onclick="abrirIncidentes()"><span class="menu-item-icon">📝</span>Registro de incidentes<span id="inc-menu-badge" style="display:none;margin-left:6px;background:var(--red);color:#fff;font-size:9px;font-weight:900;border-radius:20px;padding:2px 7px;"></span></div>
         <div class="menu-section-label">ADMINISTRACIÓN</div>
         <div class="menu-item" style="color:var(--purple);" onclick="abrirBaneo()"><span class="menu-item-icon">🚷</span>Baneo de vecinos</div>
         <div class="menu-section-label">SISTEMA</div>
@@ -760,7 +760,7 @@
     <span>DELIVERY</span>
   </div>
   <div class="bn-item bn-incid" id="btn-incidentes" onclick="abrirIncidentes()">
-    <span class="bn-icon">⚠️</span>
+    <span class="bn-icon">📝</span>
     <span>INCID</span>
     <span class="bn-badge" id="inc-nav-badge"></span>
   </div>
@@ -773,9 +773,12 @@
 <script>
 // ── CONSTANTES ─────────────────────────────────────────────
 const GEMINI_API_KEY_DEFAULT = 'AIzaSyC72OTJepbk_hvZiQW1Eeo45Ti4SNR_JWo';
-const PIN_CORRECTO = '2401';
+const PIN_CORRECTO = '2401'; // PIN maestro de emergencia (sin Sheet)
+const PIN_MAESTRO  = PIN_CORRECTO;
 const PIN_LN       = '13421342';
 const PIN_BANEO    = '13421342';
+// Vigiladores cargados desde el Sheet: [{nombre, pin}]
+let VIGILADORES = JSON.parse(localStorage.getItem('nx_vigiladores') || '[]');
 
 // ── CLIMA + RELOJ ──────────────────────────────────────────
 const CLIMA_ICONS = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'❄️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',95:'⛈️',96:'⛈️',99:'⛈️'};
@@ -799,9 +802,14 @@ function pinTecla(d){if(pinActual.length>=4)return;pinActual+=d;actualizarPuntos
 function pinBorrar(){pinActual=pinActual.slice(0,-1);actualizarPuntos();document.getElementById('pin-error').innerText='';}
 function actualizarPuntos(){for(let i=0;i<4;i++)document.getElementById('p'+i).classList.toggle('lleno',i<pinActual.length);}
 function verificarPin(){
-  if(pinActual===PIN_CORRECTO){
-    const nombre = document.getElementById('pin-nombre').value.trim();
-    if(!nombre){document.getElementById('pin-error').innerText='⚠️ Escribí tu nombre primero';pinActual='';actualizarPuntos();return;}
+  const nombre = document.getElementById('pin-nombre').value.trim();
+  if(!nombre){document.getElementById('pin-error').innerText='⚠️ Escribí tu nombre primero';pinActual='';actualizarPuntos();return;}
+
+  // Buscar vigilador por nombre en la lista del Sheet
+  const vigSheet = VIGILADORES.find(v => v.nombre.trim().toLowerCase() === nombre.toLowerCase());
+  const pinValido = vigSheet ? (pinActual === String(vigSheet.pin)) : (pinActual === PIN_MAESTRO);
+
+  if(pinValido){
     sessionStorage.setItem('nx_auth','1');
     sessionStorage.setItem('nx_vigilador', nombre);
     localStorage.setItem('nx_vigilador_ultimo', nombre);
@@ -827,7 +835,10 @@ function verificarPin(){
     if(window._turnoInterval) clearInterval(window._turnoInterval);
     window._turnoInterval = setInterval(actualizarDuracionTurno, 60000);
     iniciarApp();resetearTimeoutSeguridad();setTimeout(ajustarScrollTop,100);
-  }else{document.getElementById('pin-error').innerText='CLAVE INCORRECTA';pinActual='';actualizarPuntos();}
+  }else{
+    const msgError = vigSheet ? 'CLAVE INCORRECTA' : (VIGILADORES.length>0 ? 'VIGILADOR NO ENCONTRADO EN EL SHEET' : 'CLAVE INCORRECTA');
+    document.getElementById('pin-error').innerText=msgError;pinActual='';actualizarPuntos();
+  }
 }
 
 // ── MENÚ ───────────────────────────────────────────────────
@@ -894,6 +905,7 @@ async function sincronizar(manual=false){
     const panico=Array.isArray(data)?[]:(data.panico||[]);
     if(data.baneados)cargarBaneadosDesdeCloud(data.baneados);
     if(Array.isArray(data.listaNegra)&&data.listaNegra.length>0){LISTA_NEGRA=data.listaNegra;localStorage.setItem('nx_lista_negra',JSON.stringify(LISTA_NEGRA));}
+    if(Array.isArray(data.vigiladores)&&data.vigiladores.length>0){VIGILADORES=data.vigiladores;localStorage.setItem('nx_vigiladores',JSON.stringify(VIGILADORES));}
     const cloudIds=new Set(cloudData.map(x=>String(x.id)));
     const pend=DB.filter(x=>!cloudIds.has(String(x.id))&&(Date.now()-(x.tsE||0)<60000));
     DB=[...cloudData,...pend];localStorage.setItem('nx_db',JSON.stringify(DB));render();
