@@ -144,6 +144,33 @@
     .nexos-logo-top{width:100%;max-width:310px;margin-bottom:8px;}
     .nexos-logo-top img{width:100%;height:auto;border-radius:14px;box-shadow:0 0 0 2px rgba(0,140,255,0.8),0 0 16px rgba(0,160,255,0.8),0 0 36px rgba(0,130,255,0.5),0 0 70px rgba(0,100,255,0.25);animation:bluePulse 3s ease-in-out infinite;}
     @keyframes bluePulse{0%,100%{box-shadow:0 0 0 2px rgba(0,140,255,0.8),0 0 14px rgba(0,160,255,0.7),0 0 32px rgba(0,130,255,0.4),0 0 60px rgba(0,100,255,0.2);}50%{box-shadow:0 0 0 3px rgba(30,180,255,1),0 0 26px rgba(0,200,255,1),0 0 56px rgba(0,160,255,0.7),0 0 100px rgba(0,130,255,0.4);}}
+
+    /* ── LONG PRESS RING ────────────────────────────────── */
+    .lp-ring-svg{position:absolute;top:0;left:0;width:100%;height:100%;transform:rotate(-90deg);pointer-events:none;z-index:10;}
+    .lp-ring-track{fill:none;stroke:rgba(255,255,255,0.08);stroke-width:8;}
+    .lp-ring-fill{fill:none;stroke:#fff;stroke-width:8;stroke-linecap:round;stroke-dasharray:816;stroke-dashoffset:816;transition:stroke-dashoffset 0.05s linear;opacity:0.9;}
+    .lp-hint{font-size:11px;color:#666;letter-spacing:0.5px;margin-top:-8px;margin-bottom:4px;transition:color 0.3s;}
+    .lp-hint.pressing{color:#ff6060;animation:hintPulse 0.6s ease-in-out infinite;}
+    @keyframes hintPulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+
+    /* ── MODAL TIPO EMERGENCIA ──────────────────────────── */
+    .tipo-panel{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:400;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:env(safe-area-inset-bottom,0px);}
+    .tipo-panel.visible{display:flex;animation:slideUp 0.32s cubic-bezier(0.22,0.61,0.36,1) forwards;}
+    @keyframes slideUp{from{opacity:0;transform:translateY(60px);}to{opacity:1;transform:translateY(0);}}
+    .tipo-sheet{width:100%;max-width:420px;background:#18181c;border-radius:28px 28px 0 0;padding:24px 20px 32px;border-top:1px solid #2e2e38;}
+    .tipo-handle{width:40px;height:4px;background:#333;border-radius:4px;margin:0 auto 20px;}
+    .tipo-titulo{font-size:13px;letter-spacing:3px;color:#888;text-align:center;margin-bottom:20px;text-transform:uppercase;font-weight:700;}
+    .tipo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+    .tipo-btn{background:#1e1e24;border:2px solid #2e2e38;border-radius:20px;padding:20px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:all 0.18s ease;-webkit-tap-highlight-color:transparent;}
+    .tipo-btn:active{transform:scale(0.95);}
+    .tipo-btn.sel{border-color:var(--tc);background:rgba(var(--tcr),0.12);box-shadow:0 0 18px rgba(var(--tcr),0.3);}
+    .tipo-btn-emoji{font-size:36px;line-height:1;}
+    .tipo-btn-label{font-size:13px;font-weight:800;letter-spacing:0.5px;color:#ccc;}
+    .tipo-btn.sel .tipo-btn-label{color:#fff;}
+    .tipo-confirmar{width:100%;background:#c0392b;color:white;border:none;border-radius:16px;padding:20px;font-size:17px;font-weight:900;letter-spacing:1px;cursor:pointer;transition:0.15s;box-shadow:0 4px 20px rgba(192,57,43,0.4);display:none;}
+    .tipo-confirmar.visible{display:block;animation:fadeIn 0.2s ease;}
+    .tipo-confirmar:active{transform:scale(0.97);background:#96281b;}
+    .tipo-cancelar{text-align:center;color:#555;font-size:13px;cursor:pointer;margin-top:14px;padding:8px;}
   </style>
 </head>
 <body>
@@ -212,12 +239,18 @@
     <svg class="cooldown-ring" viewBox="0 0 280 280">
       <circle cx="140" cy="140" r="126" id="cooldown-circle"/>
     </svg>
-    <button class="boton-redondo" id="btn-panico-redondo" onclick="enviarPanico(event)">
+    <button class="boton-redondo" id="btn-panico-redondo">
+      <!-- Long press ring -->
+      <svg class="lp-ring-svg" viewBox="0 0 260 260">
+        <circle class="lp-ring-track" cx="130" cy="130" r="122"/>
+        <circle class="lp-ring-fill" cx="130" cy="130" r="122" id="lp-ring-fill"/>
+      </svg>
       <span class="boton-emoji" id="btn-emoji">🆘</span>
       <span class="boton-texto" id="btn-texto">EMERGENCIA</span>
       <span class="boton-cooldown-txt" id="btn-cooldown-txt"></span>
     </button>
   </div>
+  <div class="lp-hint" id="lp-hint">Mantené presionado para activar</div>
   <div class="aviso-cooldown" id="aviso-cooldown">
     ✅ Alerta recibida por el vigilador.<br>
     Podés volver a enviar en <span id="cooldown-restante">15:00</span>
@@ -229,7 +262,7 @@
 <div class="enviado" id="pantalla-enviado">
   <div class="enviado-icono">✅</div>
   <div class="enviado-titulo">¡ALERTA ENVIADA!</div>
-  <div class="enviado-sub">El vigilador fue notificado.<br>Quedate tranquilo, ya están al tanto.</div>
+  <div class="enviado-sub">El vigilador fue notificado.<br>Quedate tranquilo, ya están al tanto.<br><span id="enviado-tipo" style="font-size:14px;color:#00d4d4;font-weight:800;letter-spacing:1px;"></span></div>
   <button class="btn-volver" onclick="volverAlPanico()">Volver</button>
 </div>
 
@@ -255,6 +288,34 @@
     <div class="pin-intentos" id="pin-intentos"></div>
     <button class="pin-btn" onclick="verificarPin()">CONFIRMAR</button>
     <div class="pin-cerrar" onclick="cerrarPin()">Cancelar</div>
+  </div>
+</div>
+
+<!-- MODAL TIPO EMERGENCIA -->
+<div class="tipo-panel" id="tipo-panel">
+  <div class="tipo-sheet">
+    <div class="tipo-handle"></div>
+    <div class="tipo-titulo">¿Qué tipo de emergencia?</div>
+    <div class="tipo-grid">
+      <button class="tipo-btn" id="tipo-robo"     style="--tc:#e74c3c;--tcr:231,76,60"   onclick="selTipo('robo')"    >
+        <span class="tipo-btn-emoji">🔒</span>
+        <span class="tipo-btn-label">ROBO / INTRUSO</span>
+      </button>
+      <button class="tipo-btn" id="tipo-medica"   style="--tc:#3498db;--tcr:52,152,219"  onclick="selTipo('medica')"  >
+        <span class="tipo-btn-emoji">🩺</span>
+        <span class="tipo-btn-label">MÉDICA</span>
+      </button>
+      <button class="tipo-btn" id="tipo-incendio" style="--tc:#e67e22;--tcr:230,126,34"  onclick="selTipo('incendio')">
+        <span class="tipo-btn-emoji">🔥</span>
+        <span class="tipo-btn-label">INCENDIO</span>
+      </button>
+      <button class="tipo-btn" id="tipo-otra"     style="--tc:#f39c12;--tcr:243,156,18"  onclick="selTipo('otra')"    >
+        <span class="tipo-btn-emoji">⚠️</span>
+        <span class="tipo-btn-label">OTRA</span>
+      </button>
+    </div>
+    <button class="tipo-confirmar" id="tipo-confirmar" onclick="confirmarTipo()">🆘&nbsp;&nbsp;ENVIAR ALERTA</button>
+    <div class="tipo-cancelar" onclick="cerrarTipo()">Cancelar</div>
   </div>
 </div>
 
@@ -503,6 +564,8 @@
     document.getElementById('btn-emoji').innerText = '✅';
     document.getElementById('btn-cooldown-txt').style.display = 'block';
     document.getElementById('aviso-cooldown').classList.add('visible');
+    const hint = document.getElementById('lp-hint');
+    if (hint) { hint.style.display = 'none'; }
     const circ   = 2 * Math.PI * 126;
     const circle = document.getElementById('cooldown-circle');
     if (cooldownInterval) clearInterval(cooldownInterval);
@@ -539,6 +602,8 @@
     document.getElementById('btn-cooldown-txt').innerText          = '';
     document.getElementById('aviso-cooldown').classList.remove('visible');
     document.getElementById('cooldown-circle').style.strokeDashoffset = '791';
+    const hint = document.getElementById('lp-hint');
+    if (hint) { hint.style.display = ''; hint.innerText = 'Mantené presionado para activar'; hint.classList.remove('pressing'); }
   }
 
   // ── GEOLOCALIZACIÓN ────────────────────────────────────
@@ -587,10 +652,116 @@
     el.addEventListener('animationend', () => el.remove(), { once: true });
   }
 
+  // ── LONG PRESS ─────────────────────────────────────────
+  const LP_DURATION = 1500; // ms
+  let _lpTimer   = null;
+  let _lpStart   = null;
+  let _lpRAF     = null;
+  let _lpEvent   = null;
+
+  function lpTick() {
+    const elapsed  = Date.now() - _lpStart;
+    const progress = Math.min(elapsed / LP_DURATION, 1);
+    const circ     = 2 * Math.PI * 122;
+    const fill     = document.getElementById('lp-ring-fill');
+    if (fill) fill.style.strokeDashoffset = circ * (1 - progress);
+    if (progress < 1) {
+      _lpRAF = requestAnimationFrame(lpTick);
+    }
+  }
+
+  function lpStart(e) {
+    const btn = document.getElementById('btn-panico-redondo');
+    if (btn.disabled) return;
+    e.preventDefault();
+    _lpEvent = e;
+    _lpStart = Date.now();
+    document.getElementById('lp-hint').classList.add('pressing');
+    document.getElementById('lp-hint').innerText = 'Soltá para cancelar...';
+    if (navigator.vibrate) navigator.vibrate(20);
+    _lpRAF = requestAnimationFrame(lpTick);
+    _lpTimer = setTimeout(() => {
+      lpComplete();
+    }, LP_DURATION);
+  }
+
+  function lpEnd(e) {
+    if (_lpTimer) { clearTimeout(_lpTimer); _lpTimer = null; }
+    if (_lpRAF)   { cancelAnimationFrame(_lpRAF); _lpRAF = null; }
+    const fill = document.getElementById('lp-ring-fill');
+    if (fill) fill.style.strokeDashoffset = '816';
+    const hint = document.getElementById('lp-hint');
+    const btn  = document.getElementById('btn-panico-redondo');
+    if (!btn.disabled) {
+      hint.classList.remove('pressing');
+      hint.innerText = 'Mantené presionado para activar';
+    }
+    _lpStart = null;
+  }
+
+  function lpComplete() {
+    if (_lpRAF) { cancelAnimationFrame(_lpRAF); _lpRAF = null; }
+    const fill = document.getElementById('lp-ring-fill');
+    if (fill) fill.style.strokeDashoffset = '0';
+    dispararVibracion();
+    if (_lpEvent) dispararRipple(_lpEvent);
+    document.getElementById('lp-hint').classList.remove('pressing');
+    document.getElementById('lp-hint').innerText = 'Mantené presionado para activar';
+    setTimeout(() => {
+      const f = document.getElementById('lp-ring-fill');
+      if (f) f.style.strokeDashoffset = '816';
+    }, 300);
+    enviarPanico(_lpEvent, 'emergencia');
+  }
+
+  function initLongPress() {
+    const btn = document.getElementById('btn-panico-redondo');
+    btn.addEventListener('touchstart',  lpStart, { passive: false });
+    btn.addEventListener('touchend',    lpEnd,   { passive: true });
+    btn.addEventListener('touchcancel', lpEnd,   { passive: true });
+    btn.addEventListener('mousedown',   lpStart, { passive: false });
+    btn.addEventListener('mouseup',     lpEnd,   { passive: true });
+    btn.addEventListener('mouseleave',  lpEnd,   { passive: true });
+  }
+
+  // ── MODAL TIPO ─────────────────────────────────────────
+  let _tipoSeleccionado = null;
+  let _tipoEvent        = null;
+
+  function abrirTipo(e) {
+    _tipoSeleccionado = null;
+    _tipoEvent = e;
+    ['robo','medica','incendio','otra'].forEach(t => {
+      document.getElementById('tipo-'+t).classList.remove('sel');
+    });
+    document.getElementById('tipo-confirmar').classList.remove('visible');
+    document.getElementById('tipo-panel').classList.add('visible');
+  }
+
+  function cerrarTipo() {
+    document.getElementById('tipo-panel').classList.remove('visible');
+    _tipoSeleccionado = null;
+  }
+
+  function selTipo(tipo) {
+    _tipoSeleccionado = tipo;
+    ['robo','medica','incendio','otra'].forEach(t => {
+      document.getElementById('tipo-'+t).classList.toggle('sel', t === tipo);
+    });
+    document.getElementById('tipo-confirmar').classList.add('visible');
+    if (navigator.vibrate) navigator.vibrate(15);
+  }
+
+  function confirmarTipo() {
+    if (!_tipoSeleccionado) return;
+    cerrarTipo();
+    enviarPanico(_tipoEvent, _tipoSeleccionado);
+  }
+
   // ── ENVÍO ──────────────────────────────────────────────
   let _enviando = false;
 
-  async function enviarPanico(event){
+  async function enviarPanico(event, tipo){
     if (_enviando) return;
     _enviando = true;
 
@@ -612,6 +783,7 @@
     const payload = {
       accion: 'panico',
       mza, casa,
+      tipo: tipo || 'otra',
       deviceId: DEVICE_ID,
       lat: null, lng: null, mapsUrl: null
     };
@@ -652,6 +824,8 @@
 
     document.getElementById('pantalla-panico').classList.remove('visible');
     document.getElementById('pantalla-enviado').classList.add('visible');
+    const tipoEl = document.getElementById('enviado-tipo');
+    if (tipoEl) tipoEl.innerText = '🆘 Emergencia';
     _enviando = false;
   }
 
@@ -767,6 +941,7 @@
     document.getElementById('pin-input').addEventListener('keydown', e => {
       if (e.key === 'Enter') verificarPin();
     });
+    initLongPress();
     if (!localStorage.getItem(ACCESS_KEY)){
       document.getElementById('access-panel').classList.add('visible');
       setTimeout(() => accessInput && accessInput.focus(), 200);
