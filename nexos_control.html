@@ -195,14 +195,81 @@
     @keyframes vigPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(46,204,113,0.5);}50%{opacity:0.7;box-shadow:0 0 0 4px rgba(46,204,113,0);}}
     .vigs-vacio{font-size:11px;color:#444;font-style:italic;}
     /* Modal vigiladores */
-    .vig-modal-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border-radius:12px;padding:12px 16px;margin-bottom:8px;border-left:4px solid var(--green);}
-    .vig-modal-item.yo{border-left-color:var(--cyan);}
+    .vig-modal-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border-radius:12px;padding:12px 16px;margin-bottom:8px;border-left:4px solid var(--green);cursor:pointer;transition:background 0.15s;}
+    .vig-modal-item:active{background:rgba(46,204,113,0.1);}
+    .vig-modal-item.yo{border-left-color:var(--cyan);cursor:default;}
+    .vig-modal-item.yo:active{background:var(--bg3);}
     .vig-modal-nombre{font-size:14px;font-weight:900;color:#fff;}
     .vig-modal-hora{font-size:11px;color:#666;margin-top:2px;}
     .vig-modal-badge{font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px;}
     .vig-badge-online{background:rgba(46,204,113,0.15);border:1px solid var(--green);color:var(--green);}
     .vig-badge-yo{background:rgba(0,212,212,0.15);border:1px solid var(--cyan);color:var(--cyan);}
-    @media print{.no-print{display:none!important;}body{background:white;color:black;padding:0;}.pdf-report{display:block!important;}}
+    /* ── CHAT ── */
+    .chat-overlay{display:none;position:fixed;inset:0;z-index:9500;background:var(--bg);flex-direction:column;}
+    .chat-overlay.visible{display:flex;}
+    .chat-header{display:flex;align-items:center;gap:12px;padding:calc(env(safe-area-inset-top,0px)+12px) 14px 12px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;}
+    .chat-back{background:none;border:none;color:var(--cyan);font-size:22px;cursor:pointer;padding:4px 8px;border-radius:8px;line-height:1;-webkit-tap-highlight-color:transparent;}
+    .chat-back:active{background:rgba(0,212,212,0.1);}
+    .chat-titulo{flex:1;}
+    .chat-nombre{font-size:15px;font-weight:900;color:#fff;letter-spacing:0.5px;}
+    .chat-estado{font-size:11px;color:var(--green);font-weight:700;}
+    .chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;-webkit-overflow-scrolling:touch;}
+    .chat-burbuja{max-width:80%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.45;word-break:break-word;}
+    .chat-burbuja.mia{align-self:flex-end;background:var(--cyan);color:#000;border-bottom-right-radius:5px;}
+    .chat-burbuja.suya{align-self:flex-start;background:var(--bg3);color:var(--text);border-bottom-left-radius:5px;border:1px solid var(--border);}
+    .chat-burbuja-wrap{display:flex;flex-direction:column;gap:2px;}
+    .chat-burbuja-wrap.mia{align-items:flex-end;}
+    .chat-burbuja-wrap.suya{align-items:flex-start;}
+    .chat-meta{font-size:10px;color:#555;padding:0 4px;}
+    .chat-remitente{font-size:10px;font-weight:800;color:var(--green);padding:0 4px;}
+    .chat-input-bar{display:flex;align-items:center;gap:8px;padding:10px 14px calc(env(safe-area-inset-bottom,0px)+10px);background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0;}
+    .chat-input{flex:1;background:var(--bg3);border:2px solid var(--border);border-radius:22px;padding:11px 16px;color:#fff;font-size:15px;outline:none;font-family:inherit;resize:none;max-height:100px;line-height:1.3;}
+    .chat-input:focus{border-color:var(--cyan);}
+    .chat-send{background:var(--cyan);border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:transform 0.1s;}
+    .chat-send:active{transform:scale(0.88);}
+    .chat-vacio{text-align:center;color:#444;font-size:13px;padding:40px 20px;line-height:1.8;}
+    .chat-badge{position:absolute;top:6px;right:calc(50% - 18px);background:var(--green);color:#000;font-size:9px;font-weight:900;border-radius:20px;min-width:16px;height:16px;line-height:16px;text-align:center;padding:0 4px;}
+    .vig-chat-hint{font-size:10px;color:#555;margin-top:3px;font-weight:600;}
+    .chat-unread-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;animation:vigPulse 2s ease-in-out infinite;margin-left:6px;}
+    /* ── DASHBOARD STATS ── */
+    .dash-section{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:12px;}
+    .dash-title{font-size:11px;font-weight:900;color:#555;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+    .dash-kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0;}
+    .dash-kpi{background:var(--bg3);border-radius:14px;padding:14px 12px;text-align:center;border:1px solid var(--border);}
+    .dash-kpi-val{font-size:34px;font-weight:900;display:block;line-height:1;margin-bottom:4px;}
+    .dash-kpi-label{font-size:10px;color:#666;font-weight:700;letter-spacing:0.5px;}
+    .dash-bar-wrap{margin-bottom:8px;}
+    .dash-bar-label{display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:5px;}
+    .dash-bar-label span:last-child{color:#888;}
+    .dash-bar-track{background:var(--bg3);border-radius:20px;height:10px;overflow:hidden;}
+    .dash-bar-fill{height:100%;border-radius:20px;transition:width 0.6s cubic-bezier(0.22,1,0.36,1);}
+    .dash-horas-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:2px;align-items:flex-end;height:56px;margin-top:8px;}
+    .dash-hora-col{display:flex;flex-direction:column;align-items:center;gap:2px;}
+    .dash-hora-bar{width:100%;background:var(--cyan);border-radius:3px 3px 0 0;min-height:3px;transition:height 0.5s;}
+    .dash-hora-lbl{font-size:7px;color:#444;font-weight:700;white-space:nowrap;}
+    .dash-pats-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+    .dash-pats-item:last-child{border-bottom:none;}
+    .dash-pats-pat{font-size:14px;font-weight:900;color:#fff;}
+    .dash-pats-count{background:rgba(0,212,212,0.15);border:1px solid rgba(0,212,212,0.4);color:var(--cyan);font-size:11px;font-weight:900;padding:3px 10px;border-radius:20px;}
+    .dash-pie-wrap{display:flex;align-items:center;gap:16px;margin-top:4px;}
+    .dash-pie-svg{flex-shrink:0;}
+    .dash-pie-leyenda{flex:1;display:flex;flex-direction:column;gap:8px;}
+    .dash-pie-item{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;}
+    .dash-pie-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    .dash-pie-val{margin-left:auto;font-size:13px;font-weight:900;}
+    .dash-semana-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;align-items:flex-end;height:70px;margin-top:8px;}
+    .dash-semana-col{display:flex;flex-direction:column;align-items:center;gap:3px;}
+    .dash-semana-bar{width:100%;border-radius:4px 4px 0 0;min-height:4px;transition:height 0.5s;}
+    .dash-semana-lbl{font-size:8px;color:#555;font-weight:700;}
+    .dash-semana-num{font-size:9px;color:#888;font-weight:900;}
+    .dash-empty{text-align:center;color:#444;padding:20px 0;font-size:13px;}
+    .dash-refresh-btn{width:100%;background:var(--bg3);color:var(--cyan);border:1px solid rgba(0,212,212,0.3);padding:10px;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;margin-bottom:12px;}
+    .dash-top-mza-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+    .dash-top-mza-item:last-child{border-bottom:none;}
+    .dash-top-mza-label{font-size:13px;font-weight:900;color:#fff;min-width:80px;}
+    .dash-top-mza-bar-wrap{flex:1;background:var(--bg3);border-radius:20px;height:8px;overflow:hidden;}
+    .dash-top-mza-bar{height:100%;border-radius:20px;background:var(--purple);}
+    .dash-top-mza-count{font-size:12px;font-weight:900;color:var(--purple);min-width:24px;text-align:right;}
     .pdf-report{display:none;background:white;color:#111;padding:24px;font-family:sans-serif;border-radius:12px;margin-top:12px;}
     .pdf-report h2{font-size:18px;margin-bottom:4px;}
     .pdf-report table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px;}
@@ -720,6 +787,7 @@
         <div class="menu-item" style="color:var(--purple);" onclick="abrirBaneo()"><span class="menu-item-icon">🚷</span>Baneo de vecinos</div>
         <div class="menu-section-label">SISTEMA</div>
         <div class="menu-item danger" onclick="abrirReset()"><span class="menu-item-icon">📤</span>Dar salida general</div>
+        <div class="menu-item" onclick="ver('config');cerrarMenu()"><span class="menu-item-icon">⚙️</span>Configuración</div>
       </div>
     </div>
     <div class="header-right">
@@ -785,6 +853,24 @@
       <input id="cfg-url" class="giant" placeholder="URL /exec del Google Script">
       <button class="btn-save" onclick="guardarConfig()">GUARDAR</button>
     </div>
+    <!-- PANEL NOTIFICACIONES -->
+    <div class="section" id="push-status-panel" style="border-color:var(--border);transition:border-color 0.3s;">
+      <div style="font-size:13px;font-weight:900;color:#fff;margin-bottom:12px;letter-spacing:0.5px;">🔔 NOTIFICACIONES PUSH</div>
+      <div id="push-status" style="font-size:14px;font-weight:800;margin-bottom:14px;color:#888;">Verificando...</div>
+      <div style="font-size:11px;color:#555;margin-bottom:14px;line-height:1.6;">
+        Recibí alertas aunque la app esté cerrada:<br>
+        🚨 Pánico de vecinos · ⚠️ Delivery +15min · 💬 Mensajes de chat
+      </div>
+      <button id="push-btn-activar" onclick="pushActivar()" style="display:none;width:100%;background:var(--green);color:#000;border:none;border-radius:12px;padding:14px;font-weight:900;font-size:14px;cursor:pointer;margin-bottom:8px;">🔔 ACTIVAR NOTIFICACIONES</button>
+      <button id="push-btn-desactivar" onclick="pushDesuscribir()" style="display:none;width:100%;background:var(--bg3);color:#888;border:1px solid var(--border);border-radius:12px;padding:12px;font-weight:800;font-size:13px;cursor:pointer;margin-bottom:8px;">🔕 Desactivar notificaciones</button>
+      <button onclick="pushTestLocal()" style="width:100%;background:var(--bg3);color:var(--cyan);border:1px solid rgba(0,212,212,0.3);border-radius:12px;padding:12px;font-weight:800;font-size:13px;cursor:pointer;">🧪 Probar notificación</button>
+      <div style="margin-top:12px;padding:10px;background:var(--bg3);border-radius:10px;font-size:10px;color:#444;line-height:1.6;">
+        <strong style="color:#555;">ℹ️ Para que las notificaciones lleguen con la app cerrada</strong> también necesitás agregar soporte en tu Google Apps Script. Mirá la documentación incluida abajo.
+      </div>
+    </div>
+  </div>
+  <div id="p-stats" class="panel">
+    <div id="stats-contenido"></div>
   </div>
 </div><!-- /scroll-inner -->
 </div><!-- /scroll-content -->
@@ -805,7 +891,28 @@
     <button class="modal-close" onclick="cerrarModal('modal-vigs-online')">✕</button>
     <div class="modal-title">🟢 VIGILADORES EN LÍNEA</div>
     <div id="vigs-online-contenido"><div class="empty-msg">Cargando...</div></div>
-    <div style="font-size:10px;color:#444;text-align:center;margin-top:12px;">Se actualiza cada 60 segundos · Inactivo si no hay señal por +3 min</div>
+    <div style="font-size:10px;color:#444;text-align:center;margin-top:12px;">💬 Tocá un vigilador para chatear · Se actualiza cada 30 seg</div>
+  </div>
+</div>
+
+<!-- ══ CHAT OVERLAY ══ -->
+<div class="chat-overlay" id="chat-overlay">
+  <div class="chat-header">
+    <button class="chat-back" onclick="cerrarChat()">‹</button>
+    <div class="chat-titulo">
+      <div class="chat-nombre" id="chat-con-nombre">—</div>
+      <div class="chat-estado" id="chat-con-estado">● en línea</div>
+    </div>
+  </div>
+  <div class="chat-msgs" id="chat-msgs">
+    <div class="chat-vacio" id="chat-vacio">
+      💬 Iniciá la conversación<br>
+      <span style="font-size:12px;color:#333;">Los mensajes se ven en tiempo real</span>
+    </div>
+  </div>
+  <div class="chat-input-bar">
+    <textarea class="chat-input" id="chat-input" placeholder="Escribí un mensaje..." rows="1" oninput="chatAutoResize(this)" onkeydown="chatKeyDown(event)"></textarea>
+    <button class="chat-send" onclick="chatEnviar()">➤</button>
   </div>
 </div>
 
@@ -830,9 +937,9 @@
     <span>INCID</span>
     <span class="bn-badge" id="inc-nav-badge"></span>
   </div>
-  <div class="bn-item" id="btn-config" onclick="ver('config')">
-    <span class="bn-icon">⚙️</span>
-    <span>CONFIG</span>
+  <div class="bn-item" id="btn-stats" onclick="ver('stats');renderDashboard()">
+    <span class="bn-icon">📊</span>
+    <span>STATS</span>
   </div>
 </nav>
 
@@ -939,7 +1046,9 @@ setInterval(function tickContadores(){
       _alertasNotificadas.add(String(r.id));
       sessionStorage.setItem('nx_alertas_notif',JSON.stringify([..._alertasNotificadas]));
       initAudio();tocarAlertaDelivery();
-      render(); // refresh visual state (color change)
+      const mins=Math.floor((ahora-(r.tsE||0))/60000);
+      if(typeof pushNotifDeliveryAlerta==='function') pushNotifDeliveryAlerta(r.pat||'—', mins);
+      render();
     }
   });
 },1000);
@@ -1030,7 +1139,7 @@ function setSyncStatus(msg,cls){const el=document.getElementById('sync-status');
 function horaActual(){return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
 function limpiarHora(h){if(!h)return'';const s=String(h);if(s.includes('T'))return s.split('T')[1].substring(0,5);if(s.includes('\n'))return s.split('\n')[1]||'';return s;}
 function escHtml(str){if(!str)return'';return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function ver(n){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item,.bn-item').forEach(i=>i.classList.remove('active'));document.getElementById('p-'+n).classList.add('active');const btnN=document.getElementById('btn-'+n);if(btnN)btnN.classList.add('active');}
+function ver(n){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item,.bn-item').forEach(i=>i.classList.remove('active'));document.getElementById('p-'+n).classList.add('active');const btnN=document.getElementById('btn-'+n);if(btnN)btnN.classList.add('active');if(n==='config')setTimeout(pushActualizarUI,100);}
 
 // ── BASE DE DATOS LOCAL ────────────────────────────────────
 let DB=(()=>{const hoyStr=new Date().toLocaleDateString('es-AR');const raw=JSON.parse(localStorage.getItem('nx_db')||'[]');// Purgar registros ya con salida de días anteriores para no crecer infinito
@@ -1116,6 +1225,20 @@ async function fetchVigsOnline() {
       _vigsOnline = data.online;
       renderVigsOnline();
     }
+    // También traer mensajes de chat no leídos
+    if (Array.isArray(data.chat_msgs)) {
+      const yo = sessionStorage.getItem('nx_vigilador') || '';
+      data.chat_msgs.forEach(m => {
+        if (m.para !== yo) return;
+        const clave = chatClave(yo, m.de);
+        const local = JSON.parse(localStorage.getItem('nx_chat_' + clave) || '[]');
+        if (!local.find(x => x.ts === m.ts && x.de === m.de)) {
+          local.push(m);
+          localStorage.setItem('nx_chat_' + clave, JSON.stringify(local));
+        }
+      });
+      renderVigsOnline(); // refrescar badges
+    }
   } catch(e) {}
 }
 
@@ -1150,10 +1273,14 @@ function renderModalVigs() {
     const mins = v.ts ? Math.floor((ahora - v.ts) / 60000) : null;
     const tiempoStr = mins !== null ? (mins < 1 ? 'hace un momento' : `hace ${mins}min`) : '';
     const desde = v.desde ? new Date(v.desde).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
-    return `<div class="vig-modal-item${esYo?' yo':''}">
-      <div>
-        <div class="vig-modal-nombre">👤 ${escHtml(v.nombre)}${esYo?' <span style="color:#555;font-size:11px;">(vos)</span>':''}</div>
+    const unread = chatContarNoLeidos(v.nombre);
+    const unreadHtml = unread > 0 ? `<span class="chat-unread-dot"></span>` : '';
+    const chatHint = esYo ? '' : `<div class="vig-chat-hint">💬 Tocá para chatear${unread > 0 ? ` · <span style="color:var(--green);font-weight:900">${unread} nuevo${unread>1?'s':''}</span>` : ''}</div>`;
+    return `<div class="vig-modal-item${esYo?' yo':''}" ${esYo ? '' : `onclick="abrirChat('${escHtml(v.nombre)}')"`}>
+      <div style="flex:1">
+        <div class="vig-modal-nombre" style="display:flex;align-items:center;gap:6px;">👤 ${escHtml(v.nombre)}${esYo?' <span style="color:#555;font-size:11px;">(vos)</span>':''}${unreadHtml}</div>
         <div class="vig-modal-hora">${desde ? 'En turno desde ' + desde : ''}${tiempoStr ? ' · última señal ' + tiempoStr : ''}</div>
+        ${chatHint}
       </div>
       <span class="vig-modal-badge ${esYo?'vig-badge-yo':'vig-badge-online'}">${esYo?'● VOS':'● ONLINE'}</span>
     </div>`;
@@ -1177,7 +1304,7 @@ function iniciarHeartbeat() {
   if (window._heartbeatInterval) clearInterval(window._heartbeatInterval);
   if (window._vigsOnlineInterval) clearInterval(window._vigsOnlineInterval);
   window._heartbeatInterval = setInterval(heartbeatVigilador, 60000);
-  window._vigsOnlineInterval = setInterval(fetchVigsOnline, 60000);
+  window._vigsOnlineInterval = setInterval(fetchVigsOnline, 30000);
 }
 
 // Detener al cerrar sesión
@@ -2023,6 +2150,392 @@ function incCompartirResumenWA() {
   window.open(url, '_blank');
 }
 
+// ══ DASHBOARD DE ESTADÍSTICAS ═══════════════════════════════
+
+function renderDashboard() {
+  const cont = document.getElementById('stats-contenido');
+  if (!cont) return;
+
+  const ahora = Date.now();
+  const hoyStr = new Date().toLocaleDateString('es-AR');
+
+  // Datos de hoy desde DB
+  const hoy = DB.filter(r => new Date(r.tsE || 0).toLocaleDateString('es-AR') === hoyStr);
+  const total = hoy.length;
+  const adentro = hoy.filter(r => !r.hS).length;
+  const salidos = hoy.filter(r => r.hS).length;
+  const delivery = hoy.filter(r => r.tipo === 'DELIVERY').length;
+  const visitas = hoy.filter(r => r.tipo !== 'DELIVERY').length;
+  const alertas = DB.filter(r => r.tipo === 'DELIVERY' && !r.hS && (ahora - (r.tsE || 0)) > 900000).length;
+
+  // Tiempo promedio de permanencia (solo los que ya salieron)
+  const conSalida = hoy.filter(r => r.hS && r.tsE);
+  let promMin = 0;
+  if (conSalida.length > 0) {
+    const sumaMin = conSalida.reduce((acc, r) => {
+      const hSDate = new Date();
+      const [hh, mm] = (r.hS || '00:00').split(':').map(Number);
+      hSDate.setHours(hh, mm, 0, 0);
+      return acc + Math.max(0, (hSDate.getTime() - (r.tsE || 0)) / 60000);
+    }, 0);
+    promMin = Math.round(sumaMin / conSalida.length);
+  }
+  const promStr = promMin >= 60
+    ? `${Math.floor(promMin / 60)}h ${promMin % 60}min`
+    : `${promMin}min`;
+
+  // Ingresos por hora (últimas 12 horas)
+  const horaActualN = new Date().getHours();
+  const horasLabels = [];
+  const horasCounts = [];
+  for (let i = 11; i >= 0; i--) {
+    const h = (horaActualN - i + 24) % 24;
+    horasLabels.push(String(h).padStart(2, '0'));
+    horasCounts.push(hoy.filter(r => new Date(r.tsE || 0).getHours() === h).length);
+  }
+  const maxHora = Math.max(...horasCounts, 1);
+
+  // Por tipo (pie donut SVG)
+  const tipoData = [
+    { label: 'Visitas', val: visitas, color: '#2ecc71' },
+    { label: 'Delivery', val: delivery, color: '#f5c842' },
+  ];
+
+  // Patentes más frecuentes (últimos 30 días)
+  const todoDB = JSON.parse(localStorage.getItem('nx_db') || '[]');
+  const patCount = {};
+  todoDB.forEach(r => { if (r.pat) patCount[r.pat] = (patCount[r.pat] || 0) + 1; });
+  const topPats = Object.entries(patCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+  // Top manzanas
+  const mzaCount = {};
+  hoy.forEach(r => { if (r.mza) mzaCount[r.mza] = (mzaCount[r.mza] || 0) + 1; });
+  const topMzas = Object.entries(mzaCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const maxMza = topMzas.length ? topMzas[0][1] : 1;
+
+  // Historial por día (últimos 7 días)
+  const semanaData = [];
+  const diasNombres = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const dStr = d.toLocaleDateString('es-AR');
+    const cnt = todoDB.filter(r => new Date(r.tsE || 0).toLocaleDateString('es-AR') === dStr).length;
+    semanaData.push({ label: diasNombres[d.getDay()], cnt, esHoy: i === 0 });
+  }
+  const maxSemana = Math.max(...semanaData.map(d => d.cnt), 1);
+
+  // Incidentes de hoy
+  const hoyStrInc = new Date().toLocaleDateString('es-AR');
+  const incHoy = INCIDENTES.filter(i => new Date(i.ts).toLocaleDateString('es-AR') === hoyStrInc);
+  const incGrave = incHoy.filter(i => i.tipo === 'grave').length;
+  const incNormal = incHoy.filter(i => i.tipo === 'normal').length;
+  const incInfo = incHoy.filter(i => i.tipo === 'info').length;
+
+  // SVG donut
+  function buildDonut(data, total) {
+    if (total === 0) return `<svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="28" fill="none" stroke="#2e2e38" stroke-width="14"/><text x="40" y="44" text-anchor="middle" font-size="13" font-weight="900" fill="#555">—</text></svg>`;
+    const r = 28, cx = 40, cy = 40, circ = 2 * Math.PI * r;
+    let offset = 0;
+    const segs = data.map(d => {
+      const pct = d.val / total;
+      const dash = pct * circ;
+      const seg = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${d.color}" stroke-width="14" stroke-dasharray="${dash} ${circ - dash}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cy})"/>`;
+      offset += dash;
+      return seg;
+    });
+    return `<svg class="dash-pie-svg" width="80" height="80" viewBox="0 0 80 80">${segs.join('')}<text x="40" y="37" text-anchor="middle" font-size="11" font-weight="900" fill="#fff">${total}</text><text x="40" y="50" text-anchor="middle" font-size="9" fill="#666">HOY</text></svg>`;
+  }
+
+  cont.innerHTML = `
+  <button class="dash-refresh-btn" onclick="renderDashboard()">🔄 Actualizar dashboard</button>
+
+  <!-- KPIs HOY -->
+  <div class="dash-section">
+    <div class="dash-title">📅 HOY — ${hoyStr}</div>
+    <div class="dash-kpi-grid">
+      <div class="dash-kpi" style="border-color:rgba(0,212,212,0.4);">
+        <span class="dash-kpi-val" style="color:var(--cyan)">${total}</span>
+        <span class="dash-kpi-label">TOTAL INGRESOS</span>
+      </div>
+      <div class="dash-kpi" style="border-color:rgba(46,204,113,0.4);">
+        <span class="dash-kpi-val" style="color:var(--green)">${adentro}</span>
+        <span class="dash-kpi-label">ADENTRO AHORA</span>
+      </div>
+      <div class="dash-kpi" style="border-color:rgba(245,200,66,0.4);">
+        <span class="dash-kpi-val" style="color:var(--gold)">${delivery}</span>
+        <span class="dash-kpi-label">DELIVERY</span>
+      </div>
+      <div class="dash-kpi" style="border-color:${alertas > 0 ? 'rgba(231,76,60,0.5)' : 'var(--border)'};">
+        <span class="dash-kpi-val" style="color:${alertas > 0 ? 'var(--red)' : '#888'}">${alertas}</span>
+        <span class="dash-kpi-label">ALERTAS +15MIN</span>
+      </div>
+    </div>
+    ${promMin > 0 ? `<div style="margin-top:12px;background:var(--bg3);border-radius:12px;padding:12px;text-align:center;"><span style="font-size:11px;color:#666;font-weight:700;">⏱ PERMANENCIA PROMEDIO</span><br><span style="font-size:22px;font-weight:900;color:var(--purple)">${promStr}</span></div>` : ''}
+  </div>
+
+  <!-- INGRESOS POR HORA -->
+  <div class="dash-section">
+    <div class="dash-title">🕐 INGRESOS POR HORA (últimas 12h)</div>
+    ${total === 0 ? '<div class="dash-empty">Sin registros hoy</div>' : `
+    <div class="dash-horas-grid">
+      ${horasLabels.map((h, i) => `
+        <div class="dash-hora-col">
+          <div class="dash-hora-bar" style="height:${Math.max(4, Math.round((horasCounts[i] / maxHora) * 48))}px;opacity:${h === String(horaActualN).padStart(2,'0') ? '1' : '0.7'};background:${h === String(horaActualN).padStart(2,'0') ? 'var(--cyan)' : 'rgba(0,212,212,0.5)'}"></div>
+          <div class="dash-hora-lbl">${h}</div>
+          ${horasCounts[i] > 0 ? `<div style="font-size:7px;color:var(--cyan);font-weight:900;">${horasCounts[i]}</div>` : '<div style="font-size:7px;color:transparent;">0</div>'}
+        </div>`).join('')}
+    </div>`}
+  </div>
+
+  <!-- TIPO DE INGRESO -->
+  <div class="dash-section">
+    <div class="dash-title">🥧 TIPO DE INGRESO — HOY</div>
+    <div class="dash-pie-wrap">
+      ${buildDonut(tipoData, total)}
+      <div class="dash-pie-leyenda">
+        ${tipoData.map(d => `
+          <div class="dash-pie-item">
+            <div class="dash-pie-dot" style="background:${d.color}"></div>
+            <span style="color:#aaa">${d.label}</span>
+            <span class="dash-pie-val" style="color:${d.color}">${d.val}</span>
+          </div>`).join('')}
+        <div class="dash-pie-item">
+          <div class="dash-pie-dot" style="background:#888"></div>
+          <span style="color:#aaa">Salidos</span>
+          <span class="dash-pie-val" style="color:#888">${salidos}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ÚLTIMOS 7 DÍAS -->
+  <div class="dash-section">
+    <div class="dash-title">📆 INGRESOS ÚLTIMOS 7 DÍAS</div>
+    <div class="dash-semana-grid">
+      ${semanaData.map(d => `
+        <div class="dash-semana-col">
+          <div style="font-size:9px;color:${d.esHoy ? 'var(--cyan)' : '#888'};font-weight:900;min-height:12px;">${d.cnt > 0 ? d.cnt : ''}</div>
+          <div class="dash-semana-bar" style="height:${Math.max(4, Math.round((d.cnt / maxSemana) * 52))}px;background:${d.esHoy ? 'var(--cyan)' : 'rgba(0,212,212,0.35)'}"></div>
+          <div class="dash-semana-lbl" style="color:${d.esHoy ? 'var(--cyan)' : '#555'}">${d.label}</div>
+        </div>`).join('')}
+    </div>
+  </div>
+
+  <!-- TOP MANZANAS -->
+  ${topMzas.length > 0 ? `
+  <div class="dash-section">
+    <div class="dash-title">🏘️ TOP MANZANAS — HOY</div>
+    ${topMzas.map(([mza, cnt]) => `
+      <div class="dash-top-mza-item">
+        <span class="dash-top-mza-label">Mza ${escHtml(mza)}</span>
+        <div class="dash-top-mza-bar-wrap"><div class="dash-top-mza-bar" style="width:${Math.round((cnt/maxMza)*100)}%"></div></div>
+        <span class="dash-top-mza-count">${cnt}</span>
+      </div>`).join('')}
+  </div>` : ''}
+
+  <!-- PATENTES FRECUENTES -->
+  ${topPats.length > 0 ? `
+  <div class="dash-section">
+    <div class="dash-title">🔁 PATENTES MÁS FRECUENTES</div>
+    ${topPats.map(([pat, cnt]) => `
+      <div class="dash-pats-item">
+        <span class="dash-pats-pat">${escHtml(pat)}</span>
+        <span class="dash-pats-count">${cnt} visita${cnt > 1 ? 's' : ''}</span>
+      </div>`).join('')}
+    <div style="font-size:10px;color:#444;margin-top:8px;text-align:center;">Basado en datos guardados localmente</div>
+  </div>` : ''}
+
+  <!-- INCIDENTES HOY -->
+  <div class="dash-section">
+    <div class="dash-title">📝 INCIDENTES — HOY</div>
+    ${incHoy.length === 0
+      ? '<div class="dash-empty">✅ Sin incidentes hoy</div>'
+      : `<div class="dash-kpi-grid">
+          <div class="dash-kpi" style="border-color:rgba(231,76,60,0.4);">
+            <span class="dash-kpi-val" style="color:var(--red)">${incGrave}</span>
+            <span class="dash-kpi-label">🔴 GRAVES</span>
+          </div>
+          <div class="dash-kpi" style="border-color:rgba(245,200,66,0.3);">
+            <span class="dash-kpi-val" style="color:var(--gold)">${incNormal}</span>
+            <span class="dash-kpi-label">🟡 NOVEDADES</span>
+          </div>
+        </div>
+        <div style="margin-top:8px;">
+        ${incHoy.slice(0,3).map(i => {
+          const hora = new Date(i.ts).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+          const cols = {grave:'var(--red)',normal:'var(--gold)',info:'var(--blue)'};
+          return `<div style="background:var(--bg3);border-left:3px solid ${cols[i.tipo]};border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;"><span style="color:${cols[i.tipo]};font-weight:800;">${hora}</span> · ${escHtml(i.desc.substring(0,60))}${i.desc.length>60?'…':''}</div>`;
+        }).join('')}
+        ${incHoy.length > 3 ? `<div style="font-size:11px;color:#555;text-align:center;margin-top:4px;">+${incHoy.length-3} más · abrí Incidentes para ver todos</div>` : ''}
+        </div>`
+    }
+  </div>
+  `;
+}
+
+// ══ FIN DASHBOARD ════════════════════════════════════════════
+
+// ══ CHAT ENTRE VIGILADORES ══════════════════════════════════
+
+let _chatConVig = null;
+let _chatMensajes = [];
+let _chatInterval = null;
+let _chatUltimoLeido = {};
+
+function chatClave(a, b) {
+  // Clave de conversación ordenada alfabéticamente para que sea simétrica
+  return [a, b].sort().join('__NX__');
+}
+
+function chatContarNoLeidos(otroNombre) {
+  const yo = sessionStorage.getItem('nx_vigilador') || '';
+  const clave = chatClave(yo, otroNombre);
+  const msgs = JSON.parse(localStorage.getItem('nx_chat_' + clave) || '[]');
+  const ultimoLeido = _chatUltimoLeido[clave] || 0;
+  return msgs.filter(m => m.de !== yo && m.ts > ultimoLeido).length;
+}
+
+function abrirChat(nombreVig) {
+  const yo = sessionStorage.getItem('nx_vigilador') || '';
+  _chatConVig = nombreVig;
+  document.getElementById('chat-con-nombre').innerText = '💬 ' + nombreVig;
+  document.getElementById('chat-con-estado').innerText = '● en línea';
+  // Marcar como leídos
+  const clave = chatClave(yo, nombreVig);
+  _chatUltimoLeido[clave] = Date.now();
+  localStorage.setItem('nx_chat_leido', JSON.stringify(_chatUltimoLeido));
+  // Cargar mensajes locales primero
+  _chatMensajes = JSON.parse(localStorage.getItem('nx_chat_' + clave) || '[]');
+  renderChat();
+  document.getElementById('chat-overlay').classList.add('visible');
+  document.getElementById('modal-vigs-online').classList.remove('visible');
+  // Enfocar input
+  setTimeout(() => document.getElementById('chat-input').focus(), 300);
+  // Polling de mensajes
+  if (_chatInterval) clearInterval(_chatInterval);
+  chatFetchMensajes();
+  _chatInterval = setInterval(chatFetchMensajes, 8000);
+}
+
+function cerrarChat() {
+  document.getElementById('chat-overlay').classList.remove('visible');
+  if (_chatInterval) { clearInterval(_chatInterval); _chatInterval = null; }
+  _chatConVig = null;
+  // Reabrir modal de vigs
+  renderModalVigs();
+  document.getElementById('modal-vigs-online').classList.add('visible');
+}
+
+async function chatFetchMensajes() {
+  const url = localStorage.getItem('nx_url');
+  const yo = sessionStorage.getItem('nx_vigilador') || '';
+  if (!url || !_chatConVig) return;
+  try {
+    const clave = chatClave(yo, _chatConVig);
+    const r = await fetch(url + '?accion=chat&clave=' + encodeURIComponent(clave) + '&t=' + Date.now());
+    if (!r.ok) return;
+    const data = await r.json();
+    if (Array.isArray(data.mensajes)) {
+      const prevLen = _chatMensajes.length;
+      _chatMensajes = data.mensajes;
+      // Guardar localmente
+      localStorage.setItem('nx_chat_' + clave, JSON.stringify(_chatMensajes));
+      // Si hay nuevos mensajes del otro, reproducir sonido
+      const nuevos = _chatMensajes.filter(m => m.de !== yo && m.ts > (_chatUltimoLeido[clave] || 0));
+      if (nuevos.length > 0 && _chatMensajes.length > prevLen) {
+        initAudio();
+        chatSonidoRecibido();
+      }
+      // Marcar leídos
+      _chatUltimoLeido[clave] = Date.now();
+      localStorage.setItem('nx_chat_leido', JSON.stringify(_chatUltimoLeido));
+      renderChat();
+    }
+  } catch(e) {}
+}
+
+function chatSonidoRecibido() {
+  if (!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.connect(g); g.connect(audioCtx.destination);
+  o.type = 'sine'; o.frequency.value = 880;
+  g.gain.setValueAtTime(0, now);
+  g.gain.linearRampToValueAtTime(0.15, now + 0.01);
+  g.gain.setValueAtTime(0.15, now + 0.1);
+  g.gain.linearRampToValueAtTime(0, now + 0.18);
+  o.start(now); o.stop(now + 0.2);
+}
+
+function renderChat() {
+  const yo = sessionStorage.getItem('nx_vigilador') || '';
+  const cont = document.getElementById('chat-msgs');
+  const vacio = document.getElementById('chat-vacio');
+  if (!_chatMensajes.length) {
+    if (vacio) vacio.style.display = '';
+    cont.innerHTML = `<div class="chat-vacio" id="chat-vacio">
+      💬 Iniciá la conversación<br>
+      <span style="font-size:12px;color:#333;">Los mensajes llegan en segundos</span>
+    </div>`;
+    return;
+  }
+  cont.innerHTML = _chatMensajes.map(m => {
+    const esMio = m.de === yo;
+    const hora = new Date(m.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    return `<div class="chat-burbuja-wrap ${esMio?'mia':'suya'}">
+      ${!esMio ? `<div class="chat-remitente">${escHtml(m.de)}</div>` : ''}
+      <div class="chat-burbuja ${esMio?'mia':'suya'}">${escHtml(m.texto).replace(/\n/g,'<br>')}</div>
+      <div class="chat-meta">${hora}</div>
+    </div>`;
+  }).join('');
+  // Scroll al final
+  cont.scrollTop = cont.scrollHeight;
+}
+
+async function chatEnviar() {
+  const input = document.getElementById('chat-input');
+  const texto = input.value.trim();
+  const yo = sessionStorage.getItem('nx_vigilador') || '';
+  const url = localStorage.getItem('nx_url');
+  if (!texto || !_chatConVig || !yo) return;
+  input.value = '';
+  chatAutoResize(input);
+  const clave = chatClave(yo, _chatConVig);
+  const msg = { de: yo, para: _chatConVig, texto, ts: Date.now(), clave };
+  // Agregar localmente de inmediato
+  _chatMensajes.push(msg);
+  localStorage.setItem('nx_chat_' + clave, JSON.stringify(_chatMensajes));
+  renderChat();
+  // Enviar al servidor
+  if (url) {
+    try {
+      await fetch(url, {
+        method: 'POST', mode: 'no-cors',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({accion: 'chat', ...msg})
+      });
+      setTimeout(chatFetchMensajes, 1000);
+    } catch(e) {}
+  }
+}
+
+function chatAutoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+}
+
+function chatKeyDown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    chatEnviar();
+  }
+}
+
+// Cargar estado de leídos al iniciar
+_chatUltimoLeido = JSON.parse(localStorage.getItem('nx_chat_leido') || '{}');
+
+// ══ FIN CHAT ════════════════════════════════════════════════
+
 // ══ FIN INCIDENTES ══════════════════════════════════════
 
 </script>
@@ -2055,11 +2568,21 @@ function incCompartirResumenWA() {
 </div>
 
 <script>
+// ══════════════════════════════════════════════════════════
+//  NEXOS — SERVICE WORKER + PUSH NOTIFICATIONS
+// ══════════════════════════════════════════════════════════
+
+// Clave pública VAPID (par generado para este proyecto)
+const NEXOS_VAPID_PUBLIC = 'BFwTEQTNi9wabPdmsCPgLqPrdK-lt8qYjM-h0_adyhPcE2iBsPqSbAfUOU3RtpUbTRRi2vu7zSHKPLuXSd2YE10';
+
+let _swReg = null; // Referencia global al SW registration
+
 // ── REGISTRO DEL SERVICE WORKER ──────────────────────────
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw_control.js', { scope: './' })
       .then(reg => {
+        _swReg = reg;
         console.log('[NEXOS] SW registrado. Scope:', reg.scope);
         reg.addEventListener('updatefound', () => {
           const newWorker = reg.installing;
@@ -2071,6 +2594,12 @@ if ('serviceWorker' in navigator) {
             }
           });
         });
+        // Intentar suscribir push si ya tenía permiso
+        if (Notification.permission === 'granted') {
+          pushSuscribir(false);
+        }
+        // Actualizar UI del panel de notificaciones
+        pushActualizarUI();
       })
       .catch(err => console.warn('[NEXOS] SW error:', err));
 
@@ -2097,6 +2626,225 @@ function instalarPWA() {
     showToast('ℹ️ Usá "Agregar a inicio" en el menú del navegador');
   }
 }
+
+// ══════════════════════════════════════════════════════════
+//  SISTEMA DE NOTIFICACIONES PUSH
+// ══════════════════════════════════════════════════════════
+
+// Convertir base64url a Uint8Array (necesario para VAPID)
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+
+// Estado actual de la suscripción
+function pushEstado() {
+  if (!('Notification' in window)) return 'no-soportado';
+  if (!('PushManager' in window)) return 'no-soportado';
+  return Notification.permission; // 'default' | 'granted' | 'denied'
+}
+
+// Suscribir al servidor push
+async function pushSuscribir(mostrarToast = true) {
+  try {
+    const reg = _swReg || await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(NEXOS_VAPID_PUBLIC)
+    });
+    // Guardar suscripción localmente
+    localStorage.setItem('nx_push_sub', JSON.stringify(sub));
+    // Enviar suscripción al Sheet para que pueda mandar push
+    const url = localStorage.getItem('nx_url');
+    const nombre = sessionStorage.getItem('nx_vigilador') || 'desconocido';
+    if (url) {
+      fetch(url, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accion: 'push_suscribir',
+          nombre,
+          sub: JSON.stringify(sub)
+        })
+      }).catch(() => {});
+    }
+    if (mostrarToast) showToast('🔔 Notificaciones activadas');
+    pushActualizarUI();
+    return sub;
+  } catch (e) {
+    console.warn('[NEXOS] Push subscribe error:', e);
+    if (mostrarToast) showToast('⚠️ No se pudo activar: ' + e.message);
+    return null;
+  }
+}
+
+// Desuscribir
+async function pushDesuscribir() {
+  try {
+    const reg = _swReg || await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    if (sub) {
+      await sub.unsubscribe();
+      localStorage.removeItem('nx_push_sub');
+      // Notificar al Sheet
+      const url = localStorage.getItem('nx_url');
+      const nombre = sessionStorage.getItem('nx_vigilador') || 'desconocido';
+      if (url) {
+        fetch(url, {
+          method: 'POST', mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accion: 'push_desuscribir', nombre })
+        }).catch(() => {});
+      }
+    }
+    showToast('🔕 Notificaciones desactivadas');
+    pushActualizarUI();
+  } catch (e) {
+    showToast('⚠️ Error al desactivar: ' + e.message);
+  }
+}
+
+// Pedir permiso y suscribir
+async function pushActivar() {
+  if (!('Notification' in window) || !('PushManager' in window)) {
+    showToast('⚠️ Tu navegador no soporta notificaciones push');
+    return;
+  }
+  if (Notification.permission === 'denied') {
+    showToast('🚫 Notificaciones bloqueadas — habilitá desde la config del navegador');
+    pushActualizarUI();
+    return;
+  }
+  const perm = await Notification.requestPermission();
+  if (perm === 'granted') {
+    await pushSuscribir(true);
+  } else {
+    showToast('🚫 Permiso denegado');
+  }
+  pushActualizarUI();
+}
+
+// Notificación local (sin servidor, mientras la app está abierta/background)
+function pushNotifLocal(titulo, cuerpo, tag = 'nexos-local') {
+  if (Notification.permission !== 'granted') return;
+  navigator.serviceWorker.ready.then(reg => {
+    reg.showNotification(titulo, {
+      body: cuerpo,
+      icon: './nexos-icon-192.png',
+      badge: './nexos-icon-192.png',
+      vibrate: [200, 100, 200, 100, 400],
+      tag,
+      requireInteraction: true,
+      data: { url: './nexos_control.html' }
+    });
+  });
+}
+
+// Actualizar UI del panel de notificaciones
+function pushActualizarUI() {
+  const estado = pushEstado();
+  const btnActivar = document.getElementById('push-btn-activar');
+  const btnDesactivar = document.getElementById('push-btn-desactivar');
+  const statusEl = document.getElementById('push-status');
+  const statusPanel = document.getElementById('push-status-panel');
+  if (!statusEl) return;
+
+  if (estado === 'no-soportado') {
+    statusEl.innerText = '❌ No soportado en este navegador';
+    statusEl.style.color = '#888';
+    if (btnActivar) btnActivar.style.display = 'none';
+    if (btnDesactivar) btnDesactivar.style.display = 'none';
+    if (statusPanel) statusPanel.style.borderColor = 'var(--border)';
+  } else if (estado === 'granted') {
+    statusEl.innerText = '🔔 Notificaciones ACTIVAS';
+    statusEl.style.color = 'var(--green)';
+    if (btnActivar) btnActivar.style.display = 'none';
+    if (btnDesactivar) btnDesactivar.style.display = 'block';
+    if (statusPanel) statusPanel.style.borderColor = 'rgba(46,204,113,0.5)';
+  } else if (estado === 'denied') {
+    statusEl.innerText = '🚫 Bloqueadas por el navegador';
+    statusEl.style.color = 'var(--red)';
+    if (btnActivar) btnActivar.style.display = 'none';
+    if (btnDesactivar) btnDesactivar.style.display = 'none';
+    if (statusPanel) { statusPanel.style.borderColor = 'rgba(231,76,60,0.4)'; statusPanel.innerHTML += '<div style="font-size:11px;color:#888;margin-top:8px;">Para habilitar: Configuración del navegador → Permisos del sitio → Notificaciones</div>'; }
+  } else {
+    statusEl.innerText = '🔕 Notificaciones desactivadas';
+    statusEl.style.color = '#888';
+    if (btnActivar) btnActivar.style.display = 'block';
+    if (btnDesactivar) btnDesactivar.style.display = 'none';
+    if (statusPanel) statusPanel.style.borderColor = 'var(--border)';
+  }
+}
+
+// Probar notificación local
+function pushTestLocal() {
+  if (Notification.permission !== 'granted') {
+    showToast('⚠️ Activá las notificaciones primero');
+    return;
+  }
+  pushNotifLocal(
+    '🔔 NEXOS — Prueba OK',
+    'Las notificaciones están funcionando correctamente ✅',
+    'nexos-test'
+  );
+}
+
+// ── HOOKS AUTOMÁTICOS ─────────────────────────────────────
+// Se llaman desde sincronizar() cuando llegan pánico/alertas
+function pushNotifPanico(alerta) {
+  pushNotifLocal(
+    '🚨 EMERGENCIA — NEXOS',
+    `Pánico: Mza ${alerta.mza} — Casa ${alerta.casa}`,
+    'nexos-panico'
+  );
+}
+
+function pushNotifDeliveryAlerta(pat, mins) {
+  pushNotifLocal(
+    '⚠️ Delivery con alerta — NEXOS',
+    `${pat} lleva ${mins} minutos adentro sin salir`,
+    'nexos-delivery-' + pat
+  );
+}
+
+function pushNotifNuevoMensaje(de, texto) {
+  pushNotifLocal(
+    `💬 Mensaje de ${de} — NEXOS`,
+    texto.substring(0, 80),
+    'nexos-chat-' + de
+  );
+}
+
+// ── INTEGRAR CON SINCRONIZAR: notificar pánico automáticamente
+const _sincronizarOrigPush = sincronizar;
+sincronizar = async function(manual = false) {
+  const antesDB = [...DB];
+  await _sincronizarOrigPush(manual);
+  // Detectar nuevos pánicos y notificar
+  // (mostrarPanico ya los maneja, pero agregamos notif push)
+};
+
+// Parchar mostrarPanico para disparar notif
+const _mostrarPanicoOrig = mostrarPanico;
+mostrarPanico = function(alertas) {
+  _mostrarPanicoOrig(alertas);
+  alertas.forEach(a => pushNotifPanico(a));
+};
+
+// Parchar chatSonidoRecibido para también mostrar notif cuando chat está cerrado
+const _chatSonidoOrig = chatSonidoRecibido;
+chatSonidoRecibido = function() {
+  _chatSonidoOrig();
+  if (!document.getElementById('chat-overlay').classList.contains('visible')) {
+    pushNotifNuevoMensaje(_chatConVig || 'Vigilador', '📨 Nuevo mensaje');
+  }
+};
+
+// Parchar tickContadores para notif de delivery (ya existe lógica, agregamos notif)
+// Se engancha en la detección de nueva alerta delivery dentro del setInterval existente
+
 </script>
 </body>
 </html>
