@@ -1,15 +1,16 @@
 // ══════════════════════════════════════════════════════════
-//  NEXOS CONTROL — Service Worker v1.2
+//  NEXOS CONTROL — Service Worker v2.0
 //  Estrategia: Cache-first para assets estáticos
 //              Network-first para el GAS (API)
+//  v2.0: Push notifications mejoradas con acciones
 // ══════════════════════════════════════════════════════════
 
-const CACHE_NAME  = 'nexos-control-v1.2';
+const CACHE_NAME  = 'nexos-control-v2.0';
 const OFFLINE_URL = './nexos_control.html';
 
 const PRECACHE_ASSETS = [
   './nexos_control.html',
-  './manifest.json',
+  './manifest_control.json',
   './nexos-icon-192.png',
   './nexos-icon-512.png',
 ];
@@ -101,34 +102,110 @@ self.addEventListener('sync', event => {
 // ── PUSH NOTIFICATIONS ─────────────────────────────────────
 self.addEventListener('push', event => {
   if (!event.data) return;
+
   let data = {};
   try { data = event.data.json(); } catch { data.title = event.data.text(); }
-  event.waitUntil(self.registration.showNotification(
-    data.title || '🚨 NEXOS — Alerta',
-    {
-      body: data.body || 'Hay una alerta en el barrio',
+
+  // Configuración según tipo de alerta
+  const tipo = data.tipo || 'alerta';
+  const configs = {
+    panico: {
+      icon: './nexos-icon-192.png',
+      badge: './nexos-icon-192.png',
+      vibrate: [300, 100, 300, 100, 600, 100, 600],
+      requireInteraction: true,
+      tag: 'nexos-panico',
+      actions: [
+        { action: 'abrir', title: '🚨 Ver emergencia' },
+        { action: 'cerrar', title: 'Descartar' }
+      ]
+    },
+    delivery: {
+      icon: './nexos-icon-192.png',
+      badge: './nexos-icon-192.png',
+      vibrate: [200, 100, 200],
+      requireInteraction: false,
+      tag: 'nexos-delivery-' + (data.pat || ''),
+      actions: [
+        { action: 'abrir', title: '⚠️ Ver delivery' }
+      ]
+    },
+    chat: {
+      icon: './nexos-icon-192.png',
+      badge: './nexos-icon-192.png',
+      vibrate: [100, 50, 100],
+      requireInteraction: false,
+      tag: 'nexos-chat-' + (data.de || ''),
+      actions: [
+        { action: 'abrir', title: '💬 Responder' }
+      ]
+    },
+    alerta: {
       icon: './nexos-icon-192.png',
       badge: './nexos-icon-192.png',
       vibrate: [200, 100, 200, 100, 400],
-      tag: 'nexos-alerta',
       requireInteraction: true,
-      data: { url: './nexos_control.html' }
+      tag: 'nexos-alerta',
+      actions: [
+        { action: 'abrir', title: '📋 Ver alerta' }
+      ]
     }
-  ));
+  };
+
+  const cfg = configs[tipo] || configs.alerta;
+
+  event.waitUntil(
+    self.registration.showNotification(
+      data.title || '🚨 NEXOS — Alerta',
+      {
+        body: data.body || 'Hay una alerta en el barrio',
+        ...cfg,
+        data: { url: data.url || './nexos_control.html', tipo }
+      }
+    )
+  );
 });
 
+// ── NOTIFICATION CLICK ─────────────────────────────────────
 self.addEventListener('notificationclick', event => {
   event.notification.close();
+
+  if (event.action === 'cerrar') return;
+
+  const targetUrl = event.notification.data?.url || './nexos_control.html';
+
   event.waitUntil(
-    self.clients.matchAll({ type: 'window' }).then(clients => {
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
+      // Si ya hay una ventana abierta con NEXOS, enfocarla
       for (const c of clients) {
-        if (c.url.includes('nexos_control') && 'focus' in c) return c.focus();
+        if (c.url.includes('nexos_control') && 'focus' in c) {
+          c.postMessage({ type: 'NEXOS_NOTIF_CLICK', tipo: event.notification.data?.tipo });
+          return c.focus();
+        }
       }
-      return self.clients.openWindow('./nexos_control.html');
+      // Si no, abrir nueva ventana
+      return self.clients.openWindow(targetUrl);
     })
   );
 });
 
+// ── PUSH SUBSCRIPTION CHANGE ──────────────────────────────
+// Se dispara cuando el browser rota las claves (raro pero posible)
+self.addEventListener('pushsubscriptionchange', event => {
+  event.waitUntil(
+    self.registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: event.oldSubscription?.options?.applicationServerKey
+    }).then(newSub => {
+      // Notificar a la app para que re-registre la suscripción
+      self.clients.matchAll({ type: 'window' }).then(clients =>
+        clients.forEach(c => c.postMessage({ type: 'NEXOS_PUSH_RESUB', sub: JSON.stringify(newSub) }))
+      );
+    })
+  );
+});
+
+// ── MESSAGE HANDLER ────────────────────────────────────────
 self.addEventListener('message', event => {
   if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
