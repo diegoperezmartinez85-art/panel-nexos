@@ -726,7 +726,7 @@
   </div>
 
   <div class="search-box">
-    <input class="search-input" id="buscador" placeholder="PATENTE O DNI..." oninput="this.value=this.value.toUpperCase()">
+    <input class="search-input" id="buscador" placeholder="PATENTE O DNI..." oninput="autoformatearPatente(this)" inputmode="text" autocomplete="off" spellcheck="false">
     <div class="action-btns">
       <div class="btn-main ingreso" onclick="registrarRapido('ingreso')">📥 INGRESO</div>
       <div class="btn-main salida" onclick="registrarRapido('salida')">📤 SALIDA</div>
@@ -745,7 +745,7 @@
   </div>
   <div id="p-manual" class="panel">
     <div class="section">
-      <div class="campo-label">PATENTE / VEHÍCULO</div><input id="m-pat" class="giant" placeholder="PATENTE" oninput="this.value=this.value.toUpperCase()">
+      <div class="campo-label">PATENTE / VEHÍCULO</div><input id="m-pat" class="giant" placeholder="PATENTE" oninput="autoformatearPatente(this)" autocomplete="off" spellcheck="false">
       <div class="campo-label">DNI (opcional)</div><input id="m-dni" class="giant" placeholder="DNI" inputmode="numeric">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><input id="m-mza" class="giant" placeholder="MZA"><input id="m-casa" class="giant" placeholder="CASA"></div>
       <button class="btn-save" onclick="guardarForm('manual')">REGISTRAR INGRESO</button>
@@ -753,7 +753,7 @@
   </div>
   <div id="p-delivery" class="panel">
     <div class="section">
-      <div class="campo-label">PATENTE / MOTO</div><input id="d-pat" class="giant" placeholder="MOTO" oninput="this.value=this.value.toUpperCase()">
+      <div class="campo-label">PATENTE / MOTO</div><input id="d-pat" class="giant" placeholder="MOTO" oninput="autoformatearPatente(this)" autocomplete="off" spellcheck="false">
       <div class="campo-label">DNI (opcional)</div><input id="d-dni" class="giant" placeholder="DNI" inputmode="numeric">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><input id="d-mza" class="giant" placeholder="MZA"><input id="d-casa" class="giant" placeholder="CASA"></div>
       <button class="btn-save" style="background:var(--gold);color:black;" onclick="guardarForm('delivery')">DELIVERY</button>
@@ -765,7 +765,6 @@
       <button class="btn-save" onclick="guardarConfig()">GUARDAR</button>
     </div>
   </div>
-</div>
 </div><!-- /scroll-inner -->
 </div><!-- /scroll-content -->
 </div><!-- /app-wrap -->
@@ -1038,10 +1037,120 @@ async function sincronizar(manual=false){
 function enviar(datos){const url=localStorage.getItem('nx_url');if(!url)return;fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)}).then(()=>setTimeout(()=>sincronizar(),1500)).catch(()=>showToast("⚠️ No se pudo subir"));}
 function cargarBaneadosDesdeCloud(bC){if(!Array.isArray(bC))return;BANEADOS=bC.map(b=>({mza:String(b.mza||''),casa:String(b.casa||''),id:b.id||'',motivo:b.motivo||'',ts:b.ts||Date.now()}));guardarBaneados();}
 
+// ── AUTOFORMATEO DE PATENTE ────────────────────────────────
+// Formato viejo (pre-2016): ABC 123  → 3 letras + espacio + 3 dígitos
+// Formato nuevo (Mercosur): AB 123 CD → 2 letras + espacio + 3 dígitos + espacio + 2 letras
+function autoformatearPatente(input) {
+  const pos = input.selectionStart;        // guardar posición del cursor
+  const prevLen = input.value.length;
+
+  // Separar solo letras y números (sin espacios ni guiones)
+  const raw = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+  let formatted = raw;
+  let tipo = null;
+
+  if (raw.length === 0) {
+    formatted = '';
+  } else {
+    // Detectar formato en base a los primeros caracteres ya ingresados:
+    // Si los 2 primeros son letras y el 3er carácter (si existe) también es letra → formato VIEJO (ABC...)
+    // Si los 2 primeros son letras y el 3er carácter (si existe) es número → formato NUEVO (AB...)
+    const startsWithTwoLetters = /^[A-Z]{2}/.test(raw);
+    const thirdIsLetter = raw.length >= 3 && /[A-Z]/.test(raw[2]);
+    const thirdIsDigit  = raw.length >= 3 && /[0-9]/.test(raw[2]);
+
+    if (startsWithTwoLetters && thirdIsLetter) {
+      // Formato VIEJO: ABC 123
+      tipo = 'viejo';
+      const letras  = raw.slice(0, 3);
+      const numeros = raw.slice(3, 6);
+      formatted = numeros.length > 0 ? letras + ' ' + numeros : letras;
+    } else if (startsWithTwoLetters && (thirdIsDigit || (!thirdIsLetter && raw.length >= 3))) {
+      // Formato NUEVO: AB 123 CD
+      tipo = 'nuevo';
+      const let1 = raw.slice(0, 2);
+      const nums = raw.slice(2, 5);
+      const let2 = raw.slice(5, 7);
+      if (nums.length > 0 && let2.length > 0) {
+        formatted = let1 + ' ' + nums + ' ' + let2;
+      } else if (nums.length > 0) {
+        formatted = let1 + ' ' + nums;
+      } else {
+        formatted = let1;
+      }
+    } else {
+      // Todavía no hay suficientes chars para determinar — mostrar raw sin espacios
+      formatted = raw.slice(0, 7);
+    }
+  }
+
+  input.value = formatted;
+
+  // Restaurar posición del cursor compensando caracteres agregados (espacios)
+  const diff = formatted.length - prevLen;
+  const newPos = Math.max(0, pos + diff);
+  try { input.setSelectionRange(newPos, newPos); } catch(e) {}
+}
+
 // ── REGISTROS ─────────────────────────────────────────────
-function registrarRapido(tipo){const val=document.getElementById('buscador').value.trim();if(!val)return;const hora=horaActual();let item;if(tipo==='ingreso'){verificarListaNegra(val,val);item={id:Date.now(),pat:val,tipo:'VISITA',hE:hora,hS:'',tsE:Date.now(),mza:'',casa:'',dni:'',vig:sessionStorage.getItem('nx_vigilador')||''};DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}else{const c=DB.filter(x=>x.pat===val&&!x.hS).sort((a,b)=>(b.tsE||0)-(a.tsE||0));item=c[0];if(item){item.hE=limpiarHora(item.hE);item.hS=hora;DB=DB.filter(x=>x.id!==item.id);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}else{showToast("❌ NO ENCONTRADO");return;}}document.getElementById('buscador').value='';}
+function registrarRapido(tipo){const val=document.getElementById('buscador').value.trim();if(!val)return;const hora=horaActual();let item;if(tipo==='ingreso'){verificarListaNegra(val,val);item={id:Date.now(),pat:val,tipo:'VISITA',hE:hora,hS:'',tsE:Date.now(),mza:'',casa:'',dni:'',vig:sessionStorage.getItem('nx_vigilador')||''};DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);document.getElementById('buscador').value='';}else{// Verificar que exista antes de pedir confirmación
+const c=DB.filter(x=>x.pat===val&&!x.hS).sort((a,b)=>(b.tsE||0)-(a.tsE||0));if(!c.length){showToast("❌ NO ENCONTRADO");return;}pedirConfirmacionSalidaRapida(val);}}
 function guardarForm(modo){const pre=modo==='manual'?'m-':'d-';const p=document.getElementById(pre+'pat').value.trim();if(!p)return;const d=document.getElementById(pre+'dni').value.trim();verificarListaNegra(p,d);const item={id:Date.now(),pat:p,dni:d,mza:document.getElementById(pre+'mza').value.trim(),casa:document.getElementById(pre+'casa').value.trim(),tipo:modo==='manual'?'MANUAL':'DELIVERY',hE:horaActual(),hS:'',tsE:Date.now(),vig:sessionStorage.getItem('nx_vigilador')||''};DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));['pat','dni','mza','casa'].forEach(f=>{const el=document.getElementById(pre+f);if(el)el.value='';});showToast("✅ REGISTRADO");ver('lista');render();enviar(item);}
-function darSalida(id){const item=DB.find(x=>x.id===id);if(!item)return;item.hE=limpiarHora(item.hE);item.hS=horaActual();localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);}
+// ── CONFIRMACIÓN SALIDA ────────────────────────────────────
+let _salidaPendienteId=null, _salidaRapidaPendiente=false;
+
+function darSalida(id){
+  const item=DB.find(x=>x.id===id);
+  if(!item)return;
+  _salidaPendienteId=id;
+  _salidaRapidaPendiente=false;
+  const pat=item.pat||'—';
+  const tipo=item.tipo==='DELIVERY'?'🛵':'🚗';
+  document.getElementById('confirm-salida-desc').innerText=tipo+' '+pat;
+  document.getElementById('confirm-salida-overlay').classList.add('visible');
+}
+
+function pedirConfirmacionSalidaRapida(pat){
+  _salidaRapidaPendiente=true;
+  _salidaPendienteId=null;
+  document.getElementById('confirm-salida-desc').innerText='📤 '+pat;
+  document.getElementById('confirm-salida-overlay').classList.add('visible');
+}
+
+function cancelarSalida(){
+  _salidaPendienteId=null;
+  _salidaRapidaPendiente=false;
+  document.getElementById('confirm-salida-overlay').classList.remove('visible');
+}
+
+function confirmarSalida(){
+  document.getElementById('confirm-salida-overlay').classList.remove('visible');
+  if(_salidaRapidaPendiente){
+    _ejecutarSalidaRapida();
+    _salidaRapidaPendiente=false;
+    return;
+  }
+  if(_salidaPendienteId===null)return;
+  const item=DB.find(x=>x.id===_salidaPendienteId);
+  if(!item){_salidaPendienteId=null;return;}
+  item.hE=limpiarHora(item.hE);item.hS=horaActual();
+  localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);
+  _salidaPendienteId=null;
+}
+
+function _ejecutarSalidaRapida(){
+  const val=document.getElementById('buscador').value.trim();
+  if(!val)return;
+  const c=DB.filter(x=>x.pat===val&&!x.hS).sort((a,b)=>(b.tsE||0)-(a.tsE||0));
+  const item=c[0];
+  if(item){
+    item.hE=limpiarHora(item.hE);item.hS=horaActual();
+    DB=DB.filter(x=>x.id!==item.id);
+    localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);
+  }else{showToast("❌ NO ENCONTRADO");return;}
+  document.getElementById('buscador').value='';
+}
 function guardarConfig(){localStorage.setItem('nx_url',document.getElementById('cfg-url').value.trim());showToast("⚙️ GUARDADO");sincronizar();}
 
 // ── RENDER ─────────────────────────────────────────────────
@@ -1738,6 +1847,20 @@ function incCompartirResumenWA() {
 // ══ FIN INCIDENTES ══════════════════════════════════════
 
 </script>
+
+<!-- ══ MODAL CONFIRMACIÓN SALIDA ══ -->
+<div class="confirm-overlay" id="confirm-salida-overlay">
+  <div class="confirm-box" style="background-image:linear-gradient(var(--bg2),var(--bg2)),linear-gradient(135deg,#e74c3c,#f5c842);background-origin:border-box;background-clip:padding-box,border-box;">
+    <div class="confirm-icon">📤</div>
+    <div class="confirm-title" style="color:var(--red)">¿Confirmar salida?</div>
+    <div class="confirm-desc" id="confirm-salida-desc" style="font-size:15px;font-weight:900;color:#fff;margin-bottom:6px;"></div>
+    <div style="font-size:12px;color:#666;margin-bottom:18px;">Registrará la hora de salida ahora</div>
+    <div class="confirm-btns">
+      <button class="confirm-btn-cancel" onclick="cancelarSalida()">✕ Cancelar</button>
+      <button class="confirm-btn-delete" style="background:var(--red);" onclick="confirmarSalida()">📤 SALIDA</button>
+    </div>
+  </div>
+</div>
 
 <!-- ══ MODAL CONFIRMACIÓN BORRAR INCIDENTE ══ -->
 <div class="confirm-overlay" id="confirm-del-overlay">
