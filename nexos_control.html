@@ -184,6 +184,24 @@
     .dely-countdown{display:inline-block;font-size:10px;font-weight:900;font-family:monospace;background:rgba(0,212,212,0.15);color:var(--cyan);border:1px solid rgba(0,212,212,0.35);padding:2px 7px;border-radius:20px;letter-spacing:0.5px;}
     .dely-countdown.alerta-cd{background:rgba(231,76,60,0.2);color:#ff7070;border-color:rgba(231,76,60,0.5);animation:titilarCd 1s ease-in-out infinite alternate;}
     @keyframes titilarCd{from{opacity:1}to{opacity:0.55}}
+    /* ── VIGILADORES ONLINE ── */
+    .vigs-online-bar{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid rgba(46,204,113,0.25);border-radius:12px;padding:8px 12px;margin-bottom:10px;flex-wrap:wrap;cursor:pointer;transition:border-color 0.2s;}
+    .vigs-online-bar:active{border-color:rgba(46,204,113,0.6);}
+    .vigs-online-titulo{font-size:10px;font-weight:900;color:#555;letter-spacing:1px;white-space:nowrap;}
+    .vig-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(46,204,113,0.12);border:1px solid rgba(46,204,113,0.35);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:800;color:var(--green);}
+    .vig-chip .vig-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:vigPulse 2s ease-in-out infinite;}
+    .vig-chip.mismo{background:rgba(0,212,212,0.12);border-color:rgba(0,212,212,0.35);color:var(--cyan);}
+    .vig-chip.mismo .vig-dot{background:var(--cyan);}
+    @keyframes vigPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(46,204,113,0.5);}50%{opacity:0.7;box-shadow:0 0 0 4px rgba(46,204,113,0);}}
+    .vigs-vacio{font-size:11px;color:#444;font-style:italic;}
+    /* Modal vigiladores */
+    .vig-modal-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border-radius:12px;padding:12px 16px;margin-bottom:8px;border-left:4px solid var(--green);}
+    .vig-modal-item.yo{border-left-color:var(--cyan);}
+    .vig-modal-nombre{font-size:14px;font-weight:900;color:#fff;}
+    .vig-modal-hora{font-size:11px;color:#666;margin-top:2px;}
+    .vig-modal-badge{font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px;}
+    .vig-badge-online{background:rgba(46,204,113,0.15);border:1px solid var(--green);color:var(--green);}
+    .vig-badge-yo{background:rgba(0,212,212,0.15);border:1px solid var(--cyan);color:var(--cyan);}
     @media print{.no-print{display:none!important;}body{background:white;color:black;padding:0;}.pdf-report{display:block!important;}}
     .pdf-report{display:none;background:white;color:#111;padding:24px;font-family:sans-serif;border-radius:12px;margin-top:12px;}
     .pdf-report h2{font-size:18px;margin-bottom:4px;}
@@ -719,6 +737,12 @@
     <div class="turno-duracion" id="turno-duracion"></div>
   </div>
 
+  <!-- VIGILADORES ONLINE -->
+  <div class="vigs-online-bar" id="vigs-online-bar" onclick="abrirModalVigs()" title="Ver vigiladores en línea">
+    <span class="vigs-online-titulo">🟢 EN LÍNEA</span>
+    <div id="vigs-chips"><span class="vigs-vacio">Cargando...</span></div>
+  </div>
+
   <div class="monitor">
     <div class="mon-card" id="mon-card-delivery" style="color:var(--gold);cursor:pointer;" onclick="abrirDeliveryActivos()"><span class="mon-val" id="mon-d" style="text-shadow:0 0 16px rgba(245,200,66,0.7);">0</span><span style="font-size:10px">DELIVERY ▶</span></div>
     <div class="mon-card" id="mon-card-visitas" style="color:var(--green);cursor:pointer;" onclick="abrirVisitasActivas()"><span class="mon-val" id="mon-v" style="text-shadow:0 0 16px rgba(46,204,113,0.7);">0</span><span style="font-size:10px">VISITAS ▶</span></div>
@@ -775,6 +799,16 @@
     <button class="modal-close" onclick="cerrarModal('modal-clima')">✕</button>
     <div class="modal-title">🌤️ PRONÓSTICO — BUENOS AIRES</div>
     <div id="clima-contenido"><div class="clima-loading">Cargando pronóstico...</div></div>
+  </div>
+</div>
+
+<!-- ══ MODAL VIGILADORES ONLINE ══ -->
+<div class="modal-overlay" id="modal-vigs-online">
+  <div class="modal-box" style="max-width:400px;">
+    <button class="modal-close" onclick="cerrarModal('modal-vigs-online')">✕</button>
+    <div class="modal-title">🟢 VIGILADORES EN LÍNEA</div>
+    <div id="vigs-online-contenido"><div class="empty-msg">Cargando...</div></div>
+    <div style="font-size:10px;color:#444;text-align:center;margin-top:12px;">Se actualiza cada 60 segundos · Inactivo si no hay señal por +3 min</div>
   </div>
 </div>
 
@@ -952,6 +986,7 @@ function verificarPin(){
     if(window._turnoInterval) clearInterval(window._turnoInterval);
     window._turnoInterval = setInterval(actualizarDuracionTurno, 60000);
     iniciarApp();resetearTimeoutSeguridad();setTimeout(ajustarScrollTop,100);
+    iniciarHeartbeat();
   }else{
     const msgError = vigSheet ? 'CLAVE INCORRECTA' : (VIGILADORES.length>0 ? 'VIGILADOR NO ENCONTRADO EN EL SHEET' : 'CLAVE INCORRECTA');
     document.getElementById('pin-error').innerText=msgError;pinActual='';actualizarPuntos();
@@ -1026,6 +1061,7 @@ async function sincronizar(manual=false){
     if(data.baneados)cargarBaneadosDesdeCloud(data.baneados);
     if(Array.isArray(data.listaNegra)&&data.listaNegra.length>0){LISTA_NEGRA=data.listaNegra;localStorage.setItem('nx_lista_negra',JSON.stringify(LISTA_NEGRA));}
     if(Array.isArray(data.vigiladores)&&data.vigiladores.length>0){VIGILADORES=data.vigiladores;localStorage.setItem('nx_vigiladores',JSON.stringify(VIGILADORES));}
+    if(Array.isArray(data.online)){_vigsOnline=data.online;renderVigsOnline();}
     const cloudIds=new Set(cloudData.map(x=>String(x.id)));
     const pend=DB.filter(x=>!cloudIds.has(String(x.id))&&(Date.now()-(x.tsE||0)<60000));
     DB=[...cloudData,...pend];localStorage.setItem('nx_db',JSON.stringify(DB));render();
@@ -1036,6 +1072,102 @@ async function sincronizar(manual=false){
 }
 function enviar(datos){const url=localStorage.getItem('nx_url');if(!url)return;fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)}).then(()=>setTimeout(()=>sincronizar(),1500)).catch(()=>showToast("⚠️ No se pudo subir"));}
 function cargarBaneadosDesdeCloud(bC){if(!Array.isArray(bC))return;BANEADOS=bC.map(b=>({mza:String(b.mza||''),casa:String(b.casa||''),id:b.id||'',motivo:b.motivo||'',ts:b.ts||Date.now()}));guardarBaneados();}
+
+// ── VIGILADORES ONLINE ─────────────────────────────────────
+let _vigsOnline = [];
+
+async function heartbeatVigilador() {
+  const url = localStorage.getItem('nx_url');
+  const nombre = sessionStorage.getItem('nx_vigilador');
+  if (!url || !nombre) return;
+  try {
+    await fetch(url, {
+      method: 'POST', mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({accion: 'heartbeat', nombre, ts: Date.now()})
+    });
+  } catch(e) {}
+}
+
+async function fetchVigsOnline() {
+  const url = localStorage.getItem('nx_url');
+  if (!url) return;
+  try {
+    const r = await fetch(url + '?accion=vigiladores_online&t=' + Date.now());
+    if (!r.ok) return;
+    const data = await r.json();
+    if (Array.isArray(data.online)) {
+      _vigsOnline = data.online;
+      renderVigsOnline();
+    }
+  } catch(e) {}
+}
+
+function renderVigsOnline() {
+  const yo = sessionStorage.getItem('nx_vigilador') || '';
+  const chips = document.getElementById('vigs-chips');
+  if (!chips) return;
+  if (!_vigsOnline.length) {
+    chips.innerHTML = '<span class="vigs-vacio">Solo vos en línea</span>';
+  } else {
+    chips.innerHTML = _vigsOnline.map(v => {
+      const esYo = v.nombre === yo;
+      return `<span class="vig-chip${esYo?' mismo':''}"><span class="vig-dot"></span>${escHtml(v.nombre)}${esYo?' (vos)':''}</span>`;
+    }).join('');
+  }
+  // también actualizar modal si está abierto
+  const cont = document.getElementById('vigs-online-contenido');
+  if (cont && document.getElementById('modal-vigs-online').classList.contains('visible')) {
+    renderModalVigs();
+  }
+}
+
+function renderModalVigs() {
+  const yo = sessionStorage.getItem('nx_vigilador') || '';
+  const cont = document.getElementById('vigs-online-contenido');
+  if (!cont) return;
+  if (!_vigsOnline.length) {
+    cont.innerHTML = '<div class="empty-msg">Sin otros vigiladores en línea</div>';
+    return;
+  }
+  const ahora = Date.now();
+  cont.innerHTML = _vigsOnline.map(v => {
+    const esYo = v.nombre === yo;
+    const mins = v.ts ? Math.floor((ahora - v.ts) / 60000) : null;
+    const tiempoStr = mins !== null ? (mins < 1 ? 'hace un momento' : `hace ${mins}min`) : '';
+    const desde = v.desde ? new Date(v.desde).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
+    return `<div class="vig-modal-item${esYo?' yo':''}">
+      <div>
+        <div class="vig-modal-nombre">👤 ${escHtml(v.nombre)}${esYo?' <span style="color:#555;font-size:11px;">(vos)</span>':''}</div>
+        <div class="vig-modal-hora">${desde ? 'En turno desde ' + desde : ''}${tiempoStr ? ' · última señal ' + tiempoStr : ''}</div>
+      </div>
+      <span class="vig-modal-badge ${esYo?'vig-badge-yo':'vig-badge-online'}">${esYo?'● VOS':'● ONLINE'}</span>
+    </div>`;
+  }).join('');
+}
+
+function abrirModalVigs() {
+  renderModalVigs();
+  abrirModal('modal-vigs-online');
+}
+
+// Iniciar heartbeat y polling cuando el vigilador se loguea
+function iniciarHeartbeat() {
+  heartbeatVigilador();
+  fetchVigsOnline();
+  if (window._heartbeatInterval) clearInterval(window._heartbeatInterval);
+  if (window._vigsOnlineInterval) clearInterval(window._vigsOnlineInterval);
+  window._heartbeatInterval = setInterval(heartbeatVigilador, 60000);
+  window._vigsOnlineInterval = setInterval(fetchVigsOnline, 60000);
+}
+
+// Detener al cerrar sesión
+const _cerrarSesionOrig = cerrarSesion;
+cerrarSesion = function() {
+  if (window._heartbeatInterval) { clearInterval(window._heartbeatInterval); window._heartbeatInterval = null; }
+  if (window._vigsOnlineInterval) { clearInterval(window._vigsOnlineInterval); window._vigsOnlineInterval = null; }
+  _cerrarSesionOrig();
+};
 
 // ── AUTOFORMATEO DE PATENTE ────────────────────────────────
 // Formato viejo (pre-2016): ABC 123  → 3 letras + espacio + 3 dígitos
@@ -1146,7 +1278,6 @@ function _ejecutarSalidaRapida(){
   const item=c[0];
   if(item){
     item.hE=limpiarHora(item.hE);item.hS=horaActual();
-    DB=DB.filter(x=>x.id!==item.id);
     localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);
   }else{showToast("❌ NO ENCONTRADO");return;}
   document.getElementById('buscador').value='';
@@ -1243,7 +1374,7 @@ function abrirResumen(){
 }
 function abrirVehiculos(){const adentro=DB.filter(r=>!r.hS);let html='';if(!adentro.length){html='<div class="empty-msg">Sin vehículos activos 🟢</div>';}else{html=adentro.sort((a,b)=>(b.tsE||0)-(a.tsE||0)).map(r=>{const mins=Math.floor((Date.now()-(r.tsE||0))/60000);const col=r.tipo==='DELIVERY'&&mins>=15?'var(--red)':r.tipo==='DELIVERY'?'var(--gold)':'var(--green)';return`<div class="modal-row"><strong style="color:${col}">${escHtml(r.pat)}</strong>${r.dni?` · DNI: ${escHtml(r.dni)}`:''}<span style="float:right;color:#666;font-size:11px">${mins}min</span><br><span style="font-size:11px;color:#888">Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')} · ${escHtml(r.tipo)}</span></div>`;}).join('');}document.getElementById('vehiculos-contenido').innerHTML=html;abrirModal('modal-vehiculos');}
 function abrirBusqueda(){document.getElementById('busqueda-input').value='';filtrarHistorialDia();abrirModal('modal-busqueda');}
-function filtrarHistorialDia(){const q=(document.getElementById('busqueda-input').value||'').trim().toUpperCase();const hoyStr=new Date().toLocaleDateString('es-AR');let deDia=DB.filter(r=>new Date(r.tsE||0).toLocaleDateString('es-AR')===hoyStr);if(q)deDia=deDia.filter(r=>(r.pat||'').toUpperCase().includes(q)||(r.dni||'').includes(q));deDia.sort((a,b)=>(b.tsE||0)-(a.tsE||0));document.getElementById('busqueda-status').innerText=deDia.length+' registro(s) hoy';if(!deDia.length){document.getElementById('busqueda-resultados').innerHTML='<div class="empty-msg">Sin registros hoy</div>';return;}document.getElementById('busqueda-resultados').innerHTML=deDia.map(r=>{const tS=r.hS?true:false;return`<div class="modal-row" style="${tS?'opacity:0.7;border-left:4px solid #888':'border-left:4px solid var(--green)'}"><strong>${escHtml(r.pat)}</strong>${r.dni?` · DNI: ${escHtml(r.dni)}`:''}<br><span style="font-size:11px;color:#666">Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')} · ${escHtml(r.tipo)}</span><br><span style="font-size:11px;color:#888">Entró: ${escHtml(limpiarHora(r.hE))}</span><span style="float:right;font-size:12px;font-weight:bold;color:${tS?'#888':'var(--green)'}">${tS?'✅ Salió '+escHtml(limpiarHora(r.hS)):'🟢 Adentro'}</span></div>`;}).join('');}
+function filtrarHistorialDia(){const q=(document.getElementById('busqueda-input').value||'').trim().toUpperCase();const hoyStr=new Date().toLocaleDateString('es-AR');let deDia=DB.filter(r=>new Date(r.tsE||0).toLocaleDateString('es-AR')===hoyStr);if(q)deDia=deDia.filter(r=>(r.pat||'').toUpperCase().includes(q)||(r.dni||'').includes(q));deDia.sort((a,b)=>(b.tsE||0)-(a.tsE||0));const totalTodos=deDia.length;const totalAdentro=deDia.filter(r=>!r.hS).length;const totalSalidos=deDia.filter(r=>r.hS).length;document.getElementById('busqueda-status').innerText=totalTodos+' registro(s) hoy';if(!deDia.length){document.getElementById('busqueda-resultados').innerHTML='<div class="empty-msg">Sin registros hoy</div>';return;}const resumenHtml=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;"><div style="background:var(--bg3);border-radius:10px;padding:10px;text-align:center;border:1px solid var(--cyan);"><div style="font-size:22px;font-weight:900;color:var(--cyan);">${totalTodos}</div><div style="font-size:10px;color:#666;font-weight:700;">TOTAL DÍA</div></div><div style="background:var(--bg3);border-radius:10px;padding:10px;text-align:center;border:1px solid var(--green);"><div style="font-size:22px;font-weight:900;color:var(--green);">${totalAdentro}</div><div style="font-size:10px;color:#666;font-weight:700;">ADENTRO</div></div><div style="background:var(--bg3);border-radius:10px;padding:10px;text-align:center;border:1px solid #888;"><div style="font-size:22px;font-weight:900;color:#888;">${totalSalidos}</div><div style="font-size:10px;color:#666;font-weight:700;">SALIDOS</div></div></div>`;document.getElementById('busqueda-resultados').innerHTML=resumenHtml+deDia.map(r=>{const tS=r.hS?true:false;return`<div class="modal-row" style="${tS?'opacity:0.7;border-left:4px solid #888':'border-left:4px solid var(--green)'}"><strong>${escHtml(r.pat)}</strong>${r.dni?` · DNI: ${escHtml(r.dni)}`:''}<br><span style="font-size:11px;color:#666">Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')} · ${escHtml(r.tipo)}</span><br><span style="font-size:11px;color:#888">Entró: ${escHtml(limpiarHora(r.hE))}</span><span style="float:right;font-size:12px;font-weight:bold;color:${tS?'#888':'var(--green)'}">${tS?'✅ Salió '+escHtml(limpiarHora(r.hS)):'🟢 Adentro'}</span></div>`;}).join('');}
 function abrirAlertas(){const hoy=new Date().toLocaleDateString('es-AR');const guardados=JSON.parse(localStorage.getItem('nx_alertas_hoy')||'[]');const todos=[...panicosPendientes,...guardados.filter(a=>!panicosPendientes.find(p=>p.panicoId===a.panicoId))];let html=todos.length?todos.map(a=>`<div class="modal-row" style="border-left:4px solid var(--red)"><strong style="color:var(--red)">🚨 EMERGENCIA</strong><span style="float:right;font-size:11px;color:#888">${escHtml(a.fecha||'')}</span><br><span style="font-size:14px;font-weight:800">🏠 Mza ${escHtml(a.mza||'')} — Casa ${escHtml(a.casa||'')}</span><br>${a.mapsUrl?`<a href="${escHtml(a.mapsUrl)}" target="_blank" style="color:var(--green);font-size:12px">📍 Ver en Maps</a>`:'<span style="font-size:11px;color:#555">Sin GPS</span>'}</div>`).join(''):'<div class="empty-msg">Sin alertas hoy 🟢</div>';document.getElementById('alertas-contenido').innerHTML=html;abrirModal('modal-alertas');}
 function abrirTurno(){const ahora=new Date(),hoyStr=ahora.toLocaleDateString('es-AR'),horaStr=ahora.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});const vigNombre=sessionStorage.getItem('nx_vigilador')||'—';let del=0,vis=0,sal=0,sinSal=[];const deDia=DB.filter(r=>new Date(r.tsE||0).toLocaleDateString('es-AR')===hoyStr);deDia.forEach(r=>{if(r.tipo==='DELIVERY')del++;else vis++;if(r.hS)sal++;else sinSal.push(r);});document.getElementById('turno-resumen').innerHTML=`<div class="modal-stat"><span class="modal-stat-label">👤 Vigilador</span><span style="font-weight:800;color:var(--purple)">${escHtml(vigNombre)}</span></div><div class="modal-stat"><span class="modal-stat-label">📅 Fecha</span><span style="font-weight:700;color:#fff">${hoyStr}</span></div><div class="modal-stat"><span class="modal-stat-label">🕐 Hora de cierre</span><span style="font-weight:700;color:#fff">${horaStr}</span></div>` +
     (()=>{const ini=localStorage.getItem('nx_turno_inicio');if(!ini)return'';const diff=Math.floor((Date.now()-new Date(ini).getTime())/60000);const h=Math.floor(diff/60),m=diff%60;const dur=h>0?`${h}h ${String(m).padStart(2,'0')}min`:`${m}min`;return`<div class="modal-stat"><span class="modal-stat-label">⏱ Duración del turno</span><span style="font-weight:800;color:var(--purple)">${dur}</span></div>`;})() + `<div class="modal-stat"><span class="modal-stat-label">📋 Total ingresos</span><span class="modal-stat-val" style="color:var(--cyan)">${deDia.length}</span></div><div class="modal-stat"><span class="modal-stat-label">📤 Con salida</span><span class="modal-stat-val" style="color:var(--green)">${sal}</span></div><div class="modal-stat"><span class="modal-stat-label">🚨 Sin salida</span><span class="modal-stat-val" style="color:${sinSal.length>0?'var(--red)':'#888'}">${sinSal.length}</span></div>${sinSal.map(r=>`<div class="modal-row" style="border-left:3px solid var(--red)"><strong>${escHtml(r.pat)}</strong> · Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')}</div>`).join('')}`;document.getElementById('pdf-report').innerHTML=`<h2>NEXOS — Cierre de Turno</h2><p>${hoyStr} | ${horaStr} | Vigilador: ${escHtml(vigNombre)}</p><table><tr><th>Patente</th><th>DNI</th><th>Destino</th><th>Tipo</th><th>Entrada</th><th>Salida</th></tr>${deDia.map(r=>`<tr><td>${escHtml(r.pat)}</td><td>${escHtml(r.dni||'-')}</td><td>Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')}</td><td>${escHtml(r.tipo)}</td><td>${escHtml(limpiarHora(r.hE))}</td><td style="color:${r.hS?'#27ae60':'#e74c3c'}">${r.hS?escHtml(limpiarHora(r.hS)):'SIN SALIDA'}</td></tr>`).join('')}</table>`;abrirModal('modal-turno');}
