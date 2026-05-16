@@ -208,8 +208,8 @@
     .chat-overlay{display:none;position:fixed;inset:0;z-index:9500;background:var(--bg);flex-direction:column;}
     .chat-overlay.visible{display:flex;}
     .chat-header{display:flex;align-items:center;gap:12px;padding:calc(env(safe-area-inset-top,0px)+12px) 14px 12px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;}
-    .chat-back{background:none;border:none;color:var(--cyan);font-size:22px;cursor:pointer;padding:4px 8px;border-radius:8px;line-height:1;-webkit-tap-highlight-color:transparent;}
-    .chat-back:active{background:rgba(0,212,212,0.1);}
+    .chat-back{background:rgba(0,212,212,0.12);border:1px solid rgba(0,212,212,0.35);color:var(--cyan);font-size:20px;font-weight:900;cursor:pointer;padding:8px 16px;border-radius:12px;line-height:1;-webkit-tap-highlight-color:transparent;min-width:52px;min-height:44px;display:flex;align-items:center;justify-content:center;letter-spacing:1px;}
+    .chat-back:active{background:rgba(0,212,212,0.28);}
     .chat-titulo{flex:1;}
     .chat-nombre{font-size:15px;font-weight:900;color:#fff;letter-spacing:0.5px;}
     .chat-estado{font-size:11px;color:var(--green);font-weight:700;}
@@ -898,7 +898,7 @@
 <!-- ══ CHAT OVERLAY ══ -->
 <div class="chat-overlay" id="chat-overlay">
   <div class="chat-header">
-    <button class="chat-back" onclick="cerrarChat()">‹</button>
+    <button class="chat-back" onclick="cerrarChat()">✕ Cerrar</button>
     <div class="chat-titulo">
       <div class="chat-nombre" id="chat-con-nombre">—</div>
       <div class="chat-estado" id="chat-con-estado">● en línea</div>
@@ -1526,17 +1526,29 @@ async function abrirBusqueda(){
   document.getElementById('busqueda-input').value='';
   filtrarHistorialDia();
   abrirModal('modal-busqueda');
+  cargarSheetHistorialHoy();
+}
+async function cargarSheetHistorialHoy(){
   const url=localStorage.getItem('nx_url');
   if(!url)return;
   const hoyISO=new Date().toISOString().split('T')[0];
-  document.getElementById('busqueda-status').innerText='🔍 Cargando desde Sheet...';
+  const statusEl=document.getElementById('busqueda-status');
+  statusEl.innerHTML='🔍 Cargando desde Sheet...';
   try{
-    const r=await fetch(url+'?accion=buscar&fecha='+hoyISO+'&t='+Date.now());
+    const ctrl=new AbortController();
+    const tOut=setTimeout(()=>ctrl.abort(),10000);
+    const r=await fetch(url+'?accion=buscar&fecha='+hoyISO+'&t='+Date.now(),{signal:ctrl.signal});
+    clearTimeout(tOut);
     if(!r.ok)throw new Error('HTTP '+r.status);
     const data=await r.json();
     const resultados=data.resultados||(Array.isArray(data)?data:null);
     if(resultados&&resultados.length>0){_historialHoySheet=resultados;}
-  }catch(e){}
+  }catch(e){
+    const msg=e.name==='AbortError'?'⏱ Tiempo de espera agotado':'❌ Error al leer Sheet';
+    statusEl.innerHTML=msg+' <button onclick="cargarSheetHistorialHoy()" style="background:var(--bg3);border:1px solid var(--cyan);color:var(--cyan);border-radius:8px;padding:2px 10px;font-size:11px;font-weight:800;cursor:pointer;margin-left:6px;">🔄 Reintentar</button>';
+    filtrarHistorialDia();
+    return;
+  }
   filtrarHistorialDia();
 }
 function filtrarHistorialDia(){const q=(document.getElementById('busqueda-input').value||'').trim().toUpperCase();const hoyStr=new Date().toLocaleDateString('es-AR');let deDia=DB.filter(r=>new Date(r.tsE||0).toLocaleDateString('es-AR')===hoyStr);
