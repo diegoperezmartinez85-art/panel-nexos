@@ -1230,6 +1230,13 @@ async function _vaciarCola(){
   }
   _guardarCola();
 }
+// Sync inmediato al volver a la app (minimizada o pantalla bloqueada)
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && sessionStorage.getItem('nx_auth') === '1') {
+    sincronizar();
+    fetchVigsOnline();
+  }
+});
 window.addEventListener('online',()=>{showToast('🌐 Conexión restaurada');_vaciarCola();sincronizar();});
 window.addEventListener('offline',()=>showToast('📵 Sin conexión — los registros se guardan localmente'));
 
@@ -1349,13 +1356,16 @@ function iniciarHeartbeat() {
   if (window._heartbeatInterval) clearInterval(window._heartbeatInterval);
   if (window._vigsOnlineInterval) clearInterval(window._vigsOnlineInterval);
   window._heartbeatInterval = setInterval(heartbeatVigilador, 60000);
-  window._vigsOnlineInterval = setInterval(fetchVigsOnline, 30000);
+  window._vigsOnlineInterval = setInterval(fetchVigsOnline, 15000);
+  window._autoSyncInterval   = setInterval(()=>sincronizar(), 15000);
 }
 
 // Detener al cerrar sesión
 const _cerrarSesionOrig = cerrarSesion;
 cerrarSesion = function() {
   if (window._heartbeatInterval) { clearInterval(window._heartbeatInterval); window._heartbeatInterval = null; }
+  if (window._vigsOnlineInterval) { clearInterval(window._vigsOnlineInterval); window._vigsOnlineInterval = null; }
+  if (window._autoSyncInterval)   { clearInterval(window._autoSyncInterval);   window._autoSyncInterval   = null; }
   if (window._vigsOnlineInterval) { clearInterval(window._vigsOnlineInterval); window._vigsOnlineInterval = null; }
   _cerrarSesionOrig();
 };
