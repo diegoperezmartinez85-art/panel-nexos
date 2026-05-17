@@ -1080,6 +1080,7 @@ function verificarPin(){
     document.getElementById('header-bar').style.display='flex';
     document.getElementById('turno-bar').classList.add('visible');
     document.getElementById('bottom-nav').classList.add('visible');
+    document.dispatchEvent(new Event('nx-session-start'));
     setTimeout(ajustarScrollTop,150);
     document.getElementById('turno-nombre').innerText = nombre;
     // Preservar inicio de turno si el mismo vigilador se desbloquea
@@ -2946,6 +2947,63 @@ chatSonidoRecibido = function() {
     pushNotifNuevoMensaje(_chatConVig || 'Vigilador', '📨 Nuevo mensaje');
   }
 };
+
+// ── POLLING DE CHAT EN BACKGROUND ─────────────────────────
+// Detecta mensajes nuevos aunque el panel de chat esté cerrado
+let _chatBgInterval = null;
+async function chatBgPoll() {
+  const url = lsGet('nx_url');
+  const yo = sessionStorage.getItem('nx_vigilador') || '';
+  if (!url || !yo) return;
+  // Pedir mensajes de cada vigilador online (usa el endpoint que existe en GAS)
+  const leidoMap = JSON.parse(lsGet('nx_chat_leido', '{}'));
+  for (const vig of _vigsOnline) {
+    if (vig.nombre === yo) continue;
+    try {
+      const clave = chatClave(yo, vig.nombre);
+      const r = await fetch(url + '?accion=chat&clave=' + encodeURIComponent(clave) + '&t=' + Date.now());
+      if (!r.ok) continue;
+      const data = await r.json();
+      if (!Array.isArray(data.mensajes)) continue;
+      const ultimoLeido = leidoMap[clave] || 0;
+      const nuevos = data.mensajes.filter(m => m.de !== yo && m.ts > ultimoLeido);
+      if (!nuevos.length) continue;
+      // Guardar localmente
+      lsSet('nx_chat_' + clave, JSON.stringify(data.mensajes));
+      // Notificar solo si el chat con esa persona NO está abierto
+      const chatAbierto = document.getElementById('chat-overlay').classList.contains('visible') && _chatConVig === vig.nombre;
+      if (!chatAbierto) {
+        const deNombre = nuevos[nuevos.length - 1].de;
+        const textoPreview = nuevos[nuevos.length - 1].texto;
+        initAudio();
+        // Sonido directo sin parchar _chatConVig
+        if (audioCtx) {
+          const now = audioCtx.currentTime;
+          const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+          o.connect(g); g.connect(audioCtx.destination);
+          o.type = 'sine'; o.frequency.value = 880;
+          g.gain.setValueAtTime(0, now);
+          g.gain.linearRampToValueAtTime(0.15, now + 0.01);
+          g.gain.setValueAtTime(0.15, now + 0.1);
+          g.gain.linearRampToValueAtTime(0, now + 0.18);
+          o.start(now); o.stop(now + 0.2);
+        }
+        pushNotifNuevoMensaje(deNombre, textoPreview);
+      }
+      renderVigsOnline();
+    } catch(e) {}
+  }
+}
+
+function iniciarChatBgPoll() {
+  if (_chatBgInterval) return;
+  _chatBgInterval = setInterval(chatBgPoll, 12000);
+}
+
+document.addEventListener('nx-session-start', iniciarChatBgPoll);
+if (sessionStorage.getItem('nx_auth') === '1') {
+  setTimeout(iniciarChatBgPoll, 3000);
+}
 
 // Parchar tickContadores para notif de delivery (ya existe lógica, agregamos notif)
 // Se engancha en la detección de nueva alerta delivery dentro del setInterval existente
