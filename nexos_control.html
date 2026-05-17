@@ -205,15 +205,15 @@
     .vig-badge-online{background:rgba(46,204,113,0.15);border:1px solid var(--green);color:var(--green);}
     .vig-badge-yo{background:rgba(0,212,212,0.15);border:1px solid var(--cyan);color:var(--cyan);}
     /* ── CHAT ── */
-    .chat-overlay{display:none;position:fixed;inset:0;z-index:9500;background:var(--bg);flex-direction:column;}
+    .chat-overlay{display:none;position:fixed;bottom:calc(env(safe-area-inset-bottom,0px)+12px);right:12px;left:12px;z-index:9500;background:var(--bg2);flex-direction:column;border-radius:20px;border:1px solid var(--border);box-shadow:0 8px 40px rgba(0,0,0,0.7);max-height:52vh;overflow:hidden;}
     .chat-overlay.visible{display:flex;}
-    .chat-header{display:flex;align-items:center;gap:12px;padding:calc(env(safe-area-inset-top,0px)+12px) 14px 12px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;}
-    .chat-back{background:rgba(0,212,212,0.12);border:1px solid rgba(0,212,212,0.35);color:var(--cyan);font-size:20px;font-weight:900;cursor:pointer;padding:8px 16px;border-radius:12px;line-height:1;-webkit-tap-highlight-color:transparent;min-width:52px;min-height:44px;display:flex;align-items:center;justify-content:center;letter-spacing:1px;}
+    .chat-header{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;border-radius:20px 20px 0 0;}
+    .chat-back{background:rgba(0,212,212,0.12);border:1px solid rgba(0,212,212,0.35);color:var(--cyan);font-size:13px;font-weight:900;cursor:pointer;padding:6px 12px;border-radius:10px;line-height:1;-webkit-tap-highlight-color:transparent;min-width:44px;min-height:36px;display:flex;align-items:center;justify-content:center;letter-spacing:0.5px;}
     .chat-back:active{background:rgba(0,212,212,0.28);}
-    .chat-titulo{flex:1;}
-    .chat-nombre{font-size:15px;font-weight:900;color:#fff;letter-spacing:0.5px;}
-    .chat-estado{font-size:11px;color:var(--green);font-weight:700;}
-    .chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;-webkit-overflow-scrolling:touch;}
+    .chat-titulo{flex:1;min-width:0;}
+    .chat-nombre{font-size:13px;font-weight:900;color:#fff;letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .chat-estado{font-size:10px;color:var(--green);font-weight:700;}
+    .chat-msgs{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:6px;-webkit-overflow-scrolling:touch;min-height:80px;}
     .chat-burbuja{max-width:80%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.45;word-break:break-word;}
     .chat-burbuja.mia{align-self:flex-end;background:var(--cyan);color:#000;border-bottom-right-radius:5px;}
     .chat-burbuja.suya{align-self:flex-start;background:var(--bg3);color:var(--text);border-bottom-left-radius:5px;border:1px solid var(--border);}
@@ -222,10 +222,10 @@
     .chat-burbuja-wrap.suya{align-items:flex-start;}
     .chat-meta{font-size:10px;color:#555;padding:0 4px;}
     .chat-remitente{font-size:10px;font-weight:800;color:var(--green);padding:0 4px;}
-    .chat-input-bar{display:flex;align-items:center;gap:8px;padding:10px 14px calc(env(safe-area-inset-bottom,0px)+10px);background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0;}
-    .chat-input{flex:1;background:var(--bg3);border:2px solid var(--border);border-radius:22px;padding:11px 16px;color:#fff;font-size:15px;outline:none;font-family:inherit;resize:none;max-height:100px;line-height:1.3;}
+    .chat-input-bar{display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0;}
+    .chat-input{flex:1;background:var(--bg3);border:2px solid var(--border);border-radius:18px;padding:8px 12px;color:#fff;font-size:14px;outline:none;font-family:inherit;resize:none;max-height:70px;line-height:1.3;}
     .chat-input:focus{border-color:var(--cyan);}
-    .chat-send{background:var(--cyan);border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:transform 0.1s;}
+    .chat-send{background:var(--cyan);border:none;border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:transform 0.1s;}
     .chat-send:active{transform:scale(0.88);}
     .chat-vacio{text-align:center;color:#444;font-size:13px;padding:40px 20px;line-height:1.8;}
     .chat-badge{position:absolute;top:6px;right:calc(50% - 18px);background:var(--green);color:#000;font-size:9px;font-weight:900;border-radius:20px;min-width:16px;height:16px;line-height:16px;text-align:center;padding:0 4px;}
@@ -726,9 +726,9 @@
     <div class="qr-result-title">QR LEÍDO — CONFIRMAR INGRESO</div>
     <div class="qr-warn-box" id="qr-ln-warn">🚫 LISTA NEGRA detectada</div>
     <div class="qr-warn-box" id="qr-ban-warn">🚷 MANZANA/CASA BANEADA</div>
-    <div class="qr-field-row"><span class="qr-field-label">PATENTE</span><input class="qr-field-input" id="qr-f-pat" placeholder="Patente" oninput="this.value=this.value.toUpperCase()"></div>
-    <div class="qr-field-row"><span class="qr-field-label">DNI</span><input class="qr-field-input" id="qr-f-dni" placeholder="DNI" inputmode="numeric"></div>
-    <div class="qr-dest-grid"><div class="qr-field-row"><span class="qr-field-label">MZA</span><input class="qr-field-input" id="qr-f-mza" placeholder="Mza" inputmode="numeric"></div><div class="qr-field-row"><span class="qr-field-label">CASA</span><input class="qr-field-input" id="qr-f-casa" placeholder="Casa" inputmode="numeric"></div></div>
+    <div class="qr-field-row"><span class="qr-field-label">PATENTE</span><input class="qr-field-input" id="qr-f-pat" placeholder="Patente" maxlength="10" oninput="this.value=this.value.toUpperCase()"></div>
+    <div class="qr-field-row"><span class="qr-field-label">DNI</span><input class="qr-field-input" id="qr-f-dni" placeholder="DNI" inputmode="numeric" maxlength="9"></div>
+    <div class="qr-dest-grid"><div class="qr-field-row"><span class="qr-field-label">MZA</span><input class="qr-field-input" id="qr-f-mza" placeholder="Mza" inputmode="numeric" maxlength="4"></div><div class="qr-field-row"><span class="qr-field-label">CASA</span><input class="qr-field-input" id="qr-f-casa" placeholder="Casa" inputmode="numeric" maxlength="4"></div></div>
     <div class="qr-field-row" style="margin-bottom:0;"><span class="qr-field-label">TIPO</span><select class="qr-field-input" id="qr-f-tipo" style="cursor:pointer;"><option value="VISITA">VISITA</option><option value="DELIVERY">DELIVERY</option><option value="MANUAL">MANUAL</option></select></div>
     <button class="qr-btn-confirm" id="qr-btn-confirm" onclick="confirmarIngresoQR()" style="margin-top:12px;">📥 REGISTRAR INGRESO</button>
     <button class="qr-btn-rescan" onclick="qrReescanear()">🔄 VOLVER A ESCANEAR</button>
@@ -788,6 +788,7 @@
         <div class="menu-section-label">SISTEMA</div>
         <div class="menu-item danger" onclick="abrirReset()"><span class="menu-item-icon">📤</span>Dar salida general</div>
         <div class="menu-item" onclick="ver('config');cerrarMenu()"><span class="menu-item-icon">⚙️</span>Configuración</div>
+        <div class="menu-item danger" style="border-top:2px solid rgba(231,76,60,0.25);margin-top:4px;" onclick="if(confirm('¿Cerrar sesión?')){cerrarMenu();cerrarSesion();}"><span class="menu-item-icon">🔒</span>Cerrar sesión</div>
       </div>
     </div>
     <div class="header-right">
@@ -834,17 +835,17 @@
   </div>
   <div id="p-manual" class="panel">
     <div class="section">
-      <div class="campo-label">PATENTE / VEHÍCULO</div><input id="m-pat" class="giant" placeholder="PATENTE" oninput="autoformatearPatente(this)" autocomplete="off" spellcheck="false">
-      <div class="campo-label">DNI (opcional)</div><input id="m-dni" class="giant" placeholder="DNI" inputmode="numeric">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><input id="m-mza" class="giant" placeholder="MZA"><input id="m-casa" class="giant" placeholder="CASA"></div>
+      <div class="campo-label">PATENTE / VEHÍCULO</div><input id="m-pat" class="giant" placeholder="PATENTE" maxlength="10" oninput="autoformatearPatente(this)" autocomplete="off" spellcheck="false">
+      <div class="campo-label">DNI (opcional)</div><input id="m-dni" class="giant" placeholder="DNI" inputmode="numeric" maxlength="9">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><input id="m-mza" class="giant" placeholder="MZA" maxlength="4"><input id="m-casa" class="giant" placeholder="CASA" maxlength="4"></div>
       <button class="btn-save" onclick="guardarForm('manual')">REGISTRAR INGRESO</button>
     </div>
   </div>
   <div id="p-delivery" class="panel">
     <div class="section">
-      <div class="campo-label">PATENTE / MOTO</div><input id="d-pat" class="giant" placeholder="MOTO" oninput="autoformatearPatente(this)" autocomplete="off" spellcheck="false">
-      <div class="campo-label">DNI (opcional)</div><input id="d-dni" class="giant" placeholder="DNI" inputmode="numeric">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><input id="d-mza" class="giant" placeholder="MZA"><input id="d-casa" class="giant" placeholder="CASA"></div>
+      <div class="campo-label">PATENTE / MOTO</div><input id="d-pat" class="giant" placeholder="MOTO" maxlength="10" oninput="autoformatearPatente(this)" autocomplete="off" spellcheck="false">
+      <div class="campo-label">DNI (opcional)</div><input id="d-dni" class="giant" placeholder="DNI" inputmode="numeric" maxlength="9">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><input id="d-mza" class="giant" placeholder="MZA" maxlength="4"><input id="d-casa" class="giant" placeholder="CASA" maxlength="4"></div>
       <button class="btn-save" style="background:var(--gold);color:black;" onclick="guardarForm('delivery')">DELIVERY</button>
     </div>
   </div>
@@ -905,7 +906,7 @@
     </div>
   </div>
   <div class="chat-msgs" id="chat-msgs">
-    <div class="chat-vacio" id="chat-vacio">
+    <div class="chat-vacio">
       💬 Iniciá la conversación<br>
       <span style="font-size:12px;color:#333;">Los mensajes se ven en tiempo real</span>
     </div>
@@ -1124,8 +1125,17 @@ function cerrarModal(id){
 }
 
 // ── TIMEOUT SEGURIDAD ──────────────────────────────────────
-let timeoutSeguridad=null,tiempoRestante=15*60;
-function resetearTimeoutSeguridad(){if(timeoutSeguridad)clearTimeout(timeoutSeguridad);tiempoRestante=15*60;timeoutSeguridad=setTimeout(cerrarSesion,15*60*1000);}
+let timeoutSeguridad=null,timeoutAvisoBloqueo=null,tiempoRestante=15*60;
+function resetearTimeoutSeguridad(){
+  if(timeoutSeguridad)clearTimeout(timeoutSeguridad);
+  if(timeoutAvisoBloqueo)clearTimeout(timeoutAvisoBloqueo);
+  tiempoRestante=15*60;
+  // Aviso 2 minutos antes
+  timeoutAvisoBloqueo=setTimeout(()=>{
+    showToast('⚠️ Sesión se bloquea en 2 min por inactividad');
+  },(15-2)*60*1000);
+  timeoutSeguridad=setTimeout(cerrarSesion,15*60*1000);
+}
 function cerrarSesion(){if(timeoutSeguridad)clearTimeout(timeoutSeguridad);sessionStorage.removeItem('nx_auth');sessionStorage.removeItem('nx_vigilador');pinActual='';actualizarPuntos();document.getElementById('pin-screen').classList.remove('oculto');document.getElementById('header-bar').style.display='none';document.getElementById('turno-bar').classList.remove('visible');document.getElementById('bottom-nav').classList.remove('visible');setTimeout(ajustarScrollTop,100);
     document.getElementById('turno-nombre').innerText='—';
     document.getElementById('turno-desde').innerText='';
@@ -1189,13 +1199,42 @@ async function sincronizar(manual=false){
     const pend=DB.filter(x=>!cloudIds.has(String(x.id))&&(Date.now()-(x.tsE||0)<60000));
     const pendIds=new Set(pend.map(x=>String(x.id)));
     const salidosDedup=salidosHoyLocal.filter(r=>!pendIds.has(String(r.id)));
-    DB=[...cloudData,...pend,...salidosDedup];localStorage.setItem('nx_db',JSON.stringify(DB));render();
+    DB=[...cloudData,...pend,...salidosDedup];lsSet('nx_db',JSON.stringify(DB));render();
     setSyncStatus('✔ Sincronizado '+horaActual(),'sync-ok');
     if(panico.length>0){const ids=new Set(panicosPendientes.map(x=>String(x.panicoId)));const nuevas=panico.filter(a=>!ids.has(String(a.panicoId)));if(nuevas.length>0){panicosPendientes=panico;mostrarPanico(panico);}else panicosPendientes=panico;}
   }catch(e){setSyncStatus('⚠ Sin conexión','sync-err');if(manual)showToast("⚠️ Error al sincronizar");}
   finally{sincronizando=false;}
 }
-function enviar(datos){const url=localStorage.getItem('nx_url');if(!url)return;fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)}).then(()=>setTimeout(()=>sincronizar(),1500)).catch(()=>showToast("⚠️ No se pudo subir"));}
+// ── localStorage SEGURO ────────────────────────────────────
+function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){showToast('⚠️ Almacenamiento lleno');}}
+function lsGet(k,def=''){try{return localStorage.getItem(k)??def;}catch(e){return def;}}
+
+// ── COLA OFFLINE ───────────────────────────────────────────
+let _colaOffline=[];
+try{_colaOffline=JSON.parse(localStorage.getItem('nx_cola_offline')||'[]');}catch(e){_colaOffline=[];}
+function _guardarCola(){lsSet('nx_cola_offline',JSON.stringify(_colaOffline));}
+async function _vaciarCola(){
+  if(!_colaOffline.length)return;
+  const url=lsGet('nx_url');if(!url)return;
+  const pendientes=[..._colaOffline];
+  _colaOffline=[];_guardarCola();
+  for(const datos of pendientes){
+    try{await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)});}
+    catch(e){_colaOffline.push(datos);}
+  }
+  _guardarCola();
+}
+window.addEventListener('online',()=>{showToast('🌐 Conexión restaurada');_vaciarCola();sincronizar();});
+window.addEventListener('offline',()=>showToast('📵 Sin conexión — los registros se guardan localmente'));
+
+let _enviando=false;
+function enviar(datos){
+  const url=lsGet('nx_url');if(!url)return;
+  if(!navigator.onLine){_colaOffline.push(datos);_guardarCola();showToast('📵 Guardado sin conexión');registrarBackgroundSync();return;}
+  fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)})
+    .then(()=>setTimeout(()=>sincronizar(),1500))
+    .catch(()=>{_colaOffline.push(datos);_guardarCola();showToast('⚠️ Sin red — guardado en cola');registrarBackgroundSync();});
+}
 function cargarBaneadosDesdeCloud(bC){if(!Array.isArray(bC))return;BANEADOS=bC.map(b=>({mza:String(b.mza||''),casa:String(b.casa||''),id:b.id||'',motivo:b.motivo||'',ts:b.ts||Date.now()}));guardarBaneados();}
 
 // ── VIGILADORES ONLINE ─────────────────────────────────────
@@ -1372,9 +1411,21 @@ function autoformatearPatente(input) {
 }
 
 // ── REGISTROS ─────────────────────────────────────────────
-function registrarRapido(tipo){const val=document.getElementById('buscador').value.trim();if(!val)return;const hora=horaActual();let item;if(tipo==='ingreso'){verificarListaNegra(val,val);item={id:Date.now(),pat:val,tipo:'VISITA',hE:hora,hS:'',tsE:Date.now(),mza:'',casa:'',dni:'',vig:sessionStorage.getItem('nx_vigilador')||''};DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);document.getElementById('buscador').value='';}else{// Verificar que exista antes de pedir confirmación
+function registrarRapido(tipo){const val=document.getElementById('buscador').value.trim();if(!val)return;const hora=horaActual();let item;if(tipo==='ingreso'){verificarListaNegra(val,val);item={id:Date.now(),pat:val,tipo:'VISITA',hE:hora,hS:'',tsE:Date.now(),mza:'',casa:'',dni:'',vig:sessionStorage.getItem('nx_vigilador')||''};DB.push(item);lsSet('nx_db',JSON.stringify(DB));render();enviar(item);document.getElementById('buscador').value='';}else{// Verificar que exista antes de pedir confirmación
 const c=DB.filter(x=>x.pat===val&&!x.hS).sort((a,b)=>(b.tsE||0)-(a.tsE||0));if(!c.length){showToast("❌ NO ENCONTRADO");return;}pedirConfirmacionSalidaRapida(val);}}
-function guardarForm(modo){const pre=modo==='manual'?'m-':'d-';const p=document.getElementById(pre+'pat').value.trim();if(!p)return;const d=document.getElementById(pre+'dni').value.trim();verificarListaNegra(p,d);const item={id:Date.now(),pat:p,dni:d,mza:document.getElementById(pre+'mza').value.trim(),casa:document.getElementById(pre+'casa').value.trim(),tipo:modo==='manual'?'MANUAL':'DELIVERY',hE:horaActual(),hS:'',tsE:Date.now(),vig:sessionStorage.getItem('nx_vigilador')||''};DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));['pat','dni','mza','casa'].forEach(f=>{const el=document.getElementById(pre+f);if(el)el.value='';});showToast("✅ REGISTRADO");ver('lista');render();enviar(item);}
+let _guardandoForm=false;
+function guardarForm(modo){
+  if(_guardandoForm)return;
+  const pre=modo==='manual'?'m-':'d-';
+  const p=document.getElementById(pre+'pat').value.trim();if(!p)return;
+  _guardandoForm=true;setTimeout(()=>_guardandoForm=false,1500);
+  const d=document.getElementById(pre+'dni').value.trim();
+  verificarListaNegra(p,d);
+  const item={id:Date.now(),pat:p,dni:d,mza:document.getElementById(pre+'mza').value.trim(),casa:document.getElementById(pre+'casa').value.trim(),tipo:modo==='manual'?'MANUAL':'DELIVERY',hE:horaActual(),hS:'',tsE:Date.now(),vig:sessionStorage.getItem('nx_vigilador')||''};
+  DB.push(item);lsSet('nx_db',JSON.stringify(DB));
+  ['pat','dni','mza','casa'].forEach(f=>{const el=document.getElementById(pre+f);if(el)el.value='';});
+  showToast("✅ REGISTRADO");ver('lista');render();enviar(item);
+}
 // ── CONFIRMACIÓN SALIDA ────────────────────────────────────
 let _salidaPendienteId=null, _salidaRapidaPendiente=false;
 
@@ -1413,7 +1464,7 @@ function confirmarSalida(){
   const item=DB.find(x=>x.id===_salidaPendienteId);
   if(!item){_salidaPendienteId=null;return;}
   item.hE=limpiarHora(item.hE);item.hS=horaActual();
-  localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);
+  lsSet('nx_db',JSON.stringify(DB));render();enviar(item);
   _salidaPendienteId=null;
 }
 
@@ -1424,7 +1475,7 @@ function _ejecutarSalidaRapida(){
   const item=c[0];
   if(item){
     item.hE=limpiarHora(item.hE);item.hS=horaActual();
-    localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);
+    lsSet('nx_db',JSON.stringify(DB));render();enviar(item);
   }else{showToast("❌ NO ENCONTRADO");return;}
   document.getElementById('buscador').value='';
 }
@@ -1597,7 +1648,7 @@ function abrirReset(){resetPin='';actualizarResetPuntos();document.getElementByI
 function resetTecla(d){if(resetPin.length>=4)return;resetPin+=d;actualizarResetPuntos();if(resetPin.length===4)setTimeout(verificarReset,120);}
 function resetBorrar(){resetPin=resetPin.slice(0,-1);actualizarResetPuntos();}
 function actualizarResetPuntos(){for(let i=0;i<4;i++)document.getElementById('r'+i).classList.toggle('lleno',i<resetPin.length);}
-function verificarReset(){if(resetPin===PIN_CORRECTO){const activos=DB.filter(x=>!x.hS);if(!activos.length){cerrarModal('modal-reset');showToast('⚠️ No hay vehículos activos');resetPin='';actualizarResetPuntos();return;}const h=horaActual();activos.forEach(item=>{item.hE=limpiarHora(item.hE);item.hS=h;enviar(item);});DB=[];localStorage.setItem('nx_db',JSON.stringify(DB));cerrarModal('modal-reset');render();showToast('✅ Salida general: '+activos.length+' vehículo(s)');resetPin='';actualizarResetPuntos();}else{document.getElementById('reset-pin-error').innerText='CLAVE INCORRECTA';resetPin='';actualizarResetPuntos();}}
+function verificarReset(){if(resetPin===PIN_CORRECTO){const activos=DB.filter(x=>!x.hS);if(!activos.length){cerrarModal('modal-reset');showToast('⚠️ No hay vehículos activos');resetPin='';actualizarResetPuntos();return;}const h=horaActual();activos.forEach(item=>{item.hE=limpiarHora(item.hE);item.hS=h;enviar(item);});DB=[];lsSet('nx_db',JSON.stringify(DB));cerrarModal('modal-reset');render();showToast('✅ Salida general: '+activos.length+' vehículo(s)');resetPin='';actualizarResetPuntos();}else{document.getElementById('reset-pin-error').innerText='CLAVE INCORRECTA';resetPin='';actualizarResetPuntos();}}
 
 // ── BANEO ──────────────────────────────────────────────────
 let banPinActual='';
@@ -1656,7 +1707,7 @@ function qrAjustarMascaras(){const wrap=document.getElementById('qr-video-wrap')
 function qrIniciarDeteccion(){const video=document.getElementById('qr-video');const canvas=document.getElementById('qr-canvas');const ctx=canvas.getContext('2d');qrInterval=setInterval(()=>{if(video.readyState!==video.HAVE_ENOUGH_DATA)return;canvas.width=video.videoWidth;canvas.height=video.videoHeight;ctx.drawImage(video,0,0,canvas.width,canvas.height);const wrap=document.getElementById('qr-video-wrap');const wW=wrap.clientWidth,wH=wrap.clientHeight;const size=Math.min(280,wW*0.70);const rX=canvas.width/wW,rY=canvas.height/wH;const cx=((wW-size)/2)*rX,cy=((wH-size)/2)*rY,cs=size*Math.min(rX,rY);const imageData=ctx.getImageData(cx,cy,cs,cs);const code=window.jsQR?window.jsQR(imageData.data,imageData.width,imageData.height,{inversionAttempts:'dontInvert'}):null;if(code&&code.data){clearInterval(qrInterval);qrInterval=null;setQrStatus('✅ QR detectado!','ok');try{if(navigator.vibrate)navigator.vibrate([80,40,80]);}catch(e){}setTimeout(()=>qrProcesar(code.data),350);}},150);}
 function qrParsear(raw){const r={pat:'',dni:'',mza:'',casa:'',nombre:'',raw};const txt=raw.trim();if(txt.toUpperCase().includes('NEXOS')||txt.toUpperCase().includes('PATENTE:')||txt.toUpperCase().includes('DNI:')){const lines=txt.split(/\n/);lines.forEach(line=>{const l=line.trim();const mPat=l.match(/^Patente[:\s]+([\w]+)/i);if(mPat)r.pat=mPat[1].trim().toUpperCase();const mDni=l.match(/^DNI[:\s]+([\d]+)/i);if(mDni)r.dni=mDni[1].trim();const mMza=l.match(/Mza[:\s]+([\d]+)/i);if(mMza)r.mza=mMza[1].trim();const mCasa=l.match(/Casa[:\s]+([\d]+)/i);if(mCasa)r.casa=mCasa[1].trim();const mVis=l.match(/^Visita[:\s]+(.+)/i);if(mVis)r.nombre=mVis[1].trim();});if(r.pat||r.dni)return r;}if(txt.includes('@')){const parts=txt.split('@').map(p=>p.trim()).filter(p=>p);if(parts.length>=3){const posibleDni=(parts[2]||'').replace(/\D/g,'');if(posibleDni.length>=6)r.dni=posibleDni;r.nombre=((parts[1]||'')+' '+(parts[0]||'')).trim();}return r;}try{const obj=JSON.parse(txt);r.pat=(obj.pat||obj.patente||'').toUpperCase();r.dni=(obj.dni||'').replace(/\D/g,'');r.mza=(obj.mza||'').toString();r.casa=(obj.casa||'').toString();return r;}catch(e){}const san=txt.replace(/\s/g,'').toUpperCase();if(/^[A-Z]{2,3}\d{3}[A-Z]{0,2}$|^[A-Z]{3}\d{3}$/.test(san)){r.pat=san;return r;}if(/^\d{7,9}$/.test(txt.replace(/[.\s]/g,''))){r.dni=txt.replace(/[.\s]/g,'');return r;}return r;}
 function qrProcesar(raw){qrDetenerCamara();document.getElementById('qr-overlay').classList.remove('visible');const datos=qrParsear(raw);document.getElementById('qr-f-pat').value=datos.pat;document.getElementById('qr-f-dni').value=datos.dni;document.getElementById('qr-f-mza').value=datos.mza;document.getElementById('qr-f-casa').value=datos.casa;document.getElementById('qr-f-tipo').value='VISITA';document.getElementById('qr-raw-display').innerText=datos.nombre?'👤 '+datos.nombre:raw.length<200?'📋 '+raw:'';const lnW=document.getElementById('qr-ln-warn');lnW.style.display='none';const enLN=LISTA_NEGRA.find(r=>(datos.pat&&r.pat&&r.pat===datos.pat)||(datos.dni&&r.dni&&r.dni===datos.dni));if(enLN){lnW.style.display='block';lnW.innerText='🚫 LISTA NEGRA: '+(enLN.pat||enLN.dni)+(enLN.motivo?' — '+enLN.motivo:'');}const banW=document.getElementById('qr-ban-warn');banW.style.display=(datos.mza&&datos.casa&&esBaneado(datos.mza,datos.casa))?'block':'none';document.getElementById('qr-result-panel').classList.add('visible');}
-function confirmarIngresoQR(){const pat=document.getElementById('qr-f-pat').value.trim().toUpperCase();const dni=document.getElementById('qr-f-dni').value.trim();const mza=document.getElementById('qr-f-mza').value.trim();const casa=document.getElementById('qr-f-casa').value.trim();const tipo=document.getElementById('qr-f-tipo').value;if(!pat&&!dni){showToast('⚠️ Ingresá al menos patente o DNI');return;}const btn=document.getElementById('qr-btn-confirm');btn.disabled=true;btn.innerText='⏳ Registrando...';const item={id:Date.now(),pat,dni,mza,casa,tipo,hE:horaActual(),hS:'',tsE:Date.now(),vig:sessionStorage.getItem('nx_vigilador')||''};DB.push(item);localStorage.setItem('nx_db',JSON.stringify(DB));render();enviar(item);document.getElementById('qr-result-panel').classList.remove('visible');showToast('📥 QR: '+(pat||'DNI '+dni)+' — INGRESO OK');btn.disabled=false;btn.innerText='📥 REGISTRAR INGRESO';}
+function confirmarIngresoQR(){const pat=document.getElementById('qr-f-pat').value.trim().toUpperCase();const dni=document.getElementById('qr-f-dni').value.trim();const mza=document.getElementById('qr-f-mza').value.trim();const casa=document.getElementById('qr-f-casa').value.trim();const tipo=document.getElementById('qr-f-tipo').value;if(!pat&&!dni){showToast('⚠️ Ingresá al menos patente o DNI');return;}const btn=document.getElementById('qr-btn-confirm');btn.disabled=true;btn.innerText='⏳ Registrando...';const item={id:Date.now(),pat,dni,mza,casa,tipo,hE:horaActual(),hS:'',tsE:Date.now(),vig:sessionStorage.getItem('nx_vigilador')||''};DB.push(item);lsSet('nx_db',JSON.stringify(DB));render();enviar(item);document.getElementById('qr-result-panel').classList.remove('visible');showToast('📥 QR: '+(pat||'DNI '+dni)+' — INGRESO OK');btn.disabled=false;btn.innerText='📥 REGISTRAR INGRESO';}
 function qrReescanear(){document.getElementById('qr-result-panel').classList.remove('visible');abrirEscanerQR();}
 function cerrarEscanerQR(){qrDetenerCamara();document.getElementById('qr-overlay').classList.remove('visible');document.getElementById('qr-result-panel').classList.remove('visible');}
 function qrDetenerCamara(){if(qrInterval){clearInterval(qrInterval);qrInterval=null;}if(qrStream){qrStream.getTracks().forEach(t=>t.stop());qrStream=null;}qrTrack=null;qrTorchOn=false;const tb=document.getElementById('qr-torch-btn');tb.classList.remove('on');tb.innerText='💡';}
@@ -2482,10 +2533,8 @@ function chatSonidoRecibido() {
 function renderChat() {
   const yo = sessionStorage.getItem('nx_vigilador') || '';
   const cont = document.getElementById('chat-msgs');
-  const vacio = document.getElementById('chat-vacio');
   if (!_chatMensajes.length) {
-    if (vacio) vacio.style.display = '';
-    cont.innerHTML = `<div class="chat-vacio" id="chat-vacio">
+    cont.innerHTML = `<div class="chat-vacio">
       💬 Iniciá la conversación<br>
       <span style="font-size:12px;color:#333;">Los mensajes llegan en segundos</span>
     </div>`;
@@ -2595,7 +2644,7 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw_control.js', { scope: './' })
       .then(reg => {
         _swReg = reg;
-        console.log('[NEXOS] SW registrado. Scope:', reg.scope);
+        // SW registrado OK
         reg.addEventListener('updatefound', () => {
           const newWorker = reg.installing;
           newWorker.addEventListener('statechange', () => {
@@ -2619,8 +2668,45 @@ if ('serviceWorker' in navigator) {
       if (event.data?.type === 'NEXOS_SYNC_NOW') {
         if (typeof sincronizar === 'function') sincronizar();
       }
+      // Cuando el usuario toca la notificación con la app cerrada y se reabre
+      if (event.data?.type === 'NEXOS_NOTIF_CLICK') {
+        const tipo = event.data.tipo;
+        if (tipo === 'panico') {
+          if (typeof mostrarPanico === 'function' && panicosPendientes.length) mostrarPanico(panicosPendientes);
+        } else if (tipo === 'delivery') {
+          if (typeof abrirDeliveryActivos === 'function') abrirDeliveryActivos();
+        } else if (tipo === 'chat') {
+          // Abrir el panel de vigiladores
+          if (typeof abrirVigsOnline === 'function') setTimeout(abrirVigsOnline, 800);
+        }
+      }
+      // El browser rotó las claves push — re-registrar suscripción al Sheet
+      if (event.data?.type === 'NEXOS_PUSH_RESUB') {
+        try {
+          const sub = JSON.parse(event.data.sub);
+          const url = localStorage.getItem('nx_url');
+          const nombre = sessionStorage.getItem('nx_vigilador') || 'desconocido';
+          if (url) {
+            fetch(url, {
+              method: 'POST', mode: 'no-cors',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ accion: 'push_suscribir', nombre, sub: event.data.sub })
+            }).catch(() => {});
+          }
+          localStorage.setItem('nx_push_sub', event.data.sub);
+        } catch(e) {}
+      }
     });
   });
+}
+
+// ── BACKGROUND SYNC: registrar tag cuando hay pendientes ──
+async function registrarBackgroundSync() {
+  if (!('serviceWorker' in navigator) || !('SyncManager' in window)) return;
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    await reg.sync.register('nexos-sync-pendientes');
+  } catch(e) {}
 }
 
 // ── PWA: Capturar prompt de instalación ──────────────────
