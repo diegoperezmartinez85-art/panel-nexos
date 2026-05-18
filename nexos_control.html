@@ -1232,10 +1232,15 @@ async function _vaciarCola(){
   _guardarCola();
 }
 // Sync inmediato al volver a la app (minimizada o pantalla bloqueada)
+let _lastVisibilitySync = 0;
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && sessionStorage.getItem('nx_auth') === '1') {
-    sincronizar();
-    fetchVigsOnline();
+    const ahora = Date.now();
+    if (ahora - _lastVisibilitySync > 10000) { // evitar spam si minimiza/restaura rápido
+      _lastVisibilitySync = ahora;
+      sincronizar();
+      fetchVigsOnline();
+    }
   }
 });
 window.addEventListener('online',()=>{showToast('🌐 Conexión restaurada');_vaciarCola();sincronizar();});
@@ -1246,7 +1251,7 @@ function enviar(datos){
   const url=lsGet('nx_url');if(!url)return;
   if(!navigator.onLine){_colaOffline.push(datos);_guardarCola();showToast('📵 Guardado sin conexión');registrarBackgroundSync();return;}
   fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)})
-    .then(()=>setTimeout(()=>sincronizar(),1500))
+    .then(()=>setTimeout(()=>sincronizar(),2000))
     .catch(()=>{_colaOffline.push(datos);_guardarCola();showToast('⚠️ Sin red — guardado en cola');registrarBackgroundSync();});
 }
 function cargarBaneadosDesdeCloud(bC){if(!Array.isArray(bC))return;BANEADOS=bC.map(b=>({mza:String(b.mza||''),casa:String(b.casa||''),id:b.id||'',motivo:b.motivo||'',ts:b.ts||Date.now()}));guardarBaneados();}
@@ -1267,9 +1272,12 @@ async function heartbeatVigilador() {
   } catch(e) {}
 }
 
+let _lastVigsOnlineFetch = 0;
 async function fetchVigsOnline() {
   const url = localStorage.getItem('nx_url');
   if (!url) return;
+  if ((Date.now() - _lastVigsOnlineFetch) < 15000) return; // no más de 1 fetch cada 15s
+  _lastVigsOnlineFetch = Date.now();
   try {
     const r = await fetch(url + '?accion=vigiladores_online&t=' + Date.now());
     if (!r.ok) return;
@@ -1351,23 +1359,60 @@ function abrirModalVigs() {
 }
 
 // Iniciar heartbeat y polling cuando el vigilador se loguea
+// ── SYNC ADAPTATIVO ────────────────────────────────────────
+// 25s cuando hay deliveries activos (urgente), 45s cuando no hay ninguno.
+// Reduce llamadas al GAS en momentos tranquilos sin sacrificar reactividad.
+let _autoSyncDeliveryMode = false; // false = modo tranquilo (45s), true = modo delivery (25s)
+
+function _hayDeliveriesActivos() {
+  return DB.some(r => !r.hS && r.tipo === 'DELIVERY');
+}
+
+function _ajustarAutoSync() {
+  const deberiaSerRapido = _hayDeliveriesActivos();
+  if (deberiaSerRapido === _autoSyncDeliveryMode) return; // sin cambio
+  _autoSyncDeliveryMode = deberiaSerRapido;
+  if (window._autoSyncInterval) clearInterval(window._autoSyncInterval);
+  const intervalo = deberiaSerRapido ? 25000 : 45000;
+  window._autoSyncInterval = setInterval(() => {
+    if (document.visibilityState === 'visible') sincronizar();
+  }, intervalo);
+  if (typeof setSyncStatus === 'function') {
+    setSyncStatus(deberiaSerRapido ? '🛵 Sync rápido (25s)' : '⏱ Sync normal (45s)', deberiaSerRapido ? 'sync-loading' : '');
+    setTimeout(() => setSyncStatus('', ''), 2500);
+  }
+}
+
 function iniciarHeartbeat() {
   heartbeatVigilador();
   fetchVigsOnline();
   if (window._heartbeatInterval) clearInterval(window._heartbeatInterval);
   if (window._vigsOnlineInterval) clearInterval(window._vigsOnlineInterval);
-  window._heartbeatInterval = setInterval(heartbeatVigilador, 60000);
-  window._vigsOnlineInterval = setInterval(fetchVigsOnline, 30000);
-  window._autoSyncInterval   = setInterval(()=>{ if(document.visibilityState==='visible') sincronizar(); }, 25000);
+  if (window._autoSyncInterval) clearInterval(window._autoSyncInterval);
+  _autoSyncDeliveryMode = false; // reset estado
+  // Heartbeat: 90s (el GAS considera offline si no hay señal en ~2min, 90s es suficiente)
+  window._heartbeatInterval = setInterval(heartbeatVigilador, 90000);
+  // Vigiladores online: 60s (no necesita ser tan frecuente)
+  window._vigsOnlineInterval = setInterval(fetchVigsOnline, 60000);
+  // Auto-sync adaptativo: arranca en 45s y se ajusta según deliveries activos
+  window._autoSyncInterval = setInterval(() => {
+    if (document.visibilityState === 'visible') sincronizar();
+  }, 45000);
+  // Chequear cada 10s si hay que cambiar el ritmo de sync
+  if (window._adaptiveSyncCheck) clearInterval(window._adaptiveSyncCheck);
+  window._adaptiveSyncCheck = setInterval(_ajustarAutoSync, 10000);
 }
 
 // Detener al cerrar sesión
 const _cerrarSesionOrig = cerrarSesion;
 cerrarSesion = function() {
-  if (window._heartbeatInterval) { clearInterval(window._heartbeatInterval); window._heartbeatInterval = null; }
-  if (window._vigsOnlineInterval) { clearInterval(window._vigsOnlineInterval); window._vigsOnlineInterval = null; }
-  if (window._autoSyncInterval)   { clearInterval(window._autoSyncInterval);   window._autoSyncInterval   = null; }
-  if (window._vigsOnlineInterval) { clearInterval(window._vigsOnlineInterval); window._vigsOnlineInterval = null; }
+  if (window._heartbeatInterval)   { clearInterval(window._heartbeatInterval);   window._heartbeatInterval   = null; }
+  if (window._vigsOnlineInterval)  { clearInterval(window._vigsOnlineInterval);  window._vigsOnlineInterval  = null; }
+  if (window._autoSyncInterval)    { clearInterval(window._autoSyncInterval);    window._autoSyncInterval    = null; }
+  if (window._adaptiveSyncCheck)   { clearInterval(window._adaptiveSyncCheck);   window._adaptiveSyncCheck   = null; }
+  _autoSyncDeliveryMode = false;
+  _lastVigsOnlineFetch = 0;
+  _lastVisibilitySync = 0;
   _cerrarSesionOrig();
 };
 
@@ -1588,17 +1633,22 @@ function abrirResumen(){
 }
 function abrirVehiculos(){const adentro=DB.filter(r=>!r.hS);let html='';if(!adentro.length){html='<div class="empty-msg">Sin vehículos activos 🟢</div>';}else{html=adentro.sort((a,b)=>(b.tsE||0)-(a.tsE||0)).map(r=>{const mins=Math.floor((Date.now()-(r.tsE||0))/60000);const col=r.tipo==='DELIVERY'&&mins>=15?'var(--red)':r.tipo==='DELIVERY'?'var(--gold)':'var(--green)';return`<div class="modal-row"><strong style="color:${col}">${escHtml(r.pat)}</strong>${r.dni?` · DNI: ${escHtml(r.dni)}`:''}<span style="float:right;color:#666;font-size:11px">${mins}min</span><br><span style="font-size:11px;color:#888">Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')} · ${escHtml(r.tipo)}</span></div>`;}).join('');}document.getElementById('vehiculos-contenido').innerHTML=html;abrirModal('modal-vehiculos');}
 // ── HISTORIAL DEL DÍA ─────────────────────────────────────
-let _historialHoySheet = [];
 async function abrirBusqueda(){
   _historialHoySheet = [];
+  _lastHistorialFetch = 0; // forzar recarga al abrir el modal manualmente
   document.getElementById('busqueda-input').value='';
   filtrarHistorialDia();
   abrirModal('modal-busqueda');
   cargarSheetHistorialHoy();
 }
+let _historialHoySheet = [];
+let _lastHistorialFetch = 0;
 async function cargarSheetHistorialHoy(){
   const url=localStorage.getItem('nx_url');
   if(!url)return;
+  // Cache de 30s: no volver a pedir si ya se cargó recientemente
+  if(Date.now() - _lastHistorialFetch < 30000 && _historialHoySheet.length > 0){ filtrarHistorialDia(); return; }
+  _lastHistorialFetch = Date.now();
   const hoyISO=new Date().toISOString().split('T')[0];
   const statusEl=document.getElementById('busqueda-status');
   statusEl.innerHTML='🔍 Cargando desde Sheet...';
@@ -1956,8 +2006,8 @@ function iniciarApp(){
   document.getElementById('cfg-url').value=localStorage.getItem('nx_url')||'';
   actualizarContadorIncidentes();
   render();sincronizar();
-  setInterval(()=>{ if(document.visibilityState==='visible') sincronizar(); }, 25000);
-  setInterval(render,30000);
+  // NOTA: el auto-sync periódico lo maneja iniciarHeartbeat() — no duplicar aquí
+  setInterval(render,30000); // render local, sin llamada al GAS
 }
 
 document.getElementById('pin-screen').classList.remove('oculto');
@@ -2478,6 +2528,18 @@ function chatContarNoLeidos(otroNombre) {
   return msgs.filter(m => m.de !== yo && m.ts > ultimoLeido).length;
 }
 
+// Backoff adaptativo del chat: empieza en 22s, sube a 40s si 3 polls sin actividad
+let _chatPollSinActividad = 0;
+function _chatGetIntervalo() { return _chatPollSinActividad >= 3 ? 40000 : 22000; }
+function _chatReiniciarInterval() {
+  if (!_chatInterval) return;
+  clearInterval(_chatInterval);
+  _chatInterval = setInterval(() => {
+    if (document.visibilityState !== 'visible') return;
+    chatFetchMensajes();
+  }, _chatGetIntervalo());
+}
+
 function abrirChat(nombreVig) {
   const yo = sessionStorage.getItem('nx_vigilador') || '';
   _chatConVig = nombreVig;
@@ -2495,10 +2557,14 @@ function abrirChat(nombreVig) {
   document.getElementById('modal-vigs-online').classList.remove('visible');
   // Enfocar input
   setTimeout(() => document.getElementById('chat-input').focus(), 300);
-  // Polling de mensajes
+  // Polling de mensajes con backoff adaptativo
   if (_chatInterval) clearInterval(_chatInterval);
+  _chatPollSinActividad = 0; // resetear contador de inactividad
   chatFetchMensajes();
-  _chatInterval = setInterval(chatFetchMensajes, 8000);
+  _chatInterval = setInterval(() => {
+    if (document.visibilityState !== 'visible') return;
+    chatFetchMensajes();
+  }, _chatGetIntervalo());
 }
 
 function cerrarChat() {
@@ -2530,6 +2596,11 @@ async function chatFetchMensajes() {
       if (nuevos.length > 0 && _chatMensajes.length > prevLen) {
         initAudio();
         chatSonidoRecibido();
+        _chatPollSinActividad = 0;        // hay actividad → mantener ritmo normal
+        _chatReiniciarInterval();
+      } else {
+        _chatPollSinActividad++;          // sin mensajes nuevos → acercar al backoff
+        if (_chatPollSinActividad === 3) _chatReiniciarInterval(); // pasar a 40s
       }
       // Marcar leídos
       _chatUltimoLeido[clave] = Date.now();
@@ -2937,15 +3008,6 @@ function pushNotifNuevoMensaje(de, texto) {
   );
 }
 
-// ── INTEGRAR CON SINCRONIZAR: notificar pánico automáticamente
-const _sincronizarOrigPush = sincronizar;
-sincronizar = async function(manual = false) {
-  const antesDB = [...DB];
-  await _sincronizarOrigPush(manual);
-  // Detectar nuevos pánicos y notificar
-  // (mostrarPanico ya los maneja, pero agregamos notif push)
-};
-
 // Parchar mostrarPanico para disparar notif
 const _mostrarPanicoOrig = mostrarPanico;
 mostrarPanico = function(alertas) {
@@ -2963,34 +3025,80 @@ chatSonidoRecibido = function() {
 };
 
 // ── POLLING DE CHAT EN BACKGROUND ─────────────────────────
-// Detecta mensajes nuevos aunque el panel de chat esté cerrado
+// Una sola llamada al GAS trae TODOS los mensajes pendientes para este vigilador.
+// El GAS debe soportar: ?accion=chat_inbox&para=NOMBRE&desde=TIMESTAMP
+// Respuesta esperada: { conversaciones: [ { clave, mensajes: [...] }, ... ] }
+// Si el GAS aún no tiene ese endpoint, cae en fallback al comportamiento anterior (N fetches).
 let _chatBgInterval = null;
 async function chatBgPoll() {
   const url = lsGet('nx_url');
   const yo = sessionStorage.getItem('nx_vigilador') || '';
   if (!url || !yo) return;
-  // Pedir mensajes de cada vigilador online (usa el endpoint que existe en GAS)
+
   const leidoMap = JSON.parse(lsGet('nx_chat_leido', '{}'));
+  // Timestamp del mensaje más antiguo no leído (o hace 24hs como límite)
+  const _leidoVals = Object.values(leidoMap).filter(v => typeof v === 'number' && v > 0);
+  const desdeTs = _leidoVals.length ? Math.min(..._leidoVals) : Date.now() - 86400000;
+
+  try {
+    // ── INTENTO 1: endpoint unificado (1 sola llamada) ──────
+    const r = await fetch(url + '?accion=chat_inbox&para=' + encodeURIComponent(yo) + '&desde=' + desdeTs + '&t=' + Date.now());
+    if (r.ok) {
+      const data = await r.json();
+      if (Array.isArray(data.conversaciones)) {
+        // Procesar cada conversación recibida en bloque
+        let hayNuevos = false;
+        for (const conv of data.conversaciones) {
+          if (!conv.clave || !Array.isArray(conv.mensajes)) continue;
+          const ultimoLeido = leidoMap[conv.clave] || 0;
+          const nuevos = conv.mensajes.filter(m => m.de !== yo && m.ts > ultimoLeido);
+          if (!nuevos.length) continue;
+          lsSet('nx_chat_' + conv.clave, JSON.stringify(conv.mensajes));
+          hayNuevos = true;
+          // Notificar solo si ese chat no está abierto ahora
+          const otroNombre = conv.clave.split('__NX__').find(n => n !== yo) || '';
+          const chatAbierto = document.getElementById('chat-overlay').classList.contains('visible') && _chatConVig === otroNombre;
+          if (!chatAbierto) {
+            const ultimo = nuevos[nuevos.length - 1];
+            initAudio();
+            if (audioCtx) {
+              const now = audioCtx.currentTime;
+              const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+              o.connect(g); g.connect(audioCtx.destination);
+              o.type = 'sine'; o.frequency.value = 880;
+              g.gain.setValueAtTime(0, now);
+              g.gain.linearRampToValueAtTime(0.15, now + 0.01);
+              g.gain.setValueAtTime(0.15, now + 0.1);
+              g.gain.linearRampToValueAtTime(0, now + 0.18);
+              o.start(now); o.stop(now + 0.2);
+            }
+            pushNotifNuevoMensaje(ultimo.de, ultimo.texto);
+          }
+        }
+        if (hayNuevos) renderVigsOnline();
+        return; // éxito — no hacer fallback
+      }
+    }
+  } catch(e) {}
+
+  // ── FALLBACK: endpoint viejo, una llamada por vigilador ──
+  // Se usa solo si el GAS no soporta chat_inbox todavía.
   for (const vig of _vigsOnline) {
     if (vig.nombre === yo) continue;
     try {
       const clave = chatClave(yo, vig.nombre);
-      const r = await fetch(url + '?accion=chat&clave=' + encodeURIComponent(clave) + '&t=' + Date.now());
-      if (!r.ok) continue;
-      const data = await r.json();
+      const rf = await fetch(url + '?accion=chat&clave=' + encodeURIComponent(clave) + '&t=' + Date.now());
+      if (!rf.ok) continue;
+      const data = await rf.json();
       if (!Array.isArray(data.mensajes)) continue;
       const ultimoLeido = leidoMap[clave] || 0;
       const nuevos = data.mensajes.filter(m => m.de !== yo && m.ts > ultimoLeido);
       if (!nuevos.length) continue;
-      // Guardar localmente
       lsSet('nx_chat_' + clave, JSON.stringify(data.mensajes));
-      // Notificar solo si el chat con esa persona NO está abierto
       const chatAbierto = document.getElementById('chat-overlay').classList.contains('visible') && _chatConVig === vig.nombre;
       if (!chatAbierto) {
-        const deNombre = nuevos[nuevos.length - 1].de;
-        const textoPreview = nuevos[nuevos.length - 1].texto;
+        const ultimo = nuevos[nuevos.length - 1];
         initAudio();
-        // Sonido directo sin parchar _chatConVig
         if (audioCtx) {
           const now = audioCtx.currentTime;
           const o = audioCtx.createOscillator(), g = audioCtx.createGain();
@@ -3002,7 +3110,7 @@ async function chatBgPoll() {
           g.gain.linearRampToValueAtTime(0, now + 0.18);
           o.start(now); o.stop(now + 0.2);
         }
-        pushNotifNuevoMensaje(deNombre, textoPreview);
+        pushNotifNuevoMensaje(ultimo.de, ultimo.texto);
       }
       renderVigsOnline();
     } catch(e) {}
@@ -3011,7 +3119,7 @@ async function chatBgPoll() {
 
 function iniciarChatBgPoll() {
   if (_chatBgInterval) return;
-  _chatBgInterval = setInterval(()=>{ if(document.visibilityState==='visible') chatBgPoll(); }, 25000);
+  _chatBgInterval = setInterval(()=>{ if(document.visibilityState==='visible') chatBgPoll(); }, 60000);
 }
 
 document.addEventListener('nx-session-start', iniciarChatBgPoll);
@@ -3021,6 +3129,36 @@ if (sessionStorage.getItem('nx_auth') === '1') {
 
 // Parchar tickContadores para notif de delivery (ya existe lógica, agregamos notif)
 // Se engancha en la detección de nueva alerta delivery dentro del setInterval existente
+
+/*
+ * ══════════════════════════════════════════════════════════════════
+ *  ⚠️  REQUERIDO EN EL GAS PARA MÁXIMA EFICIENCIA
+ *  Sin este endpoint el sistema cae en fallback N-fetches (1 por vigilador).
+ *  Agregar este case dentro del doGet() del script de la hoja:
+ * ══════════════════════════════════════════════════════════════════
+ *
+ *  case 'chat_inbox': {
+ *    const para   = params.para  || '';
+ *    const desde  = Number(params.desde) || 0;
+ *    const ss     = SpreadsheetApp.getActiveSpreadsheet();
+ *    const sheet  = ss.getSheetByName('Chat') || ss.insertSheet('Chat');
+ *    const rows   = sheet.getDataRange().getValues();  // [clave, de, para, texto, ts]
+ *    const convMap = {};
+ *    for (let i = 1; i < rows.length; i++) {
+ *      const [clave, de, destino, texto, ts] = rows[i];
+ *      if (destino !== para && de !== para) continue;  // no me involucra
+ *      if (Number(ts) < desde) continue;               // más viejo que lo que ya leí
+ *      if (!convMap[clave]) convMap[clave] = [];
+ *      convMap[clave].push({ de, texto, ts: Number(ts) });
+ *    }
+ *    const conversaciones = Object.entries(convMap).map(([clave, mensajes]) => ({ clave, mensajes }));
+ *    return ContentService
+ *      .createTextOutput(JSON.stringify({ conversaciones }))
+ *      .setMimeType(ContentService.MimeType.JSON);
+ *  }
+ *
+ * ══════════════════════════════════════════════════════════════════
+ */
 
 </script>
 </body>
