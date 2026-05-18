@@ -1163,7 +1163,7 @@ let DB=(()=>{const hoyStr=new Date().toLocaleDateString('es-AR');const raw=JSON.
 return raw.filter(r=>!r.hS||new Date(r.tsE||0).toLocaleDateString('es-AR')===hoyStr);})();
 let LISTA_NEGRA=JSON.parse(localStorage.getItem('nx_lista_negra')||'[]');
 let BANEADOS=JSON.parse(localStorage.getItem('nx_baneados')||'[]');
-let sincronizando=false,panicosPendientes=[];
+let sincronizando=false,panicosPendientes=[],_lastSyncTs=0;
 let audioCtx=null,sirenInterval=null;
 
 function guardarBaneados(){localStorage.setItem('nx_baneados',JSON.stringify(BANEADOS));}
@@ -1188,7 +1188,7 @@ function cerrarPanico(){detenerSirena();const url=localStorage.getItem('nx_url')
 async function sincronizar(manual=false){
   const url=localStorage.getItem('nx_url');
   if(!url){if(manual)showToast("⚙️ Configurá la URL primero");return;}
-  if(sincronizando)return;
+  if(sincronizando)return;if(!manual&&(Date.now()-_lastSyncTs)<8000)return;
   sincronizando=true;setSyncStatus('Sincronizando...','sync-loading');
   try{
     const r=await fetch(url+'?t='+Date.now());if(!r.ok)throw new Error();
@@ -1210,7 +1210,7 @@ async function sincronizar(manual=false){
     setSyncStatus('✔ Sincronizado '+horaActual(),'sync-ok');
     if(panico.length>0){const ids=new Set(panicosPendientes.map(x=>String(x.panicoId)));const nuevas=panico.filter(a=>!ids.has(String(a.panicoId)));if(nuevas.length>0){panicosPendientes=panico;mostrarPanico(panico);}else panicosPendientes=panico;}
   }catch(e){setSyncStatus('⚠ Sin conexión','sync-err');if(manual)showToast("⚠️ Error al sincronizar");}
-  finally{sincronizando=false;}
+  finally{sincronizando=false;_lastSyncTs=Date.now();}
 }
 // ── localStorage SEGURO ────────────────────────────────────
 function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){showToast('⚠️ Almacenamiento lleno');}}
@@ -1357,8 +1357,8 @@ function iniciarHeartbeat() {
   if (window._heartbeatInterval) clearInterval(window._heartbeatInterval);
   if (window._vigsOnlineInterval) clearInterval(window._vigsOnlineInterval);
   window._heartbeatInterval = setInterval(heartbeatVigilador, 60000);
-  window._vigsOnlineInterval = setInterval(fetchVigsOnline, 15000);
-  window._autoSyncInterval   = setInterval(()=>sincronizar(), 15000);
+  window._vigsOnlineInterval = setInterval(fetchVigsOnline, 30000);
+  window._autoSyncInterval   = setInterval(()=>{ if(document.visibilityState==='visible') sincronizar(); }, 25000);
 }
 
 // Detener al cerrar sesión
@@ -1956,7 +1956,7 @@ function iniciarApp(){
   document.getElementById('cfg-url').value=localStorage.getItem('nx_url')||'';
   actualizarContadorIncidentes();
   render();sincronizar();
-  setInterval(()=>sincronizar(),15000);
+  setInterval(()=>{ if(document.visibilityState==='visible') sincronizar(); }, 25000);
   setInterval(render,30000);
 }
 
@@ -3011,7 +3011,7 @@ async function chatBgPoll() {
 
 function iniciarChatBgPoll() {
   if (_chatBgInterval) return;
-  _chatBgInterval = setInterval(chatBgPoll, 12000);
+  _chatBgInterval = setInterval(()=>{ if(document.visibilityState==='visible') chatBgPoll(); }, 25000);
 }
 
 document.addEventListener('nx-session-start', iniciarChatBgPoll);
