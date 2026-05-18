@@ -1216,6 +1216,13 @@ async function sincronizar(manual=false){
     if(Array.isArray(data.listaNegra)&&data.listaNegra.length>0){LISTA_NEGRA=data.listaNegra;localStorage.setItem('nx_lista_negra',JSON.stringify(LISTA_NEGRA));}
     if(Array.isArray(data.vigiladores)&&data.vigiladores.length>0){VIGILADORES=data.vigiladores;localStorage.setItem('nx_vigiladores',JSON.stringify(VIGILADORES));}
     if(Array.isArray(data.online)){_vigsOnline=data.online;renderVigsOnline();}
+    // ── Desconexión forzada desde el Sheet ──
+    const miNombre = sessionStorage.getItem('nx_vigilador') || '';
+    if (data.desconectar && Array.isArray(data.desconectar) && miNombre && data.desconectar.includes(miNombre)) {
+      showToast('🔴 Sesión cerrada remotamente por el administrador');
+      setTimeout(cerrarSesion, 1500);
+      sincronizando = false; _lastSyncTs = Date.now(); return;
+    }
     const hoyStrSync=new Date().toLocaleDateString('es-AR');
     const cloudIds=new Set(cloudData.map(x=>String(x.id)));
     // Preservar salidas de hoy que aún no subió la nube
@@ -1281,12 +1288,32 @@ async function heartbeatVigilador() {
   const nombre = sessionStorage.getItem('nx_vigilador');
   if (!url || !nombre) return;
   try {
-    await fetch(url, {
-      method: 'POST', mode: 'no-cors',
+    const r = await fetch(url, {
+      method: 'POST', mode: 'cors',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({accion: 'heartbeat', nombre, ts: Date.now()})
     });
-  } catch(e) {}
+    // Si el GAS responde con desconexión forzada, cerrar sesión
+    if (r.ok) {
+      try {
+        const data = await r.json();
+        if (data && data.desconectar === true) {
+          showToast('🔴 Sesión cerrada remotamente por el administrador');
+          setTimeout(cerrarSesion, 1500);
+          return;
+        }
+      } catch(e) {}
+    }
+  } catch(e) {
+    // fallback sin CORS: enviar sin esperar respuesta
+    try {
+      fetch(url, {
+        method: 'POST', mode: 'no-cors',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({accion: 'heartbeat', nombre, ts: Date.now()})
+      });
+    } catch(e2) {}
+  }
 }
 
 let _lastVigsOnlineFetch = 0;
@@ -1302,6 +1329,13 @@ async function fetchVigsOnline() {
     if (Array.isArray(data.online)) {
       _vigsOnline = data.online;
       renderVigsOnline();
+    }
+    // ── Desconexión forzada desde el Sheet ──
+    const miNombreVig = sessionStorage.getItem('nx_vigilador') || '';
+    if (data.desconectar && Array.isArray(data.desconectar) && miNombreVig && data.desconectar.includes(miNombreVig)) {
+      showToast('🔴 Sesión cerrada remotamente por el administrador');
+      setTimeout(cerrarSesion, 1500);
+      return;
     }
     // También traer mensajes de chat no leídos
     if (Array.isArray(data.chat_msgs)) {
