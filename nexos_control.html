@@ -43,7 +43,7 @@
     .turno-desde{font-size:11px;color:#555;font-weight:600;margin-left:4px;}
     .turno-duracion{font-size:12px;font-weight:800;color:#444;font-family:monospace;letter-spacing:1px;}
     .pin-logo-img-wrap{position:relative;margin-bottom:28px;display:flex;align-items:center;justify-content:center;}
-    .pin-logo-img{width:200px;height:auto;border-radius:22px;box-shadow:0 0 0 2px rgba(0,212,212,0.8),0 0 18px rgba(0,212,212,0.7),0 0 40px rgba(0,212,212,0.4),0 0 70px rgba(168,85,247,0.3);animation:neonLogoPulse 2.8s ease-in-out infinite;}
+    .pin-logo-img{width:250px;height:auto;border-radius:22px;box-shadow:0 0 0 2px rgba(0,212,212,0.8),0 0 18px rgba(0,212,212,0.7),0 0 40px rgba(0,212,212,0.4),0 0 70px rgba(168,85,247,0.3);animation:neonLogoPulse 2.8s ease-in-out infinite;}
     @keyframes neonLogoPulse{0%,100%{box-shadow:0 0 0 2px rgba(0,212,212,0.8),0 0 18px rgba(0,212,212,0.7),0 0 40px rgba(0,212,212,0.4),0 0 70px rgba(168,85,247,0.3);}50%{box-shadow:0 0 0 3px rgba(0,212,212,1),0 0 28px rgba(0,212,212,0.9),0 0 60px rgba(0,212,212,0.6),0 0 100px rgba(168,85,247,0.5);}}
     .app{max-width:500px;margin:0 auto;}
     .monitor{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
@@ -234,6 +234,16 @@
     .chat-badge{position:absolute;top:6px;right:calc(50% - 18px);background:var(--green);color:#000;font-size:9px;font-weight:900;border-radius:20px;min-width:16px;height:16px;line-height:16px;text-align:center;padding:0 4px;}
     .vig-chat-hint{font-size:10px;color:#555;margin-top:3px;font-weight:600;}
     .chat-unread-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;animation:vigPulse 2s ease-in-out infinite;margin-left:6px;}
+    .chat-img-btn{background:rgba(0,212,212,0.1);border:1px solid rgba(0,212,212,0.3);color:var(--cyan);font-size:18px;cursor:pointer;border-radius:50%;width:38px;height:38px;flex-shrink:0;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:background 0.15s;}
+    .chat-img-btn:active{background:rgba(0,212,212,0.28);}
+    .chat-img-preview-wrap{display:none;align-items:center;gap:8px;padding:6px 10px;background:var(--bg3);border-top:1px solid var(--border);}
+    .chat-img-preview-wrap.visible{display:flex;}
+    .chat-img-preview-thumb{width:52px;height:52px;object-fit:cover;border-radius:10px;border:2px solid var(--cyan);}
+    .chat-img-preview-cancel{background:rgba(231,76,60,0.2);border:1px solid var(--red);color:var(--red);font-size:12px;font-weight:900;cursor:pointer;border-radius:8px;padding:5px 10px;-webkit-tap-highlight-color:transparent;}
+    .chat-img-preview-label{font-size:11px;color:#888;flex:1;}
+    .chat-burbuja img.chat-msg-img{max-width:200px;max-height:200px;border-radius:10px;display:block;cursor:pointer;margin-top:4px;}
+    .chat-burbuja.mia img.chat-msg-img{border:2px solid rgba(0,0,0,0.15);}
+    .chat-burbuja.suya img.chat-msg-img{border:2px solid var(--border);}
     /* ── DASHBOARD STATS ── */
     .dash-section{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:12px;}
     .dash-title{font-size:11px;font-weight:900;color:#555;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
@@ -917,7 +927,14 @@
       <span style="font-size:12px;color:#333;">Los mensajes se ven en tiempo real</span>
     </div>
   </div>
+  <div class="chat-img-preview-wrap" id="chat-img-preview-wrap">
+    <img class="chat-img-preview-thumb" id="chat-img-preview-thumb" src="" alt="preview">
+    <span class="chat-img-preview-label">Imagen lista para enviar</span>
+    <button class="chat-img-preview-cancel" onclick="chatCancelarImagen()">✕ Quitar</button>
+  </div>
   <div class="chat-input-bar">
+    <button class="chat-img-btn" onclick="document.getElementById('chat-img-input').click()" title="Enviar imagen">📷</button>
+    <input type="file" id="chat-img-input" accept="image/*" style="display:none;" onchange="chatSeleccionarImagen(this)">
     <textarea class="chat-input" id="chat-input" placeholder="Escribí un mensaje..." rows="1" oninput="chatAutoResize(this)" onkeydown="chatKeyDown(event)"></textarea>
     <button class="chat-send" onclick="chatEnviar()">➤</button>
   </div>
@@ -2636,9 +2653,16 @@ function renderChat() {
   cont.innerHTML = _chatMensajes.map(m => {
     const esMio = m.de === yo;
     const hora = new Date(m.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    let contenido = '';
+    if (m.imagen) {
+      contenido += `<img class="chat-msg-img" src="${m.imagen}" alt="imagen" onclick="chatVerImagen(this.src)">`;
+    }
+    if (m.texto) {
+      contenido += `<span>${escHtml(m.texto).replace(/\n/g,'<br>')}</span>`;
+    }
     return `<div class="chat-burbuja-wrap ${esMio?'mia':'suya'}">
       ${!esMio ? `<div class="chat-remitente">${escHtml(m.de)}</div>` : ''}
-      <div class="chat-burbuja ${esMio?'mia':'suya'}">${escHtml(m.texto).replace(/\n/g,'<br>')}</div>
+      <div class="chat-burbuja ${esMio?'mia':'suya'}">${contenido}</div>
       <div class="chat-meta">${hora}</div>
     </div>`;
   }).join('');
@@ -2646,16 +2670,57 @@ function renderChat() {
   cont.scrollTop = cont.scrollHeight;
 }
 
+let _chatImagenPendiente = null; // base64 de la imagen a enviar
+
+function chatSeleccionarImagen(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    // Redimensionar si es muy grande (max 800px ancho)
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 800;
+      let w = img.width, h = img.height;
+      if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      _chatImagenPendiente = canvas.toDataURL('image/jpeg', 0.75);
+      document.getElementById('chat-img-preview-thumb').src = _chatImagenPendiente;
+      document.getElementById('chat-img-preview-wrap').classList.add('visible');
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  input.value = ''; // reset para poder seleccionar la misma imagen de nuevo
+}
+
+function chatCancelarImagen() {
+  _chatImagenPendiente = null;
+  document.getElementById('chat-img-preview-wrap').classList.remove('visible');
+  document.getElementById('chat-img-preview-thumb').src = '';
+}
+
+function chatVerImagen(src) {
+  document.getElementById('foto-overlay-img').src = src;
+  document.getElementById('foto-overlay').classList.add('visible');
+}
+
 async function chatEnviar() {
   const input = document.getElementById('chat-input');
   const texto = input.value.trim();
+  const imagen = _chatImagenPendiente;
   const yo = sessionStorage.getItem('nx_vigilador') || '';
   const url = localStorage.getItem('nx_url');
-  if (!texto || !_chatConVig || !yo) return;
+  if (!texto && !imagen) return;
+  if (!_chatConVig || !yo) return;
   input.value = '';
   chatAutoResize(input);
+  chatCancelarImagen();
   const clave = chatClave(yo, _chatConVig);
-  const msg = { de: yo, para: _chatConVig, texto, ts: Date.now(), clave };
+  const msg = { de: yo, para: _chatConVig, texto: texto || '', ts: Date.now(), clave };
+  if (imagen) msg.imagen = imagen;
   // Agregar localmente de inmediato
   _chatMensajes.push(msg);
   localStorage.setItem('nx_chat_' + clave, JSON.stringify(_chatMensajes));
