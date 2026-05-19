@@ -13,10 +13,8 @@
   <!-- Firebase SDK (modular compat para uso global) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-  <!-- FCM: Firebase Cloud Messaging (necesario para push con app cerrada) -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
   <script>
-    // Inicialización de Firebase — Realtime Database + FCM Messaging
+    // Inicialización de Firebase — solo para el chat en tiempo real
     const _fbApp = firebase.initializeApp({
       apiKey: "AIzaSyBw6O59fZ6fPeVUf5BPxAMfw2jssVJNSE4",
       authDomain: "nexos-panel.firebaseapp.com",
@@ -27,15 +25,6 @@
       appId: "1:485679155987:web:566522d28bbb81693f28e6"
     });
     const _fbDB = firebase.database();
-
-    // Instancia FCM (se usa más abajo para obtener el token del dispositivo)
-    let _fbMessaging = null;
-    try {
-      _fbMessaging = firebase.messaging();
-    } catch(e) {
-      // El navegador no soporta FCM (ej: Safari iOS < 16.4)
-      console.warn('[NEXOS FCM] Messaging no soportado en este navegador:', e.message);
-    }
   </script>
   <link rel="apple-touch-icon" href="./nexos-icon-192.png">
   <link rel="apple-touch-icon" sizes="192x192" href="./nexos-icon-192.png">
@@ -903,19 +892,11 @@
         Recibí alertas aunque la app esté cerrada:<br>
         🚨 Pánico de vecinos · ⚠️ Delivery +15min · 💬 Mensajes de chat
       </div>
-      <!-- Estado FCM (Firebase Cloud Messaging) -->
-      <div id="fcm-status-row" style="display:flex;align-items:center;gap:8px;background:var(--bg3);border-radius:10px;padding:10px 12px;margin-bottom:12px;border:1px solid var(--border);">
-        <span style="font-size:16px;">📡</span>
-        <div style="flex:1;">
-          <div style="font-size:10px;font-weight:900;color:#555;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;">FCM — Notif. con app cerrada</div>
-          <div id="fcm-status-text" style="font-size:12px;font-weight:800;color:#555;">No activado</div>
-        </div>
-      </div>
       <button id="push-btn-activar" onclick="pushActivar()" style="display:none;width:100%;background:var(--green);color:#000;border:none;border-radius:12px;padding:14px;font-weight:900;font-size:14px;cursor:pointer;margin-bottom:8px;">🔔 ACTIVAR NOTIFICACIONES</button>
       <button id="push-btn-desactivar" onclick="pushDesuscribir()" style="display:none;width:100%;background:var(--bg3);color:#888;border:1px solid var(--border);border-radius:12px;padding:12px;font-weight:800;font-size:13px;cursor:pointer;margin-bottom:8px;">🔕 Desactivar notificaciones</button>
       <button onclick="pushTestLocal()" style="width:100%;background:var(--bg3);color:var(--cyan);border:1px solid rgba(0,212,212,0.3);border-radius:12px;padding:12px;font-weight:800;font-size:13px;cursor:pointer;">🧪 Probar notificación</button>
       <div style="margin-top:12px;padding:10px;background:var(--bg3);border-radius:10px;font-size:10px;color:#444;line-height:1.6;">
-        <strong style="color:#555;">ℹ️ Para enviar push desde tu backend</strong> usá el token FCM guardado en Firebase DB bajo <code style="color:var(--cyan)">/fcm_tokens/&lt;nombre_vigilador&gt;</code>. Enviá un POST a la API de FCM con ese token.
+        <strong style="color:#555;">ℹ️ Para que las notificaciones lleguen con la app cerrada</strong> también necesitás agregar soporte en tu Google Apps Script. Mirá la documentación incluida abajo.
       </div>
     </div>
   </div>
@@ -2089,22 +2070,93 @@ if(ultimoVigilador) document.getElementById('pin-nombre').value = ultimoVigilado
 // ══════════════════════════════════════════════════════════
 //  REGISTRO DE INCIDENTES
 // ══════════════════════════════════════════════════════════
-let INCIDENTES = JSON.parse(localStorage.getItem('nx_incidentes') || '[]');
-let incTipoSel = 'grave';
-let incFotoData = null;
+// ══════════════════════════════════════════════════════════════════
+//  INCIDENTES — Firebase Realtime Database
+//  Ruta: /incidentes/{id}
+//  Todos los vigiladores ven los mismos incidentes en tiempo real.
+//  La lista local INCIDENTES[] se mantiene sincronizada por el
+//  listener de Firebase; nunca se escribe directo en ella desde el form.
+// ══════════════════════════════════════════════════════════════════
 
-function guardarIncidentes() {
-  localStorage.setItem('nx_incidentes', JSON.stringify(INCIDENTES));
-  actualizarContadorIncidentes();
+let INCIDENTES = [];          // espejo local, actualizado por Firebase
+let incTipoSel  = 'grave';
+let incFotoData = null;
+let _incFbListener = null;    // referencia para poder desuscribir si hace falta
+
+// ── INICIALIZAR LISTENER FIREBASE ────────────────────────────────
+// Llama a esta función una sola vez (después del login).
+// Escucha cambios en /incidentes en tiempo real y mantiene INCIDENTES[]
+// y la UI siempre al día para todos los dispositivos conectados.
+function incIniciarFirebase() {
+  if (_incFbListener) return; // ya está suscripto
+  const ref = _fbDB.ref('incidentes');
+
+  _incFbListener = ref.orderByChild('ts').on('value', snap => {
+    const datos = [];
+    snap.forEach(child => {
+      datos.push({ fbKey: child.key, ...child.val() });
+    });
+    // Ordenar: más reciente primero
+    datos.sort((a, b) => b.ts - a.ts);
+    INCIDENTES = datos;
+
+    // Migrar incidentes viejos de localStorage si los hay (solo 1 vez)
+    _incMigrarLocalStorage();
+
+    actualizarContadorIncidentes();
+    // Si el modal está abierto, re-renderizar automáticamente
+    if (document.getElementById('modal-incidentes')?.classList.contains('visible')) {
+      renderIncidentes();
+    }
+    // Notificación push si llegó un incidente GRAVE nuevo de otro vigilador
+    _incNotificarNuevo(datos);
+  });
 }
 
+// Migración única desde localStorage al arrancar por primera vez con Firebase
+let _incMigrado = false;
+function _incMigrarLocalStorage() {
+  if (_incMigrado) return;
+  _incMigrado = true;
+  const viejos = JSON.parse(localStorage.getItem('nx_incidentes') || '[]');
+  if (!viejos.length) return;
+  // Solo migrar los que NO existen ya en Firebase (por id/ts)
+  const tsExistentes = new Set(INCIDENTES.map(i => i.ts));
+  const aMigrar = viejos.filter(v => !tsExistentes.has(v.ts));
+  if (!aMigrar.length) { localStorage.removeItem('nx_incidentes'); return; }
+  aMigrar.forEach(inc => {
+    const { id, ...datos } = inc; // descartar el id numérico viejo
+    _fbDB.ref('incidentes').push({ ...datos, migrado: true }).catch(() => {});
+  });
+  localStorage.removeItem('nx_incidentes');
+  console.log(`[NEXOS] ${aMigrar.length} incidente(s) migrado(s) de localStorage a Firebase`);
+}
+
+// Notificar si llegó un incidente nuevo grave de otro vigilador
+let _incUltimoTs = 0;
+function _incNotificarNuevo(lista) {
+  const yo = sessionStorage.getItem('nx_vigilador') || '';
+  const nuevos = lista.filter(i => i.ts > _incUltimoTs && i.vig !== yo && i.tipo === 'grave');
+  if (_incUltimoTs > 0 && nuevos.length) {
+    nuevos.forEach(i => {
+      pushNotifLocal(
+        '🔴 INCIDENTE GRAVE — NEXOS',
+        `${i.vig ? i.vig + ': ' : ''}${i.desc.substring(0, 80)}`,
+        'nexos-inc-' + i.ts
+      );
+    });
+  }
+  if (lista.length) _incUltimoTs = Math.max(...lista.map(i => i.ts));
+}
+
+// ── CONTADOR Y BADGES ────────────────────────────────────────────
 function actualizarContadorIncidentes() {
   const hoyStr = new Date().toLocaleDateString('es-AR');
-  const hoy = INCIDENTES.filter(i => new Date(i.ts).toLocaleDateString('es-AR') === hoyStr);
+  const hoy    = INCIDENTES.filter(i => new Date(i.ts).toLocaleDateString('es-AR') === hoyStr);
   const graves = hoy.filter(i => i.tipo === 'grave').length;
-  const color = graves > 0 ? 'var(--red)' : 'var(--gold)';
+  const color    = graves > 0 ? 'var(--red)' : 'var(--gold)';
   const txtColor = graves > 0 ? '#fff' : '#000';
-  // Badge en barra de navegación
+
   const navBadge = document.getElementById('inc-nav-badge');
   if (navBadge) {
     if (hoy.length > 0) {
@@ -2116,7 +2168,6 @@ function actualizarContadorIncidentes() {
       navBadge.classList.remove('visible');
     }
   }
-  // Badge en menú hamburguesa
   const menuBadge = document.getElementById('inc-menu-badge');
   if (menuBadge) {
     if (hoy.length > 0) {
@@ -2128,33 +2179,44 @@ function actualizarContadorIncidentes() {
       menuBadge.style.display = 'none';
     }
   }
-  // Compatibilidad con elemento anterior si existe
   const counter = document.getElementById('inc-menu-counter');
   if (counter) counter.style.display = 'none';
 }
 
+// ── SELECCIÓN DE TIPO ────────────────────────────────────────────
 function incSelTipo(tipo) {
   incTipoSel = tipo;
   ['grave','normal','info'].forEach(t => {
     const btn = document.getElementById('inc-btn-' + t);
     btn.className = 'inc-tipo-btn' + (t === tipo ? ' sel-' + t : '');
   });
-  // Cambiar borde del textarea
-  const ta = document.getElementById('inc-texto');
   const colores = {grave:'var(--red)', normal:'var(--gold)', info:'var(--blue)'};
-  ta.style.borderColor = colores[tipo];
+  document.getElementById('inc-texto').style.borderColor = colores[tipo];
 }
 
+// ── FOTO ─────────────────────────────────────────────────────────
 function incPreviewFoto(input) {
   const file = input.files[0];
   if (!file) return;
+  // Comprimir antes de guardar si la imagen es muy grande
   const reader = new FileReader();
   reader.onload = e => {
-    incFotoData = e.target.result;
-    const prev = document.getElementById('inc-foto-preview');
-    prev.src = incFotoData;
-    prev.style.display = 'block';
-    prev.title = 'Tocá para quitar la foto';
+    const img = new Image();
+    img.onload = () => {
+      // Máximo 800px ancho para no inflar Firebase
+      const MAX = 800;
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      incFotoData = canvas.toDataURL('image/jpeg', 0.75);
+      const prev = document.getElementById('inc-foto-preview');
+      prev.src = incFotoData;
+      prev.style.display = 'block';
+      prev.title = 'Tocá para quitar la foto';
+    };
+    img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 }
@@ -2167,54 +2229,73 @@ function incQuitarFoto() {
   document.getElementById('inc-foto-input').value = '';
 }
 
-function incGuardar() {
+// ── GUARDAR INCIDENTE EN FIREBASE ────────────────────────────────
+async function incGuardar() {
   const texto = document.getElementById('inc-texto').value.trim();
   if (!texto) { showToast('⚠️ Describí el incidente primero'); return; }
+
+  const btn = document.querySelector('.inc-guardar-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Guardando...'; }
+
   const vig = sessionStorage.getItem('nx_vigilador') || '';
   const inc = {
-    id: Date.now(),
-    ts: Date.now(),
+    ts:   Date.now(),
     tipo: incTipoSel,
     desc: texto,
-    vig: vig,
-    foto: incFotoData || null
+    vig:  vig,
+    foto: incFotoData || null   // base64 comprimido o null
   };
-  INCIDENTES.unshift(inc);
-  guardarIncidentes();
-  // Limpiar form
-  document.getElementById('inc-texto').value = '';
-  incQuitarFoto();
-  incSelTipo('grave');
-  showToast('✅ Incidente registrado');
-  renderIncidentes();
-  // Enviar al sheet si hay URL
-  const url = localStorage.getItem('nx_url');
-  if (url) {
-    fetch(url, {
-      method: 'POST', mode: 'no-cors',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({accion: 'incidente', ...inc, foto: inc.foto ? '[foto adjunta]' : ''})
-    }).catch(() => {});
+
+  try {
+    // Escribir en Firebase — el listener 'value' actualizará INCIDENTES[] y la UI automáticamente
+    await _fbDB.ref('incidentes').push(inc);
+
+    // Limpiar form
+    document.getElementById('inc-texto').value = '';
+    incQuitarFoto();
+    incSelTipo('grave');
+    showToast('✅ Incidente guardado y compartido');
+
+    // Enviar al Sheet (sin foto para no superar el límite de GAS)
+    const url = localStorage.getItem('nx_url');
+    if (url) {
+      fetch(url, {
+        method: 'POST', mode: 'no-cors',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({accion: 'incidente', ...inc, foto: inc.foto ? '[foto adjunta]' : ''})
+      }).catch(() => {});
+    }
+  } catch(e) {
+    showToast('❌ Error al guardar: ' + e.message);
+    console.error('[NEXOS INC] Error Firebase:', e);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '💾 GUARDAR INCIDENTE'; }
   }
 }
 
-function incEliminar(id) {
-  INCIDENTES = INCIDENTES.filter(i => i.id !== id);
-  guardarIncidentes();
-  renderIncidentes();
+// ── ELIMINAR DE FIREBASE ─────────────────────────────────────────
+async function incEliminar(fbKey) {
+  try {
+    await _fbDB.ref('incidentes/' + fbKey).remove();
+    // El listener 'value' actualizará INCIDENTES[] y la UI automáticamente
+  } catch(e) {
+    showToast('❌ Error al borrar: ' + e.message);
+  }
 }
 
 let incPendienteEliminar = null;
 
-function incPedirConfirmacion(id) {
-  const inc = INCIDENTES.find(i => i.id === id);
+function incPedirConfirmacion(fbKey) {
+  const inc = INCIDENTES.find(i => i.fbKey === fbKey);
   if (!inc) return;
-  incPendienteEliminar = id;
-  const hora = new Date(inc.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  incPendienteEliminar = fbKey;
+  const hora    = new Date(inc.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
   const tipoLabels = {grave:'🔴 GRAVE', normal:'🟡 NOVEDAD', info:'🔵 INFO'};
   const preview = inc.desc.length > 60 ? inc.desc.substring(0, 60) + '…' : inc.desc;
   document.getElementById('confirm-del-desc').innerHTML =
-    `<strong style="color:#fff">${tipoLabels[inc.tipo]}</strong> · ${hora}<br><span style="font-size:12px;color:#666;margin-top:4px;display:block">"${preview}"</span><br><span style="color:#e74c3c;font-size:12px;font-weight:800;">Esta acción no se puede deshacer.</span>`;
+    `<strong style="color:#fff">${tipoLabels[inc.tipo]}</strong> · ${hora}<br>` +
+    `<span style="font-size:12px;color:#666;margin-top:4px;display:block">"${preview}"</span><br>` +
+    `<span style="color:#e74c3c;font-size:12px;font-weight:800;">Esta acción no se puede deshacer.</span>`;
   document.getElementById('confirm-del-overlay').classList.add('visible');
 }
 
@@ -2232,6 +2313,7 @@ function incConfirmarBorrar() {
   document.getElementById('confirm-del-overlay').classList.remove('visible');
 }
 
+// ── ABRIR MODAL ──────────────────────────────────────────────────
 function abrirIncidentes() {
   renderIncidentes();
   incSelTipo('grave');
@@ -2241,11 +2323,13 @@ function abrirIncidentes() {
   setTimeout(() => document.getElementById('inc-texto').focus(), 150);
 }
 
+// ── RENDER ───────────────────────────────────────────────────────
 function renderIncidentes() {
   const cont = document.getElementById('inc-lista');
   if (!cont) return;
-  const hoyStr = new Date().toLocaleDateString('es-AR');
-  const hoy = INCIDENTES.filter(i => new Date(i.ts).toLocaleDateString('es-AR') === hoyStr);
+
+  const hoyStr     = new Date().toLocaleDateString('es-AR');
+  const hoy        = INCIDENTES.filter(i => new Date(i.ts).toLocaleDateString('es-AR') === hoyStr);
   const anteriores = INCIDENTES.filter(i => new Date(i.ts).toLocaleDateString('es-AR') !== hoyStr);
 
   if (!INCIDENTES.length) {
@@ -2254,33 +2338,43 @@ function renderIncidentes() {
   }
 
   const renderItem = (inc) => {
-    const hora = new Date(inc.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-    const fecha = new Date(inc.ts).toLocaleDateString('es-AR');
-    const hoyStr2 = new Date().toLocaleDateString('es-AR');
-    const fechaLabel = fecha === hoyStr2 ? hora : fecha + ' ' + hora;
+    const hora       = new Date(inc.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const fecha      = new Date(inc.ts).toLocaleDateString('es-AR');
+    const fechaLabel = fecha === hoyStr ? hora : fecha + ' ' + hora;
     const tipoLabels = {grave:'🔴 GRAVE', normal:'🟡 NOVEDAD', info:'🔵 INFO'};
-    const tipoCls = {grave:'inc-tipo-grave', normal:'inc-tipo-normal', info:'inc-tipo-info'};
-    const fotoHtml = inc.foto
-      ? `<img class="inc-foto" src="${inc.foto}" onclick="verFotoFullscreen('${inc.id}')" title="Tocá para ampliar">`
+    const tipoCls    = {grave:'inc-tipo-grave', normal:'inc-tipo-normal', info:'inc-tipo-info'};
+    const fotoHtml   = inc.foto
+      ? `<img class="inc-foto" src="${inc.foto}" onclick="verFotoFullscreen('${inc.fbKey}')" title="Tocá para ampliar">`
       : '';
-    return `<div class="inc-item ${inc.tipo}" id="inc-${inc.id}">
+    // Indicador "en vivo" para incidentes de otros vigiladores del turno actual
+    const yo        = sessionStorage.getItem('nx_vigilador') || '';
+    const esPropio  = inc.vig === yo;
+    const vigHtml   = inc.vig
+      ? `<div class="inc-vig">👤 ${escHtml(inc.vig)}${!esPropio ? ' <span style="font-size:9px;background:rgba(0,212,212,0.15);color:var(--cyan);border:1px solid rgba(0,212,212,0.3);border-radius:10px;padding:1px 6px;font-weight:800;letter-spacing:0.5px;">EN VIVO</span>' : ''}</div>`
+      : '';
+    return `<div class="inc-item ${inc.tipo}" id="inc-${inc.fbKey}">
       <div class="inc-header">
         <span class="inc-tipo-badge ${tipoCls[inc.tipo]}">${tipoLabels[inc.tipo]}</span>
         <span class="inc-hora">${fechaLabel}</span>
       </div>
       <div class="inc-desc">${escHtml(inc.desc)}</div>
-      ${inc.vig ? `<div class="inc-vig">👤 ${escHtml(inc.vig)}</div>` : ''}
+      ${vigHtml}
       ${fotoHtml}
       <div class="inc-actions-row">
-        <button class="inc-wa-btn" onclick="incCompartirWA(${inc.id})">📲 Compartir por WhatsApp</button>
-        <button class="inc-del-btn" onclick="incPedirConfirmacion(${inc.id})">🗑️ Borrar</button>
+        <button class="inc-wa-btn" onclick="incCompartirWA('${inc.fbKey}')">📲 WhatsApp</button>
+        <button class="inc-del-btn" onclick="incPedirConfirmacion('${inc.fbKey}')">🗑️ Borrar</button>
       </div>
     </div>`;
   };
 
   let html = '';
   if (hoy.length) {
-    html += `<div style="font-size:10px;color:#666;letter-spacing:1px;font-weight:700;padding:4px 0 8px;">HOY — ${hoy.length} INCIDENTE(S)</div>`;
+    html += `<div style="font-size:10px;color:#666;letter-spacing:1px;font-weight:700;padding:4px 0 8px;display:flex;align-items:center;gap:8px;">
+      HOY — ${hoy.length} INCIDENTE(S)
+      <span style="display:inline-flex;align-items:center;gap:4px;font-size:9px;color:var(--green);font-weight:800;">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--green);animation:vigPulse 2s infinite;display:inline-block;"></span>EN TIEMPO REAL
+      </span>
+    </div>`;
     html += hoy.map(renderItem).join('');
   }
   if (anteriores.length) {
@@ -2290,18 +2384,18 @@ function renderIncidentes() {
   cont.innerHTML = html;
 }
 
-// Guardar foto base64 en un mapa para acceso rápido
-function verFotoFullscreen(id) {
-  const inc = INCIDENTES.find(i => i.id == id);
+// ── FOTO FULLSCREEN ──────────────────────────────────────────────
+function verFotoFullscreen(fbKey) {
+  const inc = INCIDENTES.find(i => i.fbKey === fbKey);
   if (!inc || !inc.foto) return;
   document.getElementById('foto-overlay-img').src = inc.foto;
   document.getElementById('foto-overlay').classList.add('visible');
 }
 
-// Incluir incidentes del turno en el contexto de la IA
+// ── CONTEXTO PARA IA ─────────────────────────────────────────────
 function incObtenerContextoIA() {
   const hoyStr = new Date().toLocaleDateString('es-AR');
-  const hoy = INCIDENTES.filter(i => new Date(i.ts).toLocaleDateString('es-AR') === hoyStr);
+  const hoy    = INCIDENTES.filter(i => new Date(i.ts).toLocaleDateString('es-AR') === hoyStr);
   if (!hoy.length) return '\nINCIDENTES HOY: ninguno';
   return '\nINCIDENTES HOY (' + hoy.length + '):\n' +
     hoy.map(i => {
@@ -2309,8 +2403,8 @@ function incObtenerContextoIA() {
       return `  - [${i.tipo.toUpperCase()}] ${hora}: ${i.desc}${i.vig ? ' (por '+i.vig+')' : ''}`;
     }).join('\n');
 }
-function incCompartirWA(id) {
-  const inc = INCIDENTES.find(i => i.id == id);
+function incCompartirWA(fbKey) {
+  const inc = INCIDENTES.find(i => i.fbKey === fbKey);
   if (!inc) return;
   const hora = new Date(inc.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
   const fecha = new Date(inc.ts).toLocaleDateString('es-AR');
@@ -2844,93 +2938,9 @@ _chatUltimoLeido = JSON.parse(localStorage.getItem('nx_chat_leido') || '{}');
 // Clave pública VAPID (par generado para este proyecto)
 const NEXOS_VAPID_PUBLIC = 'BFwTEQTNi9wabPdmsCPgLqPrdK-lt8qYjM-h0_adyhPcE2iBsPqSbAfUOU3RtpUbTRRi2vu7zSHKPLuXSd2YE10';
 
-// Clave VAPID de FCM (tu clave del proyecto Firebase)
-const NEXOS_FCM_VAPID = 'BCoaJ_X4dxBITDpz6tlBDuprc_dUtp3XxdK24nWrEm889ARQBMVUU_nlm1uFhxVBqSNmI73B39781pz5sFZtXXs';
+let _swReg = null; // Referencia global al SW registration
 
-let _swReg    = null; // Referencia global al SW registration (sw_control.js)
-let _fcmToken = null; // Token FCM del dispositivo actual
-
-// ══════════════════════════════════════════════════════════
-//  FCM: Obtener token del dispositivo y guardarlo en Firebase
-//  Este token es la "dirección" única del dispositivo para
-//  recibir notificaciones push incluso con la app cerrada.
-// ══════════════════════════════════════════════════════════
-async function fcmObtenerToken() {
-  if (!_fbMessaging) {
-    console.warn('[NEXOS FCM] Messaging no disponible — navegador no compatible');
-    return null;
-  }
-  try {
-    // FCM usa su propio SW (firebase-messaging-sw.js) para las notificaciones en background.
-    // Le indicamos ese SW explícitamente para evitar conflictos con sw_control.js
-    const fcmSwReg = await navigator.serviceWorker.register('./firebase-messaging-sw.js', { scope: './' });
-
-    const token = await _fbMessaging.getToken({
-      vapidKey:        NEXOS_FCM_VAPID,
-      serviceWorkerRegistration: fcmSwReg
-    });
-
-    if (token) {
-      _fcmToken = token;
-      console.log('[NEXOS FCM] Token obtenido:', token);
-
-      // Guardar token localmente
-      localStorage.setItem('nx_fcm_token', token);
-
-      // Guardar token en Firebase Realtime Database asociado al vigilador
-      // Ruta: /fcm_tokens/<nombre_vigilador> = { token, ts, ua }
-      const nombre = sessionStorage.getItem('nx_vigilador') || 'anonimo';
-      _fbDB.ref('fcm_tokens/' + nombre.replace(/[.#$[\]]/g, '_')).set({
-        token,
-        ts:  Date.now(),
-        ua:  navigator.userAgent.substring(0, 100)
-      }).catch(e => console.warn('[NEXOS FCM] Error guardando token en DB:', e));
-
-      return token;
-    } else {
-      console.warn('[NEXOS FCM] No se obtuvo token — permiso no otorgado aún');
-      return null;
-    }
-  } catch (e) {
-    console.warn('[NEXOS FCM] Error al obtener token:', e.message);
-    return null;
-  }
-}
-
-// Eliminar el token FCM cuando el usuario desactiva notificaciones
-async function fcmEliminarToken() {
-  if (!_fbMessaging || !_fcmToken) return;
-  try {
-    await _fbMessaging.deleteToken();
-    _fcmToken = null;
-    localStorage.removeItem('nx_fcm_token');
-    // Eliminar de Firebase DB
-    const nombre = sessionStorage.getItem('nx_vigilador') || 'anonimo';
-    _fbDB.ref('fcm_tokens/' + nombre.replace(/[.#$[\]]/g, '_')).remove().catch(()=>{});
-    console.log('[NEXOS FCM] Token eliminado');
-  } catch(e) {
-    console.warn('[NEXOS FCM] Error eliminando token:', e);
-  }
-}
-
-// ── MENSAJES FCM EN FOREGROUND (app abierta) ─────────────
-// Cuando la app está abierta, Firebase NO muestra notificación automática.
-// Usamos onMessage para mostrarla nosotros con pushNotifLocal.
-function fcmIniciarForeground() {
-  if (!_fbMessaging) return;
-  _fbMessaging.onMessage((payload) => {
-    console.log('[NEXOS FCM] Mensaje en foreground:', payload);
-    const data   = payload.data         || {};
-    const notif  = payload.notification || {};
-    const tipo   = data.tipo || 'general';
-    const titulo = notif.title || data.titulo || '🔔 NEXOS';
-    const cuerpo = notif.body  || data.cuerpo || '';
-    // Mostrar notificación local vía SW (igual que pushNotifLocal)
-    pushNotifLocal(titulo, cuerpo, 'nexos-fcm-' + tipo);
-  });
-}
-
-// ── REGISTRO DEL SERVICE WORKER principal ────────────────
+// ── REGISTRO DEL SERVICE WORKER ──────────────────────────
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw_control.js', { scope: './' })
@@ -2947,12 +2957,9 @@ if ('serviceWorker' in navigator) {
             }
           });
         });
-        // Intentar suscribir push Web si ya tenía permiso
+        // Intentar suscribir push si ya tenía permiso
         if (Notification.permission === 'granted') {
           pushSuscribir(false);
-          // También re-obtener token FCM si ya había permiso
-          fcmObtenerToken();
-          fcmIniciarForeground();
         }
         // Actualizar UI del panel de notificaciones
         pushActualizarUI();
@@ -2992,26 +2999,6 @@ if ('serviceWorker' in navigator) {
         } catch(e) {}
       }
     });
-  });
-
-  // ── Manejar apertura desde notificación FCM (hash #notif=tipo) ──
-  window.addEventListener('load', () => {
-    const hash = window.location.hash;
-    if (hash.startsWith('#notif=')) {
-      const tipo = hash.replace('#notif=', '');
-      // Limpiar hash de la URL
-      history.replaceState(null, '', window.location.pathname + window.location.search);
-      // Reaccionar al tipo luego de que la app cargue completamente
-      setTimeout(() => {
-        if (tipo === 'panico' && typeof mostrarPanico === 'function' && panicosPendientes?.length) {
-          mostrarPanico(panicosPendientes);
-        } else if (tipo === 'delivery' && typeof abrirDeliveryActivos === 'function') {
-          abrirDeliveryActivos();
-        } else if (tipo === 'chat' && typeof abrirVigsOnline === 'function') {
-          abrirVigsOnline();
-        }
-      }, 1200);
-    }
   });
 }
 
@@ -3093,10 +3080,9 @@ async function pushSuscribir(mostrarToast = true) {
   }
 }
 
-// Desuscribir (Web Push + FCM)
+// Desuscribir
 async function pushDesuscribir() {
   try {
-    // 1) Web Push
     const reg = _swReg || await navigator.serviceWorker.ready;
     const sub = await reg.pushManager.getSubscription();
     if (sub) {
@@ -3113,8 +3099,6 @@ async function pushDesuscribir() {
         }).catch(() => {});
       }
     }
-    // 2) FCM: eliminar token del dispositivo y de Firebase DB
-    await fcmEliminarToken();
     showToast('🔕 Notificaciones desactivadas');
     pushActualizarUI();
   } catch (e) {
@@ -3122,7 +3106,7 @@ async function pushDesuscribir() {
   }
 }
 
-// Pedir permiso y suscribir (Web Push + FCM)
+// Pedir permiso y suscribir
 async function pushActivar() {
   if (!('Notification' in window) || !('PushManager' in window)) {
     showToast('⚠️ Tu navegador no soporta notificaciones push');
@@ -3135,15 +3119,7 @@ async function pushActivar() {
   }
   const perm = await Notification.requestPermission();
   if (perm === 'granted') {
-    // 1) Web Push API (para notificaciones en background con app abierta/minimizada)
     await pushSuscribir(true);
-    // 2) FCM (para notificaciones con app COMPLETAMENTE cerrada o pantalla apagada)
-    const token = await fcmObtenerToken();
-    if (token) {
-      showToast('🔔 Push activado — app cerrada también recibirá alertas');
-    }
-    // Iniciar listener de mensajes en foreground
-    fcmIniciarForeground();
   } else {
     showToast('🚫 Permiso denegado');
   }
@@ -3173,8 +3149,6 @@ function pushActualizarUI() {
   const btnDesactivar = document.getElementById('push-btn-desactivar');
   const statusEl = document.getElementById('push-status');
   const statusPanel = document.getElementById('push-status-panel');
-  const fcmStatusText = document.getElementById('fcm-status-text');
-  const fcmStatusRow = document.getElementById('fcm-status-row');
   if (!statusEl) return;
 
   if (estado === 'no-soportado') {
@@ -3201,28 +3175,6 @@ function pushActualizarUI() {
     if (btnActivar) btnActivar.style.display = 'block';
     if (btnDesactivar) btnDesactivar.style.display = 'none';
     if (statusPanel) statusPanel.style.borderColor = 'var(--border)';
-  }
-
-  // Actualizar estado FCM
-  if (fcmStatusText && fcmStatusRow) {
-    const tokenGuardado = localStorage.getItem('nx_fcm_token') || _fcmToken;
-    if (!_fbMessaging) {
-      fcmStatusText.innerText = '❌ No soportado (requiere Chrome/Android)';
-      fcmStatusText.style.color = '#666';
-      fcmStatusRow.style.borderColor = 'var(--border)';
-    } else if (estado === 'granted' && tokenGuardado) {
-      fcmStatusText.innerText = '✅ Activo — notif. con app cerrada OK';
-      fcmStatusText.style.color = 'var(--green)';
-      fcmStatusRow.style.borderColor = 'rgba(46,204,113,0.4)';
-    } else if (estado === 'granted' && !tokenGuardado) {
-      fcmStatusText.innerText = '⏳ Obteniendo token FCM...';
-      fcmStatusText.style.color = 'var(--gold)';
-      fcmStatusRow.style.borderColor = 'rgba(245,200,66,0.4)';
-    } else {
-      fcmStatusText.innerText = '🔕 Activá notificaciones para habilitar';
-      fcmStatusText.style.color = '#555';
-      fcmStatusRow.style.borderColor = 'var(--border)';
-    }
   }
 }
 
@@ -3349,9 +3301,15 @@ async function chatBgPoll() {
   iniciarChatBgFirebase();
 }
 
-document.addEventListener('nx-session-start', iniciarChatBgPoll);
+document.addEventListener('nx-session-start', () => {
+  iniciarChatBgPoll();
+  incIniciarFirebase();       // ← arranca el listener de incidentes en tiempo real
+});
 if (sessionStorage.getItem('nx_auth') === '1') {
-  setTimeout(iniciarChatBgPoll, 3000);
+  setTimeout(() => {
+    iniciarChatBgPoll();
+    incIniciarFirebase();
+  }, 3000);
 }
 
 // Parchar tickContadores para notif de delivery (ya existe lógica, agregamos notif)
@@ -3359,7 +3317,41 @@ if (sessionStorage.getItem('nx_auth') === '1') {
 
 /*
  * ══════════════════════════════════════════════════════════════════
- *  ⚠️  REQUERIDO EN EL GAS PARA MÁXIMA EFICIENCIA
+ *  🔐 REGLAS RECOMENDADAS — Firebase Realtime Database
+ *  Copiá esto en: Firebase Console → Realtime Database → Reglas
+ *
+ *  Permiten lectura/escritura solo desde el dominio de tu app.
+ *  (Para una app con autenticación agregarías auth != null)
+ * ══════════════════════════════════════════════════════════════════
+ *
+ *  {
+ *    "rules": {
+ *      "incidentes": {
+ *        ".read":  true,
+ *        ".write": true,
+ *        "$id": {
+ *          ".validate": "newData.hasChildren(['ts','tipo','desc'])"
+ *        }
+ *      },
+ *      "chat": {
+ *        ".read":  true,
+ *        ".write": true
+ *      },
+ *      "fcm_tokens": {
+ *        ".read":  true,
+ *        ".write": true
+ *      },
+ *      "presencia": {
+ *        ".read":  true,
+ *        ".write": true
+ *      }
+ *    }
+ *  }
+ *
+ * ══════════════════════════════════════════════════════════════════
+ */
+
+
  *  Sin este endpoint el sistema cae en fallback N-fetches (1 por vigilador).
  *  Agregar este case dentro del doGet() del script de la hoja:
  * ══════════════════════════════════════════════════════════════════
