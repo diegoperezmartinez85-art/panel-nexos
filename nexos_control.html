@@ -10,6 +10,22 @@
   <meta name="apple-mobile-web-app-title" content="NEXOS">
   <meta name="theme-color" content="#00d4d4">
   <link rel="manifest" href="./manifest_control.json">
+  <!-- Firebase SDK (modular compat para uso global) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script>
+    // Inicialización de Firebase — solo para el chat en tiempo real
+    const _fbApp = firebase.initializeApp({
+      apiKey: "AIzaSyBw6O59fZ6fPeVUf5BPxAMfw2jssVJNSE4",
+      authDomain: "nexos-panel.firebaseapp.com",
+      databaseURL: "https://nexos-panel-default-rtdb.firebaseio.com",
+      projectId: "nexos-panel",
+      storageBucket: "nexos-panel.firebasestorage.app",
+      messagingSenderId: "485679155987",
+      appId: "1:485679155987:web:566522d28bbb81693f28e6"
+    });
+    const _fbDB = firebase.database();
+  </script>
   <link rel="apple-touch-icon" href="./nexos-icon-192.png">
   <link rel="apple-touch-icon" sizes="192x192" href="./nexos-icon-192.png">
   <link rel="apple-touch-icon" sizes="512x512" href="./nexos-icon-512.png">
@@ -1329,6 +1345,8 @@ async function fetchVigsOnline() {
     if (Array.isArray(data.online)) {
       _vigsOnline = data.online;
       renderVigsOnline();
+      // Actualizar listeners de Firebase para background
+      if (typeof iniciarChatBgFirebase === 'function') iniciarChatBgFirebase();
     }
     // ── Desconexión forzada desde el Sheet ──
     const miNombreVig = sessionStorage.getItem('nx_vigilador') || '';
@@ -2559,16 +2577,23 @@ function renderDashboard() {
 
 // ══ FIN DASHBOARD ════════════════════════════════════════════
 
-// ══ CHAT ENTRE VIGILADORES ══════════════════════════════════
+// ══ CHAT ENTRE VIGILADORES — Firebase Realtime Database ══════
 
 let _chatConVig = null;
 let _chatMensajes = [];
-let _chatInterval = null;
+let _chatInterval = null;      // ya no se usa para polling, se conserva por compatibilidad
 let _chatUltimoLeido = {};
+let _fbChatUnsubscribe = null; // función para desuscribir el listener de Firebase
+let _fbBgListeners = {};       // { clave: unsubscribeFn } para el polling de background
 
+// Clave de conversación ordenada alfabéticamente (simétrica entre los dos usuarios)
 function chatClave(a, b) {
-  // Clave de conversación ordenada alfabéticamente para que sea simétrica
   return [a, b].sort().join('__NX__');
+}
+
+// Clave segura para usar como nodo de Firebase (sin caracteres prohibidos)
+function chatClaveFirebase(a, b) {
+  return chatClave(a, b).replace(/[.#$[\]/]/g, '_');
 }
 
 function chatContarNoLeidos(otroNombre) {
@@ -2579,16 +2604,34 @@ function chatContarNoLeidos(otroNombre) {
   return msgs.filter(m => m.de !== yo && m.ts > ultimoLeido).length;
 }
 
-// Backoff adaptativo del chat: empieza en 22s, sube a 40s si 3 polls sin actividad
+// (Compatibilidad: estas funciones ya no hacen nada pero existían antes)
 let _chatPollSinActividad = 0;
-function _chatGetIntervalo() { return _chatPollSinActividad >= 3 ? 40000 : 22000; }
-function _chatReiniciarInterval() {
-  if (!_chatInterval) return;
-  clearInterval(_chatInterval);
-  _chatInterval = setInterval(() => {
-    if (document.visibilityState !== 'visible') return;
-    chatFetchMensajes();
-  }, _chatGetIntervalo());
+function _chatGetIntervalo() { return 22000; }
+function _chatReiniciarInterval() {}
+
+// ── Suscribir listener de Firebase para una conversación abierta ──
+function _fbChatSuscribir(clave, fbClave, yo) {
+  if (_fbChatUnsubscribe) { _fbChatUnsubscribe(); _fbChatUnsubscribe = null; }
+  const ref = _fbDB.ref('chat/' + fbClave);
+  const onVal = ref.on('value', snapshot => {
+    const raw = snapshot.val();
+    if (!raw) { _chatMensajes = []; renderChat(); return; }
+    const msgs = Object.values(raw).sort((a, b) => a.ts - b.ts);
+    const prevLen = _chatMensajes.length;
+    _chatMensajes = msgs;
+    // Guardar copia local
+    localStorage.setItem('nx_chat_' + clave, JSON.stringify(msgs));
+    // Sonido si hay mensajes nuevos del otro
+    const nuevos = msgs.filter(m => m.de !== yo && m.ts > (_chatUltimoLeido[clave] || 0));
+    if (nuevos.length > 0 && msgs.length > prevLen) {
+      initAudio();
+      chatSonidoRecibido();
+    }
+    _chatUltimoLeido[clave] = Date.now();
+    localStorage.setItem('nx_chat_leido', JSON.stringify(_chatUltimoLeido));
+    renderChat();
+  });
+  _fbChatUnsubscribe = () => ref.off('value', onVal);
 }
 
 function abrirChat(nombreVig) {
@@ -2596,69 +2639,36 @@ function abrirChat(nombreVig) {
   _chatConVig = nombreVig;
   document.getElementById('chat-con-nombre').innerText = '💬 ' + nombreVig;
   document.getElementById('chat-con-estado').innerText = '● en línea';
-  // Marcar como leídos
   const clave = chatClave(yo, nombreVig);
+  const fbClave = chatClaveFirebase(yo, nombreVig);
   _chatUltimoLeido[clave] = Date.now();
   localStorage.setItem('nx_chat_leido', JSON.stringify(_chatUltimoLeido));
-  // Cargar mensajes locales primero
+  // Mostrar mensajes locales mientras carga Firebase
   _chatMensajes = JSON.parse(localStorage.getItem('nx_chat_' + clave) || '[]');
   renderChat();
   document.getElementById('chat-overlay').classList.add('visible');
   document.getElementById('chat-backdrop').classList.add('visible');
   document.getElementById('modal-vigs-online').classList.remove('visible');
-  // Enfocar input
   setTimeout(() => document.getElementById('chat-input').focus(), 300);
-  // Polling de mensajes con backoff adaptativo
-  if (_chatInterval) clearInterval(_chatInterval);
-  _chatPollSinActividad = 0; // resetear contador de inactividad
-  chatFetchMensajes();
-  _chatInterval = setInterval(() => {
-    if (document.visibilityState !== 'visible') return;
-    chatFetchMensajes();
-  }, _chatGetIntervalo());
+  // Suscribir listener en tiempo real
+  _fbChatSuscribir(clave, fbClave, yo);
 }
 
 function cerrarChat() {
   document.getElementById('chat-overlay').classList.remove('visible');
   document.getElementById('chat-backdrop').classList.remove('visible');
+  // Desuscribir listener de Firebase
+  if (_fbChatUnsubscribe) { _fbChatUnsubscribe(); _fbChatUnsubscribe = null; }
   if (_chatInterval) { clearInterval(_chatInterval); _chatInterval = null; }
   _chatConVig = null;
-  // Reabrir modal de vigs
   renderModalVigs();
   document.getElementById('modal-vigs-online').classList.add('visible');
 }
 
+// chatFetchMensajes ya no es necesario (Firebase hace push en tiempo real),
+// se conserva por si algún código interno la llama.
 async function chatFetchMensajes() {
-  const url = localStorage.getItem('nx_url');
-  const yo = sessionStorage.getItem('nx_vigilador') || '';
-  if (!url || !_chatConVig) return;
-  try {
-    const clave = chatClave(yo, _chatConVig);
-    const r = await fetch(url + '?accion=chat&clave=' + encodeURIComponent(clave) + '&t=' + Date.now());
-    if (!r.ok) return;
-    const data = await r.json();
-    if (Array.isArray(data.mensajes)) {
-      const prevLen = _chatMensajes.length;
-      _chatMensajes = data.mensajes;
-      // Guardar localmente
-      localStorage.setItem('nx_chat_' + clave, JSON.stringify(_chatMensajes));
-      // Si hay nuevos mensajes del otro, reproducir sonido
-      const nuevos = _chatMensajes.filter(m => m.de !== yo && m.ts > (_chatUltimoLeido[clave] || 0));
-      if (nuevos.length > 0 && _chatMensajes.length > prevLen) {
-        initAudio();
-        chatSonidoRecibido();
-        _chatPollSinActividad = 0;        // hay actividad → mantener ritmo normal
-        _chatReiniciarInterval();
-      } else {
-        _chatPollSinActividad++;          // sin mensajes nuevos → acercar al backoff
-        if (_chatPollSinActividad === 3) _chatReiniciarInterval(); // pasar a 40s
-      }
-      // Marcar leídos
-      _chatUltimoLeido[clave] = Date.now();
-      localStorage.setItem('nx_chat_leido', JSON.stringify(_chatUltimoLeido));
-      renderChat();
-    }
-  } catch(e) {}
+  // no-op: Firebase onValue ya actualiza _chatMensajes automáticamente
 }
 
 function chatSonidoRecibido() {
@@ -2753,22 +2763,27 @@ async function chatEnviar() {
   chatAutoResize(input);
   chatCancelarImagen();
   const clave = chatClave(yo, _chatConVig);
-  const msg = { de: yo, para: _chatConVig, texto: texto || '', ts: Date.now(), clave };
+  const fbClave = chatClaveFirebase(yo, _chatConVig);
+  const ts = Date.now();
+  const msg = { de: yo, para: _chatConVig, texto: texto || '', ts, clave };
   if (imagen) msg.imagen = imagen;
-  // Agregar localmente de inmediato
-  _chatMensajes.push(msg);
-  localStorage.setItem('nx_chat_' + clave, JSON.stringify(_chatMensajes));
-  renderChat();
-  // Enviar al servidor
+  // ── Escribir en Firebase (tiempo real) ──
+  try {
+    await _fbDB.ref('chat/' + fbClave).push(msg);
+    // Firebase onValue actualizará _chatMensajes y renderChat() automáticamente
+  } catch(e) {
+    // Fallback: mostrar localmente aunque Firebase falle
+    _chatMensajes.push(msg);
+    localStorage.setItem('nx_chat_' + clave, JSON.stringify(_chatMensajes));
+    renderChat();
+  }
+  // ── Notificar también al GAS (para historial en Sheet) — opcional ──
   if (url) {
-    try {
-      await fetch(url, {
-        method: 'POST', mode: 'no-cors',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({accion: 'chat', ...msg})
-      });
-      setTimeout(chatFetchMensajes, 1000);
-    } catch(e) {}
+    fetch(url, {
+      method: 'POST', mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({accion: 'chat', ...msg})
+    }).catch(() => {});
   }
 }
 
@@ -3123,102 +3138,72 @@ chatSonidoRecibido = function() {
   }
 };
 
-// ── POLLING DE CHAT EN BACKGROUND ─────────────────────────
-// Una sola llamada al GAS trae TODOS los mensajes pendientes para este vigilador.
-// El GAS debe soportar: ?accion=chat_inbox&para=NOMBRE&desde=TIMESTAMP
-// Respuesta esperada: { conversaciones: [ { clave, mensajes: [...] }, ... ] }
-// Si el GAS aún no tiene ese endpoint, cae en fallback al comportamiento anterior (N fetches).
-let _chatBgInterval = null;
-async function chatBgPoll() {
-  const url = lsGet('nx_url');
-  const yo = sessionStorage.getItem('nx_vigilador') || '';
-  if (!url || !yo) return;
+// ── ESCUCHA DE CHAT EN BACKGROUND (Firebase) ─────────────────
+// Suscribe un listener de Firebase por cada vigilador online para recibir
+// mensajes en tiempo real aunque el chat esté cerrado.
+let _chatBgInterval = null; // conservado por compatibilidad, ya no se usa para polling
 
+function _fbBgSuscribirVig(yo, otroNombre) {
+  const clave = chatClave(yo, otroNombre);
+  const fbClave = chatClaveFirebase(yo, otroNombre);
+  if (_fbBgListeners[clave]) return; // ya suscripto
+  const ref = _fbDB.ref('chat/' + fbClave);
   const leidoMap = JSON.parse(lsGet('nx_chat_leido', '{}'));
-  // Timestamp del mensaje más antiguo no leído (o hace 24hs como límite)
-  const _leidoVals = Object.values(leidoMap).filter(v => typeof v === 'number' && v > 0);
-  const desdeTs = _leidoVals.length ? Math.min(..._leidoVals) : Date.now() - 86400000;
-
-  try {
-    // ── INTENTO 1: endpoint unificado (1 sola llamada) ──────
-    const r = await fetch(url + '?accion=chat_inbox&para=' + encodeURIComponent(yo) + '&desde=' + desdeTs + '&t=' + Date.now());
-    if (r.ok) {
-      const data = await r.json();
-      if (Array.isArray(data.conversaciones)) {
-        // Procesar cada conversación recibida en bloque
-        let hayNuevos = false;
-        for (const conv of data.conversaciones) {
-          if (!conv.clave || !Array.isArray(conv.mensajes)) continue;
-          const ultimoLeido = leidoMap[conv.clave] || 0;
-          const nuevos = conv.mensajes.filter(m => m.de !== yo && m.ts > ultimoLeido);
-          if (!nuevos.length) continue;
-          lsSet('nx_chat_' + conv.clave, JSON.stringify(conv.mensajes));
-          hayNuevos = true;
-          // Notificar solo si ese chat no está abierto ahora
-          const otroNombre = conv.clave.split('__NX__').find(n => n !== yo) || '';
-          const chatAbierto = document.getElementById('chat-overlay').classList.contains('visible') && _chatConVig === otroNombre;
-          if (!chatAbierto) {
-            const ultimo = nuevos[nuevos.length - 1];
-            initAudio();
-            if (audioCtx) {
-              const now = audioCtx.currentTime;
-              const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-              o.connect(g); g.connect(audioCtx.destination);
-              o.type = 'sine'; o.frequency.value = 880;
-              g.gain.setValueAtTime(0, now);
-              g.gain.linearRampToValueAtTime(0.15, now + 0.01);
-              g.gain.setValueAtTime(0.15, now + 0.1);
-              g.gain.linearRampToValueAtTime(0, now + 0.18);
-              o.start(now); o.stop(now + 0.2);
-            }
-            pushNotifNuevoMensaje(ultimo.de, ultimo.texto);
-          }
-        }
-        if (hayNuevos) renderVigsOnline();
-        return; // éxito — no hacer fallback
-      }
+  const ultimoLeido = leidoMap[clave] || Date.now();
+  const handler = ref.orderByChild('ts').startAt(ultimoLeido + 1).on('child_added', snap => {
+    const m = snap.val();
+    if (!m || m.de === yo) return;
+    // Chat con ese vig está abierto → no notificar (onValue ya renderiza)
+    const chatAbierto = document.getElementById('chat-overlay').classList.contains('visible') && _chatConVig === otroNombre;
+    if (chatAbierto) return;
+    // Actualizar cache local
+    const msgs = JSON.parse(localStorage.getItem('nx_chat_' + clave) || '[]');
+    msgs.push(m);
+    localStorage.setItem('nx_chat_' + clave, JSON.stringify(msgs));
+    // Sonido y notificación
+    initAudio();
+    if (audioCtx) {
+      const now = audioCtx.currentTime;
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type = 'sine'; o.frequency.value = 880;
+      g.gain.setValueAtTime(0, now);
+      g.gain.linearRampToValueAtTime(0.15, now + 0.01);
+      g.gain.setValueAtTime(0.15, now + 0.1);
+      g.gain.linearRampToValueAtTime(0, now + 0.18);
+      o.start(now); o.stop(now + 0.2);
     }
-  } catch(e) {}
-
-  // ── FALLBACK: endpoint viejo, una llamada por vigilador ──
-  // Se usa solo si el GAS no soporta chat_inbox todavía.
-  for (const vig of _vigsOnline) {
-    if (vig.nombre === yo) continue;
-    try {
-      const clave = chatClave(yo, vig.nombre);
-      const rf = await fetch(url + '?accion=chat&clave=' + encodeURIComponent(clave) + '&t=' + Date.now());
-      if (!rf.ok) continue;
-      const data = await rf.json();
-      if (!Array.isArray(data.mensajes)) continue;
-      const ultimoLeido = leidoMap[clave] || 0;
-      const nuevos = data.mensajes.filter(m => m.de !== yo && m.ts > ultimoLeido);
-      if (!nuevos.length) continue;
-      lsSet('nx_chat_' + clave, JSON.stringify(data.mensajes));
-      const chatAbierto = document.getElementById('chat-overlay').classList.contains('visible') && _chatConVig === vig.nombre;
-      if (!chatAbierto) {
-        const ultimo = nuevos[nuevos.length - 1];
-        initAudio();
-        if (audioCtx) {
-          const now = audioCtx.currentTime;
-          const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-          o.connect(g); g.connect(audioCtx.destination);
-          o.type = 'sine'; o.frequency.value = 880;
-          g.gain.setValueAtTime(0, now);
-          g.gain.linearRampToValueAtTime(0.15, now + 0.01);
-          g.gain.setValueAtTime(0.15, now + 0.1);
-          g.gain.linearRampToValueAtTime(0, now + 0.18);
-          o.start(now); o.stop(now + 0.2);
-        }
-        pushNotifNuevoMensaje(ultimo.de, ultimo.texto);
-      }
-      renderVigsOnline();
-    } catch(e) {}
-  }
+    pushNotifNuevoMensaje(m.de, m.texto || '📷 imagen');
+    renderVigsOnline();
+  });
+  _fbBgListeners[clave] = () => ref.off('child_added', handler);
 }
 
+function _fbBgDesuscribirTodos() {
+  Object.values(_fbBgListeners).forEach(fn => fn());
+  _fbBgListeners = {};
+}
+
+// Se llama cada vez que cambia la lista de vigiladores online
+function iniciarChatBgFirebase() {
+  const yo = sessionStorage.getItem('nx_vigilador') || '';
+  if (!yo) return;
+  // Desuscribir vigs que ya no están online
+  const clavesOnline = new Set((_vigsOnline || []).filter(v => v.nombre !== yo).map(v => chatClave(yo, v.nombre)));
+  Object.keys(_fbBgListeners).forEach(clave => {
+    if (!clavesOnline.has(clave)) { _fbBgListeners[clave](); delete _fbBgListeners[clave]; }
+  });
+  // Suscribir nuevos vigs
+  (_vigsOnline || []).forEach(v => { if (v.nombre !== yo) _fbBgSuscribirVig(yo, v.nombre); });
+}
+
+// Compatibilidad con el evento que antes arrancaba el polling
 function iniciarChatBgPoll() {
-  if (_chatBgInterval) return;
-  _chatBgInterval = setInterval(()=>{ if(document.visibilityState==='visible') chatBgPoll(); }, 60000);
+  iniciarChatBgFirebase();
+}
+
+async function chatBgPoll() {
+  iniciarChatBgFirebase();
 }
 
 document.addEventListener('nx-session-start', iniciarChatBgPoll);
