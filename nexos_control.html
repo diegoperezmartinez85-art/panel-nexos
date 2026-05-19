@@ -13,8 +13,10 @@
   <!-- Firebase SDK (modular compat para uso global) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <!-- FCM: Firebase Cloud Messaging (necesario para push con app cerrada) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
   <script>
-    // Inicialización de Firebase — solo para el chat en tiempo real
+    // Inicialización de Firebase — Realtime Database + FCM Messaging
     const _fbApp = firebase.initializeApp({
       apiKey: "AIzaSyBw6O59fZ6fPeVUf5BPxAMfw2jssVJNSE4",
       authDomain: "nexos-panel.firebaseapp.com",
@@ -25,6 +27,15 @@
       appId: "1:485679155987:web:566522d28bbb81693f28e6"
     });
     const _fbDB = firebase.database();
+
+    // Instancia FCM (se usa más abajo para obtener el token del dispositivo)
+    let _fbMessaging = null;
+    try {
+      _fbMessaging = firebase.messaging();
+    } catch(e) {
+      // El navegador no soporta FCM (ej: Safari iOS < 16.4)
+      console.warn('[NEXOS FCM] Messaging no soportado en este navegador:', e.message);
+    }
   </script>
   <link rel="apple-touch-icon" href="./nexos-icon-192.png">
   <link rel="apple-touch-icon" sizes="192x192" href="./nexos-icon-192.png">
@@ -892,11 +903,19 @@
         Recibí alertas aunque la app esté cerrada:<br>
         🚨 Pánico de vecinos · ⚠️ Delivery +15min · 💬 Mensajes de chat
       </div>
+      <!-- Estado FCM (Firebase Cloud Messaging) -->
+      <div id="fcm-status-row" style="display:flex;align-items:center;gap:8px;background:var(--bg3);border-radius:10px;padding:10px 12px;margin-bottom:12px;border:1px solid var(--border);">
+        <span style="font-size:16px;">📡</span>
+        <div style="flex:1;">
+          <div style="font-size:10px;font-weight:900;color:#555;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;">FCM — Notif. con app cerrada</div>
+          <div id="fcm-status-text" style="font-size:12px;font-weight:800;color:#555;">No activado</div>
+        </div>
+      </div>
       <button id="push-btn-activar" onclick="pushActivar()" style="display:none;width:100%;background:var(--green);color:#000;border:none;border-radius:12px;padding:14px;font-weight:900;font-size:14px;cursor:pointer;margin-bottom:8px;">🔔 ACTIVAR NOTIFICACIONES</button>
       <button id="push-btn-desactivar" onclick="pushDesuscribir()" style="display:none;width:100%;background:var(--bg3);color:#888;border:1px solid var(--border);border-radius:12px;padding:12px;font-weight:800;font-size:13px;cursor:pointer;margin-bottom:8px;">🔕 Desactivar notificaciones</button>
       <button onclick="pushTestLocal()" style="width:100%;background:var(--bg3);color:var(--cyan);border:1px solid rgba(0,212,212,0.3);border-radius:12px;padding:12px;font-weight:800;font-size:13px;cursor:pointer;">🧪 Probar notificación</button>
       <div style="margin-top:12px;padding:10px;background:var(--bg3);border-radius:10px;font-size:10px;color:#444;line-height:1.6;">
-        <strong style="color:#555;">ℹ️ Para que las notificaciones lleguen con la app cerrada</strong> también necesitás agregar soporte en tu Google Apps Script. Mirá la documentación incluida abajo.
+        <strong style="color:#555;">ℹ️ Para enviar push desde tu backend</strong> usá el token FCM guardado en Firebase DB bajo <code style="color:var(--cyan)">/fcm_tokens/&lt;nombre_vigilador&gt;</code>. Enviá un POST a la API de FCM con ese token.
       </div>
     </div>
   </div>
@@ -2825,9 +2844,93 @@ _chatUltimoLeido = JSON.parse(localStorage.getItem('nx_chat_leido') || '{}');
 // Clave pública VAPID (par generado para este proyecto)
 const NEXOS_VAPID_PUBLIC = 'BFwTEQTNi9wabPdmsCPgLqPrdK-lt8qYjM-h0_adyhPcE2iBsPqSbAfUOU3RtpUbTRRi2vu7zSHKPLuXSd2YE10';
 
-let _swReg = null; // Referencia global al SW registration
+// Clave VAPID de FCM (tu clave del proyecto Firebase)
+const NEXOS_FCM_VAPID = 'BCoaJ_X4dxBITDpz6tlBDuprc_dUtp3XxdK24nWrEm889ARQBMVUU_nlm1uFhxVBqSNmI73B39781pz5sFZtXXs';
 
-// ── REGISTRO DEL SERVICE WORKER ──────────────────────────
+let _swReg    = null; // Referencia global al SW registration (sw_control.js)
+let _fcmToken = null; // Token FCM del dispositivo actual
+
+// ══════════════════════════════════════════════════════════
+//  FCM: Obtener token del dispositivo y guardarlo en Firebase
+//  Este token es la "dirección" única del dispositivo para
+//  recibir notificaciones push incluso con la app cerrada.
+// ══════════════════════════════════════════════════════════
+async function fcmObtenerToken() {
+  if (!_fbMessaging) {
+    console.warn('[NEXOS FCM] Messaging no disponible — navegador no compatible');
+    return null;
+  }
+  try {
+    // FCM usa su propio SW (firebase-messaging-sw.js) para las notificaciones en background.
+    // Le indicamos ese SW explícitamente para evitar conflictos con sw_control.js
+    const fcmSwReg = await navigator.serviceWorker.register('./firebase-messaging-sw.js', { scope: './' });
+
+    const token = await _fbMessaging.getToken({
+      vapidKey:        NEXOS_FCM_VAPID,
+      serviceWorkerRegistration: fcmSwReg
+    });
+
+    if (token) {
+      _fcmToken = token;
+      console.log('[NEXOS FCM] Token obtenido:', token);
+
+      // Guardar token localmente
+      localStorage.setItem('nx_fcm_token', token);
+
+      // Guardar token en Firebase Realtime Database asociado al vigilador
+      // Ruta: /fcm_tokens/<nombre_vigilador> = { token, ts, ua }
+      const nombre = sessionStorage.getItem('nx_vigilador') || 'anonimo';
+      _fbDB.ref('fcm_tokens/' + nombre.replace(/[.#$[\]]/g, '_')).set({
+        token,
+        ts:  Date.now(),
+        ua:  navigator.userAgent.substring(0, 100)
+      }).catch(e => console.warn('[NEXOS FCM] Error guardando token en DB:', e));
+
+      return token;
+    } else {
+      console.warn('[NEXOS FCM] No se obtuvo token — permiso no otorgado aún');
+      return null;
+    }
+  } catch (e) {
+    console.warn('[NEXOS FCM] Error al obtener token:', e.message);
+    return null;
+  }
+}
+
+// Eliminar el token FCM cuando el usuario desactiva notificaciones
+async function fcmEliminarToken() {
+  if (!_fbMessaging || !_fcmToken) return;
+  try {
+    await _fbMessaging.deleteToken();
+    _fcmToken = null;
+    localStorage.removeItem('nx_fcm_token');
+    // Eliminar de Firebase DB
+    const nombre = sessionStorage.getItem('nx_vigilador') || 'anonimo';
+    _fbDB.ref('fcm_tokens/' + nombre.replace(/[.#$[\]]/g, '_')).remove().catch(()=>{});
+    console.log('[NEXOS FCM] Token eliminado');
+  } catch(e) {
+    console.warn('[NEXOS FCM] Error eliminando token:', e);
+  }
+}
+
+// ── MENSAJES FCM EN FOREGROUND (app abierta) ─────────────
+// Cuando la app está abierta, Firebase NO muestra notificación automática.
+// Usamos onMessage para mostrarla nosotros con pushNotifLocal.
+function fcmIniciarForeground() {
+  if (!_fbMessaging) return;
+  _fbMessaging.onMessage((payload) => {
+    console.log('[NEXOS FCM] Mensaje en foreground:', payload);
+    const data   = payload.data         || {};
+    const notif  = payload.notification || {};
+    const tipo   = data.tipo || 'general';
+    const titulo = notif.title || data.titulo || '🔔 NEXOS';
+    const cuerpo = notif.body  || data.cuerpo || '';
+    // Mostrar notificación local vía SW (igual que pushNotifLocal)
+    pushNotifLocal(titulo, cuerpo, 'nexos-fcm-' + tipo);
+  });
+}
+
+// ── REGISTRO DEL SERVICE WORKER principal ────────────────
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw_control.js', { scope: './' })
@@ -2844,9 +2947,12 @@ if ('serviceWorker' in navigator) {
             }
           });
         });
-        // Intentar suscribir push si ya tenía permiso
+        // Intentar suscribir push Web si ya tenía permiso
         if (Notification.permission === 'granted') {
           pushSuscribir(false);
+          // También re-obtener token FCM si ya había permiso
+          fcmObtenerToken();
+          fcmIniciarForeground();
         }
         // Actualizar UI del panel de notificaciones
         pushActualizarUI();
@@ -2886,6 +2992,26 @@ if ('serviceWorker' in navigator) {
         } catch(e) {}
       }
     });
+  });
+
+  // ── Manejar apertura desde notificación FCM (hash #notif=tipo) ──
+  window.addEventListener('load', () => {
+    const hash = window.location.hash;
+    if (hash.startsWith('#notif=')) {
+      const tipo = hash.replace('#notif=', '');
+      // Limpiar hash de la URL
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+      // Reaccionar al tipo luego de que la app cargue completamente
+      setTimeout(() => {
+        if (tipo === 'panico' && typeof mostrarPanico === 'function' && panicosPendientes?.length) {
+          mostrarPanico(panicosPendientes);
+        } else if (tipo === 'delivery' && typeof abrirDeliveryActivos === 'function') {
+          abrirDeliveryActivos();
+        } else if (tipo === 'chat' && typeof abrirVigsOnline === 'function') {
+          abrirVigsOnline();
+        }
+      }, 1200);
+    }
   });
 }
 
@@ -2967,9 +3093,10 @@ async function pushSuscribir(mostrarToast = true) {
   }
 }
 
-// Desuscribir
+// Desuscribir (Web Push + FCM)
 async function pushDesuscribir() {
   try {
+    // 1) Web Push
     const reg = _swReg || await navigator.serviceWorker.ready;
     const sub = await reg.pushManager.getSubscription();
     if (sub) {
@@ -2986,6 +3113,8 @@ async function pushDesuscribir() {
         }).catch(() => {});
       }
     }
+    // 2) FCM: eliminar token del dispositivo y de Firebase DB
+    await fcmEliminarToken();
     showToast('🔕 Notificaciones desactivadas');
     pushActualizarUI();
   } catch (e) {
@@ -2993,7 +3122,7 @@ async function pushDesuscribir() {
   }
 }
 
-// Pedir permiso y suscribir
+// Pedir permiso y suscribir (Web Push + FCM)
 async function pushActivar() {
   if (!('Notification' in window) || !('PushManager' in window)) {
     showToast('⚠️ Tu navegador no soporta notificaciones push');
@@ -3006,7 +3135,15 @@ async function pushActivar() {
   }
   const perm = await Notification.requestPermission();
   if (perm === 'granted') {
+    // 1) Web Push API (para notificaciones en background con app abierta/minimizada)
     await pushSuscribir(true);
+    // 2) FCM (para notificaciones con app COMPLETAMENTE cerrada o pantalla apagada)
+    const token = await fcmObtenerToken();
+    if (token) {
+      showToast('🔔 Push activado — app cerrada también recibirá alertas');
+    }
+    // Iniciar listener de mensajes en foreground
+    fcmIniciarForeground();
   } else {
     showToast('🚫 Permiso denegado');
   }
@@ -3036,6 +3173,8 @@ function pushActualizarUI() {
   const btnDesactivar = document.getElementById('push-btn-desactivar');
   const statusEl = document.getElementById('push-status');
   const statusPanel = document.getElementById('push-status-panel');
+  const fcmStatusText = document.getElementById('fcm-status-text');
+  const fcmStatusRow = document.getElementById('fcm-status-row');
   if (!statusEl) return;
 
   if (estado === 'no-soportado') {
@@ -3062,6 +3201,28 @@ function pushActualizarUI() {
     if (btnActivar) btnActivar.style.display = 'block';
     if (btnDesactivar) btnDesactivar.style.display = 'none';
     if (statusPanel) statusPanel.style.borderColor = 'var(--border)';
+  }
+
+  // Actualizar estado FCM
+  if (fcmStatusText && fcmStatusRow) {
+    const tokenGuardado = localStorage.getItem('nx_fcm_token') || _fcmToken;
+    if (!_fbMessaging) {
+      fcmStatusText.innerText = '❌ No soportado (requiere Chrome/Android)';
+      fcmStatusText.style.color = '#666';
+      fcmStatusRow.style.borderColor = 'var(--border)';
+    } else if (estado === 'granted' && tokenGuardado) {
+      fcmStatusText.innerText = '✅ Activo — notif. con app cerrada OK';
+      fcmStatusText.style.color = 'var(--green)';
+      fcmStatusRow.style.borderColor = 'rgba(46,204,113,0.4)';
+    } else if (estado === 'granted' && !tokenGuardado) {
+      fcmStatusText.innerText = '⏳ Obteniendo token FCM...';
+      fcmStatusText.style.color = 'var(--gold)';
+      fcmStatusRow.style.borderColor = 'rgba(245,200,66,0.4)';
+    } else {
+      fcmStatusText.innerText = '🔕 Activá notificaciones para habilitar';
+      fcmStatusText.style.color = '#555';
+      fcmStatusRow.style.borderColor = 'var(--border)';
+    }
   }
 }
 
