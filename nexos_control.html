@@ -2230,7 +2230,7 @@ function incQuitarFoto() {
 }
 
 // ── GUARDAR INCIDENTE EN FIREBASE ────────────────────────────────
-async function incGuardar() {
+function incGuardar() {
   const texto = document.getElementById('inc-texto').value.trim();
   if (!texto) { showToast('⚠️ Describí el incidente primero'); return; }
 
@@ -2243,44 +2243,39 @@ async function incGuardar() {
     tipo: incTipoSel,
     desc: texto,
     vig:  vig,
-    foto: incFotoData || null   // base64 comprimido o null
+    foto: incFotoData || null
   };
 
-  try {
-    // Escribir en Firebase — el listener 'value' actualizará INCIDENTES[] y la UI automáticamente
-    await _fbDB.ref('incidentes').push(inc);
-
-    // Limpiar form
-    document.getElementById('inc-texto').value = '';
-    incQuitarFoto();
-    incSelTipo('grave');
-    showToast('✅ Incidente guardado y compartido');
-
-    // Enviar al Sheet (sin foto para no superar el límite de GAS)
-    const url = localStorage.getItem('nx_url');
-    if (url) {
-      fetch(url, {
-        method: 'POST', mode: 'no-cors',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({accion: 'incidente', ...inc, foto: inc.foto ? '[foto adjunta]' : ''})
-      }).catch(() => {});
-    }
-  } catch(e) {
-    showToast('❌ Error al guardar: ' + e.message);
-    console.error('[NEXOS INC] Error Firebase:', e);
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '💾 GUARDAR INCIDENTE'; }
-  }
+  _fbDB.ref('incidentes').push(inc)
+    .then(function() {
+      document.getElementById('inc-texto').value = '';
+      incQuitarFoto();
+      incSelTipo('grave');
+      showToast('✅ Incidente guardado y compartido');
+      // Enviar al Sheet (sin foto)
+      var url = localStorage.getItem('nx_url');
+      if (url) {
+        fetch(url, {
+          method: 'POST', mode: 'no-cors',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({accion: 'incidente', ts: inc.ts, tipo: inc.tipo, desc: inc.desc, vig: inc.vig, foto: inc.foto ? '[foto adjunta]' : ''})
+        }).catch(function(){});
+      }
+      if (btn) { btn.disabled = false; btn.textContent = '💾 GUARDAR INCIDENTE'; }
+    })
+    .catch(function(e) {
+      showToast('❌ Error al guardar: ' + e.message);
+      console.error('[NEXOS INC] Error Firebase:', e);
+      if (btn) { btn.disabled = false; btn.textContent = '💾 GUARDAR INCIDENTE'; }
+    });
 }
 
 // ── ELIMINAR DE FIREBASE ─────────────────────────────────────────
-async function incEliminar(fbKey) {
-  try {
-    await _fbDB.ref('incidentes/' + fbKey).remove();
-    // El listener 'value' actualizará INCIDENTES[] y la UI automáticamente
-  } catch(e) {
-    showToast('❌ Error al borrar: ' + e.message);
-  }
+function incEliminar(fbKey) {
+  _fbDB.ref('incidentes/' + fbKey).remove()
+    .catch(function(e) {
+      showToast('❌ Error al borrar: ' + e.message);
+    });
 }
 
 let incPendienteEliminar = null;
