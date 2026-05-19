@@ -1303,33 +1303,15 @@ async function heartbeatVigilador() {
   const url = localStorage.getItem('nx_url');
   const nombre = sessionStorage.getItem('nx_vigilador');
   if (!url || !nombre) return;
+  // GAS no soporta CORS en POST — usamos no-cors directamente.
+  // La detección de desconexión forzada la maneja fetchVigsOnline (GET con cors).
   try {
-    const r = await fetch(url, {
-      method: 'POST', mode: 'cors',
+    fetch(url, {
+      method: 'POST', mode: 'no-cors',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({accion: 'heartbeat', nombre, ts: Date.now()})
     });
-    // Si el GAS responde con desconexión forzada, cerrar sesión
-    if (r.ok) {
-      try {
-        const data = await r.json();
-        if (data && data.desconectar === true) {
-          showToast('🔴 Sesión cerrada remotamente por el administrador');
-          setTimeout(cerrarSesion, 1500);
-          return;
-        }
-      } catch(e) {}
-    }
-  } catch(e) {
-    // fallback sin CORS: enviar sin esperar respuesta
-    try {
-      fetch(url, {
-        method: 'POST', mode: 'no-cors',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({accion: 'heartbeat', nombre, ts: Date.now()})
-      });
-    } catch(e2) {}
-  }
+  } catch(e) {}
 }
 
 let _lastVigsOnlineFetch = 0;
