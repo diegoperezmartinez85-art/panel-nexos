@@ -10,25 +10,6 @@
   <meta name="apple-mobile-web-app-title" content="NEXOS">
   <meta name="theme-color" content="#00d4d4">
   <link rel="manifest" href="./manifest_control.json">
-  <!-- Firebase SDK (modular compat para uso global) -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
-  <script>
-    // Firebase — DB (chat + incidentes en tiempo real)
-    // _fbMsg se inicializa DESPUÉS del registro del SW para no romper nada
-    const _fbApp = firebase.initializeApp({
-      apiKey: "AIzaSyBw6O59fZ6fPeVUf5BPxAMfw2jssVJNSE4",
-      authDomain: "nexos-panel.firebaseapp.com",
-      databaseURL: "https://nexos-panel-default-rtdb.firebaseio.com",
-      projectId: "nexos-panel",
-      storageBucket: "nexos-panel.firebasestorage.app",
-      messagingSenderId: "485679155987",
-      appId: "1:485679155987:web:566522d28bbb81693f28e6"
-    });
-    const _fbDB = firebase.database();
-    let   _fbMsg = null; // se instancia en initFCM() tras registrar el SW
-  </script>
   <link rel="apple-touch-icon" href="./nexos-icon-192.png">
   <link rel="apple-touch-icon" sizes="192x192" href="./nexos-icon-192.png">
   <link rel="apple-touch-icon" sizes="512x512" href="./nexos-icon-512.png">
@@ -1202,7 +1183,7 @@ let BANEADOS=JSON.parse(localStorage.getItem('nx_baneados')||'[]');
 let sincronizando=false,panicosPendientes=[],_lastSyncTs=0;
 let audioCtx=null,sirenInterval=null;
 
-function guardarBaneados(){localStorage.setItem('nx_baneados',JSON.stringify(BANEADOS));}
+function guardarBaneados(){lsSet('nx_baneados',JSON.stringify(BANEADOS));}
 function esBaneado(mza,casa){const mN=String(mza||'').trim(),cN=String(casa||'').trim();if(!mN||!cN)return false;return BANEADOS.some(b=>String(b.mza).trim()===mN&&String(b.casa).trim()===cN);}
 function verificarListaNegra(pat,dni){const match=LISTA_NEGRA.find(r=>(r.pat&&r.pat===pat)||(r.dni&&r.dni===dni&&dni));if(match)showToast('🚫 LISTA NEGRA: '+(match.pat||match.dni)+(match.motivo?' — '+match.motivo:''));}
 
@@ -1244,9 +1225,9 @@ async function sincronizar(manual=false){
     }
     const hoyStrSync=new Date().toLocaleDateString('es-AR');
     const cloudIds=new Set(cloudData.map(x=>String(x.id)));
-    // Preservar salidas de hoy que aún no subió la nube
-    const salidosHoyLocal=DB.filter(r=>r.hS&&new Date(r.tsE||0).toLocaleDateString('es-AR')===hoyStrSync&&!cloudIds.has(String(r.id)));
-    const pend=DB.filter(x=>!cloudIds.has(String(x.id))&&(Date.now()-(x.tsE||0)<60000));
+    // Preservar salidas locales que el cloud todavía no tiene (sin límite de tiempo)
+    const salidosHoyLocal=DB.filter(r=>r.hS&&!cloudIds.has(String(r.id)));
+    const pend=DB.filter(x=>!cloudIds.has(String(x.id))&&(Date.now()-(x.tsE||0)<180000)); // 3 min para redes lentas
     const pendIds=new Set(pend.map(x=>String(x.id)));
     const salidosDedup=salidosHoyLocal.filter(r=>!pendIds.has(String(r.id)));
     DB=[...cloudData,...pend,...salidosDedup];lsSet('nx_db',JSON.stringify(DB));render();
@@ -1256,7 +1237,7 @@ async function sincronizar(manual=false){
   finally{sincronizando=false;_lastSyncTs=Date.now();}
 }
 // ── localStorage SEGURO ────────────────────────────────────
-function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){showToast('⚠️ Almacenamiento lleno');}}
+function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){showToast('❌ Error al guardar: '+(e.message||'sin permiso'));throw e;}}
 function lsGet(k,def=''){try{return localStorage.getItem(k)??def;}catch(e){return def;}}
 
 // ── COLA OFFLINE ───────────────────────────────────────────
@@ -1306,8 +1287,8 @@ async function heartbeatVigilador() {
   const url = localStorage.getItem('nx_url');
   const nombre = sessionStorage.getItem('nx_vigilador');
   if (!url || !nombre) return;
-  // GAS no soporta CORS en POST — usamos no-cors directamente.
-  // La detección de desconexión forzada la maneja fetchVigsOnline (GET con cors).
+  // GAS no soporta CORS en POST — se usa no-cors directamente.
+  // La desconexion forzada se detecta en sincronizar() y fetchVigsOnline().
   try {
     fetch(url, {
       method: 'POST', mode: 'no-cors',
@@ -1330,8 +1311,6 @@ async function fetchVigsOnline() {
     if (Array.isArray(data.online)) {
       _vigsOnline = data.online;
       renderVigsOnline();
-      // Actualizar listeners de Firebase para background
-      if (typeof iniciarChatBgFirebase === 'function') iniciarChatBgFirebase();
     }
     // ── Desconexión forzada desde el Sheet ──
     const miNombreVig = sessionStorage.getItem('nx_vigilador') || '';
@@ -1595,7 +1574,7 @@ function _ejecutarSalidaRapida(){
   }else{showToast("❌ NO ENCONTRADO");return;}
   document.getElementById('buscador').value='';
 }
-function guardarConfig(){localStorage.setItem('nx_url',document.getElementById('cfg-url').value.trim());showToast("⚙️ GUARDADO");sincronizar();}
+function guardarConfig(){lsSet('nx_url',document.getElementById('cfg-url').value.trim());showToast("⚙️ GUARDADO");sincronizar();}
 
 // ── RENDER ─────────────────────────────────────────────────
 function render(){
@@ -2073,93 +2052,26 @@ if(ultimoVigilador) document.getElementById('pin-nombre').value = ultimoVigilado
 // ══════════════════════════════════════════════════════════
 //  REGISTRO DE INCIDENTES
 // ══════════════════════════════════════════════════════════
-// ══════════════════════════════════════════════════════════════════
-//  INCIDENTES — Firebase Realtime Database
-//  Ruta: /incidentes/{id}
-//  Todos los vigiladores ven los mismos incidentes en tiempo real.
-//  La lista local INCIDENTES[] se mantiene sincronizada por el
-//  listener de Firebase; nunca se escribe directo en ella desde el form.
-// ══════════════════════════════════════════════════════════════════
-
-let INCIDENTES = [];          // espejo local, actualizado por Firebase
-let incTipoSel  = 'grave';
+let INCIDENTES = JSON.parse(localStorage.getItem('nx_incidentes') || '[]');
+let incTipoSel = 'grave';
 let incFotoData = null;
-let _incFbListener = null;    // referencia para poder desuscribir si hace falta
 
-// ── INICIALIZAR LISTENER FIREBASE ────────────────────────────────
-// Llama a esta función una sola vez (después del login).
-// Escucha cambios en /incidentes en tiempo real y mantiene INCIDENTES[]
-// y la UI siempre al día para todos los dispositivos conectados.
-function incIniciarFirebase() {
-  if (_incFbListener) return; // ya está suscripto
-  const ref = _fbDB.ref('incidentes');
-
-  _incFbListener = ref.orderByChild('ts').on('value', snap => {
-    const datos = [];
-    snap.forEach(child => {
-      datos.push({ fbKey: child.key, ...child.val() });
-    });
-    // Ordenar: más reciente primero
-    datos.sort((a, b) => b.ts - a.ts);
-    INCIDENTES = datos;
-
-    // Migrar incidentes viejos de localStorage si los hay (solo 1 vez)
-    _incMigrarLocalStorage();
-
-    actualizarContadorIncidentes();
-    // Si el modal está abierto, re-renderizar automáticamente
-    if (document.getElementById('modal-incidentes')?.classList.contains('visible')) {
-      renderIncidentes();
-    }
-    // Notificación push si llegó un incidente GRAVE nuevo de otro vigilador
-    _incNotificarNuevo(datos);
-  });
-}
-
-// Migración única desde localStorage al arrancar por primera vez con Firebase
-let _incMigrado = false;
-function _incMigrarLocalStorage() {
-  if (_incMigrado) return;
-  _incMigrado = true;
-  const viejos = JSON.parse(localStorage.getItem('nx_incidentes') || '[]');
-  if (!viejos.length) return;
-  // Solo migrar los que NO existen ya en Firebase (por id/ts)
-  const tsExistentes = new Set(INCIDENTES.map(i => i.ts));
-  const aMigrar = viejos.filter(v => !tsExistentes.has(v.ts));
-  if (!aMigrar.length) { localStorage.removeItem('nx_incidentes'); return; }
-  aMigrar.forEach(inc => {
-    const { id, ...datos } = inc; // descartar el id numérico viejo
-    _fbDB.ref('incidentes').push({ ...datos, migrado: true }).catch(() => {});
-  });
-  localStorage.removeItem('nx_incidentes');
-  console.log(`[NEXOS] ${aMigrar.length} incidente(s) migrado(s) de localStorage a Firebase`);
-}
-
-// Notificar si llegó un incidente nuevo grave de otro vigilador
-let _incUltimoTs = 0;
-function _incNotificarNuevo(lista) {
-  const yo = sessionStorage.getItem('nx_vigilador') || '';
-  const nuevos = lista.filter(i => i.ts > _incUltimoTs && i.vig !== yo && i.tipo === 'grave');
-  if (_incUltimoTs > 0 && nuevos.length) {
-    nuevos.forEach(i => {
-      pushNotifLocal(
-        '🔴 INCIDENTE GRAVE — NEXOS',
-        `${i.vig ? i.vig + ': ' : ''}${i.desc.substring(0, 80)}`,
-        'nexos-inc-' + i.ts
-      );
-    });
+function guardarIncidentes() {
+  try {
+    lsSet('nx_incidentes', JSON.stringify(INCIDENTES));
+  } catch(e) {
+    return; // toast ya mostrado por lsSet
   }
-  if (lista.length) _incUltimoTs = Math.max(...lista.map(i => i.ts));
+  actualizarContadorIncidentes();
 }
 
-// ── CONTADOR Y BADGES ────────────────────────────────────────────
 function actualizarContadorIncidentes() {
   const hoyStr = new Date().toLocaleDateString('es-AR');
-  const hoy    = INCIDENTES.filter(i => new Date(i.ts).toLocaleDateString('es-AR') === hoyStr);
+  const hoy = INCIDENTES.filter(i => new Date(i.ts).toLocaleDateString('es-AR') === hoyStr);
   const graves = hoy.filter(i => i.tipo === 'grave').length;
-  const color    = graves > 0 ? 'var(--red)' : 'var(--gold)';
+  const color = graves > 0 ? 'var(--red)' : 'var(--gold)';
   const txtColor = graves > 0 ? '#fff' : '#000';
-
+  // Badge en barra de navegación
   const navBadge = document.getElementById('inc-nav-badge');
   if (navBadge) {
     if (hoy.length > 0) {
@@ -2171,6 +2083,7 @@ function actualizarContadorIncidentes() {
       navBadge.classList.remove('visible');
     }
   }
+  // Badge en menú hamburguesa
   const menuBadge = document.getElementById('inc-menu-badge');
   if (menuBadge) {
     if (hoy.length > 0) {
@@ -2182,44 +2095,33 @@ function actualizarContadorIncidentes() {
       menuBadge.style.display = 'none';
     }
   }
+  // Compatibilidad con elemento anterior si existe
   const counter = document.getElementById('inc-menu-counter');
   if (counter) counter.style.display = 'none';
 }
 
-// ── SELECCIÓN DE TIPO ────────────────────────────────────────────
 function incSelTipo(tipo) {
   incTipoSel = tipo;
   ['grave','normal','info'].forEach(t => {
     const btn = document.getElementById('inc-btn-' + t);
     btn.className = 'inc-tipo-btn' + (t === tipo ? ' sel-' + t : '');
   });
+  // Cambiar borde del textarea
+  const ta = document.getElementById('inc-texto');
   const colores = {grave:'var(--red)', normal:'var(--gold)', info:'var(--blue)'};
-  document.getElementById('inc-texto').style.borderColor = colores[tipo];
+  ta.style.borderColor = colores[tipo];
 }
 
-// ── FOTO ─────────────────────────────────────────────────────────
 function incPreviewFoto(input) {
   const file = input.files[0];
   if (!file) return;
-  // Comprimir antes de guardar si la imagen es muy grande
   const reader = new FileReader();
   reader.onload = e => {
-    const img = new Image();
-    img.onload = () => {
-      // Máximo 800px ancho para no inflar Firebase
-      const MAX = 800;
-      const canvas = document.createElement('canvas');
-      let w = img.width, h = img.height;
-      if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      incFotoData = canvas.toDataURL('image/jpeg', 0.75);
-      const prev = document.getElementById('inc-foto-preview');
-      prev.src = incFotoData;
-      prev.style.display = 'block';
-      prev.title = 'Tocá para quitar la foto';
-    };
-    img.src = e.target.result;
+    incFotoData = e.target.result;
+    const prev = document.getElementById('inc-foto-preview');
+    prev.src = incFotoData;
+    prev.style.display = 'block';
+    prev.title = 'Tocá para quitar la foto';
   };
   reader.readAsDataURL(file);
 }
@@ -2232,68 +2134,54 @@ function incQuitarFoto() {
   document.getElementById('inc-foto-input').value = '';
 }
 
-// ── GUARDAR INCIDENTE EN FIREBASE ────────────────────────────────
 function incGuardar() {
   const texto = document.getElementById('inc-texto').value.trim();
   if (!texto) { showToast('⚠️ Describí el incidente primero'); return; }
-
-  const btn = document.querySelector('.inc-guardar-btn');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Guardando...'; }
-
   const vig = sessionStorage.getItem('nx_vigilador') || '';
   const inc = {
-    ts:   Date.now(),
+    id: Date.now(),
+    ts: Date.now(),
     tipo: incTipoSel,
     desc: texto,
-    vig:  vig,
+    vig: vig,
     foto: incFotoData || null
   };
-
-  _fbDB.ref('incidentes').push(inc)
-    .then(function() {
-      document.getElementById('inc-texto').value = '';
-      incQuitarFoto();
-      incSelTipo('grave');
-      showToast('✅ Incidente guardado y compartido');
-      // Enviar al Sheet (sin foto)
-      var url = localStorage.getItem('nx_url');
-      if (url) {
-        fetch(url, {
-          method: 'POST', mode: 'no-cors',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({accion: 'incidente', ts: inc.ts, tipo: inc.tipo, desc: inc.desc, vig: inc.vig, foto: inc.foto ? '[foto adjunta]' : ''})
-        }).catch(function(){});
-      }
-      if (btn) { btn.disabled = false; btn.textContent = '💾 GUARDAR INCIDENTE'; }
-    })
-    .catch(function(e) {
-      showToast('❌ Error al guardar: ' + e.message);
-      console.error('[NEXOS INC] Error Firebase:', e);
-      if (btn) { btn.disabled = false; btn.textContent = '💾 GUARDAR INCIDENTE'; }
-    });
+  INCIDENTES.unshift(inc);
+  guardarIncidentes();
+  // Limpiar form
+  document.getElementById('inc-texto').value = '';
+  incQuitarFoto();
+  incSelTipo('grave');
+  showToast('✅ Incidente registrado');
+  renderIncidentes();
+  // Enviar al sheet si hay URL
+  const url = localStorage.getItem('nx_url');
+  if (url) {
+    fetch(url, {
+      method: 'POST', mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({accion: 'incidente', ...inc, foto: inc.foto ? '[foto adjunta]' : ''})
+    }).catch(() => {});
+  }
 }
 
-// ── ELIMINAR DE FIREBASE ─────────────────────────────────────────
-function incEliminar(fbKey) {
-  _fbDB.ref('incidentes/' + fbKey).remove()
-    .catch(function(e) {
-      showToast('❌ Error al borrar: ' + e.message);
-    });
+function incEliminar(id) {
+  INCIDENTES = INCIDENTES.filter(i => i.id !== id);
+  guardarIncidentes();
+  renderIncidentes();
 }
 
 let incPendienteEliminar = null;
 
-function incPedirConfirmacion(fbKey) {
-  const inc = INCIDENTES.find(i => i.fbKey === fbKey);
+function incPedirConfirmacion(id) {
+  const inc = INCIDENTES.find(i => i.id === id);
   if (!inc) return;
-  incPendienteEliminar = fbKey;
-  const hora    = new Date(inc.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  incPendienteEliminar = id;
+  const hora = new Date(inc.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
   const tipoLabels = {grave:'🔴 GRAVE', normal:'🟡 NOVEDAD', info:'🔵 INFO'};
   const preview = inc.desc.length > 60 ? inc.desc.substring(0, 60) + '…' : inc.desc;
   document.getElementById('confirm-del-desc').innerHTML =
-    `<strong style="color:#fff">${tipoLabels[inc.tipo]}</strong> · ${hora}<br>` +
-    `<span style="font-size:12px;color:#666;margin-top:4px;display:block">"${preview}"</span><br>` +
-    `<span style="color:#e74c3c;font-size:12px;font-weight:800;">Esta acción no se puede deshacer.</span>`;
+    `<strong style="color:#fff">${tipoLabels[inc.tipo]}</strong> · ${hora}<br><span style="font-size:12px;color:#666;margin-top:4px;display:block">"${preview}"</span><br><span style="color:#e74c3c;font-size:12px;font-weight:800;">Esta acción no se puede deshacer.</span>`;
   document.getElementById('confirm-del-overlay').classList.add('visible');
 }
 
@@ -2311,7 +2199,6 @@ function incConfirmarBorrar() {
   document.getElementById('confirm-del-overlay').classList.remove('visible');
 }
 
-// ── ABRIR MODAL ──────────────────────────────────────────────────
 function abrirIncidentes() {
   renderIncidentes();
   incSelTipo('grave');
@@ -2321,13 +2208,11 @@ function abrirIncidentes() {
   setTimeout(() => document.getElementById('inc-texto').focus(), 150);
 }
 
-// ── RENDER ───────────────────────────────────────────────────────
 function renderIncidentes() {
   const cont = document.getElementById('inc-lista');
   if (!cont) return;
-
-  const hoyStr     = new Date().toLocaleDateString('es-AR');
-  const hoy        = INCIDENTES.filter(i => new Date(i.ts).toLocaleDateString('es-AR') === hoyStr);
+  const hoyStr = new Date().toLocaleDateString('es-AR');
+  const hoy = INCIDENTES.filter(i => new Date(i.ts).toLocaleDateString('es-AR') === hoyStr);
   const anteriores = INCIDENTES.filter(i => new Date(i.ts).toLocaleDateString('es-AR') !== hoyStr);
 
   if (!INCIDENTES.length) {
@@ -2336,43 +2221,33 @@ function renderIncidentes() {
   }
 
   const renderItem = (inc) => {
-    const hora       = new Date(inc.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-    const fecha      = new Date(inc.ts).toLocaleDateString('es-AR');
-    const fechaLabel = fecha === hoyStr ? hora : fecha + ' ' + hora;
+    const hora = new Date(inc.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const fecha = new Date(inc.ts).toLocaleDateString('es-AR');
+    const hoyStr2 = new Date().toLocaleDateString('es-AR');
+    const fechaLabel = fecha === hoyStr2 ? hora : fecha + ' ' + hora;
     const tipoLabels = {grave:'🔴 GRAVE', normal:'🟡 NOVEDAD', info:'🔵 INFO'};
-    const tipoCls    = {grave:'inc-tipo-grave', normal:'inc-tipo-normal', info:'inc-tipo-info'};
-    const fotoHtml   = inc.foto
-      ? `<img class="inc-foto" src="${inc.foto}" onclick="verFotoFullscreen('${inc.fbKey}')" title="Tocá para ampliar">`
+    const tipoCls = {grave:'inc-tipo-grave', normal:'inc-tipo-normal', info:'inc-tipo-info'};
+    const fotoHtml = inc.foto
+      ? `<img class="inc-foto" src="${inc.foto}" onclick="verFotoFullscreen('${inc.id}')" title="Tocá para ampliar">`
       : '';
-    // Indicador "en vivo" para incidentes de otros vigiladores del turno actual
-    const yo        = sessionStorage.getItem('nx_vigilador') || '';
-    const esPropio  = inc.vig === yo;
-    const vigHtml   = inc.vig
-      ? `<div class="inc-vig">👤 ${escHtml(inc.vig)}${!esPropio ? ' <span style="font-size:9px;background:rgba(0,212,212,0.15);color:var(--cyan);border:1px solid rgba(0,212,212,0.3);border-radius:10px;padding:1px 6px;font-weight:800;letter-spacing:0.5px;">EN VIVO</span>' : ''}</div>`
-      : '';
-    return `<div class="inc-item ${inc.tipo}" id="inc-${inc.fbKey}">
+    return `<div class="inc-item ${inc.tipo}" id="inc-${inc.id}">
       <div class="inc-header">
         <span class="inc-tipo-badge ${tipoCls[inc.tipo]}">${tipoLabels[inc.tipo]}</span>
         <span class="inc-hora">${fechaLabel}</span>
       </div>
       <div class="inc-desc">${escHtml(inc.desc)}</div>
-      ${vigHtml}
+      ${inc.vig ? `<div class="inc-vig">👤 ${escHtml(inc.vig)}</div>` : ''}
       ${fotoHtml}
       <div class="inc-actions-row">
-        <button class="inc-wa-btn" onclick="incCompartirWA('${inc.fbKey}')">📲 WhatsApp</button>
-        <button class="inc-del-btn" onclick="incPedirConfirmacion('${inc.fbKey}')">🗑️ Borrar</button>
+        <button class="inc-wa-btn" onclick="incCompartirWA(${inc.id})">📲 Compartir por WhatsApp</button>
+        <button class="inc-del-btn" onclick="incPedirConfirmacion(${inc.id})">🗑️ Borrar</button>
       </div>
     </div>`;
   };
 
   let html = '';
   if (hoy.length) {
-    html += `<div style="font-size:10px;color:#666;letter-spacing:1px;font-weight:700;padding:4px 0 8px;display:flex;align-items:center;gap:8px;">
-      HOY — ${hoy.length} INCIDENTE(S)
-      <span style="display:inline-flex;align-items:center;gap:4px;font-size:9px;color:var(--green);font-weight:800;">
-        <span style="width:6px;height:6px;border-radius:50%;background:var(--green);animation:vigPulse 2s infinite;display:inline-block;"></span>EN TIEMPO REAL
-      </span>
-    </div>`;
+    html += `<div style="font-size:10px;color:#666;letter-spacing:1px;font-weight:700;padding:4px 0 8px;">HOY — ${hoy.length} INCIDENTE(S)</div>`;
     html += hoy.map(renderItem).join('');
   }
   if (anteriores.length) {
@@ -2382,18 +2257,18 @@ function renderIncidentes() {
   cont.innerHTML = html;
 }
 
-// ── FOTO FULLSCREEN ──────────────────────────────────────────────
-function verFotoFullscreen(fbKey) {
-  const inc = INCIDENTES.find(i => i.fbKey === fbKey);
+// Guardar foto base64 en un mapa para acceso rápido
+function verFotoFullscreen(id) {
+  const inc = INCIDENTES.find(i => i.id == id);
   if (!inc || !inc.foto) return;
   document.getElementById('foto-overlay-img').src = inc.foto;
   document.getElementById('foto-overlay').classList.add('visible');
 }
 
-// ── CONTEXTO PARA IA ─────────────────────────────────────────────
+// Incluir incidentes del turno en el contexto de la IA
 function incObtenerContextoIA() {
   const hoyStr = new Date().toLocaleDateString('es-AR');
-  const hoy    = INCIDENTES.filter(i => new Date(i.ts).toLocaleDateString('es-AR') === hoyStr);
+  const hoy = INCIDENTES.filter(i => new Date(i.ts).toLocaleDateString('es-AR') === hoyStr);
   if (!hoy.length) return '\nINCIDENTES HOY: ninguno';
   return '\nINCIDENTES HOY (' + hoy.length + '):\n' +
     hoy.map(i => {
@@ -2401,8 +2276,8 @@ function incObtenerContextoIA() {
       return `  - [${i.tipo.toUpperCase()}] ${hora}: ${i.desc}${i.vig ? ' (por '+i.vig+')' : ''}`;
     }).join('\n');
 }
-function incCompartirWA(fbKey) {
-  const inc = INCIDENTES.find(i => i.fbKey === fbKey);
+function incCompartirWA(id) {
+  const inc = INCIDENTES.find(i => i.id == id);
   if (!inc) return;
   const hora = new Date(inc.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
   const fecha = new Date(inc.ts).toLocaleDateString('es-AR');
@@ -2670,23 +2545,16 @@ function renderDashboard() {
 
 // ══ FIN DASHBOARD ════════════════════════════════════════════
 
-// ══ CHAT ENTRE VIGILADORES — Firebase Realtime Database ══════
+// ══ CHAT ENTRE VIGILADORES ══════════════════════════════════
 
 let _chatConVig = null;
 let _chatMensajes = [];
-let _chatInterval = null;      // ya no se usa para polling, se conserva por compatibilidad
+let _chatInterval = null;
 let _chatUltimoLeido = {};
-let _fbChatUnsubscribe = null; // función para desuscribir el listener de Firebase
-let _fbBgListeners = {};       // { clave: unsubscribeFn } para el polling de background
 
-// Clave de conversación ordenada alfabéticamente (simétrica entre los dos usuarios)
 function chatClave(a, b) {
+  // Clave de conversación ordenada alfabéticamente para que sea simétrica
   return [a, b].sort().join('__NX__');
-}
-
-// Clave segura para usar como nodo de Firebase (sin caracteres prohibidos)
-function chatClaveFirebase(a, b) {
-  return chatClave(a, b).replace(/[.#$[\]/]/g, '_');
 }
 
 function chatContarNoLeidos(otroNombre) {
@@ -2697,34 +2565,16 @@ function chatContarNoLeidos(otroNombre) {
   return msgs.filter(m => m.de !== yo && m.ts > ultimoLeido).length;
 }
 
-// (Compatibilidad: estas funciones ya no hacen nada pero existían antes)
+// Backoff adaptativo del chat: empieza en 22s, sube a 40s si 3 polls sin actividad
 let _chatPollSinActividad = 0;
-function _chatGetIntervalo() { return 22000; }
-function _chatReiniciarInterval() {}
-
-// ── Suscribir listener de Firebase para una conversación abierta ──
-function _fbChatSuscribir(clave, fbClave, yo) {
-  if (_fbChatUnsubscribe) { _fbChatUnsubscribe(); _fbChatUnsubscribe = null; }
-  const ref = _fbDB.ref('chat/' + fbClave);
-  const onVal = ref.on('value', snapshot => {
-    const raw = snapshot.val();
-    if (!raw) { _chatMensajes = []; renderChat(); return; }
-    const msgs = Object.values(raw).sort((a, b) => a.ts - b.ts);
-    const prevLen = _chatMensajes.length;
-    _chatMensajes = msgs;
-    // Guardar copia local
-    localStorage.setItem('nx_chat_' + clave, JSON.stringify(msgs));
-    // Sonido si hay mensajes nuevos del otro
-    const nuevos = msgs.filter(m => m.de !== yo && m.ts > (_chatUltimoLeido[clave] || 0));
-    if (nuevos.length > 0 && msgs.length > prevLen) {
-      initAudio();
-      chatSonidoRecibido();
-    }
-    _chatUltimoLeido[clave] = Date.now();
-    localStorage.setItem('nx_chat_leido', JSON.stringify(_chatUltimoLeido));
-    renderChat();
-  });
-  _fbChatUnsubscribe = () => ref.off('value', onVal);
+function _chatGetIntervalo() { return _chatPollSinActividad >= 3 ? 40000 : 22000; }
+function _chatReiniciarInterval() {
+  if (!_chatInterval) return;
+  clearInterval(_chatInterval);
+  _chatInterval = setInterval(() => {
+    if (document.visibilityState !== 'visible') return;
+    chatFetchMensajes();
+  }, _chatGetIntervalo());
 }
 
 function abrirChat(nombreVig) {
@@ -2732,36 +2582,69 @@ function abrirChat(nombreVig) {
   _chatConVig = nombreVig;
   document.getElementById('chat-con-nombre').innerText = '💬 ' + nombreVig;
   document.getElementById('chat-con-estado').innerText = '● en línea';
+  // Marcar como leídos
   const clave = chatClave(yo, nombreVig);
-  const fbClave = chatClaveFirebase(yo, nombreVig);
   _chatUltimoLeido[clave] = Date.now();
   localStorage.setItem('nx_chat_leido', JSON.stringify(_chatUltimoLeido));
-  // Mostrar mensajes locales mientras carga Firebase
+  // Cargar mensajes locales primero
   _chatMensajes = JSON.parse(localStorage.getItem('nx_chat_' + clave) || '[]');
   renderChat();
   document.getElementById('chat-overlay').classList.add('visible');
   document.getElementById('chat-backdrop').classList.add('visible');
   document.getElementById('modal-vigs-online').classList.remove('visible');
+  // Enfocar input
   setTimeout(() => document.getElementById('chat-input').focus(), 300);
-  // Suscribir listener en tiempo real
-  _fbChatSuscribir(clave, fbClave, yo);
+  // Polling de mensajes con backoff adaptativo
+  if (_chatInterval) clearInterval(_chatInterval);
+  _chatPollSinActividad = 0; // resetear contador de inactividad
+  chatFetchMensajes();
+  _chatInterval = setInterval(() => {
+    if (document.visibilityState !== 'visible') return;
+    chatFetchMensajes();
+  }, _chatGetIntervalo());
 }
 
 function cerrarChat() {
   document.getElementById('chat-overlay').classList.remove('visible');
   document.getElementById('chat-backdrop').classList.remove('visible');
-  // Desuscribir listener de Firebase
-  if (_fbChatUnsubscribe) { _fbChatUnsubscribe(); _fbChatUnsubscribe = null; }
   if (_chatInterval) { clearInterval(_chatInterval); _chatInterval = null; }
   _chatConVig = null;
+  // Reabrir modal de vigs
   renderModalVigs();
   document.getElementById('modal-vigs-online').classList.add('visible');
 }
 
-// chatFetchMensajes ya no es necesario (Firebase hace push en tiempo real),
-// se conserva por si algún código interno la llama.
 async function chatFetchMensajes() {
-  // no-op: Firebase onValue ya actualiza _chatMensajes automáticamente
+  const url = localStorage.getItem('nx_url');
+  const yo = sessionStorage.getItem('nx_vigilador') || '';
+  if (!url || !_chatConVig) return;
+  try {
+    const clave = chatClave(yo, _chatConVig);
+    const r = await fetch(url + '?accion=chat&clave=' + encodeURIComponent(clave) + '&t=' + Date.now());
+    if (!r.ok) return;
+    const data = await r.json();
+    if (Array.isArray(data.mensajes)) {
+      const prevLen = _chatMensajes.length;
+      _chatMensajes = data.mensajes;
+      // Guardar localmente
+      localStorage.setItem('nx_chat_' + clave, JSON.stringify(_chatMensajes));
+      // Si hay nuevos mensajes del otro, reproducir sonido
+      const nuevos = _chatMensajes.filter(m => m.de !== yo && m.ts > (_chatUltimoLeido[clave] || 0));
+      if (nuevos.length > 0 && _chatMensajes.length > prevLen) {
+        initAudio();
+        chatSonidoRecibido();
+        _chatPollSinActividad = 0;        // hay actividad → mantener ritmo normal
+        _chatReiniciarInterval();
+      } else {
+        _chatPollSinActividad++;          // sin mensajes nuevos → acercar al backoff
+        if (_chatPollSinActividad === 3) _chatReiniciarInterval(); // pasar a 40s
+      }
+      // Marcar leídos
+      _chatUltimoLeido[clave] = Date.now();
+      localStorage.setItem('nx_chat_leido', JSON.stringify(_chatUltimoLeido));
+      renderChat();
+    }
+  } catch(e) {}
 }
 
 function chatSonidoRecibido() {
@@ -2856,27 +2739,22 @@ async function chatEnviar() {
   chatAutoResize(input);
   chatCancelarImagen();
   const clave = chatClave(yo, _chatConVig);
-  const fbClave = chatClaveFirebase(yo, _chatConVig);
-  const ts = Date.now();
-  const msg = { de: yo, para: _chatConVig, texto: texto || '', ts, clave };
+  const msg = { de: yo, para: _chatConVig, texto: texto || '', ts: Date.now(), clave };
   if (imagen) msg.imagen = imagen;
-  // ── Escribir en Firebase (tiempo real) ──
-  try {
-    await _fbDB.ref('chat/' + fbClave).push(msg);
-    // Firebase onValue actualizará _chatMensajes y renderChat() automáticamente
-  } catch(e) {
-    // Fallback: mostrar localmente aunque Firebase falle
-    _chatMensajes.push(msg);
-    localStorage.setItem('nx_chat_' + clave, JSON.stringify(_chatMensajes));
-    renderChat();
-  }
-  // ── Notificar también al GAS (para historial en Sheet) — opcional ──
+  // Agregar localmente de inmediato
+  _chatMensajes.push(msg);
+  localStorage.setItem('nx_chat_' + clave, JSON.stringify(_chatMensajes));
+  renderChat();
+  // Enviar al servidor
   if (url) {
-    fetch(url, {
-      method: 'POST', mode: 'no-cors',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({accion: 'chat', ...msg})
-    }).catch(() => {});
+    try {
+      await fetch(url, {
+        method: 'POST', mode: 'no-cors',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({accion: 'chat', ...msg})
+      });
+      setTimeout(chatFetchMensajes, 1000);
+    } catch(e) {}
   }
 }
 
@@ -2929,99 +2807,78 @@ _chatUltimoLeido = JSON.parse(localStorage.getItem('nx_chat_leido') || '{}');
 </div>
 
 <script>
-// ══════════════════════════════════════════════════════════════════════════
-//  NEXOS — SERVICE WORKER + FIREBASE CLOUD MESSAGING  v3.1
-//
-//  FLUJO:
-//  1. Se registran sw_control.js (caché) y firebase-messaging-sw.js (FCM).
-//  2. initFCM() crea _fbMsg y configura onMessage para foreground.
-//  3. pushSuscribir() obtiene el token FCM y lo guarda en Firebase RTDB.
-//  4. Al ocurrir un evento: pushNotifLocal() muestra en foreground y
-//     _pushEncolarTrigger() llama al GAS para que envíe FCM a todos
-//     los dispositivos cerrados via fcm_tokens en RTDB.
-//  5. Con la app cerrada: firebase-messaging-sw.js onBackgroundMessage
-//     muestra la notificación directamente desde el Service Worker.
-//
-//  NOTA: _fbMsg se inicializa DESPUÉS del SW para evitar errores.
-// ══════════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
+//  NEXOS — SERVICE WORKER + PUSH NOTIFICATIONS
+// ══════════════════════════════════════════════════════════
 
-const NEXOS_VAPID_PUBLIC = 'BCoaJ_X4dxBITDpz6tlBDuprc_dUtp3XxdK24nWrEm889ARQBMVUU_nlm1uFhxVBqSNmI73B39781pz5sFZtXXs';
+// Clave pública VAPID (par generado para este proyecto)
+const NEXOS_VAPID_PUBLIC = 'BFwTEQTNi9wabPdmsCPgLqPrdK-lt8qYjM-h0_adyhPcE2iBsPqSbAfUOU3RtpUbTRRi2vu7zSHKPLuXSd2YE10';
 
-let _swReg    = null;   // sw_control.js
-let _swFcmReg = null;   // firebase-messaging-sw.js
+let _swReg = null; // Referencia global al SW registration
 
-// ════════════════════════════════════════════════════════════════════════════
-//  INICIALIZAR FCM (se llama SOLO después de que el SW está listo)
-// ════════════════════════════════════════════════════════════════════════════
-function initFCM() {
-  if (_fbMsg) return; // ya inicializado
-  try {
-    _fbMsg = firebase.messaging();
-
-    // ── Mensajes en FOREGROUND (app abierta) ────────────────────────────
-    _fbMsg.onMessage((payload) => {
-      const n    = payload.notification || {};
-      const d    = payload.data         || {};
-      const tipo = d.tipo || 'general';
-      const titulo = n.title || d.title || '🔔 NEXOS CONTROL';
-      const cuerpo = n.body  || d.body  || 'Tenés una nueva alerta';
-      pushNotifLocal(titulo, cuerpo, 'nexos-fcm-' + tipo + '-' + Date.now(), tipo);
-    });
-
-    // Si ya tenía permiso, renovar token
-    if (Notification.permission === 'granted') pushSuscribir(false);
-
-  } catch (e) {
-    console.warn('[NEXOS] FCM init error:', e.message);
-    // El error NO rompe _fbDB ni el chat — son independientes
-  }
-}
-
-// ════════════════════════════════════════════════════════════════════════════
-//  REGISTRO DE SERVICE WORKERS
-// ════════════════════════════════════════════════════════════════════════════
+// ── REGISTRO DEL SERVICE WORKER ──────────────────────────
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', async () => {
-    try {
-      // ── SW de caché / background sync ──────────────────────────────────
-      _swReg = await navigator.serviceWorker.register('./sw_control.js', { scope: './' });
-      _swReg.addEventListener('updatefound', () => {
-        const w = _swReg.installing;
-        if (!w) return;
-        w.addEventListener('statechange', () => {
-          if (w.state === 'installed' && navigator.serviceWorker.controller)
-            if (typeof showToast === 'function') showToast('🔄 Nueva versión — recargá la app');
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw_control.js', { scope: './' })
+      .then(reg => {
+        _swReg = reg;
+        // SW registrado OK
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              if (typeof showToast === 'function') {
+                showToast('🔄 Nueva versión disponible — recargá la app');
+              }
+            }
+          });
         });
-      });
-
-      // ── SW de FCM — DEBE llamarse firebase-messaging-sw.js ─────────────
-      _swFcmReg = await navigator.serviceWorker.register('./firebase-messaging-sw.js', { scope: './' });
-
-      // ── Mensajes desde sw_control.js ────────────────────────────────────
-      navigator.serviceWorker.addEventListener('message', event => {
-        const { type, tipo } = event.data || {};
-        if (type === 'NEXOS_SYNC_NOW'    && typeof sincronizar === 'function') sincronizar();
-        if (type === 'NEXOS_PUSH_RESUB')  pushSuscribir(false);
-        if (type === 'NEXOS_NOTIF_CLICK') {
-          if (tipo === 'panico'   && typeof mostrarPanico === 'function' && panicosPendientes.length) mostrarPanico(panicosPendientes);
-          if (tipo === 'delivery' && typeof abrirDeliveryActivos === 'function') abrirDeliveryActivos();
-          if (tipo === 'chat'     && typeof abrirVigsOnline === 'function') setTimeout(abrirVigsOnline, 800);
+        // Intentar suscribir push si ya tenía permiso
+        if (Notification.permission === 'granted') {
+          pushSuscribir(false);
         }
-      });
+        // Actualizar UI del panel de notificaciones
+        pushActualizarUI();
+      })
+      .catch(err => console.warn('[NEXOS] SW error:', err));
 
-      // ── Inicializar FCM recién aquí (SW ya registrado) ──────────────────
-      initFCM();
-      pushActualizarUI();
-
-    } catch (err) {
-      console.warn('[NEXOS] SW error:', err);
-    }
+    navigator.serviceWorker.addEventListener('message', event => {
+      if (event.data?.type === 'NEXOS_SYNC_NOW') {
+        if (typeof sincronizar === 'function') sincronizar();
+      }
+      // Cuando el usuario toca la notificación con la app cerrada y se reabre
+      if (event.data?.type === 'NEXOS_NOTIF_CLICK') {
+        const tipo = event.data.tipo;
+        if (tipo === 'panico') {
+          if (typeof mostrarPanico === 'function' && panicosPendientes.length) mostrarPanico(panicosPendientes);
+        } else if (tipo === 'delivery') {
+          if (typeof abrirDeliveryActivos === 'function') abrirDeliveryActivos();
+        } else if (tipo === 'chat') {
+          // Abrir el panel de vigiladores
+          if (typeof abrirVigsOnline === 'function') setTimeout(abrirVigsOnline, 800);
+        }
+      }
+      // El browser rotó las claves push — re-registrar suscripción al Sheet
+      if (event.data?.type === 'NEXOS_PUSH_RESUB') {
+        try {
+          const sub = JSON.parse(event.data.sub);
+          const url = localStorage.getItem('nx_url');
+          const nombre = sessionStorage.getItem('nx_vigilador') || 'desconocido';
+          if (url) {
+            fetch(url, {
+              method: 'POST', mode: 'no-cors',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ accion: 'push_suscribir', nombre, sub: event.data.sub })
+            }).catch(() => {});
+          }
+          localStorage.setItem('nx_push_sub', event.data.sub);
+        } catch(e) {}
+      }
+    });
   });
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-//  BACKGROUND SYNC
-// ════════════════════════════════════════════════════════════════════════════
+// ── BACKGROUND SYNC: registrar tag cuando hay pendientes ──
 async function registrarBackgroundSync() {
   if (!('serviceWorker' in navigator) || !('SyncManager' in window)) return;
   try {
@@ -3030,11 +2887,13 @@ async function registrarBackgroundSync() {
   } catch(e) {}
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-//  PWA
-// ════════════════════════════════════════════════════════════════════════════
+// ── PWA: Capturar prompt de instalación ──────────────────
 let pwaInstallPrompt = null;
-window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); pwaInstallPrompt = e; });
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  pwaInstallPrompt = e;
+});
+
 function instalarPWA() {
   if (pwaInstallPrompt) {
     pwaInstallPrompt.prompt();
@@ -3044,295 +2903,348 @@ function instalarPWA() {
   }
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-//  FCM TOKEN — registro en Firebase RTDB
-// ════════════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
+//  SISTEMA DE NOTIFICACIONES PUSH
+// ══════════════════════════════════════════════════════════
+
+// Convertir base64url a Uint8Array (necesario para VAPID)
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+
+// Estado actual de la suscripción
+function pushEstado() {
+  if (!('Notification' in window)) return 'no-soportado';
+  if (!('PushManager' in window)) return 'no-soportado';
+  return Notification.permission; // 'default' | 'granted' | 'denied'
+}
+
+// Suscribir al servidor push
 async function pushSuscribir(mostrarToast = true) {
   try {
-    if (!('Notification' in window)) throw new Error('No soportado');
-
-    if (Notification.permission === 'default') {
-      const perm = await Notification.requestPermission();
-      if (perm !== 'granted') {
-        if (mostrarToast) showToast('🚫 Permiso denegado');
-        pushActualizarUI(); return null;
-      }
-    }
-    if (Notification.permission !== 'granted') {
-      if (mostrarToast) showToast('🚫 Notificaciones bloqueadas');
-      pushActualizarUI(); return null;
-    }
-
-    // Asegurar que FCM esté inicializado
-    if (!_fbMsg) { initFCM(); }
-    if (!_fbMsg) throw new Error('FCM no disponible en este navegador');
-
-    // Usar el SW de FCM registrado (o esperar al ready)
-    const swReg = _swFcmReg || await navigator.serviceWorker.ready;
-
-    const token = await _fbMsg.getToken({ vapidKey: NEXOS_VAPID_PUBLIC, serviceWorkerRegistration: swReg });
-    if (!token) throw new Error('No se obtuvo token FCM');
-
-    localStorage.setItem('nx_fcm_token', token);
-
-    // Guardar en Firebase RTDB → el GAS lo lee para enviar FCM
+    const reg = _swReg || await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(NEXOS_VAPID_PUBLIC)
+    });
+    // Guardar suscripción localmente
+    localStorage.setItem('nx_push_sub', JSON.stringify(sub));
+    // Enviar suscripción al Sheet para que pueda mandar push
+    const url = localStorage.getItem('nx_url');
     const nombre = sessionStorage.getItem('nx_vigilador') || 'desconocido';
-    await _fbDB.ref('fcm_tokens/' + nombre).set({ token, nombre, ts: Date.now(), ua: navigator.userAgent.substring(0, 100) });
-
+    if (url) {
+      fetch(url, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accion: 'push_suscribir',
+          nombre,
+          sub: JSON.stringify(sub)
+        })
+      }).catch(() => {});
+    }
     if (mostrarToast) showToast('🔔 Notificaciones activadas');
     pushActualizarUI();
-    return token;
+    return sub;
   } catch (e) {
-    console.warn('[NEXOS] pushSuscribir error:', e.message);
+    console.warn('[NEXOS] Push subscribe error:', e);
     if (mostrarToast) showToast('⚠️ No se pudo activar: ' + e.message);
-    pushActualizarUI();
     return null;
   }
 }
 
+// Desuscribir
 async function pushDesuscribir() {
   try {
-    if (_fbMsg) await _fbMsg.deleteToken().catch(() => {});
-    localStorage.removeItem('nx_fcm_token');
-    const nombre = sessionStorage.getItem('nx_vigilador') || 'desconocido';
-    await _fbDB.ref('fcm_tokens/' + nombre).remove();
+    const reg = _swReg || await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    if (sub) {
+      await sub.unsubscribe();
+      localStorage.removeItem('nx_push_sub');
+      // Notificar al Sheet
+      const url = localStorage.getItem('nx_url');
+      const nombre = sessionStorage.getItem('nx_vigilador') || 'desconocido';
+      if (url) {
+        fetch(url, {
+          method: 'POST', mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accion: 'push_desuscribir', nombre })
+        }).catch(() => {});
+      }
+    }
     showToast('🔕 Notificaciones desactivadas');
     pushActualizarUI();
-  } catch (e) { showToast('⚠️ Error: ' + e.message); }
+  } catch (e) {
+    showToast('⚠️ Error al desactivar: ' + e.message);
+  }
 }
 
+// Pedir permiso y suscribir
 async function pushActivar() {
   if (!('Notification' in window) || !('PushManager' in window)) {
-    showToast('⚠️ Tu navegador no soporta push'); return;
+    showToast('⚠️ Tu navegador no soporta notificaciones push');
+    return;
   }
   if (Notification.permission === 'denied') {
-    showToast('🚫 Bloqueadas — habilitá desde config del navegador');
-    pushActualizarUI(); return;
+    showToast('🚫 Notificaciones bloqueadas — habilitá desde la config del navegador');
+    pushActualizarUI();
+    return;
   }
-  await pushSuscribir(true);
+  const perm = await Notification.requestPermission();
+  if (perm === 'granted') {
+    await pushSuscribir(true);
+  } else {
+    showToast('🚫 Permiso denegado');
+  }
+  pushActualizarUI();
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-//  PUSH QUEUE — encola eventos para que el GAS envíe FCM a dispositivos cerrados
-// ════════════════════════════════════════════════════════════════════════════
-function _pushEncolarTrigger(tipo, titulo, cuerpo, extra) {
-  if (!sessionStorage.getItem('nx_auth')) return;
-  const url = localStorage.getItem('nx_url');
-  // Llamar al GAS con accion push_enviar → GAS envía FCM a todos los tokens
-  if (url) {
-    fetch(url, {
-      method: 'POST', mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ accion: 'push_enviar', tipo, titulo, cuerpo, extra: extra || null })
-    }).catch(() => {});
-  }
-}
-
-// ════════════════════════════════════════════════════════════════════════════
-//  NOTIFICACIÓN LOCAL (foreground / background reciente)
-// ════════════════════════════════════════════════════════════════════════════
-function pushNotifLocal(titulo, cuerpo, tag = 'nexos-local', tipo = 'general') {
+// Notificación local (sin servidor, mientras la app está abierta/background)
+function pushNotifLocal(titulo, cuerpo, tag = 'nexos-local') {
   if (Notification.permission !== 'granted') return;
-  const vibrateMap = {
-    panico:    [400, 100, 400, 100, 800],
-    chat:      [200, 100, 200],
-    delivery:  [300, 100, 300, 100, 300],
-    incidente: [300, 100, 300],
-    general:   [200, 100, 200],
-  };
   navigator.serviceWorker.ready.then(reg => {
     reg.showNotification(titulo, {
-      body: cuerpo, icon: './nexos-icon-192.png', badge: './nexos-icon-192.png',
-      vibrate: vibrateMap[tipo] || [200, 100, 200], tag, renotify: true, silent: false,
-      requireInteraction: tipo === 'panico' || tipo === 'incidente',
-      data: { url: './nexos_control.html', tipo }
+      body: cuerpo,
+      icon: './nexos-icon-192.png',
+      badge: './nexos-icon-192.png',
+      vibrate: [200, 100, 200, 100, 400],
+      tag,
+      requireInteraction: true,
+      data: { url: './nexos_control.html' }
     });
   });
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-//  UI DE NOTIFICACIONES
-// ════════════════════════════════════════════════════════════════════════════
-function pushEstado() {
-  if (!('Notification' in window) || !('PushManager' in window)) return 'no-soportado';
-  return Notification.permission;
-}
-
+// Actualizar UI del panel de notificaciones
 function pushActualizarUI() {
-  const estado      = pushEstado();
-  const btnActivar  = document.getElementById('push-btn-activar');
-  const btnDesact   = document.getElementById('push-btn-desactivar');
-  const statusEl    = document.getElementById('push-status');
+  const estado = pushEstado();
+  const btnActivar = document.getElementById('push-btn-activar');
+  const btnDesactivar = document.getElementById('push-btn-desactivar');
+  const statusEl = document.getElementById('push-status');
   const statusPanel = document.getElementById('push-status-panel');
   if (!statusEl) return;
 
   if (estado === 'no-soportado') {
-    statusEl.innerText = '❌ No soportado'; statusEl.style.color = '#888';
-    if (btnActivar)  btnActivar.style.display  = 'none';
-    if (btnDesact)   btnDesact.style.display   = 'none';
-  } else if (estado === 'granted') {
-    const hasToken = !!localStorage.getItem('nx_fcm_token');
-    statusEl.innerText = hasToken ? '🔔 Notificaciones ACTIVAS' : '⏳ Reconectando...';
-    statusEl.style.color = hasToken ? 'var(--green)' : 'var(--gold)';
-    if (btnActivar)  btnActivar.style.display  = 'none';
-    if (btnDesact)   btnDesact.style.display   = 'block';
-    if (statusPanel) statusPanel.style.borderColor = hasToken ? 'rgba(46,204,113,0.5)' : 'rgba(245,200,66,0.4)';
-  } else if (estado === 'denied') {
-    statusEl.innerText = '🚫 Bloqueadas por el navegador'; statusEl.style.color = 'var(--red)';
+    statusEl.innerText = '❌ No soportado en este navegador';
+    statusEl.style.color = '#888';
     if (btnActivar) btnActivar.style.display = 'none';
-    if (btnDesact)  btnDesact.style.display  = 'none';
-    if (statusPanel) statusPanel.style.borderColor = 'rgba(231,76,60,0.4)';
+    if (btnDesactivar) btnDesactivar.style.display = 'none';
+    if (statusPanel) statusPanel.style.borderColor = 'var(--border)';
+  } else if (estado === 'granted') {
+    statusEl.innerText = '🔔 Notificaciones ACTIVAS';
+    statusEl.style.color = 'var(--green)';
+    if (btnActivar) btnActivar.style.display = 'none';
+    if (btnDesactivar) btnDesactivar.style.display = 'block';
+    if (statusPanel) statusPanel.style.borderColor = 'rgba(46,204,113,0.5)';
+  } else if (estado === 'denied') {
+    statusEl.innerText = '🚫 Bloqueadas por el navegador';
+    statusEl.style.color = 'var(--red)';
+    if (btnActivar) btnActivar.style.display = 'none';
+    if (btnDesactivar) btnDesactivar.style.display = 'none';
+    if (statusPanel) { statusPanel.style.borderColor = 'rgba(231,76,60,0.4)'; statusPanel.innerHTML += '<div style="font-size:11px;color:#888;margin-top:8px;">Para habilitar: Configuración del navegador → Permisos del sitio → Notificaciones</div>'; }
   } else {
-    statusEl.innerText = '🔕 Desactivadas'; statusEl.style.color = '#888';
+    statusEl.innerText = '🔕 Notificaciones desactivadas';
+    statusEl.style.color = '#888';
     if (btnActivar) btnActivar.style.display = 'block';
-    if (btnDesact)  btnDesact.style.display  = 'none';
+    if (btnDesactivar) btnDesactivar.style.display = 'none';
     if (statusPanel) statusPanel.style.borderColor = 'var(--border)';
   }
 }
 
+// Probar notificación local
 function pushTestLocal() {
-  if (Notification.permission !== 'granted') { showToast('⚠️ Activá las notificaciones primero'); return; }
-  pushNotifLocal('🔔 NEXOS — Prueba OK', 'Notificaciones funcionando ✅', 'nexos-test', 'general');
+  if (Notification.permission !== 'granted') {
+    showToast('⚠️ Activá las notificaciones primero');
+    return;
+  }
+  pushNotifLocal(
+    '🔔 NEXOS — Prueba OK',
+    'Las notificaciones están funcionando correctamente ✅',
+    'nexos-test'
+  );
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-//  HOOKS — notificaciones de eventos del sistema
-//  Estrategia doble:
-//  • pushNotifLocal()       → muestra inmediato si la app está abierta/reciente
-//  • _pushEncolarTrigger()  → llama al GAS que envía FCM a dispositivos cerrados
-// ════════════════════════════════════════════════════════════════════════════
-
-// Pánico — se llama desde mostrarPanico() en el script principal
+// ── HOOKS AUTOMÁTICOS ─────────────────────────────────────
+// Se llaman desde sincronizar() cuando llegan pánico/alertas
 function pushNotifPanico(alerta) {
-  pushNotifLocal('🚨 EMERGENCIA — NEXOS', `Pánico: Mza ${alerta.mza} — Casa ${alerta.casa}`, 'nexos-panico', 'panico');
-  _pushEncolarTrigger('panico', '🚨 EMERGENCIA — NEXOS', `Pánico: Mza ${alerta.mza} — Casa ${alerta.casa}`, { mza: alerta.mza, casa: alerta.casa });
+  pushNotifLocal(
+    '🚨 EMERGENCIA — NEXOS',
+    `Pánico: Mza ${alerta.mza} — Casa ${alerta.casa}`,
+    'nexos-panico'
+  );
 }
 
-// Incidente grave — se llama desde _incNotificarNuevo() en el script principal
-function pushNotifIncidente(vig, desc) {
-  const body = `${vig ? vig + ': ' : ''}${desc.substring(0, 80)}`;
-  pushNotifLocal('🔴 INCIDENTE GRAVE — NEXOS', body, 'nexos-inc-' + Date.now(), 'incidente');
-  _pushEncolarTrigger('incidente', '🔴 INCIDENTE GRAVE — NEXOS', body, { vig });
+function pushNotifDeliveryAlerta(pat, mins) {
+  pushNotifLocal(
+    '⚠️ Delivery con alerta — NEXOS',
+    `${pat} lleva ${mins} minutos adentro sin salir`,
+    'nexos-delivery-' + pat
+  );
 }
 
-// Chat nuevo mensaje — se llama desde _fbBgSuscribirVig() en el script principal
 function pushNotifNuevoMensaje(de, texto) {
-  pushNotifLocal(`💬 Mensaje de ${de} — NEXOS`, texto.substring(0, 80), 'nexos-chat-' + de, 'chat');
+  pushNotifLocal(
+    `💬 Mensaje de ${de} — NEXOS`,
+    texto.substring(0, 80),
+    'nexos-chat-' + de
+  );
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-//  EXTENSIONES DEL SCRIPT PRINCIPAL
-//  Estas funciones extienden las del primer bloque de script SIN reemplazarlas.
-//  Se registran en los eventos correctos usando addEventListener para no pisar
-//  los listeners existentes.
-// ════════════════════════════════════════════════════════════════════════════
+// Parchar mostrarPanico para disparar notif
+const _mostrarPanicoOrig = mostrarPanico;
+mostrarPanico = function(alertas) {
+  _mostrarPanicoOrig(alertas);
+  alertas.forEach(a => pushNotifPanico(a));
+};
 
-// ── 1. Pánico: hook al evento que dispara mostrarPanico ──────────────────
-//    El script principal llama mostrarPanico(alertas) al detectar pánico nuevo.
-//    Lo extendemos sobreescribiendo la función global DESPUÉS de que esté definida.
-(function _hookPanico() {
-  const orig = window.mostrarPanico;
-  if (typeof orig !== 'function') { setTimeout(_hookPanico, 200); return; }
-  window.mostrarPanico = function(alertas) {
-    orig.call(this, alertas);
-    alertas.forEach(a => pushNotifPanico(a));
-  };
-})();
+// Parchar chatSonidoRecibido para también mostrar notif cuando chat está cerrado
+const _chatSonidoOrig = chatSonidoRecibido;
+chatSonidoRecibido = function() {
+  _chatSonidoOrig();
+  if (!document.getElementById('chat-overlay').classList.contains('visible')) {
+    pushNotifNuevoMensaje(_chatConVig || 'Vigilador', '📨 Nuevo mensaje');
+  }
+};
 
-// ── 2. Incidentes: extender _incNotificarNuevo para disparar FCM ─────────
-//    La función original ya llama pushNotifLocal para foreground.
-//    La extendemos para agregar _pushEncolarTrigger (dispositivos cerrados).
-(function _hookIncidentes() {
-  const orig = window._incNotificarNuevo;
-  if (typeof orig !== 'function') { setTimeout(_hookIncidentes, 200); return; }
-  window._incNotificarNuevo = function(lista) {
-    orig.call(this, lista); // <— la original maneja foreground y su propio estado
-    // Solo agregar la cola FCM para dispositivos cerrados
-    const yo = sessionStorage.getItem('nx_vigilador') || '';
-    lista.filter(i => i.tipo === 'grave' && i.vig !== yo).forEach(i => {
-      _pushEncolarTrigger('incidente', '🔴 INCIDENTE GRAVE — NEXOS',
-        `${i.vig ? i.vig + ': ' : ''}${(i.desc || '').substring(0, 80)}`, { vig: i.vig });
-    });
-  };
-})();
-
-// ════════════════════════════════════════════════════════════════════════════
-//  CHAT BACKGROUND — escucha mensajes cuando el chat está cerrado
-//  Se activa mientras la pestaña está abierta; FCM cubre cuando está cerrada.
-// ════════════════════════════════════════════════════════════════════════════
-// _fbBgListeners ya declarado en el bloque de chat (línea ~2680)
-
-function _fbBgSuscribirVig(yo, otroNombre) {
-  const clave   = chatClave(yo, otroNombre);
-  const fbClave = chatClaveFirebase(yo, otroNombre);
-  if (_fbBgListeners[clave]) return;
-
-  const leidoMap    = JSON.parse(localStorage.getItem('nx_chat_leido') || '{}');
-  const ultimoLeido = leidoMap[clave] || Date.now();
-
-  const ref     = _fbDB.ref('chat/' + fbClave);
-  const handler = ref.orderByChild('ts').startAt(ultimoLeido + 1).on('child_added', snap => {
-    const m = snap.val();
-    if (!m || m.de === yo) return;
-
-    // Si el chat con esa persona está abierto, no notificar (el listener activo lo muestra)
-    const chatAbierto = document.getElementById('chat-overlay')?.classList.contains('visible')
-                        && typeof _chatConVig !== 'undefined' && _chatConVig === otroNombre;
-    if (chatAbierto) return;
-
-    // Guardar en cache local
-    const msgs = JSON.parse(localStorage.getItem('nx_chat_' + clave) || '[]');
-    msgs.push(m);
-    localStorage.setItem('nx_chat_' + clave, JSON.stringify(msgs));
-
-    // Sonido
-    initAudio();
-    if (typeof chatSonidoRecibido === 'function') chatSonidoRecibido();
-
-    // Notif local
-    pushNotifNuevoMensaje(m.de, m.texto || '📷 imagen');
-
-    // Actualizar badge de vigs online
-    if (typeof renderVigsOnline === 'function') renderVigsOnline();
-  });
-
-  _fbBgListeners[clave] = () => ref.off('child_added', handler);
-}
-
-function _fbBgDesuscribirTodos() {
-  Object.values(_fbBgListeners).forEach(fn => fn());
-  _fbBgListeners = {};
-}
-
-function iniciarChatBgFirebase() {
+// ── POLLING DE CHAT EN BACKGROUND ─────────────────────────
+// Una sola llamada al GAS trae TODOS los mensajes pendientes para este vigilador.
+// El GAS debe soportar: ?accion=chat_inbox&para=NOMBRE&desde=TIMESTAMP
+// Respuesta esperada: { conversaciones: [ { clave, mensajes: [...] }, ... ] }
+// Si el GAS aún no tiene ese endpoint, cae en fallback al comportamiento anterior (N fetches).
+let _chatBgInterval = null;
+async function chatBgPoll() {
+  const url = lsGet('nx_url');
   const yo = sessionStorage.getItem('nx_vigilador') || '';
-  if (!yo) return;
-  const activos = new Set((_vigsOnline || []).filter(v => v.nombre !== yo).map(v => chatClave(yo, v.nombre)));
-  // Desuscribir conversaciones que ya no están online
-  Object.keys(_fbBgListeners).forEach(clave => {
-    if (!activos.has(clave)) { _fbBgListeners[clave](); delete _fbBgListeners[clave]; }
-  });
-  // Suscribir nuevas
-  (_vigsOnline || []).forEach(v => { if (v.nombre !== yo) _fbBgSuscribirVig(yo, v.nombre); });
+  if (!url || !yo) return;
+
+  const leidoMap = JSON.parse(lsGet('nx_chat_leido', '{}'));
+  // Timestamp del mensaje más antiguo no leído (o hace 24hs como límite)
+  const _leidoVals = Object.values(leidoMap).filter(v => typeof v === 'number' && v > 0);
+  const desdeTs = _leidoVals.length ? Math.min(..._leidoVals) : Date.now() - 86400000;
+
+  try {
+    // ── INTENTO 1: endpoint unificado (1 sola llamada) ──────
+    const r = await fetch(url + '?accion=chat_inbox&para=' + encodeURIComponent(yo) + '&desde=' + desdeTs + '&t=' + Date.now());
+    if (r.ok) {
+      const data = await r.json();
+      if (Array.isArray(data.conversaciones)) {
+        // Procesar cada conversación recibida en bloque
+        let hayNuevos = false;
+        for (const conv of data.conversaciones) {
+          if (!conv.clave || !Array.isArray(conv.mensajes)) continue;
+          const ultimoLeido = leidoMap[conv.clave] || 0;
+          const nuevos = conv.mensajes.filter(m => m.de !== yo && m.ts > ultimoLeido);
+          if (!nuevos.length) continue;
+          lsSet('nx_chat_' + conv.clave, JSON.stringify(conv.mensajes));
+          hayNuevos = true;
+          // Notificar solo si ese chat no está abierto ahora
+          const otroNombre = conv.clave.split('__NX__').find(n => n !== yo) || '';
+          const chatAbierto = document.getElementById('chat-overlay').classList.contains('visible') && _chatConVig === otroNombre;
+          if (!chatAbierto) {
+            const ultimo = nuevos[nuevos.length - 1];
+            initAudio();
+            if (audioCtx) {
+              const now = audioCtx.currentTime;
+              const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+              o.connect(g); g.connect(audioCtx.destination);
+              o.type = 'sine'; o.frequency.value = 880;
+              g.gain.setValueAtTime(0, now);
+              g.gain.linearRampToValueAtTime(0.15, now + 0.01);
+              g.gain.setValueAtTime(0.15, now + 0.1);
+              g.gain.linearRampToValueAtTime(0, now + 0.18);
+              o.start(now); o.stop(now + 0.2);
+            }
+            pushNotifNuevoMensaje(ultimo.de, ultimo.texto);
+          }
+        }
+        if (hayNuevos) renderVigsOnline();
+        return; // éxito — no hacer fallback
+      }
+    }
+  } catch(e) {}
+
+  // ── FALLBACK: endpoint viejo, una llamada por vigilador ──
+  // Se usa solo si el GAS no soporta chat_inbox todavía.
+  for (const vig of _vigsOnline) {
+    if (vig.nombre === yo) continue;
+    try {
+      const clave = chatClave(yo, vig.nombre);
+      const rf = await fetch(url + '?accion=chat&clave=' + encodeURIComponent(clave) + '&t=' + Date.now());
+      if (!rf.ok) continue;
+      const data = await rf.json();
+      if (!Array.isArray(data.mensajes)) continue;
+      const ultimoLeido = leidoMap[clave] || 0;
+      const nuevos = data.mensajes.filter(m => m.de !== yo && m.ts > ultimoLeido);
+      if (!nuevos.length) continue;
+      lsSet('nx_chat_' + clave, JSON.stringify(data.mensajes));
+      const chatAbierto = document.getElementById('chat-overlay').classList.contains('visible') && _chatConVig === vig.nombre;
+      if (!chatAbierto) {
+        const ultimo = nuevos[nuevos.length - 1];
+        initAudio();
+        if (audioCtx) {
+          const now = audioCtx.currentTime;
+          const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+          o.connect(g); g.connect(audioCtx.destination);
+          o.type = 'sine'; o.frequency.value = 880;
+          g.gain.setValueAtTime(0, now);
+          g.gain.linearRampToValueAtTime(0.15, now + 0.01);
+          g.gain.setValueAtTime(0.15, now + 0.1);
+          g.gain.linearRampToValueAtTime(0, now + 0.18);
+          o.start(now); o.stop(now + 0.2);
+        }
+        pushNotifNuevoMensaje(ultimo.de, ultimo.texto);
+      }
+      renderVigsOnline();
+    } catch(e) {}
+  }
 }
 
-// Alias de compatibilidad
-function iniciarChatBgPoll() { iniciarChatBgFirebase(); }
-async function chatBgPoll()  { iniciarChatBgFirebase(); }
+function iniciarChatBgPoll() {
+  if (_chatBgInterval) return;
+  _chatBgInterval = setInterval(()=>{ if(document.visibilityState==='visible') chatBgPoll(); }, 60000);
+}
 
-// Arrancar cuando el usuario inicia sesión
-document.addEventListener('nx-session-start', () => {
-  iniciarChatBgFirebase();
-  if (typeof incIniciarFirebase === 'function') incIniciarFirebase();
-});
-
-// Si ya estaba logueado (recarga), arrancar después de que el DOM termine
+document.addEventListener('nx-session-start', iniciarChatBgPoll);
 if (sessionStorage.getItem('nx_auth') === '1') {
-  setTimeout(() => {
-    iniciarChatBgFirebase();
-    if (typeof incIniciarFirebase === 'function') incIniciarFirebase();
-  }, 2000);
+  setTimeout(iniciarChatBgPoll, 3000);
 }
+
+// Parchar tickContadores para notif de delivery (ya existe lógica, agregamos notif)
+// Se engancha en la detección de nueva alerta delivery dentro del setInterval existente
+
+/*
+ * ══════════════════════════════════════════════════════════════════
+ *  ⚠️  REQUERIDO EN EL GAS PARA MÁXIMA EFICIENCIA
+ *  Sin este endpoint el sistema cae en fallback N-fetches (1 por vigilador).
+ *  Agregar este case dentro del doGet() del script de la hoja:
+ * ══════════════════════════════════════════════════════════════════
+ *
+ *  case 'chat_inbox': {
+ *    const para   = params.para  || '';
+ *    const desde  = Number(params.desde) || 0;
+ *    const ss     = SpreadsheetApp.getActiveSpreadsheet();
+ *    const sheet  = ss.getSheetByName('Chat') || ss.insertSheet('Chat');
+ *    const rows   = sheet.getDataRange().getValues();  // [clave, de, para, texto, ts]
+ *    const convMap = {};
+ *    for (let i = 1; i < rows.length; i++) {
+ *      const [clave, de, destino, texto, ts] = rows[i];
+ *      if (destino !== para && de !== para) continue;  // no me involucra
+ *      if (Number(ts) < desde) continue;               // más viejo que lo que ya leí
+ *      if (!convMap[clave]) convMap[clave] = [];
+ *      convMap[clave].push({ de, texto, ts: Number(ts) });
+ *    }
+ *    const conversaciones = Object.entries(convMap).map(([clave, mensajes]) => ({ clave, mensajes }));
+ *    return ContentService
+ *      .createTextOutput(JSON.stringify({ conversaciones }))
+ *      .setMimeType(ContentService.MimeType.JSON);
+ *  }
+ *
+ * ══════════════════════════════════════════════════════════════════
+ */
+
 </script>
 </body>
 </html>
