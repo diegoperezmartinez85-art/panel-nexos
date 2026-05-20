@@ -15,7 +15,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
   <script>
-    // Inicialización de Firebase — Realtime DB + Cloud Messaging
+    // Firebase — DB (chat + incidentes en tiempo real)
+    // _fbMsg se inicializa DESPUÉS del registro del SW para no romper nada
     const _fbApp = firebase.initializeApp({
       apiKey: "AIzaSyBw6O59fZ6fPeVUf5BPxAMfw2jssVJNSE4",
       authDomain: "nexos-panel.firebaseapp.com",
@@ -25,8 +26,8 @@
       messagingSenderId: "485679155987",
       appId: "1:485679155987:web:566522d28bbb81693f28e6"
     });
-    const _fbDB      = firebase.database();
-    const _fbMsg     = firebase.messaging();   // FCM — notificaciones push
+    const _fbDB = firebase.database();
+    let   _fbMsg = null; // se instancia en initFCM() tras registrar el SW
   </script>
   <link rel="apple-touch-icon" href="./nexos-icon-192.png">
   <link rel="apple-touch-icon" sizes="192x192" href="./nexos-icon-192.png">
@@ -2929,25 +2930,52 @@ _chatUltimoLeido = JSON.parse(localStorage.getItem('nx_chat_leido') || '{}');
 
 <script>
 // ══════════════════════════════════════════════════════════════════════════
-//  NEXOS CONTROL — SERVICE WORKER + FIREBASE CLOUD MESSAGING (FCM)
-//  v3.0 — Notificaciones push via Firebase (background + foreground)
+//  NEXOS — SERVICE WORKER + FIREBASE CLOUD MESSAGING  v3.1
 //
-//  FLUJO COMPLETO:
-//  1. Al iniciar, el SW firebase-messaging-sw.js se registra en la raíz.
-//  2. El cliente obtiene un FCM token y lo guarda en Firebase RTDB bajo
-//     fcm_tokens/{nombre} — ya NO se usa VAPID manual ni el GAS para tokens.
-//  3. Cuando ocurre un evento (pánico, incidente, chat) se escribe un
-//     trigger en push_queue/{id} que el GAS lee y envía la push FCM.
-//  4. Si la app está ABIERTA  → _fbMsg.onMessage() muestra la notif.
-//  5. Si la app está CERRADA  → firebase-messaging-sw.js onBackgroundMessage
-//     muestra la notif directamente desde el Service Worker.
+//  FLUJO:
+//  1. Se registran sw_control.js (caché) y firebase-messaging-sw.js (FCM).
+//  2. initFCM() crea _fbMsg y configura onMessage para foreground.
+//  3. pushSuscribir() obtiene el token FCM y lo guarda en Firebase RTDB.
+//  4. Al ocurrir un evento: pushNotifLocal() muestra en foreground y
+//     _pushEncolarTrigger() llama al GAS para que envíe FCM a todos
+//     los dispositivos cerrados via fcm_tokens en RTDB.
+//  5. Con la app cerrada: firebase-messaging-sw.js onBackgroundMessage
+//     muestra la notificación directamente desde el Service Worker.
+//
+//  NOTA: _fbMsg se inicializa DESPUÉS del SW para evitar errores.
 // ══════════════════════════════════════════════════════════════════════════
 
-// Clave pública VAPID (par del proyecto — usada por Firebase Messaging)
-const NEXOS_VAPID_PUBLIC = 'BFwTEQTNi9wabPdmsCPgLqPrdK-lt8qYjM-h0_adyhPcE2iBsPqSbAfUOU3RtpUbTRRi2vu7zSHKPLuXSd2YE10';
+const NEXOS_VAPID_PUBLIC = 'BCoaJ_X4dxBITDpz6tlBDuprc_dUtp3XxdK24nWrEm889ARQBMVUU_nlm1uFhxVBqSNmI73B39781pz5sFZtXXs';
 
-let _swReg     = null;  // registro de sw_control.js (caché + sync)
-let _swFcmReg  = null;  // registro de firebase-messaging-sw.js (FCM)
+let _swReg    = null;   // sw_control.js
+let _swFcmReg = null;   // firebase-messaging-sw.js
+
+// ════════════════════════════════════════════════════════════════════════════
+//  INICIALIZAR FCM (se llama SOLO después de que el SW está listo)
+// ════════════════════════════════════════════════════════════════════════════
+function initFCM() {
+  if (_fbMsg) return; // ya inicializado
+  try {
+    _fbMsg = firebase.messaging();
+
+    // ── Mensajes en FOREGROUND (app abierta) ────────────────────────────
+    _fbMsg.onMessage((payload) => {
+      const n    = payload.notification || {};
+      const d    = payload.data         || {};
+      const tipo = d.tipo || 'general';
+      const titulo = n.title || d.title || '🔔 NEXOS CONTROL';
+      const cuerpo = n.body  || d.body  || 'Tenés una nueva alerta';
+      pushNotifLocal(titulo, cuerpo, 'nexos-fcm-' + tipo + '-' + Date.now(), tipo);
+    });
+
+    // Si ya tenía permiso, renovar token
+    if (Notification.permission === 'granted') pushSuscribir(false);
+
+  } catch (e) {
+    console.warn('[NEXOS] FCM init error:', e.message);
+    // El error NO rompe _fbDB ni el chat — son independientes
+  }
+}
 
 // ════════════════════════════════════════════════════════════════════════════
 //  REGISTRO DE SERVICE WORKERS
@@ -2959,51 +2987,34 @@ if ('serviceWorker' in navigator) {
       _swReg = await navigator.serviceWorker.register('./sw_control.js', { scope: './' });
       _swReg.addEventListener('updatefound', () => {
         const w = _swReg.installing;
-        w && w.addEventListener('statechange', () => {
-          if (w.state === 'installed' && navigator.serviceWorker.controller) {
-            if (typeof showToast === 'function') showToast('🔄 Nueva versión disponible — recargá la app');
-          }
+        if (!w) return;
+        w.addEventListener('statechange', () => {
+          if (w.state === 'installed' && navigator.serviceWorker.controller)
+            if (typeof showToast === 'function') showToast('🔄 Nueva versión — recargá la app');
         });
       });
 
-      // ── SW de Firebase Messaging (FCM) ──────────────────────────────────
-      // DEBE llamarse firebase-messaging-sw.js y estar en la raíz del scope
+      // ── SW de FCM — DEBE llamarse firebase-messaging-sw.js ─────────────
       _swFcmReg = await navigator.serviceWorker.register('./firebase-messaging-sw.js', { scope: './' });
 
-      // ── Handler de mensajes desde sw_control.js ─────────────────────────
+      // ── Mensajes desde sw_control.js ────────────────────────────────────
       navigator.serviceWorker.addEventListener('message', event => {
         const { type, tipo } = event.data || {};
-        if (type === 'NEXOS_SYNC_NOW' && typeof sincronizar === 'function') sincronizar();
+        if (type === 'NEXOS_SYNC_NOW'    && typeof sincronizar === 'function') sincronizar();
+        if (type === 'NEXOS_PUSH_RESUB')  pushSuscribir(false);
         if (type === 'NEXOS_NOTIF_CLICK') {
           if (tipo === 'panico'   && typeof mostrarPanico === 'function' && panicosPendientes.length) mostrarPanico(panicosPendientes);
           if (tipo === 'delivery' && typeof abrirDeliveryActivos === 'function') abrirDeliveryActivos();
           if (tipo === 'chat'     && typeof abrirVigsOnline === 'function') setTimeout(abrirVigsOnline, 800);
         }
-        if (type === 'NEXOS_PUSH_RESUB') {
-          // El SW rotó las claves — volver a registrar el token FCM
-          pushSuscribir(false);
-        }
       });
 
-      // ── FCM foreground: mensajes cuando la app está ABIERTA ─────────────
-      _fbMsg.onMessage((payload) => {
-        console.log('[NEXOS FCM] Mensaje en foreground:', payload);
-        const n    = payload.notification || {};
-        const d    = payload.data         || {};
-        const tipo = d.tipo || 'general';
-        const titulo = n.title || d.titulo || '🔔 NEXOS CONTROL';
-        const cuerpo = n.body  || d.cuerpo || 'Tenés una nueva alerta';
-        pushNotifLocal(titulo, cuerpo, 'nexos-fcm-' + tipo + '-' + Date.now(), tipo);
-      });
-
-      // ── Si ya tenía permiso, renovar token FCM ──────────────────────────
-      if (Notification.permission === 'granted') {
-        pushSuscribir(false);
-      }
+      // ── Inicializar FCM recién aquí (SW ya registrado) ──────────────────
+      initFCM();
       pushActualizarUI();
 
     } catch (err) {
-      console.warn('[NEXOS] SW registration error:', err);
+      console.warn('[NEXOS] SW error:', err);
     }
   });
 }
@@ -3020,13 +3031,10 @@ async function registrarBackgroundSync() {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-//  PWA — prompt de instalación
+//  PWA
 // ════════════════════════════════════════════════════════════════════════════
 let pwaInstallPrompt = null;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  pwaInstallPrompt = e;
-});
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); pwaInstallPrompt = e; });
 function instalarPWA() {
   if (pwaInstallPrompt) {
     pwaInstallPrompt.prompt();
@@ -3037,311 +3045,257 @@ function instalarPWA() {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-//  FCM — REGISTRO DE TOKEN EN FIREBASE RTDB
+//  FCM TOKEN — registro en Firebase RTDB
 // ════════════════════════════════════════════════════════════════════════════
-
-// Pedir permiso y registrar token FCM en Firebase RTDB
 async function pushSuscribir(mostrarToast = true) {
   try {
-    if (!('Notification' in window)) throw new Error('Notificaciones no soportadas');
+    if (!('Notification' in window)) throw new Error('No soportado');
 
-    // Solicitar permiso si hace falta
     if (Notification.permission === 'default') {
       const perm = await Notification.requestPermission();
       if (perm !== 'granted') {
         if (mostrarToast) showToast('🚫 Permiso denegado');
-        pushActualizarUI();
-        return null;
+        pushActualizarUI(); return null;
       }
     }
     if (Notification.permission !== 'granted') {
-      if (mostrarToast) showToast('🚫 Notificaciones bloqueadas en el navegador');
-      pushActualizarUI();
-      return null;
+      if (mostrarToast) showToast('🚫 Notificaciones bloqueadas');
+      pushActualizarUI(); return null;
     }
 
-    // Asegurarse de que el SW de FCM está listo
+    // Asegurar que FCM esté inicializado
+    if (!_fbMsg) { initFCM(); }
+    if (!_fbMsg) throw new Error('FCM no disponible en este navegador');
+
+    // Usar el SW de FCM registrado (o esperar al ready)
     const swReg = _swFcmReg || await navigator.serviceWorker.ready;
 
-    // Obtener el token FCM
-    const token = await _fbMsg.getToken({
-      vapidKey:                  NEXOS_VAPID_PUBLIC,
-      serviceWorkerRegistration: swReg
-    });
-
+    const token = await _fbMsg.getToken({ vapidKey: NEXOS_VAPID_PUBLIC, serviceWorkerRegistration: swReg });
     if (!token) throw new Error('No se obtuvo token FCM');
 
-    // Guardar en localStorage (referencia local)
     localStorage.setItem('nx_fcm_token', token);
 
-    // ── Guardar en Firebase RTDB bajo fcm_tokens/{nombre} ──────────────────
+    // Guardar en Firebase RTDB → el GAS lo lee para enviar FCM
     const nombre = sessionStorage.getItem('nx_vigilador') || 'desconocido';
-    await _fbDB.ref('fcm_tokens/' + nombre).set({
-      token,
-      nombre,
-      ts:        Date.now(),
-      userAgent: navigator.userAgent.substring(0, 120)
-    });
+    await _fbDB.ref('fcm_tokens/' + nombre).set({ token, nombre, ts: Date.now(), ua: navigator.userAgent.substring(0, 100) });
 
-    if (mostrarToast) showToast('🔔 Notificaciones FCM activadas');
+    if (mostrarToast) showToast('🔔 Notificaciones activadas');
     pushActualizarUI();
     return token;
   } catch (e) {
-    console.warn('[NEXOS] FCM getToken error:', e);
+    console.warn('[NEXOS] pushSuscribir error:', e.message);
     if (mostrarToast) showToast('⚠️ No se pudo activar: ' + e.message);
     pushActualizarUI();
     return null;
   }
 }
 
-// Desuscribir — borra token local y en Firebase RTDB
 async function pushDesuscribir() {
   try {
-    const token = localStorage.getItem('nx_fcm_token');
-    if (token) await _fbMsg.deleteToken();
+    if (_fbMsg) await _fbMsg.deleteToken().catch(() => {});
     localStorage.removeItem('nx_fcm_token');
-
     const nombre = sessionStorage.getItem('nx_vigilador') || 'desconocido';
     await _fbDB.ref('fcm_tokens/' + nombre).remove();
-
     showToast('🔕 Notificaciones desactivadas');
     pushActualizarUI();
-  } catch (e) {
-    showToast('⚠️ Error al desactivar: ' + e.message);
-  }
+  } catch (e) { showToast('⚠️ Error: ' + e.message); }
 }
 
-// Pedir permiso y suscribir (llamado desde el botón de la UI)
 async function pushActivar() {
   if (!('Notification' in window) || !('PushManager' in window)) {
-    showToast('⚠️ Tu navegador no soporta notificaciones push');
-    return;
+    showToast('⚠️ Tu navegador no soporta push'); return;
   }
   if (Notification.permission === 'denied') {
-    showToast('🚫 Notificaciones bloqueadas — habilitá desde la config del navegador');
-    pushActualizarUI();
-    return;
+    showToast('🚫 Bloqueadas — habilitá desde config del navegador');
+    pushActualizarUI(); return;
   }
   await pushSuscribir(true);
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-//  PUSH QUEUE — Escribe en Firebase RTDB para que el servidor envíe FCM
-//  El GAS lee /push_queue y envía la notif via FCM HTTP v1 API.
-//  También puede usarse con Firebase Cloud Functions (trigger onWrite).
+//  PUSH QUEUE — encola eventos para que el GAS envíe FCM a dispositivos cerrados
 // ════════════════════════════════════════════════════════════════════════════
 function _pushEncolarTrigger(tipo, titulo, cuerpo, extra) {
-  const url = localStorage.getItem('nx_url');
-  // Solo encolar si el usuario tiene sesión
   if (!sessionStorage.getItem('nx_auth')) return;
-  const trigger = { tipo, titulo, cuerpo, extra: extra || null, ts: Date.now() };
-  // Escribir en Firebase para que el backend lo procese
-  _fbDB.ref('push_queue').push(trigger).catch(() => {});
-  // También avisar al GAS si está configurado (compatibilidad)
+  const url = localStorage.getItem('nx_url');
+  // Llamar al GAS con accion push_enviar → GAS envía FCM a todos los tokens
   if (url) {
     fetch(url, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ accion: 'push_enviar', ...trigger })
+      body: JSON.stringify({ accion: 'push_enviar', tipo, titulo, cuerpo, extra: extra || null })
     }).catch(() => {});
   }
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-//  NOTIFICACIÓN LOCAL (mientras la app está abierta o en background reciente)
+//  NOTIFICACIÓN LOCAL (foreground / background reciente)
 // ════════════════════════════════════════════════════════════════════════════
 function pushNotifLocal(titulo, cuerpo, tag = 'nexos-local', tipo = 'general') {
   if (Notification.permission !== 'granted') return;
   const vibrateMap = {
-    panico:   [400, 100, 400, 100, 800],
-    chat:     [200, 100, 200],
-    delivery: [300, 100, 300, 100, 300],
-    incidente:[300, 100, 300],
-    general:  [200, 100, 200],
+    panico:    [400, 100, 400, 100, 800],
+    chat:      [200, 100, 200],
+    delivery:  [300, 100, 300, 100, 300],
+    incidente: [300, 100, 300],
+    general:   [200, 100, 200],
   };
   navigator.serviceWorker.ready.then(reg => {
     reg.showNotification(titulo, {
-      body:               cuerpo,
-      icon:               './nexos-icon-192.png',
-      badge:              './nexos-icon-192.png',
-      vibrate:            vibrateMap[tipo] || [200, 100, 200],
-      tag,
+      body: cuerpo, icon: './nexos-icon-192.png', badge: './nexos-icon-192.png',
+      vibrate: vibrateMap[tipo] || [200, 100, 200], tag, renotify: true, silent: false,
       requireInteraction: tipo === 'panico' || tipo === 'incidente',
-      renotify:           true,
-      silent:             false,
       data: { url: './nexos_control.html', tipo }
     });
   });
 }
 
-// Estado de permisos
+// ════════════════════════════════════════════════════════════════════════════
+//  UI DE NOTIFICACIONES
+// ════════════════════════════════════════════════════════════════════════════
 function pushEstado() {
-  if (!('Notification' in window)) return 'no-soportado';
-  if (!('PushManager' in window)) return 'no-soportado';
+  if (!('Notification' in window) || !('PushManager' in window)) return 'no-soportado';
   return Notification.permission;
 }
 
-// Actualizar UI del panel de notificaciones
 function pushActualizarUI() {
-  const estado       = pushEstado();
-  const btnActivar   = document.getElementById('push-btn-activar');
-  const btnDesact    = document.getElementById('push-btn-desactivar');
-  const statusEl     = document.getElementById('push-status');
-  const statusPanel  = document.getElementById('push-status-panel');
+  const estado      = pushEstado();
+  const btnActivar  = document.getElementById('push-btn-activar');
+  const btnDesact   = document.getElementById('push-btn-desactivar');
+  const statusEl    = document.getElementById('push-status');
+  const statusPanel = document.getElementById('push-status-panel');
   if (!statusEl) return;
 
   if (estado === 'no-soportado') {
-    statusEl.innerText = '❌ No soportado en este navegador';
-    statusEl.style.color = '#888';
-    if (btnActivar) btnActivar.style.display = 'none';
-    if (btnDesact)  btnDesact.style.display  = 'none';
-    if (statusPanel) statusPanel.style.borderColor = 'var(--border)';
+    statusEl.innerText = '❌ No soportado'; statusEl.style.color = '#888';
+    if (btnActivar)  btnActivar.style.display  = 'none';
+    if (btnDesact)   btnDesact.style.display   = 'none';
   } else if (estado === 'granted') {
     const hasToken = !!localStorage.getItem('nx_fcm_token');
-    statusEl.innerText = hasToken ? '🔔 Notificaciones ACTIVAS (FCM)' : '⏳ Reconectando...';
+    statusEl.innerText = hasToken ? '🔔 Notificaciones ACTIVAS' : '⏳ Reconectando...';
     statusEl.style.color = hasToken ? 'var(--green)' : 'var(--gold)';
-    if (btnActivar) btnActivar.style.display = 'none';
-    if (btnDesact)  btnDesact.style.display  = 'block';
+    if (btnActivar)  btnActivar.style.display  = 'none';
+    if (btnDesact)   btnDesact.style.display   = 'block';
     if (statusPanel) statusPanel.style.borderColor = hasToken ? 'rgba(46,204,113,0.5)' : 'rgba(245,200,66,0.4)';
   } else if (estado === 'denied') {
-    statusEl.innerText = '🚫 Bloqueadas por el navegador';
-    statusEl.style.color = 'var(--red)';
+    statusEl.innerText = '🚫 Bloqueadas por el navegador'; statusEl.style.color = 'var(--red)';
     if (btnActivar) btnActivar.style.display = 'none';
     if (btnDesact)  btnDesact.style.display  = 'none';
-    if (statusPanel) {
-      statusPanel.style.borderColor = 'rgba(231,76,60,0.4)';
-      if (!statusPanel.querySelector('.push-blocked-hint')) {
-        const hint = document.createElement('div');
-        hint.className = 'push-blocked-hint';
-        hint.style = 'font-size:11px;color:#888;margin-top:8px;';
-        hint.textContent = 'Para habilitar: Configuración del navegador → Permisos del sitio → Notificaciones';
-        statusPanel.appendChild(hint);
-      }
-    }
+    if (statusPanel) statusPanel.style.borderColor = 'rgba(231,76,60,0.4)';
   } else {
-    statusEl.innerText = '🔕 Notificaciones desactivadas';
-    statusEl.style.color = '#888';
+    statusEl.innerText = '🔕 Desactivadas'; statusEl.style.color = '#888';
     if (btnActivar) btnActivar.style.display = 'block';
     if (btnDesact)  btnDesact.style.display  = 'none';
     if (statusPanel) statusPanel.style.borderColor = 'var(--border)';
   }
 }
 
-// Probar notificación local
 function pushTestLocal() {
-  if (Notification.permission !== 'granted') {
-    showToast('⚠️ Activá las notificaciones primero');
-    return;
-  }
-  pushNotifLocal('🔔 NEXOS — Prueba OK', 'Las notificaciones están funcionando ✅ (FCM activo)', 'nexos-test', 'general');
+  if (Notification.permission !== 'granted') { showToast('⚠️ Activá las notificaciones primero'); return; }
+  pushNotifLocal('🔔 NEXOS — Prueba OK', 'Notificaciones funcionando ✅', 'nexos-test', 'general');
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-//  HOOKS — Se llaman desde los eventos del sistema
+//  HOOKS — notificaciones de eventos del sistema
+//  Estrategia doble:
+//  • pushNotifLocal()       → muestra inmediato si la app está abierta/reciente
+//  • _pushEncolarTrigger()  → llama al GAS que envía FCM a dispositivos cerrados
 // ════════════════════════════════════════════════════════════════════════════
 
-// Pánico — notifica localmente Y encola push para dispositivos cerrados
+// Pánico — se llama desde mostrarPanico() en el script principal
 function pushNotifPanico(alerta) {
-  pushNotifLocal(
-    '🚨 EMERGENCIA — NEXOS',
-    `Pánico: Mza ${alerta.mza} — Casa ${alerta.casa}`,
-    'nexos-panico',
-    'panico'
-  );
-  _pushEncolarTrigger('panico',
-    '🚨 EMERGENCIA — NEXOS',
-    `Pánico: Mza ${alerta.mza} — Casa ${alerta.casa}`,
-    { mza: alerta.mza, casa: alerta.casa }
-  );
+  pushNotifLocal('🚨 EMERGENCIA — NEXOS', `Pánico: Mza ${alerta.mza} — Casa ${alerta.casa}`, 'nexos-panico', 'panico');
+  _pushEncolarTrigger('panico', '🚨 EMERGENCIA — NEXOS', `Pánico: Mza ${alerta.mza} — Casa ${alerta.casa}`, { mza: alerta.mza, casa: alerta.casa });
 }
 
-// Delivery con alerta
-function pushNotifDeliveryAlerta(pat, mins) {
-  pushNotifLocal(
-    '⚠️ Delivery con alerta — NEXOS',
-    `${pat} lleva ${mins} minutos adentro sin salir`,
-    'nexos-delivery-' + pat,
-    'delivery'
-  );
-}
-
-// Nuevo mensaje de chat
-function pushNotifNuevoMensaje(de, texto) {
-  pushNotifLocal(
-    `💬 Mensaje de ${de} — NEXOS`,
-    texto.substring(0, 80),
-    'nexos-chat-' + de,
-    'chat'
-  );
-}
-
-// Incidente grave de otro vigilador
+// Incidente grave — se llama desde _incNotificarNuevo() en el script principal
 function pushNotifIncidente(vig, desc) {
-  pushNotifLocal(
-    '🔴 INCIDENTE GRAVE — NEXOS',
-    `${vig ? vig + ': ' : ''}${desc.substring(0, 80)}`,
-    'nexos-inc-' + Date.now(),
-    'incidente'
-  );
-  _pushEncolarTrigger('incidente',
-    '🔴 INCIDENTE GRAVE — NEXOS',
-    `${vig ? vig + ': ' : ''}${desc.substring(0, 80)}`,
-    { vig }
-  );
+  const body = `${vig ? vig + ': ' : ''}${desc.substring(0, 80)}`;
+  pushNotifLocal('🔴 INCIDENTE GRAVE — NEXOS', body, 'nexos-inc-' + Date.now(), 'incidente');
+  _pushEncolarTrigger('incidente', '🔴 INCIDENTE GRAVE — NEXOS', body, { vig });
 }
 
-// Parchar mostrarPanico para disparar notif
-const _mostrarPanicoOrig = mostrarPanico;
-mostrarPanico = function(alertas) {
-  _mostrarPanicoOrig(alertas);
-  alertas.forEach(a => pushNotifPanico(a));
-};
-
-// Parchar chatSonidoRecibido para notif cuando chat está cerrado
-const _chatSonidoOrig = chatSonidoRecibido;
-chatSonidoRecibido = function() {
-  _chatSonidoOrig();
-  if (!document.getElementById('chat-overlay').classList.contains('visible')) {
-    pushNotifNuevoMensaje(_chatConVig || 'Vigilador', '📨 Nuevo mensaje');
-  }
-};
+// Chat nuevo mensaje — se llama desde _fbBgSuscribirVig() en el script principal
+function pushNotifNuevoMensaje(de, texto) {
+  pushNotifLocal(`💬 Mensaje de ${de} — NEXOS`, texto.substring(0, 80), 'nexos-chat-' + de, 'chat');
+}
 
 // ════════════════════════════════════════════════════════════════════════════
-//  ESCUCHA DE CHAT EN BACKGROUND (Firebase Realtime DB)
-//  Listeners activos mientras la pestaña está abierta — FCM cubre el resto
+//  EXTENSIONES DEL SCRIPT PRINCIPAL
+//  Estas funciones extienden las del primer bloque de script SIN reemplazarlas.
+//  Se registran en los eventos correctos usando addEventListener para no pisar
+//  los listeners existentes.
 // ════════════════════════════════════════════════════════════════════════════
-let _chatBgInterval = null;
+
+// ── 1. Pánico: hook al evento que dispara mostrarPanico ──────────────────
+//    El script principal llama mostrarPanico(alertas) al detectar pánico nuevo.
+//    Lo extendemos sobreescribiendo la función global DESPUÉS de que esté definida.
+(function _hookPanico() {
+  const orig = window.mostrarPanico;
+  if (typeof orig !== 'function') { setTimeout(_hookPanico, 200); return; }
+  window.mostrarPanico = function(alertas) {
+    orig.call(this, alertas);
+    alertas.forEach(a => pushNotifPanico(a));
+  };
+})();
+
+// ── 2. Incidentes: extender _incNotificarNuevo para disparar FCM ─────────
+//    La función original ya llama pushNotifLocal para foreground.
+//    La extendemos para agregar _pushEncolarTrigger (dispositivos cerrados).
+(function _hookIncidentes() {
+  const orig = window._incNotificarNuevo;
+  if (typeof orig !== 'function') { setTimeout(_hookIncidentes, 200); return; }
+  window._incNotificarNuevo = function(lista) {
+    orig.call(this, lista); // <— la original maneja foreground y su propio estado
+    // Solo agregar la cola FCM para dispositivos cerrados
+    const yo = sessionStorage.getItem('nx_vigilador') || '';
+    lista.filter(i => i.tipo === 'grave' && i.vig !== yo).forEach(i => {
+      _pushEncolarTrigger('incidente', '🔴 INCIDENTE GRAVE — NEXOS',
+        `${i.vig ? i.vig + ': ' : ''}${(i.desc || '').substring(0, 80)}`, { vig: i.vig });
+    });
+  };
+})();
+
+// ════════════════════════════════════════════════════════════════════════════
+//  CHAT BACKGROUND — escucha mensajes cuando el chat está cerrado
+//  Se activa mientras la pestaña está abierta; FCM cubre cuando está cerrada.
+// ════════════════════════════════════════════════════════════════════════════
+// _fbBgListeners ya declarado en el bloque de chat (línea ~2680)
 
 function _fbBgSuscribirVig(yo, otroNombre) {
   const clave   = chatClave(yo, otroNombre);
   const fbClave = chatClaveFirebase(yo, otroNombre);
   if (_fbBgListeners[clave]) return;
-  const ref = _fbDB.ref('chat/' + fbClave);
-  const leidoMap    = JSON.parse(lsGet('nx_chat_leido', '{}'));
+
+  const leidoMap    = JSON.parse(localStorage.getItem('nx_chat_leido') || '{}');
   const ultimoLeido = leidoMap[clave] || Date.now();
+
+  const ref     = _fbDB.ref('chat/' + fbClave);
   const handler = ref.orderByChild('ts').startAt(ultimoLeido + 1).on('child_added', snap => {
     const m = snap.val();
     if (!m || m.de === yo) return;
-    const chatAbierto = document.getElementById('chat-overlay').classList.contains('visible') && _chatConVig === otroNombre;
+
+    // Si el chat con esa persona está abierto, no notificar (el listener activo lo muestra)
+    const chatAbierto = document.getElementById('chat-overlay')?.classList.contains('visible')
+                        && typeof _chatConVig !== 'undefined' && _chatConVig === otroNombre;
     if (chatAbierto) return;
+
+    // Guardar en cache local
     const msgs = JSON.parse(localStorage.getItem('nx_chat_' + clave) || '[]');
     msgs.push(m);
     localStorage.setItem('nx_chat_' + clave, JSON.stringify(msgs));
+
+    // Sonido
     initAudio();
-    if (audioCtx) {
-      const now = audioCtx.currentTime;
-      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-      o.connect(g); g.connect(audioCtx.destination);
-      o.type = 'sine'; o.frequency.value = 880;
-      g.gain.setValueAtTime(0, now);
-      g.gain.linearRampToValueAtTime(0.15, now + 0.01);
-      g.gain.setValueAtTime(0.15, now + 0.1);
-      g.gain.linearRampToValueAtTime(0, now + 0.18);
-      o.start(now); o.stop(now + 0.2);
-    }
+    if (typeof chatSonidoRecibido === 'function') chatSonidoRecibido();
+
+    // Notif local
     pushNotifNuevoMensaje(m.de, m.texto || '📷 imagen');
-    renderVigsOnline();
+
+    // Actualizar badge de vigs online
+    if (typeof renderVigsOnline === 'function') renderVigsOnline();
   });
+
   _fbBgListeners[clave] = () => ref.off('child_added', handler);
 }
 
@@ -3353,92 +3307,32 @@ function _fbBgDesuscribirTodos() {
 function iniciarChatBgFirebase() {
   const yo = sessionStorage.getItem('nx_vigilador') || '';
   if (!yo) return;
-  const clavesOnline = new Set((_vigsOnline || []).filter(v => v.nombre !== yo).map(v => chatClave(yo, v.nombre)));
+  const activos = new Set((_vigsOnline || []).filter(v => v.nombre !== yo).map(v => chatClave(yo, v.nombre)));
+  // Desuscribir conversaciones que ya no están online
   Object.keys(_fbBgListeners).forEach(clave => {
-    if (!clavesOnline.has(clave)) { _fbBgListeners[clave](); delete _fbBgListeners[clave]; }
+    if (!activos.has(clave)) { _fbBgListeners[clave](); delete _fbBgListeners[clave]; }
   });
+  // Suscribir nuevas
   (_vigsOnline || []).forEach(v => { if (v.nombre !== yo) _fbBgSuscribirVig(yo, v.nombre); });
 }
 
+// Alias de compatibilidad
 function iniciarChatBgPoll() { iniciarChatBgFirebase(); }
 async function chatBgPoll()  { iniciarChatBgFirebase(); }
 
+// Arrancar cuando el usuario inicia sesión
 document.addEventListener('nx-session-start', () => {
-  iniciarChatBgPoll();
-  incIniciarFirebase();
+  iniciarChatBgFirebase();
+  if (typeof incIniciarFirebase === 'function') incIniciarFirebase();
 });
+
+// Si ya estaba logueado (recarga), arrancar después de que el DOM termine
 if (sessionStorage.getItem('nx_auth') === '1') {
-  setTimeout(() => { iniciarChatBgPoll(); incIniciarFirebase(); }, 3000);
+  setTimeout(() => {
+    iniciarChatBgFirebase();
+    if (typeof incIniciarFirebase === 'function') incIniciarFirebase();
+  }, 2000);
 }
-
-// ════════════════════════════════════════════════════════════════════════════
-//  PARCHE — _incNotificarNuevo ahora usa pushNotifIncidente (con cola FCM)
-// ════════════════════════════════════════════════════════════════════════════
-// Sobreescribir la función definida más arriba para usar el nuevo hook
-(function() {
-  let _incUltimoTsLocal = 0;
-  const origFn = window._incNotificarNuevo || function(){};
-  window._incNotificarNuevo = function(lista) {
-    const yo = sessionStorage.getItem('nx_vigilador') || '';
-    const nuevos = lista.filter(i => i.ts > _incUltimoTsLocal && i.vig !== yo && i.tipo === 'grave');
-    if (_incUltimoTsLocal > 0 && nuevos.length) {
-      nuevos.forEach(i => pushNotifIncidente(i.vig, i.desc));
-    }
-    if (lista.length) _incUltimoTsLocal = Math.max(...lista.map(i => i.ts));
-  };
-  // Si ya existe la función global, reemplazarla
-  if (typeof _incNotificarNuevo === 'function') {
-    window._incNotificarNuevo = window._incNotificarNuevo;
-  }
-})();
-
-/*
- * ══════════════════════════════════════════════════════════════════
- *  🔐 REGLAS FIREBASE RTDB — copiar en Firebase Console → Reglas
- * ══════════════════════════════════════════════════════════════════
- *  {
- *    "rules": {
- *      "incidentes":  { ".read": true, ".write": true },
- *      "chat":        { ".read": true, ".write": true },
- *      "fcm_tokens":  { ".read": true, ".write": true },
- *      "presencia":   { ".read": true, ".write": true },
- *      "push_queue":  { ".read": true, ".write": true }
- *    }
- *  }
- *
- * ══════════════════════════════════════════════════════════════════
- *  📤 GAS — Agregar en doPost() para procesar push_queue:
- *
- *  case 'push_enviar': {
- *    // Leer todos los tokens de Firebase RTDB
- *    const rtdbUrl = 'https://nexos-panel-default-rtdb.firebaseio.com/fcm_tokens.json';
- *    const tokensResp = UrlFetchApp.fetch(rtdbUrl);
- *    const tokensData = JSON.parse(tokensResp.getContentText());
- *    const tokens = Object.values(tokensData || {}).map(t => t.token).filter(Boolean);
- *    // Enviar FCM HTTP v1 API a cada token
- *    const yo = params.vig || '';
- *    const accessToken = ScriptApp.getOAuthToken();
- *    tokens.forEach(token => {
- *      UrlFetchApp.fetch(
- *        'https://fcm.googleapis.com/v1/projects/nexos-panel/messages:send',
- *        {
- *          method: 'POST',
- *          headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
- *          payload: JSON.stringify({
- *            message: {
- *              token,
- *              notification: { title: params.titulo, body: params.cuerpo },
- *              data: { tipo: params.tipo }
- *            }
- *          }),
- *          muteHttpExceptions: true
- *        }
- *      );
- *    });
- *    break;
- *  }
- * ══════════════════════════════════════════════════════════════════
- */
 </script>
 </body>
 </html>
