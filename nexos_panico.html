@@ -21,8 +21,8 @@
       padding:24px;padding-top:calc(24px + env(safe-area-inset-top));
       user-select:none;
     }
-    .pantalla{width:100%;max-width:380px;text-align:center;display:none;}
-    .pantalla.visible{display:block;}
+    .pantalla{width:100%;max-width:380px;text-align:center;display:none;flex-direction:column;align-items:center;}
+    .pantalla.visible{display:flex;}
     .logo{font-size:13px;letter-spacing:4px;color:#555;margin-bottom:40px;}
     .setup-title{font-size:18px;font-weight:900;color:#fff;margin-bottom:24px;}
     .setup-subtitle{font-size:13px;color:#888;letter-spacing:1px;margin-bottom:20px;}
@@ -154,7 +154,7 @@
     .access-btn:active{transform:scale(0.97);background:#96281b;}
     .access-error{color:#e74c3c;font-size:13px;font-weight:700;min-height:18px;text-align:center;}
 
-    .nexos-logo-top{width:100%;max-width:310px;margin-bottom:8px;}
+    .nexos-logo-top{width:100%;max-width:310px;margin-bottom:8px;margin-left:auto;margin-right:auto;display:block;}
     .nexos-logo-top img{width:100%;height:auto;border-radius:14px;box-shadow:0 0 0 2px rgba(0,140,255,0.8),0 0 16px rgba(0,160,255,0.8),0 0 36px rgba(0,130,255,0.5),0 0 70px rgba(0,100,255,0.25);animation:bluePulse 3s ease-in-out infinite;}
     @keyframes bluePulse{0%,100%{box-shadow:0 0 0 2px rgba(0,140,255,0.8),0 0 14px rgba(0,160,255,0.7),0 0 32px rgba(0,130,255,0.4),0 0 60px rgba(0,100,255,0.2);}50%{box-shadow:0 0 0 3px rgba(30,180,255,1),0 0 26px rgba(0,200,255,1),0 0 56px rgba(0,160,255,0.7),0 0 100px rgba(0,130,255,0.4);}}
 
@@ -184,6 +184,11 @@
     .tipo-confirmar.visible{display:block;animation:fadeIn 0.2s ease;}
     .tipo-confirmar:active{transform:scale(0.97);background:#96281b;}
     .tipo-cancelar{text-align:center;color:#555;font-size:13px;cursor:pointer;margin-top:14px;padding:8px;}
+    .ig-link{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:#aaa;font-size:11px;font-weight:700;letter-spacing:0.5px;padding:6px 14px;border-radius:20px;border:1px solid transparent;background-image:linear-gradient(#0f0f11,#0f0f11),linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);background-origin:border-box;background-clip:padding-box,border-box;box-shadow:0 0 8px rgba(220,39,67,0.25),0 0 16px rgba(188,24,136,0.15);transition:all 0.25s ease;margin-top:14px;}
+    .ig-link:active{transform:scale(0.96);}
+    .ig-link:hover{color:#fff;box-shadow:0 0 12px rgba(220,39,67,0.5),0 0 24px rgba(188,24,136,0.3);}
+    .ig-link svg{flex-shrink:0;opacity:0.75;}
+    .ig-link:hover svg{opacity:1;}
   </style>
 </head>
 <body>
@@ -273,6 +278,10 @@
     Podés volver a enviar en <span id="cooldown-restante">15:00</span>
   </div>
   <button class="btn-cfg-main" onclick="pedirPinParaCambiar()">📍 Cambiar ubicación</button>
+  <a class="ig-link" href="https://www.instagram.com/nexosmaps?igsh=MThvc241Y2JhNmhvcQ%3D%3D&utm_source=qr" target="_blank" rel="noopener">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+    @nexosmaps
+  </a>
 </div>
 
 <!-- CONFIRMACIÓN -->
