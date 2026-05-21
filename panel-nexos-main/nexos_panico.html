@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>NEXOS — EMERGENCIA</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f0f11">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="NEXOS">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    body{
+      background:#0f0f11;color:white;
+      font-family:-apple-system,system-ui,sans-serif;
+      min-height:100dvh;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      padding:24px;padding-top:calc(24px + env(safe-area-inset-top));
+      user-select:none;
+    }
+    .pantalla{width:100%;max-width:380px;text-align:center;display:none;flex-direction:column;align-items:center;}
+    .pantalla.visible{display:flex;}
+    .logo{font-size:13px;letter-spacing:4px;color:#555;margin-bottom:40px;}
+    .setup-title{font-size:18px;font-weight:900;color:#fff;margin-bottom:24px;}
+    .setup-subtitle{font-size:13px;color:#888;letter-spacing:1px;margin-bottom:20px;}
+    .form-box{background:#1a1a1e;border:1px solid #2e2e38;border-radius:24px;padding:28px 24px;margin-bottom:24px;}
+    .campo{width:100%;background:#24242a;border:2px solid #2e2e38;border-radius:14px;padding:20px;color:white;font-size:28px;font-weight:700;text-align:center;outline:none;margin-bottom:12px;-moz-appearance:textfield;}
+    .campo::-webkit-inner-spin-button,.campo::-webkit-outer-spin-button{-webkit-appearance:none;}
+    .campo::placeholder{color:#444;font-size:18px;font-weight:400;}
+    .campo:focus{border-color:#e74c3c;}
+
+    .pantalla-panico{width:100%;max-width:380px;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
+    .pantalla-panico.visible{display:flex;}
+    .info-config{text-align:center;color:#888;font-size:13px;margin-bottom:10px;}
+    .info-config strong{color:#00d4d4;font-weight:800;}
+
+    .boton-redondo-container{width:280px;height:280px;display:flex;align-items:center;justify-content:center;margin:20px 0;position:relative;border-radius:50%;box-shadow:0 0 18px rgba(255,30,30,0.7),0 0 40px rgba(255,30,30,0.4);animation:neonRedPulse 2s ease-in-out infinite;}
+    .cooldown-ring{position:absolute;top:0;left:0;width:100%;height:100%;transform:rotate(-90deg);pointer-events:none;}
+    .cooldown-ring circle{fill:none;stroke:#e74c3c;stroke-width:6;stroke-linecap:round;stroke-dasharray:791;stroke-dashoffset:791;transition:stroke-dashoffset 1s linear;opacity:0.6;}
+
+    .ripple-wave{position:absolute;border-radius:50%;transform:scale(0);background:radial-gradient(circle,rgba(255,80,80,0.55) 0%,rgba(255,30,30,0.25) 50%,transparent 100%);pointer-events:none;animation:rippleExpand 0.9s cubic-bezier(0.22,0.61,0.36,1) forwards;}
+    @keyframes rippleExpand{0%{transform:scale(0);opacity:1;}60%{transform:scale(2.8);opacity:0.6;}100%{transform:scale(4.2);opacity:0;}}
+    .ripple-wave-2{position:absolute;border-radius:50%;transform:scale(0);background:radial-gradient(circle,rgba(255,120,120,0.35) 0%,rgba(255,50,50,0.15) 50%,transparent 100%);pointer-events:none;animation:rippleExpand2 1.1s cubic-bezier(0.22,0.61,0.36,1) 0.15s forwards;}
+    @keyframes rippleExpand2{0%{transform:scale(0);opacity:0.8;}60%{transform:scale(2.2);opacity:0.45;}100%{transform:scale(3.8);opacity:0;}}
+    .ripple-wave-3{position:absolute;border-radius:50%;transform:scale(0);background:radial-gradient(circle,rgba(255,160,160,0.2) 0%,transparent 70%);pointer-events:none;animation:rippleExpand3 1.4s cubic-bezier(0.22,0.61,0.36,1) 0.3s forwards;}
+    @keyframes rippleExpand3{0%{transform:scale(0);opacity:0.6;}60%{transform:scale(1.8);opacity:0.3;}100%{transform:scale(3.2);opacity:0;}}
+    .ripple-flash{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.35) 0%,rgba(255,80,80,0.5) 40%,transparent 75%);pointer-events:none;transform:scale(0);animation:rippleFlash 0.35s ease-out forwards;}
+    @keyframes rippleFlash{0%{transform:scale(0);opacity:1;}50%{transform:scale(1.1);opacity:0.8;}100%{transform:scale(1.6);opacity:0;}}
+
+    .boton-redondo{width:260px;height:260px;border-radius:50%;background:#cc0000;border:3px solid #ff2020;color:white;cursor:pointer;transition:background 0.3s ease,border-color 0.3s ease;box-shadow:0 0 18px rgba(255,30,30,0.7),0 0 40px rgba(255,30,30,0.4);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;position:relative;overflow:hidden;animation:neonRedPulse 2s ease-in-out infinite;}
+    .boton-redondo.cooldown-mode{background:#000 !important;border-color:#550000 !important;animation:none !important;box-shadow:inset 0 0 20px rgba(0,0,0,0.8) !important;}
+    @keyframes neonRedPulse{0%,100%{box-shadow:0 0 18px rgba(255,30,30,0.7),0 0 40px rgba(255,30,30,0.4);}50%{box-shadow:0 0 28px rgba(255,30,30,1),0 0 60px rgba(255,30,30,0.6);}}
+    .boton-redondo::before{content:none;}
+    .boton-redondo::after{content:none;}
+    .liquid-fill{position:absolute;left:-10%;right:-10%;bottom:0;height:0%;pointer-events:none;background:#cc0000;transition:height 1s linear;z-index:0;}
+    .liquid-fill::before{content:'';position:absolute;top:-20px;left:0;right:0;height:40px;background:inherit;border-radius:50%;animation:wave 1.8s ease-in-out infinite;}
+    @keyframes wave{0%,100%{transform:scaleY(1) translateX(0);}50%{transform:scaleY(1.6) translateX(5%);}}
+    .boton-redondo .boton-emoji,.boton-redondo .boton-texto,.boton-redondo .boton-cooldown-txt,.lp-ring-svg{position:relative;z-index:1;}
+
+    .boton-redondo:active:not(:disabled){transform:scale(0.95);}
+    .boton-redondo:disabled:not(.cooldown-mode){cursor:not-allowed;}
+    .boton-emoji{font-size:52px;line-height:1;}
+    .boton-texto{font-size:17px;font-weight:800;letter-spacing:1px;text-align:center;line-height:1.2;}
+    .boton-cooldown-txt{font-size:12px;color:#aaa;font-weight:600;letter-spacing:0.5px;display:none;}
+
+    .aviso-cooldown{display:none;background:#1e1a10;border:1px solid #f39c12;border-radius:16px;padding:14px 20px;text-align:center;color:#f39c12;font-size:13px;font-weight:700;width:100%;max-width:340px;}
+    .aviso-cooldown.visible{display:block;}
+    .aviso-cooldown span{font-size:16px;font-weight:900;color:#fff;}
+
+    .pantalla-baneado{width:100%;max-width:380px;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;}
+    .pantalla-baneado.visible{display:flex;}
+    .ban-icono{font-size:80px;margin-bottom:8px;}
+    .ban-titulo{font-size:26px;font-weight:900;color:#e74c3c;letter-spacing:1px;}
+    .ban-subtitulo{font-size:15px;color:#888;line-height:1.5;max-width:320px;}
+    .ban-box{background:#1a0a0a;border:2px solid #c0392b;border-radius:20px;padding:24px 20px;width:100%;max-width:340px;}
+    .ban-box-titulo{font-size:13px;letter-spacing:2px;color:#c0392b;font-weight:800;margin-bottom:10px;text-transform:uppercase;}
+    .ban-box-texto{font-size:14px;color:#aaa;line-height:1.6;}
+    .ban-contacto{font-size:13px;color:#666;margin-top:8px;}
+    .ban-contacto strong{color:#00d4d4;}
+
+    .device-id-badge{font-size:10px;color:#333;letter-spacing:1px;margin-top:4px;font-family:monospace;}
+
+    .btn-cfg-main{background:#1a1a1e;color:#00d4d4;border:1px solid #00d4d4;border-radius:50px;padding:14px 40px;font-size:14px;font-weight:800;cursor:pointer;transition:0.2s;}
+    .btn-cfg-main:active{transform:scale(0.98);background:#00d4d4;color:#0f0f11;}
+    .btn-setup{width:100%;background:#c0392b;color:white;border:none;border-radius:20px;padding:26px;font-size:22px;font-weight:900;letter-spacing:1px;cursor:pointer;transition:0.15s;}
+    .btn-setup:active{transform:scale(0.97);background:#96281b;}
+
+    .enviado{display:none;flex-direction:column;align-items:center;text-align:center;width:100%;max-width:380px;animation:fadeIn 0.4s ease;}
+    .enviado.visible{display:flex;}
+    @keyframes fadeIn{from{opacity:0;transform:scale(0.9)}to{opacity:1;transform:scale(1)}}
+    @keyframes checkBounce{
+      0%  {transform:scale(0);   opacity:0;}
+      40% {transform:scale(1.45);opacity:1; filter:drop-shadow(0 0 18px #2ecc71) drop-shadow(0 0 36px #2ecc71);}
+      60% {transform:scale(0.85);}
+      78% {transform:scale(1.18);}
+      90% {transform:scale(0.95);}
+      100%{transform:scale(1);   opacity:1; filter:drop-shadow(0 0 6px #2ecc71);}
+    }
+    .enviado-icono{font-size:90px;margin-bottom:24px;}
+    .enviado-titulo{font-size:28px;font-weight:900;color:#2ecc71;margin-bottom:10px;}
+    .enviado-sub{font-size:16px;color:#888;margin-bottom:40px;line-height:1.5;}
+    .btn-volver{background:#1a1a1e;color:#00d4d4;border:1px solid #00d4d4;border-radius:50px;padding:14px 40px;font-size:16px;font-weight:800;cursor:pointer;transition:0.2s;}
+    .btn-volver:active{transform:scale(0.98);background:#00d4d4;color:#0f0f11;}
+
+    .error-msg{color:#e74c3c;font-size:13px;margin-top:10px;min-height:18px;font-weight:600;}
+
+    .cfg-panel{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:200;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+    .cfg-panel.visible{display:flex;}
+    .cfg-content{width:100%;max-width:400px;text-align:center;}
+    .cfg-title{font-size:18px;font-weight:900;margin-bottom:6px;color:#fff;}
+    .cfg-sub{font-size:13px;color:#888;margin-bottom:24px;}
+    .cfg-campo{width:100%;background:#24242a;border:2px solid #2e2e38;border-radius:14px;padding:18px;color:white;font-size:26px;font-weight:700;text-align:center;outline:none;margin-bottom:12px;-moz-appearance:textfield;}
+    .cfg-campo::-webkit-inner-spin-button,.cfg-campo::-webkit-outer-spin-button{-webkit-appearance:none;}
+    .cfg-campo:focus{border-color:#e74c3c;}
+    .cfg-btn{width:100%;background:#c0392b;color:white;border:none;border-radius:14px;padding:18px;font-weight:800;font-size:16px;cursor:pointer;margin-bottom:10px;transition:0.2s;}
+    .cfg-btn:active{transform:scale(0.98);background:#96281b;}
+    .cfg-cerrar{color:#888;font-size:13px;cursor:pointer;margin-top:6px;}
+
+    .pin-panel{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:300;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+    .pin-panel.visible{display:flex;}
+    .pin-content{width:100%;max-width:340px;text-align:center;}
+    .pin-title{font-size:20px;font-weight:900;color:#fff;margin-bottom:8px;}
+    .pin-sub{font-size:13px;color:#888;margin-bottom:24px;line-height:1.5;}
+    .pin-campo{width:100%;background:#24242a;border:2px solid #2e2e38;border-radius:14px;padding:20px;color:white;font-size:36px;font-weight:900;text-align:center;outline:none;margin-bottom:12px;letter-spacing:8px;-moz-appearance:textfield;}
+    .pin-campo::-webkit-inner-spin-button,.pin-campo::-webkit-outer-spin-button{-webkit-appearance:none;}
+    .pin-campo:focus{border-color:#e74c3c;}
+    .pin-intentos{font-size:12px;color:#e74c3c;margin-top:4px;min-height:16px;font-weight:700;margin-bottom:12px;}
+    .pin-btn{width:100%;background:#c0392b;color:white;border:none;border-radius:14px;padding:18px;font-weight:800;font-size:16px;cursor:pointer;margin-bottom:10px;transition:0.2s;}
+    .pin-btn:active{transform:scale(0.98);background:#96281b;}
+    .pin-cerrar{color:#555;font-size:13px;cursor:pointer;margin-top:6px;}
+
+    .offline-badge{position:fixed;top:16px;right:16px;background:#e74c3c;color:white;font-size:11px;font-weight:800;padding:6px 12px;border-radius:20px;display:none;z-index:300;letter-spacing:1px;}
+    .offline-badge.visible{display:block;}
+
+    .access-panel{display:none;position:fixed;inset:0;background:#0f0f11;z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:0;}
+    .access-panel.visible{display:flex;}
+    .access-logo-wrap{margin-bottom:32px;display:flex;align-items:center;justify-content:center;}
+    .access-logo-img{width:280px;max-width:88vw;height:auto;border-radius:18px;box-shadow:0 0 0 2.5px rgba(255,30,30,0.9),0 0 18px rgba(255,30,30,0.95),0 0 40px rgba(255,30,30,0.6),0 0 80px rgba(255,30,30,0.3);animation:accessRedPulse 2.2s ease-in-out infinite;}
+    @keyframes accessRedPulse{0%,100%{box-shadow:0 0 0 2px rgba(255,30,30,0.9),0 0 16px rgba(255,30,30,0.9),0 0 38px rgba(255,30,30,0.5),0 0 70px rgba(255,30,30,0.25);}50%{box-shadow:0 0 0 3px rgba(255,30,30,1),0 0 28px rgba(255,30,30,1),0 0 64px rgba(255,30,30,0.8),0 0 110px rgba(255,30,30,0.45);}}
+    .access-label{font-size:12px;letter-spacing:4px;color:#555;text-transform:uppercase;margin-bottom:6px;}
+    .access-subtitle{font-size:19px;font-weight:900;color:#fff;margin-bottom:24px;letter-spacing:0.5px;}
+    .access-input-wrap{background:#1a1a1e;border:1px solid #2e2e38;border-radius:20px;padding:26px 22px 22px;width:100%;max-width:310px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+    .access-dots{display:flex;gap:14px;justify-content:center;}
+    .access-dot{width:14px;height:14px;border-radius:50%;border:2px solid #444;transition:all 0.15s ease;}
+    .access-dot.filled{background:#e74c3c;border-color:#e74c3c;box-shadow:0 0 10px rgba(231,76,60,0.8);}
+    .access-campo{width:100%;background:#24242a;border:2px solid #2e2e38;border-radius:14px;padding:20px;color:white;font-size:40px;font-weight:900;text-align:center;outline:none;letter-spacing:12px;-moz-appearance:textfield;transition:border-color 0.2s;}
+    .access-campo::-webkit-inner-spin-button,.access-campo::-webkit-outer-spin-button{-webkit-appearance:none;}
+    .access-campo::placeholder{color:#333;font-size:22px;letter-spacing:8px;font-weight:400;}
+    .access-campo:focus{border-color:#e74c3c;}
+    .access-btn{width:100%;background:#c0392b;color:white;border:none;border-radius:14px;padding:20px;font-size:17px;font-weight:900;letter-spacing:1px;cursor:pointer;transition:0.15s;box-shadow:0 4px 20px rgba(192,57,43,0.4);}
+    .access-btn:active{transform:scale(0.97);background:#96281b;}
+    .access-error{color:#e74c3c;font-size:13px;font-weight:700;min-height:18px;text-align:center;}
+
+    .nexos-logo-top{width:100%;max-width:310px;margin-bottom:8px;margin-left:auto;margin-right:auto;display:block;}
+    .nexos-logo-top img{width:100%;height:auto;border-radius:14px;box-shadow:0 0 0 2px rgba(0,140,255,0.8),0 0 16px rgba(0,160,255,0.8),0 0 36px rgba(0,130,255,0.5),0 0 70px rgba(0,100,255,0.25);animation:bluePulse 3s ease-in-out infinite;}
+    @keyframes bluePulse{0%,100%{box-shadow:0 0 0 2px rgba(0,140,255,0.8),0 0 14px rgba(0,160,255,0.7),0 0 32px rgba(0,130,255,0.4),0 0 60px rgba(0,100,255,0.2);}50%{box-shadow:0 0 0 3px rgba(30,180,255,1),0 0 26px rgba(0,200,255,1),0 0 56px rgba(0,160,255,0.7),0 0 100px rgba(0,130,255,0.4);}}
+
+    /* ── LONG PRESS RING ────────────────────────────────── */
+    .lp-ring-svg{position:absolute;top:0;left:0;width:100%;height:100%;transform:rotate(-90deg);pointer-events:none;z-index:10;}
+    .lp-ring-track{fill:none;stroke:rgba(255,255,255,0.08);stroke-width:8;}
+    .lp-ring-fill{fill:none;stroke:#fff;stroke-width:8;stroke-linecap:round;stroke-dasharray:816;stroke-dashoffset:816;transition:stroke-dashoffset 0.05s linear;opacity:0.9;}
+    .lp-hint{font-size:11px;color:#666;letter-spacing:0.5px;margin-top:-8px;margin-bottom:4px;transition:color 0.3s;}
+    .lp-hint.pressing{color:#ff6060;animation:hintPulse 0.6s ease-in-out infinite;}
+    @keyframes hintPulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+
+    /* ── MODAL TIPO EMERGENCIA ──────────────────────────── */
+    .tipo-panel{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:400;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:env(safe-area-inset-bottom,0px);}
+    .tipo-panel.visible{display:flex;animation:slideUp 0.32s cubic-bezier(0.22,0.61,0.36,1) forwards;}
+    @keyframes slideUp{from{opacity:0;transform:translateY(60px);}to{opacity:1;transform:translateY(0);}}
+    .tipo-sheet{width:100%;max-width:420px;background:#18181c;border-radius:28px 28px 0 0;padding:24px 20px 32px;border-top:1px solid #2e2e38;}
+    .tipo-handle{width:40px;height:4px;background:#333;border-radius:4px;margin:0 auto 20px;}
+    .tipo-titulo{font-size:13px;letter-spacing:3px;color:#888;text-align:center;margin-bottom:20px;text-transform:uppercase;font-weight:700;}
+    .tipo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+    .tipo-btn{background:#1e1e24;border:2px solid #2e2e38;border-radius:20px;padding:20px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:all 0.18s ease;-webkit-tap-highlight-color:transparent;}
+    .tipo-btn:active{transform:scale(0.95);}
+    .tipo-btn.sel{border-color:var(--tc);background:rgba(var(--tcr),0.12);box-shadow:0 0 18px rgba(var(--tcr),0.3);}
+    .tipo-btn-emoji{font-size:36px;line-height:1;}
+    .tipo-btn-label{font-size:13px;font-weight:800;letter-spacing:0.5px;color:#ccc;}
+    .tipo-btn.sel .tipo-btn-label{color:#fff;}
+    .tipo-confirmar{width:100%;background:#c0392b;color:white;border:none;border-radius:16px;padding:20px;font-size:17px;font-weight:900;letter-spacing:1px;cursor:pointer;transition:0.15s;box-shadow:0 4px 20px rgba(192,57,43,0.4);display:none;}
+    .tipo-confirmar.visible{display:block;animation:fadeIn 0.2s ease;}
+    .tipo-confirmar:active{transform:scale(0.97);background:#96281b;}
+    .tipo-cancelar{text-align:center;color:#555;font-size:13px;cursor:pointer;margin-top:14px;padding:8px;}
+    .ig-link{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:#aaa;font-size:11px;font-weight:700;letter-spacing:0.5px;padding:6px 14px;border-radius:20px;border:1px solid transparent;background-image:linear-gradient(#0f0f11,#0f0f11),linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);background-origin:border-box;background-clip:padding-box,border-box;box-shadow:0 0 8px rgba(220,39,67,0.25),0 0 16px rgba(188,24,136,0.15);transition:all 0.25s ease;margin-top:14px;}
+    .ig-link:active{transform:scale(0.96);}
+    .ig-link:hover{color:#fff;box-shadow:0 0 12px rgba(220,39,67,0.5),0 0 24px rgba(188,24,136,0.3);}
+    .ig-link svg{flex-shrink:0;opacity:0.75;}
+    .ig-link:hover svg{opacity:1;}
+
+    /* ── CLIMA WIDGET ── */
+    .clima-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:5px 12px;cursor:pointer;transition:all 0.2s ease;-webkit-tap-highlight-color:transparent;margin-bottom:6px;}
+    .clima-chip:active{transform:scale(0.95);background:rgba(255,255,255,0.08);}
+    .clima-chip-icon{font-size:15px;line-height:1;}
+    .clima-chip-icon.doble{display:inline-flex;flex-direction:column;align-items:center;font-size:9px;line-height:1.2;gap:0;}
+    .clima-chip-temp{font-size:12px;font-weight:800;color:#ccc;font-family:monospace;letter-spacing:0.5px;}
+    .clima-chip-hora{font-size:12px;font-weight:700;color:#aaa;font-family:monospace;letter-spacing:0.5px;border-left:1px solid rgba(255,255,255,0.15);padding-left:7px;margin-left:2px;}
+
+    /* ── MODAL PRONÓSTICO ── */
+    .clima-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:8000;align-items:flex-end;justify-content:center;padding:0;}
+    .clima-overlay.visible{display:flex;animation:fadeIn 0.2s ease;}
+    .clima-sheet{width:100%;max-width:420px;background:#18181c;border-radius:26px 26px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(74,144,226,0.3);box-shadow:0 -8px 40px rgba(0,0,0,0.8);}
+    .clima-handle{width:36px;height:4px;background:#333;border-radius:4px;margin:0 auto 18px;}
+    .clima-current{display:flex;align-items:center;justify-content:center;gap:14px;padding:10px 0 18px;border-bottom:1px solid #2e2e38;}
+    .clima-current-icon{font-size:48px;line-height:1;}
+    .clima-current-temp{font-size:48px;font-weight:900;color:#4a90e2;font-family:monospace;text-shadow:0 0 16px rgba(74,144,226,0.5);}
+    .clima-current-info{display:flex;flex-direction:column;gap:4px;}
+    .clima-current-desc{font-size:13px;color:#aaa;font-weight:700;}
+    .clima-current-sensacion{font-size:12px;color:#666;}
+    .clima-dias{display:flex;flex-direction:column;gap:6px;padding-top:14px;}
+    .clima-dia-row{display:flex;align-items:center;justify-content:space-between;background:#24242a;border-radius:12px;padding:11px 14px;}
+    .clima-dia-nombre{font-size:13px;font-weight:800;color:#ddd;min-width:60px;}
+    .clima-dia-icon{font-size:20px;line-height:1;}
+    .clima-dia-temps{display:flex;gap:10px;align-items:center;}
+    .clima-dia-max{font-size:14px;font-weight:900;color:#4a90e2;}
+    .clima-dia-min{font-size:12px;font-weight:700;color:#555;}
+    .clima-dia-lluvia{font-size:11px;color:#4a90e2;font-weight:700;min-width:36px;text-align:right;}
+    .clima-loading{text-align:center;padding:28px 0;color:#555;font-size:13px;}
+    .clima-cerrar{text-align:center;color:#555;font-size:13px;cursor:pointer;margin-top:16px;padding:6px;}
+  </style>
+</head>
+<body>
+
+<div class="offline-badge" id="offline-badge">SIN CONEXIÓN</div>
+
+<!-- ACCESS PANEL -->
+<div class="access-panel" id="access-panel">
+  <div class="access-logo-wrap">
+    <img class="access-logo-img" id="access-logo-img" src="" alt="NEXOS">
+  </div>
+  <div class="access-label">NEXOS · VECINOS</div>
+  <div class="access-subtitle">Ingresá el código de acceso</div>
+  <div class="access-input-wrap">
+    <div class="access-dots">
+      <div class="access-dot" id="dot-0"></div>
+      <div class="access-dot" id="dot-1"></div>
+      <div class="access-dot" id="dot-2"></div>
+      <div class="access-dot" id="dot-3"></div>
+    </div>
+    <input class="access-campo" id="access-input" type="password" inputmode="numeric" maxlength="4" placeholder="····" autocomplete="off">
+    <div class="access-error" id="access-error"></div>
+    <button class="access-btn" onclick="verificarAcceso()">INGRESAR</button>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div class="pantalla" id="pantalla-setup">
+  <div class="nexos-logo-top" style="margin-bottom:16px;">
+    <img id="setup-logo-img" src="" alt="NEXOS">
+  </div>
+  <div class="logo">NEXOS · VECINOS</div>
+  <div class="form-box">
+    <div class="setup-title">⚙️ CONFIGURACIÓN</div>
+    <div class="setup-subtitle">Ingresá tu ubicación una sola vez</div>
+    <input class="campo" id="setup-mza"  type="number" placeholder="N° Manzana" inputmode="numeric">
+    <input class="campo" id="setup-casa" type="number" placeholder="N° Casa"    inputmode="numeric">
+    <div class="error-msg" id="setup-error"></div>
+  </div>
+  <button class="btn-setup" onclick="guardarSetup()">✅&nbsp;&nbsp;CONFIRMAR</button>
+</div>
+
+<!-- PANTALLA BANEADO -->
+<div class="pantalla-baneado" id="pantalla-baneado">
+  <div class="nexos-logo-top">
+    <img id="baneado-logo-img" src="" alt="NEXOS">
+  </div>
+  <div class="ban-icono">🚫</div>
+  <div class="ban-titulo">ACCESO BLOQUEADO</div>
+  <div class="ban-subtitulo">Tu acceso al botón de emergencia ha sido suspendido por la administración del barrio.</div>
+  <div class="ban-box">
+    <div class="ban-box-titulo">📋 MOTIVO DE LA SUSPENSIÓN</div>
+    <div class="ban-box-texto" id="ban-motivo-texto">Uso indebido del sistema de alertas de emergencia.</div>
+  </div>
+  <div class="ban-contacto">
+    Para apelar esta decisión comunicate con<br>
+    <strong>la administración del consorcio</strong>.
+  </div>
+  <div class="device-id-badge" id="ban-device-id"></div>
+</div>
+
+<!-- PÁNICO -->
+<div class="pantalla-panico" id="pantalla-panico">
+  <div class="nexos-logo-top">
+    <img id="panico-logo-img" src="" alt="NEXOS">
+  </div>
+  <div class="info-config">Configurado: <strong id="config-display"></strong></div>
+  <div class="clima-chip" id="clima-chip" onclick="abrirPronostico()">
+    <span class="clima-chip-icon" id="chip-icon">🌤️</span>
+    <span class="clima-chip-temp" id="chip-temp">--°</span>
+    <span class="clima-chip-hora" id="chip-hora">--:--</span>
+  </div>
+  <div class="boton-redondo-container">
+    <svg class="cooldown-ring" viewBox="0 0 280 280">
+      <circle cx="140" cy="140" r="126" id="cooldown-circle"/>
+    </svg>
+    <button class="boton-redondo" id="btn-panico-redondo">
+      <!-- Long press ring -->
+      <svg class="lp-ring-svg" viewBox="0 0 260 260">
+        <circle class="lp-ring-track" cx="130" cy="130" r="122"/>
+        <circle class="lp-ring-fill" cx="130" cy="130" r="122" id="lp-ring-fill"/>
+      </svg>
+      <div class="liquid-fill" id="liquid-fill"></div>
+      <span class="boton-emoji" id="btn-emoji">🆘</span>
+      <span class="boton-texto" id="btn-texto">EMERGENCIA</span>
+      <span class="boton-cooldown-txt" id="btn-cooldown-txt"></span>
+    </button>
+  </div>
+  <div class="lp-hint" id="lp-hint">Mantené presionado para activar</div>
+  <div class="aviso-cooldown" id="aviso-cooldown">
+    ✅ Alerta recibida por el vigilador.<br>
+    Podés volver a enviar en <span id="cooldown-restante">15:00</span>
+  </div>
+  <button class="btn-cfg-main" onclick="pedirPinParaCambiar()">📍 Cambiar ubicación</button>
+  <a class="ig-link" href="https://www.instagram.com/nexosmaps?igsh=MThvc241Y2JhNmhvcQ%3D%3D&utm_source=qr" target="_blank" rel="noopener">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+    @nexosmaps
+  </a>
+</div>
+
+<!-- CONFIRMACIÓN -->
+<div class="enviado" id="pantalla-enviado">
+  <div class="enviado-icono">✅</div>
+  <div class="enviado-titulo">¡ALERTA ENVIADA!</div>
+  <div class="enviado-sub">El vigilador fue notificado.<br>Quedate tranquilo, ya están al tanto.<br><span id="enviado-tipo" style="font-size:14px;color:#00d4d4;font-weight:800;letter-spacing:1px;"></span></div>
+  <button class="btn-volver" onclick="volverAlPanico()">Volver</button>
+</div>
+
+<!-- CAMBIAR UBICACIÓN -->
+<div class="cfg-panel" id="cfg-panel">
+  <div class="cfg-content">
+    <div class="cfg-title">📍 CAMBIAR UBICACIÓN</div>
+    <div class="cfg-sub">Ingresá los nuevos datos de tu casa</div>
+    <input class="cfg-campo" id="cfg-mza"  type="number" placeholder="N° Manzana" inputmode="numeric">
+    <input class="cfg-campo" id="cfg-casa" type="number" placeholder="N° Casa"    inputmode="numeric">
+    <div class="error-msg" id="cfg-error"></div>
+    <button class="cfg-btn" onclick="guardarCfg()">✅ GUARDAR</button>
+    <div class="cfg-cerrar" onclick="cerrarCfg()">Cancelar</div>
+  </div>
+</div>
+
+<!-- PIN PARA CAMBIAR UBICACIÓN -->
+<div class="pin-panel" id="pin-panel">
+  <div class="pin-content">
+    <div class="pin-title">🔑 PIN de administrador</div>
+    <div class="pin-sub">Para cambiar la ubicación necesitás el PIN.<br>Pedíselo a la administración del barrio.</div>
+    <input class="pin-campo" id="pin-input" type="password" inputmode="numeric" maxlength="6" placeholder="····">
+    <div class="pin-intentos" id="pin-intentos"></div>
+    <button class="pin-btn" onclick="verificarPin()">CONFIRMAR</button>
+    <div class="pin-cerrar" onclick="cerrarPin()">Cancelar</div>
+  </div>
+</div>
+
+<!-- MODAL PRONÓSTICO -->
+<div class="clima-overlay" id="clima-overlay" onclick="cerrarPronostico(event)">
+  <div class="clima-sheet">
+    <div class="clima-handle"></div>
+    <div id="clima-contenido"><div class="clima-loading">⏳ Cargando pronóstico...</div></div>
+    <div class="clima-cerrar" onclick="document.getElementById('clima-overlay').classList.remove('visible')">Cerrar</div>
+  </div>
+</div>
+
+<!-- MODAL TIPO EMERGENCIA -->
+<div class="tipo-panel" id="tipo-panel">
+  <div class="tipo-sheet">
+    <div class="tipo-handle"></div>
+    <div class="tipo-titulo">¿Qué tipo de emergencia?</div>
+    <div class="tipo-grid">
+      <button class="tipo-btn" id="tipo-robo"     style="--tc:#e74c3c;--tcr:231,76,60"   onclick="selTipo('robo')"    >
+        <span class="tipo-btn-emoji">🔒</span>
+        <span class="tipo-btn-label">ROBO / INTRUSO</span>
+      </button>
+      <button class="tipo-btn" id="tipo-medica"   style="--tc:#3498db;--tcr:52,152,219"  onclick="selTipo('medica')"  >
+        <span class="tipo-btn-emoji">🩺</span>
+        <span class="tipo-btn-label">MÉDICA</span>
+      </button>
+      <button class="tipo-btn" id="tipo-incendio" style="--tc:#e67e22;--tcr:230,126,34"  onclick="selTipo('incendio')">
+        <span class="tipo-btn-emoji">🔥</span>
+        <span class="tipo-btn-label">INCENDIO</span>
+      </button>
+      <button class="tipo-btn" id="tipo-otra"     style="--tc:#f39c12;--tcr:243,156,18"  onclick="selTipo('otra')"    >
+        <span class="tipo-btn-emoji">⚠️</span>
+        <span class="tipo-btn-label">OTRA</span>
+      </button>
+    </div>
+    <button class="tipo-confirmar" id="tipo-confirmar" onclick="confirmarTipo()">🆘&nbsp;&nbsp;ENVIAR ALERTA</button>
+    <div class="tipo-cancelar" onclick="cerrarTipo()">Cancelar</div>
+  </div>
+</div>
+
+<script>
+  // ══════════════════════════════════════════════════════
+  // DEVICE FINGERPRINT
+  // ══════════════════════════════════════════════════════
+  function djb2(str) {
+    let h = 5381;
+    for (let i = 0; i < str.length; i++) {
+      h = ((h << 5) + h) ^ str.charCodeAt(i);
+      h |= 0;
+    }
+    return (h >>> 0).toString(36);
+  }
+
+  function recopilarSenales() {
+    const nav = navigator;
+    const signals = [
+      nav.platform || '',
+      nav.language || '',
+      Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+      String(nav.hardwareConcurrency || 0),
+      String(screen.colorDepth || 0),
+      String(screen.width) + 'x' + String(screen.height),
+      String('ontouchstart' in window),
+      String(Math.round((window.devicePixelRatio || 1) * 10)),
+      (nav.userAgent || '').substring(0, 80),
+      String(nav.plugins ? nav.plugins.length : 0),
+    ];
+    return signals.join('|');
+  }
+
+  function canvasFingerprint() {
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 220; canvas.height = 30;
+      const ctx = canvas.getContext('2d');
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillStyle = '#f60'; ctx.fillRect(125, 1, 62, 20);
+      ctx.fillStyle = '#069'; ctx.font = '11pt no-such-font,Arial';
+      ctx.fillText('NEXOS 🆘 emergency', 2, 15);
+      ctx.fillStyle = 'rgba(102,204,0,0.7)';
+      ctx.font = '18pt Arial';
+      ctx.fillText('NEXOS', 4, 25);
+      return djb2(canvas.toDataURL().substring(22, 300));
+    } catch(e) {
+      return 'nc';
+    }
+  }
+
+  function obtenerDeviceId() {
+    const STORAGE_KEY = '_nx_did';
+    let stored = localStorage.getItem(STORAGE_KEY);
+    if (stored && /^nx-[a-z0-9]{6,12}$/.test(stored)) {
+      return stored;
+    }
+    const base      = recopilarSenales();
+    const canvas    = canvasFingerprint();
+    const combined  = djb2(base + canvas + djb2(base));
+    const deviceId  = 'nx-' + combined.substring(0, 9);
+    localStorage.setItem(STORAGE_KEY, deviceId);
+    return deviceId;
+  }
+
+  const DEVICE_ID = obtenerDeviceId();
+
+  // ══════════════════════════════════════════════════════
+  // LOGO
+  // ══════════════════════════════════════════════════════
+  const LOGO_SRC = 'data:image/jpeg;base64,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';
+
+  ['access-logo-img','panico-logo-img','baneado-logo-img','setup-logo-img'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.src = LOGO_SRC;
+  });
+
+  document.getElementById('ban-device-id').innerText = 'ID: ' + DEVICE_ID;
+
+  const COOLDOWN_MS = 15 * 60 * 1000;
+  let cooldownInterval = null;
+
+  // ══════════════════════════════════════════════════════
+  // HMAC KEY — XOR ofuscada (key 0x4E), misma técnica que PIN/acceso
+  // Cambiá _hk si querés otra clave para el barrio
+  // Para generar: cada char → charCode XOR 0x4E → hex de 2 dígitos
+  // Ej. en consola: 'miClave'.split('').map(c=>(c.charCodeAt(0)^0x4E).toString(16).padStart(2,'0')).join('')
+  // ══════════════════════════════════════════════════════
+  const _hk = '222f3a2b3f2b222f'; // → "lq|mlq|l" (ejemplo — cambialo)
+  const HMAC_KEY = _xd(_hk);
+
+  // ── HMAC-like: djb2 con clave ──────────────────────────
+  // No es criptografía real, pero dificulta requests forjados sin leer el código
+  function hashHMAC(mensaje) {
+    const data = HMAC_KEY + mensaje + HMAC_KEY; // envelope con clave
+    let h = 5381;
+    for (let i = 0; i < data.length; i++) {
+      h = ((h << 5) + h) ^ data.charCodeAt(i);
+      h |= 0;
+    }
+    return (h >>> 0).toString(16).padStart(8, '0');
+  }
+
+  function generarFirma(deviceId, ts, tipo) {
+    return hashHMAC(deviceId + '|' + ts + '|' + tipo);
+  }
+
+  // ── TRIPLE VERIFICACIÓN DE COOLDOWN ───────────────────
+  // Detecta si alguien manipuló localStorage borrando nx_last_panico
+  // sin borrar el hash de verificación nx_lp_v, o viceversa
+  function cooldownManipulado() {
+    const ts   = localStorage.getItem('nx_last_panico');
+    const hash = localStorage.getItem('nx_lp_v');
+    // Si existe uno pero no el otro → manipulación
+    if (!!ts !== !!hash) return true;
+    if (!ts)             return false; // ninguno existe → OK (nunca usó)
+    // Verificar que el hash sea consistente con deviceId + timestamp
+    if (hash !== hashHMAC(DEVICE_ID + '|' + ts)) return true;
+    return false;
+  }
+
+  function guardarTimestampCooldown(ts) {
+    const tsStr = String(ts);
+    localStorage.setItem('nx_last_panico', tsStr);
+    localStorage.setItem('nx_lp_v', hashHMAC(DEVICE_ID + '|' + tsStr));
+    try { sessionStorage.setItem('nx_lp_s', tsStr); } catch(e) {}
+  }
+
+  // ══════════════════════════════════════════════════════
+  // ENDPOINT OFUSCADO — fragmentado en base64
+  // ══════════════════════════════════════════════════════
+  const PANIC_URL = 'https://script.google.com/macros/s/AKfycby4yDWVe9ERyMQ79qIv1X4GQGTI9GgQqMllBMgzx8lZBCNl9hpGEHlHZS8slkBQ-LR3XA/exec';
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  }
+
+  function actualizarOffline(){
+    document.getElementById('offline-badge').classList.toggle('visible',!navigator.onLine);
+  }
+  window.addEventListener('online', actualizarOffline);
+  window.addEventListener('offline', actualizarOffline);
+  actualizarOffline();
+
+  // ══════════════════════════════════════════════════════
+  // CÓDIGO DE ACCESO — XOR ofuscado (key 0x4E)
+  // El valor real es derivado en runtime, nunca aparece en texto plano
+  // ══════════════════════════════════════════════════════
+  const ACCESS_KEY = 'nx_access_ok';
+
+  // Hash djb2 del código de acceso — generado fuera del browser
+  // Se compara contra el hash de lo que ingresa el usuario
+  function _xd(s){ return s.match(/.{2}/g).map(h=>String.fromCharCode(parseInt(h,16)^0x4E)).join(''); }
+  const _ac = '7e787f79';
+  // Nunca almacenamos el código plano; solo comparamos hashes
+  function hashAccess(code){
+    let h=5381;
+    for(let i=0;i<code.length;i++){h=((h<<5)+h)^code.charCodeAt(i);h|=0;}
+    return String(h>>>0);
+  }
+  // El hash de referencia se computa UNA vez al cargar, desde la forma ofuscada
+  const ACCESS_HASH = (()=>{ return hashAccess(_xd(_ac)); })();
+
+  function verificarAcceso(){
+    const val = document.getElementById('access-input').value.trim();
+    const err = document.getElementById('access-error');
+    if(!val){err.innerText='Ingresá el código';return;}
+    if(hashAccess(val)===ACCESS_HASH){
+      localStorage.setItem(ACCESS_KEY,'1');
+      document.getElementById('access-panel').classList.remove('visible');
+      inicializar();
+    } else {
+      err.innerText='❌ Código incorrecto';
+      document.getElementById('access-input').value='';
+      actualizarDots('');
+      setTimeout(()=>{err.innerText='';},2500);
+    }
+  }
+
+  function actualizarDots(val){
+    for(let i=0;i<4;i++){
+      const d=document.getElementById('dot-'+i);
+      if(d) d.classList.toggle('filled', i<val.length);
+    }
+  }
+
+  // ══════════════════════════════════════════════════════
+  // SISTEMA DE BANEO
+  // ══════════════════════════════════════════════════════
+  let BANEADOS_LOCAL = JSON.parse(localStorage.getItem('nx_baneados_vecino') || '[]');
+  let DEVICES_BANEADOS = JSON.parse(localStorage.getItem('nx_devices_baneados') || '[]');
+
+  async function cargarBaneados() {
+    try {
+      const r = await fetch(PANIC_URL + '?accion=get_baneados&t=' + Date.now());
+      if (!r.ok) return;
+      const data = await r.json();
+      if (Array.isArray(data.baneados)) {
+        BANEADOS_LOCAL = data.baneados;
+        localStorage.setItem('nx_baneados_vecino', JSON.stringify(BANEADOS_LOCAL));
+      }
+      if (Array.isArray(data.devicesBaneados)) {
+        DEVICES_BANEADOS = data.devicesBaneados;
+        localStorage.setItem('nx_devices_baneados', JSON.stringify(DEVICES_BANEADOS));
+      }
+    } catch(e) {}
+  }
+
+  function esBaneado(mza, casa) {
+    const mzaN  = String(mza  || '').trim();
+    const casaN = String(casa || '').trim();
+    const deviceBan = DEVICES_BANEADOS.find(b => b.deviceId === DEVICE_ID);
+    if (deviceBan) return { ...deviceBan, tipo: 'device' };
+    if (!mzaN || !casaN) return null;
+    const casaBan = BANEADOS_LOCAL.find(b =>
+      String(b.mza).trim() === mzaN &&
+      String(b.casa).trim() === casaN
+    );
+    if (casaBan) return { ...casaBan, tipo: 'casa' };
+    return null;
+  }
+
+  // ── INIT ───────────────────────────────────────────────
+  async function inicializar(){
+    const mza  = localStorage.getItem('nx_manzana');
+    const casa = localStorage.getItem('nx_casa');
+    if (!mza || !casa) { mostrarSetup(); return; }
+    const banCache = esBaneado(mza, casa);
+    if (banCache) {
+      mostrarPantallaBaneado(banCache);
+    } else {
+      mostrarPantallaPanico();
+    }
+    cargarBaneados().then(() => {
+      const banFresh = esBaneado(mza, casa);
+      if (banFresh) mostrarPantallaBaneado(banFresh);
+    }).catch(() => {});
+  }
+
+  function mostrarSetup(){
+    document.getElementById('pantalla-setup').classList.add('visible');
+    document.getElementById('pantalla-panico').classList.remove('visible');
+    document.getElementById('pantalla-enviado').classList.remove('visible');
+    document.getElementById('pantalla-baneado').classList.remove('visible');
+  }
+
+  function mostrarPantallaBaneado(ban) {
+    document.getElementById('pantalla-setup').classList.remove('visible');
+    document.getElementById('pantalla-panico').classList.remove('visible');
+    document.getElementById('pantalla-enviado').classList.remove('visible');
+    document.getElementById('pantalla-baneado').classList.add('visible');
+    const motivoEl = document.getElementById('ban-motivo-texto');
+    if (ban && ban.motivo && ban.motivo.trim()) {
+      motivoEl.innerText = ban.motivo;
+    } else {
+      motivoEl.innerText = 'Uso indebido del sistema de alertas de emergencia.';
+    }
+  }
+
+  function mostrarPantallaPanico(){
+    const mza  = localStorage.getItem('nx_manzana');
+    const casa = localStorage.getItem('nx_casa');
+    document.getElementById('config-display').innerText = `Mz. ${mza} Casa ${casa}`;
+    document.getElementById('pantalla-setup').classList.remove('visible');
+    document.getElementById('pantalla-panico').classList.add('visible');
+    document.getElementById('pantalla-enviado').classList.remove('visible');
+    document.getElementById('pantalla-baneado').classList.remove('visible');
+    verificarCooldown();
+  }
+
+  function guardarSetup(){
+    const mza  = document.getElementById('setup-mza').value.trim();
+    const casa = document.getElementById('setup-casa').value.trim();
+    const err  = document.getElementById('setup-error');
+    err.innerText = '';
+    if (!mza || !casa){ err.innerText='Completá manzana y casa'; return; }
+    localStorage.setItem('nx_manzana', mza);
+    localStorage.setItem('nx_casa', casa);
+    inicializar();
+  }
+
+  // ── COOLDOWN ───────────────────────────────────────────
+  function verificarCooldown(){
+    // Si detectamos manipulación, forzamos cooldown completo como penalidad
+    if (cooldownManipulado()) {
+      guardarTimestampCooldown(Date.now());
+      activarUI_Cooldown(COOLDOWN_MS);
+      return;
+    }
+    const ts   = parseInt(localStorage.getItem('nx_last_panico') || '0');
+    const diff = Date.now() - ts;
+    if (ts && diff < COOLDOWN_MS){ activarUI_Cooldown(COOLDOWN_MS - diff); }
+    else { desactivarUI_Cooldown(); }
+  }
+
+  function activarUI_Cooldown(msRestantes){
+    const btn = document.getElementById('btn-panico-redondo');
+    btn.disabled = true;
+    // Pasar a negro con líquido llenándose
+    btn.classList.add('cooldown-mode');
+    const liquidEl = document.getElementById('liquid-fill');
+    if (liquidEl) { liquidEl.style.transition = 'none'; liquidEl.style.height = '0%'; void liquidEl.offsetWidth; liquidEl.style.transition = 'height 1s linear'; }
+
+    const emojiEl = document.getElementById('btn-emoji');
+    emojiEl.innerText = '✅';
+    emojiEl.style.animation = 'none';
+    emojiEl.style.display = 'inline-block';
+    void emojiEl.offsetWidth;
+    emojiEl.style.animation = 'checkBounce 0.65s cubic-bezier(0.22,0.61,0.36,1) forwards';
+    document.getElementById('btn-cooldown-txt').style.display = 'block';
+    document.getElementById('aviso-cooldown').classList.add('visible');
+    const hint = document.getElementById('lp-hint');
+    if (hint) { hint.style.display = 'none'; }
+    const circ   = 2 * Math.PI * 126;
+    const circle = document.getElementById('cooldown-circle');
+    if (cooldownInterval) { clearInterval(cooldownInterval); cooldownInterval = null; }
+    let _thisInterval = null; // captura local para evitar bug de closure
+    function actualizar(){
+      const ts      = parseInt(localStorage.getItem('nx_last_panico') || '0');
+      const restante = COOLDOWN_MS - (Date.now() - ts);
+      if (restante <= 0){
+        clearInterval(_thisInterval);
+        cooldownInterval = null;
+        desactivarUI_Cooldown();
+        return;
+      }
+      const mins = Math.floor(restante / 60000);
+      const segs = Math.floor((restante % 60000) / 1000);
+      const txt  = `${String(mins).padStart(2,'0')}:${String(segs).padStart(2,'0')}`;
+      document.getElementById('cooldown-restante').innerText = txt;
+      document.getElementById('btn-cooldown-txt').innerText  = txt;
+      document.getElementById('btn-texto').innerText = 'ALERTA RECIBIDA';
+      const progreso = 1 - (restante / COOLDOWN_MS);
+      circle.style.strokeDashoffset = circ * (1 - progreso);
+      const llenado = progreso;
+      const liquidEl = document.getElementById('liquid-fill');
+      if (liquidEl) {
+        liquidEl.style.height = (llenado * 98).toFixed(1) + '%';
+        const intensidad = Math.round(150 + llenado * 55);
+        liquidEl.style.backgroundColor = `rgb(${intensidad},0,0)`;
+      }
+    }
+    actualizar();
+    _thisInterval = cooldownInterval = setInterval(actualizar, 1000);
+  }
+
+  function desactivarUI_Cooldown(){
+    if (cooldownInterval) { clearInterval(cooldownInterval); cooldownInterval = null; }
+    const btn = document.getElementById('btn-panico-redondo');
+    btn.disabled = false;
+    btn.style.pointerEvents = '';   // restituir interacción (se bloquea en enviarPanico)
+    btn.classList.remove('cooldown-mode');
+    btn.style.removeProperty('--liquid-y');
+    btn.style.removeProperty('--liquid-wave-y');
+    document.getElementById('btn-emoji').innerText                 = '🆘';
+    document.getElementById('btn-emoji').style.animation           = '';
+    document.getElementById('btn-emoji').style.filter              = '';
+    const liqEl = document.getElementById('liquid-fill');
+    if (liqEl) { liqEl.style.height = '0%'; liqEl.style.backgroundColor = ''; }
+    document.getElementById('btn-texto').innerText                 = 'EMERGENCIA';
+    document.getElementById('btn-cooldown-txt').style.display      = 'none';
+    document.getElementById('btn-cooldown-txt').innerText          = '';
+    document.getElementById('aviso-cooldown').classList.remove('visible');
+    document.getElementById('cooldown-circle').style.strokeDashoffset = '791';
+    const hint = document.getElementById('lp-hint');
+    if (hint) { hint.style.display = ''; hint.innerText = 'Mantené presionado para activar'; hint.classList.remove('pressing'); }
+  }
+
+  // ── GEOLOCALIZACIÓN ────────────────────────────────────
+  function obtenerUbicacion(){
+    return new Promise((resolve)=>{
+      if (!navigator.geolocation){ resolve(null); return; }
+      navigator.geolocation.getCurrentPosition(
+        pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        ()  => resolve(null),
+        { timeout: 20000, maximumAge: 0 }
+      );
+    });
+  }
+
+  // ── VIBRACIÓN + RIPPLE ─────────────────────────────────
+  function dispararVibracion() {
+    if (!navigator.vibrate) return;
+    navigator.vibrate([120, 60, 60, 40, 80]);
+  }
+
+  function dispararRipple(e) {
+    const btn  = document.getElementById('btn-panico-redondo');
+    const rect = btn.getBoundingClientRect();
+    let clientX, clientY;
+    if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX; clientY = e.touches[0].clientY;
+    } else if (e.changedTouches && e.changedTouches.length > 0) {
+      clientX = e.changedTouches[0].clientX; clientY = e.changedTouches[0].clientY;
+    } else {
+      clientX = e.clientX; clientY = e.clientY;
+    }
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+    const size = Math.max(rect.width, rect.height);
+    crearRippleEl(btn, x, y, size * 0.55, 'ripple-flash');
+    crearRippleEl(btn, x, y, size,        'ripple-wave');
+    crearRippleEl(btn, x, y, size * 0.85, 'ripple-wave-2');
+    crearRippleEl(btn, x, y, size * 0.7,  'ripple-wave-3');
+  }
+
+  function crearRippleEl(parent, x, y, size, className) {
+    const el = document.createElement('span');
+    el.className = className;
+    el.style.cssText = `width:${size}px;height:${size}px;left:${x-size/2}px;top:${y-size/2}px;`;
+    parent.appendChild(el);
+    el.addEventListener('animationend', () => el.remove(), { once: true });
+  }
+
+  // ── LONG PRESS ─────────────────────────────────────────
+  const LP_DURATION = 1500; // ms
+  let _lpTimer   = null;
+  let _lpStart   = null;
+  let _lpRAF     = null;
+  let _lpEvent   = null;
+
+  function lpTick() {
+    const elapsed  = Date.now() - _lpStart;
+    const progress = Math.min(elapsed / LP_DURATION, 1);
+    const circ     = 2 * Math.PI * 122;
+    const fill     = document.getElementById('lp-ring-fill');
+    if (fill) fill.style.strokeDashoffset = circ * (1 - progress);
+    if (progress < 1) {
+      _lpRAF = requestAnimationFrame(lpTick);
+    }
+  }
+
+  function lpStart(e) {
+    const btn = document.getElementById('btn-panico-redondo');
+    if (btn.disabled) return;
+    e.preventDefault();
+    _lpEvent = e;
+    _lpStart = Date.now();
+    document.getElementById('lp-hint').classList.add('pressing');
+    document.getElementById('lp-hint').innerText = 'Soltá para cancelar...';
+    if (navigator.vibrate) navigator.vibrate(20);
+    _lpRAF = requestAnimationFrame(lpTick);
+    _lpTimer = setTimeout(() => {
+      lpComplete();
+    }, LP_DURATION);
+  }
+
+  function lpEnd(e) {
+    if (_lpTimer) { clearTimeout(_lpTimer); _lpTimer = null; }
+    if (_lpRAF)   { cancelAnimationFrame(_lpRAF); _lpRAF = null; }
+    const fill = document.getElementById('lp-ring-fill');
+    if (fill) fill.style.strokeDashoffset = '816';
+    const hint = document.getElementById('lp-hint');
+    const btn  = document.getElementById('btn-panico-redondo');
+    if (!btn.disabled) {
+      hint.classList.remove('pressing');
+      hint.innerText = 'Mantené presionado para activar';
+    }
+    _lpStart = null;
+  }
+
+  function lpComplete() {
+    if (_lpRAF) { cancelAnimationFrame(_lpRAF); _lpRAF = null; }
+    const fill = document.getElementById('lp-ring-fill');
+    if (fill) fill.style.strokeDashoffset = '0';
+    dispararVibracion();
+    if (_lpEvent) dispararRipple(_lpEvent);
+    document.getElementById('lp-hint').classList.remove('pressing');
+    document.getElementById('lp-hint').innerText = 'Mantené presionado para activar';
+    // Flash rojo inmediato al completar el long press
+    const btn = document.getElementById('btn-panico-redondo');
+    btn.classList.add('pressed-flash');
+    setTimeout(() => {
+      const f = document.getElementById('lp-ring-fill');
+      if (f) f.style.strokeDashoffset = '816';
+    }, 300);
+    enviarPanico(_lpEvent, 'emergencia');
+  }
+
+  function initLongPress() {
+    const btn = document.getElementById('btn-panico-redondo');
+    btn.addEventListener('touchstart',  lpStart, { passive: false });
+    btn.addEventListener('touchend',    lpEnd,   { passive: true });
+    btn.addEventListener('touchcancel', lpEnd,   { passive: true });
+    btn.addEventListener('mousedown',   lpStart, { passive: false });
+    btn.addEventListener('mouseup',     lpEnd,   { passive: true });
+    btn.addEventListener('mouseleave',  lpEnd,   { passive: true });
+  }
+
+  // ── MODAL TIPO ─────────────────────────────────────────
+  let _tipoSeleccionado = null;
+  let _tipoEvent        = null;
+
+  function abrirTipo(e) {
+    _tipoSeleccionado = null;
+    _tipoEvent = e;
+    ['robo','medica','incendio','otra'].forEach(t => {
+      document.getElementById('tipo-'+t).classList.remove('sel');
+    });
+    document.getElementById('tipo-confirmar').classList.remove('visible');
+    document.getElementById('tipo-panel').classList.add('visible');
+  }
+
+  function cerrarTipo() {
+    document.getElementById('tipo-panel').classList.remove('visible');
+    _tipoSeleccionado = null;
+  }
+
+  function selTipo(tipo) {
+    _tipoSeleccionado = tipo;
+    ['robo','medica','incendio','otra'].forEach(t => {
+      document.getElementById('tipo-'+t).classList.toggle('sel', t === tipo);
+    });
+    document.getElementById('tipo-confirmar').classList.add('visible');
+    if (navigator.vibrate) navigator.vibrate(15);
+  }
+
+  function confirmarTipo() {
+    if (!_tipoSeleccionado) return;
+    cerrarTipo();
+    enviarPanico(_tipoEvent, _tipoSeleccionado);
+  }
+
+  // ── ENVÍO ──────────────────────────────────────────────
+  let _enviando = false;
+
+  async function enviarPanico(event, tipo){
+    if (_enviando) return;
+    _enviando = true;
+
+    const btn = document.getElementById('btn-panico-redondo');
+    btn.disabled = true;
+    btn.style.pointerEvents = 'none';
+
+    dispararVibracion();
+    if (event) dispararRipple(event);
+
+    const mza  = localStorage.getItem('nx_manzana');
+    const casa = localStorage.getItem('nx_casa');
+
+    const tsEnvio = Date.now();
+    guardarTimestampCooldown(tsEnvio);
+
+    document.getElementById('btn-emoji').innerText = '⏳';
+    document.getElementById('btn-texto').innerText = 'Enviando...';
+
+    const tipoFinal = tipo || 'otra';
+    const payload = {
+      accion: 'panico',
+      mza, casa,
+      tipo: tipoFinal,
+      deviceId: DEVICE_ID,
+      ts: tsEnvio,
+      sig: generarFirma(DEVICE_ID, tsEnvio, tipoFinal),
+      lat: null, lng: null, mapsUrl: null
+    };
+
+    // Pedir geo y baneo en paralelo, esperando que el usuario acepte el permiso
+    // Timeout de 20s para darle tiempo al cartel de permisos del browser
+    const geoPromise = obtenerUbicacion().then(geo => {
+      if (geo) {
+        payload.lat     = geo.lat;
+        payload.lng     = geo.lng;
+        payload.mapsUrl = `https://maps.google.com/?q=${geo.lat},${geo.lng}`;
+      }
+    }).catch(() => {});
+
+    const baneoPromise = cargarBaneados().then(() => {
+      const ban = esBaneado(mza, casa);
+      if (ban) { mostrarPantallaBaneado(ban); _enviando = false; }
+    }).catch(() => {});
+
+    // Esperar ambos: geo (hasta 20s para que el usuario acepte permiso) y baneo
+    await Promise.all([
+      Promise.race([geoPromise, new Promise(r => setTimeout(r, 20000))]),
+      baneoPromise.catch(() => {})
+    ]);
+
+    const ban = esBaneado(mza, casa);
+    if (ban) { _enviando = false; return; }
+
+    try {
+      fetch(PANIC_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).catch(() => guardarOffline(payload));
+    } catch(e) {
+      guardarOffline(payload);
+    }
+
+    document.getElementById('pantalla-panico').classList.remove('visible');
+    document.getElementById('pantalla-enviado').classList.add('visible');
+    const tipoEl = document.getElementById('enviado-tipo');
+    if (tipoEl) tipoEl.innerText = '🆘 Emergencia';
+    _enviando = false;
+  }
+
+  function guardarOffline(payload){
+    const cola = JSON.parse(localStorage.getItem('nx_offline_queue') || '[]');
+    cola.push({ payload, ts: Date.now() });
+    localStorage.setItem('nx_offline_queue', JSON.stringify(cola));
+  }
+
+  async function enviarColaOffline(){
+    const cola = JSON.parse(localStorage.getItem('nx_offline_queue') || '[]');
+    if (!cola.length || !navigator.onLine) return;
+    for (const item of cola){
+      try{ await fetch(PANIC_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(item.payload)}); }
+      catch(e){ return; }
+    }
+    localStorage.removeItem('nx_offline_queue');
+  }
+  window.addEventListener('online', enviarColaOffline);
+
+  function volverAlPanico(){
+    document.getElementById('pantalla-enviado').classList.remove('visible');
+    inicializar();
+  }
+
+  // ── CAMBIAR UBICACIÓN ──────────────────────────────────
+  function abrirCfg(){
+    document.getElementById('cfg-mza').value  = localStorage.getItem('nx_manzana') || '';
+    document.getElementById('cfg-casa').value = localStorage.getItem('nx_casa')    || '';
+    document.getElementById('cfg-error').innerText = '';
+    document.getElementById('cfg-panel').classList.add('visible');
+  }
+  function cerrarCfg(){ document.getElementById('cfg-panel').classList.remove('visible'); }
+  function guardarCfg(){
+    const mza  = document.getElementById('cfg-mza').value.trim();
+    const casa = document.getElementById('cfg-casa').value.trim();
+    const err  = document.getElementById('cfg-error');
+    err.innerText = '';
+    if (!mza || !casa){ err.innerText='Completá manzana y casa'; return; }
+    localStorage.setItem('nx_manzana', mza);
+    localStorage.setItem('nx_casa', casa);
+    cerrarCfg();
+    inicializar();
+  }
+
+  // ══════════════════════════════════════════════════════
+  // PIN DE ADMINISTRADOR — XOR ofuscado (key 0x4E)
+  // El valor real nunca aparece en texto plano en el código
+  // ══════════════════════════════════════════════════════
+  const _pc = '7f7d7a7c';
+
+  let intentosFallidos = 0;
+  const MAX_INTENTOS = 5;
+
+  function hashPin(pin){
+    let h=0;
+    for(let i=0;i<pin.length;i++){h=((h<<5)-h)+pin.charCodeAt(i);h|=0;}
+    return String(h);
+  }
+  // El hash de referencia se computa UNA vez al cargar, desde la forma ofuscada
+  const PIN_HASH = (()=>{ return hashPin(_xd(_pc)); })();
+
+  function pinEsCorrecto(pin){ return hashPin(pin.trim()) === PIN_HASH; }
+
+  function pedirPinParaCambiar(){
+    const block = parseInt(localStorage.getItem('nx_pin_block') || '0');
+    if (block && Date.now() < block){
+      const min = Math.ceil((block - Date.now()) / 60000);
+      alert('Bloqueado. Intentá en ' + min + ' minuto' + (min > 1 ? 's' : '') + '.');
+      return;
+    }
+    intentosFallidos = 0;
+    document.getElementById('pin-input').value = '';
+    document.getElementById('pin-intentos').innerText = '';
+    document.getElementById('pin-panel').classList.add('visible');
+    setTimeout(() => document.getElementById('pin-input').focus(), 100);
+  }
+
+  function verificarPin(){
+    const pin = document.getElementById('pin-input').value.trim();
+    const msg = document.getElementById('pin-intentos');
+    if (!pin){ msg.innerText = 'Ingresá el PIN'; return; }
+    if (!pinEsCorrecto(pin)){
+      intentosFallidos++;
+      document.getElementById('pin-input').value = '';
+      const restantes = MAX_INTENTOS - intentosFallidos;
+      if (restantes <= 0){
+        localStorage.setItem('nx_pin_block', String(Date.now() + 5 * 60 * 1000));
+        cerrarPin();
+        alert('Demasiados intentos. Intentá en 5 minutos.');
+        return;
+      }
+      msg.innerText = '❌ PIN incorrecto. ' + restantes + ' intento' + (restantes > 1 ? 's' : '') + ' restante' + (restantes > 1 ? 's' : '') + '.';
+      return;
+    }
+    cerrarPin();
+    abrirCfg();
+  }
+
+  function cerrarPin(){
+    document.getElementById('pin-input').value = '';
+    document.getElementById('pin-intentos').innerText = '';
+    document.getElementById('pin-panel').classList.remove('visible');
+  }
+
+  // ── DOMContentLoaded ──────────────────────────────────
+  window.addEventListener('DOMContentLoaded', () => {
+    const accessInput = document.getElementById('access-input');
+    if (accessInput){
+      accessInput.addEventListener('input', () => actualizarDots(accessInput.value));
+      accessInput.addEventListener('keydown', e => { if (e.key === 'Enter') verificarAcceso(); });
+    }
+    document.getElementById('pin-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') verificarPin();
+    });
+    initLongPress();
+    if (!localStorage.getItem(ACCESS_KEY)){
+      document.getElementById('access-panel').classList.add('visible');
+      setTimeout(() => accessInput && accessInput.focus(), 200);
+    } else {
+      inicializar();
+    }
+    obtenerClima();
+  });
+
+  // ══════════════════════════════════════════════════════
+  // CLIMA
+  // ══════════════════════════════════════════════════════
+  const CLIMA_ICONS = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'❄️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',95:'⛈️',96:'⛈️',99:'⛈️'};
+  const CLIMA_DESC  = {0:'Cielo despejado',1:'Principalmente despejado',2:'Parcialmente nublado',3:'Cubierto',45:'Niebla',48:'Niebla con escarcha',51:'Llovizna leve',53:'Llovizna moderada',55:'Llovizna intensa',61:'Lluvia leve',63:'Lluvia moderada',65:'Lluvia intensa',71:'Nieve leve',73:'Nieve moderada',75:'Nieve intensa',80:'Lluvia débil',81:'Lluvia moderada',82:'Lluvia fuerte',95:'Tormenta',96:'Tormenta con granizo',99:'Tormenta con granizo fuerte'};
+  const DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+
+  // ── ÍCONOS NOCTURNOS (20:00 – 05:59) ──────────────────
+  function esNoche() {
+    const h = new Date().getHours();
+    return h >= 20 || h < 6;
+  }
+
+  // Calcula la fase lunar real a partir de una luna nueva de referencia
+  function faselunar() {
+    const FASES = ['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘'];
+    const REF   = new Date('2000-01-06T18:14:00Z'); // luna nueva conocida (J2000)
+    const CICLO = 29.53058867; // días sinódicos
+    const diasDesdeRef = (Date.now() - REF.getTime()) / 86400000;
+    const faseNorm = ((diasDesdeRef % CICLO) + CICLO) % CICLO;
+    return FASES[Math.floor((faseNorm / CICLO) * 8) % 8];
+  }
+
+  // Mapa completo de íconos nocturnos: luna + fenómeno climático
+  function iconosNoche() {
+    const luna = faselunar();
+    return {
+      0:  luna,          // despejado → fase pura
+      1:  '🌙',          // principalmente despejado
+      2:  '🌛',          // parcialmente nublado
+      3:  '☁️',          // cubierto
+      45: '🌫️',          // niebla
+      48: '🌫️',          // niebla con escarcha
+      51: luna+'🌦️',    // llovizna leve
+      53: luna+'🌦️',    // llovizna moderada
+      55: luna+'🌧️',    // llovizna intensa
+      61: luna+'🌧️',    // lluvia leve
+      63: luna+'🌧️',    // lluvia moderada
+      65: luna+'🌧️',    // lluvia intensa
+      71: luna+'❄️',    // nieve leve
+      73: luna+'❄️',    // nieve moderada
+      75: luna+'❄️',    // nieve intensa
+      80: luna+'🌦️',    // chubascos débiles
+      81: luna+'🌧️',    // chubascos moderados
+      82: luna+'⛈️',    // chubascos fuertes
+      95: luna+'⛈️',    // tormenta
+      96: luna+'⛈️',    // tormenta con granizo
+      99: luna+'⛈️',    // tormenta con granizo fuerte
+    };
+  }
+
+  // Devuelve el ícono correcto según hora del día
+  // soloActual=true → usa lógica noche (chip y clima actual del modal)
+  // soloActual=false → siempre ícono diurno (filas de pronóstico futuro)
+  function iconoClima(code, soloActual = true) {
+    if (soloActual && esNoche()) {
+      const mapa = iconosNoche();
+      return mapa[code] ?? CLIMA_ICONS[code] ?? '🌙';
+    }
+    return CLIMA_ICONS[code] || '🌤️';
+  }
+
+  // Aplica clase 'doble' al chip-icon si el ícono tiene 2 emojis
+  function ajustarIconoChip(icono) {
+    const el = document.getElementById('chip-icon');
+    if (!el) return;
+    const segs = [...new Intl.Segmenter(undefined, {granularity:'grapheme'}).segment(icono)];
+    const esDoble = segs.length > 1;
+    el.classList.toggle('doble', esDoble);
+    if (esDoble) {
+      el.innerHTML = `<span>${segs[0].segment}</span><span>${segs[1].segment}</span>`;
+    } else {
+      el.textContent = icono;
+    }
+  }
+
+  let climaCode = 1; // se actualiza al recibir la API; usado para recalcular luna cada segundo
+
+  function actualizarHora(){
+    const ahora = new Date();
+    const hh = String(ahora.getHours()).padStart(2,'0');
+    const mm = String(ahora.getMinutes()).padStart(2,'0');
+    const el = document.getElementById('chip-hora');
+    if(el) el.textContent = hh + ':' + mm;
+    // Recalcular ícono cada segundo para que la luna aparezca al pasar las 20:00
+    // aunque la API no vuelva a llamarse
+    ajustarIconoChip(iconoClima(climaCode));
+  }
+  actualizarHora();
+  setInterval(actualizarHora, 1000);
+
+  async function obtenerClima(){
+    try {
+      const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-34.61&longitude=-58.37&current_weather=true');
+      const d = await r.json();
+      const code = d.current_weather?.weathercode ?? 1;
+      const temp = d.current_weather?.temperature;
+      climaCode = code; // guardar para recalcular en cada tick del reloj
+      document.getElementById('chip-temp').innerText = (typeof temp === 'number') ? Math.round(temp) + '°' : '--°';
+    } catch(e) {}
+  }
+
+  async function abrirPronostico(){
+    document.getElementById('clima-overlay').classList.add('visible');
+    document.getElementById('clima-contenido').innerHTML = '<div class="clima-loading">Cargando...</div>';
+    try {
+      const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-34.61&longitude=-58.37&current_weather=true&current=apparent_temperature,wind_speed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max&forecast_days=6&timezone=America%2FArgentina%2FBuenos_Aires');
+      const d = await r.json();
+      const cw   = d.current_weather;
+      const icon = iconoClima(cw.weathercode);
+      const temp = Math.round(cw.temperature);
+      const desc = CLIMA_DESC[cw.weathercode] || '';
+      const sensacion = d.current?.apparent_temperature != null ? Math.round(d.current.apparent_temperature) : null;
+      const viento    = d.current?.wind_speed_10m != null ? Math.round(d.current.wind_speed_10m) : null;
+      const daily = d.daily;
+      let diasHtml = '';
+      for (let i = 1; i < Math.min(6, daily.time.length); i++) {
+        const fecha  = new Date(daily.time[i] + 'T12:00:00');
+        const nombre = DIAS[fecha.getDay()];
+        const dicon  = iconoClima(daily.weathercode[i], false);
+        const max    = Math.round(daily.temperature_2m_max[i]);
+        const min    = Math.round(daily.temperature_2m_min[i]);
+        const lluvia = daily.precipitation_probability_max[i] ?? 0;
+        const vMax   = daily.wind_speed_10m_max?.[i] != null ? Math.round(daily.wind_speed_10m_max[i]) : null;
+        diasHtml += '<div class="clima-dia-row"><span class="clima-dia-nombre">' + nombre + '</span><span class="clima-dia-icon">' + dicon + '</span><div class="clima-dia-temps"><span class="clima-dia-max">' + max + '</span><span class="clima-dia-min">' + min + '</span></div><span class="clima-dia-lluvia">' + (lluvia > 0 ? '💧' + lluvia + '%' : '') + (vMax != null && vMax > 20 ? ' 💨' + vMax : '') + '</span></div>';
+      }
+      const sensHtml = sensacion != null ? '<span class="clima-current-sensacion">ST: ' + sensacion + (viento != null ? ' · 💨 ' + viento + ' km/h' : '') + '</span>' : '<span class="clima-current-sensacion">Buenos Aires</span>';
+      document.getElementById('clima-contenido').innerHTML = '<div class="clima-current"><span class="clima-current-icon">' + icon + '</span><span class="clima-current-temp">' + temp + '°</span><div class="clima-current-info"><span class="clima-current-desc">' + desc + '</span>' + sensHtml + '</div></div><div class="clima-dias">' + diasHtml + '</div>';
+    } catch(e) {
+      document.getElementById('clima-contenido').innerHTML = '<div class="clima-loading" style="color:#e74c3c">No se pudo cargar el pronóstico</div>';
+    }
+  }
+
+  function cerrarPronostico(e){
+    if (e.target === document.getElementById('clima-overlay'))
+      document.getElementById('clima-overlay').classList.remove('visible');
+  }
+</script>
+</body>
+</html>
