@@ -520,7 +520,7 @@
   const PANIC_URL = 'https://script.google.com/macros/s/AKfycby4yDWVe9ERyMQ79qIv1X4GQGTI9GgQqMllBMgzx8lZBCNl9hpGEHlHZS8slkBQ-LR3XA/exec';
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(()=>{});
+    navigator.serviceWorker.register('sw.js', { scope: './nexos_panico.html' }).catch(()=>{});
   }
 
   function actualizarOffline(){
