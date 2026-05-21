@@ -194,7 +194,9 @@
     .clima-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:5px 12px;cursor:pointer;transition:all 0.2s ease;-webkit-tap-highlight-color:transparent;margin-bottom:6px;}
     .clima-chip:active{transform:scale(0.95);background:rgba(255,255,255,0.08);}
     .clima-chip-icon{font-size:15px;line-height:1;}
+    .clima-chip-icon.doble{display:inline-flex;flex-direction:column;align-items:center;font-size:9px;line-height:1.2;gap:0;}
     .clima-chip-temp{font-size:12px;font-weight:800;color:#ccc;font-family:monospace;letter-spacing:0.5px;}
+    .clima-chip-hora{font-size:12px;font-weight:700;color:#aaa;font-family:monospace;letter-spacing:0.5px;border-left:1px solid rgba(255,255,255,0.15);padding-left:7px;margin-left:2px;}
 
     /* ── MODAL PRONÓSTICO ── */
     .clima-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:8000;align-items:flex-end;justify-content:center;padding:0;}
@@ -287,6 +289,7 @@
   <div class="clima-chip" id="clima-chip" onclick="abrirPronostico()">
     <span class="clima-chip-icon" id="chip-icon">🌤️</span>
     <span class="clima-chip-temp" id="chip-temp">--°</span>
+    <span class="clima-chip-hora" id="chip-hora">--:--</span>
   </div>
   <div class="boton-redondo-container">
     <svg class="cooldown-ring" viewBox="0 0 280 280">
@@ -698,11 +701,17 @@
     if (hint) { hint.style.display = 'none'; }
     const circ   = 2 * Math.PI * 126;
     const circle = document.getElementById('cooldown-circle');
-    if (cooldownInterval) clearInterval(cooldownInterval);
+    if (cooldownInterval) { clearInterval(cooldownInterval); cooldownInterval = null; }
+    let _thisInterval = null; // captura local para evitar bug de closure
     function actualizar(){
       const ts      = parseInt(localStorage.getItem('nx_last_panico') || '0');
       const restante = COOLDOWN_MS - (Date.now() - ts);
-      if (restante <= 0){ clearInterval(cooldownInterval); desactivarUI_Cooldown(); return; }
+      if (restante <= 0){
+        clearInterval(_thisInterval);
+        cooldownInterval = null;
+        desactivarUI_Cooldown();
+        return;
+      }
       const mins = Math.floor(restante / 60000);
       const segs = Math.floor((restante % 60000) / 1000);
       const txt  = `${String(mins).padStart(2,'0')}:${String(segs).padStart(2,'0')}`;
@@ -720,12 +729,14 @@
       }
     }
     actualizar();
-    cooldownInterval = setInterval(actualizar, 1000);
+    _thisInterval = cooldownInterval = setInterval(actualizar, 1000);
   }
 
   function desactivarUI_Cooldown(){
+    if (cooldownInterval) { clearInterval(cooldownInterval); cooldownInterval = null; }
     const btn = document.getElementById('btn-panico-redondo');
     btn.disabled = false;
+    btn.style.pointerEvents = '';   // restituir interacción (se bloquea en enviarPanico)
     btn.classList.remove('cooldown-mode');
     btn.style.removeProperty('--liquid-y');
     btn.style.removeProperty('--liquid-wave-y');
@@ -1102,13 +1113,97 @@
   const CLIMA_DESC  = {0:'Cielo despejado',1:'Principalmente despejado',2:'Parcialmente nublado',3:'Cubierto',45:'Niebla',48:'Niebla con escarcha',51:'Llovizna leve',53:'Llovizna moderada',55:'Llovizna intensa',61:'Lluvia leve',63:'Lluvia moderada',65:'Lluvia intensa',71:'Nieve leve',73:'Nieve moderada',75:'Nieve intensa',80:'Lluvia débil',81:'Lluvia moderada',82:'Lluvia fuerte',95:'Tormenta',96:'Tormenta con granizo',99:'Tormenta con granizo fuerte'};
   const DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 
+  // ── ÍCONOS NOCTURNOS (20:00 – 05:59) ──────────────────
+  function esNoche() {
+    const h = new Date().getHours();
+    return h >= 20 || h < 6;
+  }
+
+  // Calcula la fase lunar real a partir de una luna nueva de referencia
+  function faselunar() {
+    const FASES = ['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘'];
+    const REF   = new Date('2000-01-06T18:14:00Z'); // luna nueva conocida (J2000)
+    const CICLO = 29.53058867; // días sinódicos
+    const diasDesdeRef = (Date.now() - REF.getTime()) / 86400000;
+    const faseNorm = ((diasDesdeRef % CICLO) + CICLO) % CICLO;
+    return FASES[Math.floor((faseNorm / CICLO) * 8) % 8];
+  }
+
+  // Mapa completo de íconos nocturnos: luna + fenómeno climático
+  function iconosNoche() {
+    const luna = faselunar();
+    return {
+      0:  luna,          // despejado → fase pura
+      1:  '🌙',          // principalmente despejado
+      2:  '🌛',          // parcialmente nublado
+      3:  '☁️',          // cubierto
+      45: '🌫️',          // niebla
+      48: '🌫️',          // niebla con escarcha
+      51: luna+'🌦️',    // llovizna leve
+      53: luna+'🌦️',    // llovizna moderada
+      55: luna+'🌧️',    // llovizna intensa
+      61: luna+'🌧️',    // lluvia leve
+      63: luna+'🌧️',    // lluvia moderada
+      65: luna+'🌧️',    // lluvia intensa
+      71: luna+'❄️',    // nieve leve
+      73: luna+'❄️',    // nieve moderada
+      75: luna+'❄️',    // nieve intensa
+      80: luna+'🌦️',    // chubascos débiles
+      81: luna+'🌧️',    // chubascos moderados
+      82: luna+'⛈️',    // chubascos fuertes
+      95: luna+'⛈️',    // tormenta
+      96: luna+'⛈️',    // tormenta con granizo
+      99: luna+'⛈️',    // tormenta con granizo fuerte
+    };
+  }
+
+  // Devuelve el ícono correcto según hora del día
+  // soloActual=true → usa lógica noche (chip y clima actual del modal)
+  // soloActual=false → siempre ícono diurno (filas de pronóstico futuro)
+  function iconoClima(code, soloActual = true) {
+    if (soloActual && esNoche()) {
+      const mapa = iconosNoche();
+      return mapa[code] ?? CLIMA_ICONS[code] ?? '🌙';
+    }
+    return CLIMA_ICONS[code] || '🌤️';
+  }
+
+  // Aplica clase 'doble' al chip-icon si el ícono tiene 2 emojis
+  function ajustarIconoChip(icono) {
+    const el = document.getElementById('chip-icon');
+    if (!el) return;
+    const segs = [...new Intl.Segmenter(undefined, {granularity:'grapheme'}).segment(icono)];
+    const esDoble = segs.length > 1;
+    el.classList.toggle('doble', esDoble);
+    if (esDoble) {
+      el.innerHTML = `<span>${segs[0].segment}</span><span>${segs[1].segment}</span>`;
+    } else {
+      el.textContent = icono;
+    }
+  }
+
+  let climaCode = 1; // se actualiza al recibir la API; usado para recalcular luna cada segundo
+
+  function actualizarHora(){
+    const ahora = new Date();
+    const hh = String(ahora.getHours()).padStart(2,'0');
+    const mm = String(ahora.getMinutes()).padStart(2,'0');
+    const el = document.getElementById('chip-hora');
+    if(el) el.textContent = hh + ':' + mm;
+    // Recalcular ícono cada segundo para que la luna aparezca al pasar las 20:00
+    // aunque la API no vuelva a llamarse
+    ajustarIconoChip(iconoClima(climaCode));
+  }
+  actualizarHora();
+  setInterval(actualizarHora, 1000);
+
   async function obtenerClima(){
     try {
       const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-34.61&longitude=-58.37&current_weather=true');
       const d = await r.json();
       const code = d.current_weather?.weathercode ?? 1;
       const temp = d.current_weather?.temperature;
-      document.getElementById('chip-icon').innerText = CLIMA_ICONS[code] || '🌤️';
+      climaCode = code; // guardar para recalcular en cada tick del reloj
       document.getElementById('chip-temp').innerText = (typeof temp === 'number') ? Math.round(temp) + '°' : '--°';
     } catch(e) {}
   }
@@ -1120,7 +1215,7 @@
       const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-34.61&longitude=-58.37&current_weather=true&current=apparent_temperature,wind_speed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max&forecast_days=6&timezone=America%2FArgentina%2FBuenos_Aires');
       const d = await r.json();
       const cw   = d.current_weather;
-      const icon = CLIMA_ICONS[cw.weathercode] || '🌤️';
+      const icon = iconoClima(cw.weathercode);
       const temp = Math.round(cw.temperature);
       const desc = CLIMA_DESC[cw.weathercode] || '';
       const sensacion = d.current?.apparent_temperature != null ? Math.round(d.current.apparent_temperature) : null;
@@ -1130,7 +1225,7 @@
       for (let i = 1; i < Math.min(6, daily.time.length); i++) {
         const fecha  = new Date(daily.time[i] + 'T12:00:00');
         const nombre = DIAS[fecha.getDay()];
-        const dicon  = CLIMA_ICONS[daily.weathercode[i]] || '🌤️';
+        const dicon  = iconoClima(daily.weathercode[i], false);
         const max    = Math.round(daily.temperature_2m_max[i]);
         const min    = Math.round(daily.temperature_2m_min[i]);
         const lluvia = daily.precipitation_probability_max[i] ?? 0;
