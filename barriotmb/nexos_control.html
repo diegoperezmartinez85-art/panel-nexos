@@ -2283,6 +2283,18 @@ document.addEventListener('touchstart',initAudio,{once:true});
 document.addEventListener('click',initAudio,{once:true});
 
 // ── PÁNICO ─────────────────────────────────────────────────
+function obtenerInfoTipo(tipo) {
+  const tKey = String(tipo || 'emergencia').trim().toLowerCase();
+  const MAPA_TIPOS = {
+    'emergencia': { texto: 'EMERGENCIA GENERAL', icono: '🚨', color: '#ef4444', glow: 'rgba(239, 68, 68, 0.25)' },
+    'robo': { texto: 'ROBO / INTRUSO', icono: '🔒', color: '#ef4444', glow: 'rgba(239, 68, 68, 0.28)' },
+    'medica': { texto: 'EMERGENCIA MÉDICA', icono: '🩺', color: '#06b6d4', glow: 'rgba(6, 182, 212, 0.25)' },
+    'incendio': { texto: 'INCENDIO DETECTADO', icono: '🔥', color: '#f97316', glow: 'rgba(249, 115, 22, 0.25)' },
+    'otra': { texto: 'ALERTA GENERAL', icono: '⚠️', color: '#f59e0b', glow: 'rgba(245, 158, 11, 0.22)' }
+  };
+  return MAPA_TIPOS[tKey] || MAPA_TIPOS['emergencia'];
+}
+
 function mostrarPanico(alertas){
   const guardados=JSON.parse(localStorage.getItem('nx_alertas_hoy')||'[]');
   alertas.forEach(a=>{if(!guardados.find(g=>g.panicoId===a.panicoId))guardados.push(a);});
@@ -2292,18 +2304,38 @@ function mostrarPanico(alertas){
     let mapUrl=(a.mapsUrl||'').trim();
     if(!mapUrl&&a.lat&&a.lng)mapUrl='https://maps.google.com/?q='+a.lat+','+a.lng;
     const mapsHtml=mapUrl?`<a class="panico-maps-btn" href="${escHtml(mapUrl)}" target="_blank">📍 Ver ubicación en Google Maps</a>`:'<div class="panico-no-maps">📍 Sin GPS</div>';
-    return`<div class="panico-item"><div class="panico-hora">${escHtml(a.fecha||'')}</div><div class="panico-loc">🏠 Mza <strong>${escHtml(a.mza)}</strong> — Casa <strong>${escHtml(a.casa)}</strong></div>${mapsHtml}</div>`;
+    
+    const info = obtenerInfoTipo(a.tipo);
+    const badgeHtml = `<div class="panico-tipo-badge" style="display:inline-flex; align-items:center; gap:6px; background:${info.glow}; border:1px solid ${info.color}; color:${info.color}; font-size:11px; font-weight:800; padding:4px 10px; border-radius:20px; margin-bottom:10px; text-transform:uppercase;">${info.icono} ${info.texto}</div>`;
+    
+    return`<div class="panico-item" style="border-left:5px solid ${info.color};">${badgeHtml}<div class="panico-hora">${escHtml(a.fecha||'')}</div><div class="panico-loc">🏠 Mza <strong>${escHtml(a.mza)}</strong> — Casa <strong>${escHtml(a.casa)}</strong></div>${mapsHtml}</div>`;
   }).join('');
-  document.getElementById('panico-overlay').classList.add('visible');
-  initAudio();
-  iniciarSirena();
   
   if(alertas&&alertas.length>0){
     const ultimo=alertas[alertas.length-1];
+    const info = obtenerInfoTipo(ultimo.tipo);
+    
+    const mainIcon = document.querySelector('#panico-overlay .panico-icono');
+    if (mainIcon) mainIcon.innerText = info.icono;
+    
+    const mainTitle = document.querySelector('#panico-overlay .panico-titulo');
+    if (mainTitle) mainTitle.innerText = `¡ ${info.texto} !`;
+    
+    const tKey = String(ultimo.tipo || 'emergencia').trim().toLowerCase();
+    let tipoVoz = "emergencia";
+    if (tKey === 'robo') tipoVoz = "emergencia de robo";
+    else if (tKey === 'medica') tipoVoz = "emergencia médica";
+    else if (tKey === 'incendio') tipoVoz = "emergencia de incendio";
+    else if (tKey === 'otra') tipoVoz = "alerta de seguridad";
+    
     setTimeout(()=>{
-      emitirAlertaVoz(`¡Atención! Alerta de pánico en manzana ${ultimo.mza}, casa ${ultimo.casa}. Repito, pánico en manzana ${ultimo.mza}, casa ${ultimo.casa}.`);
+      emitirAlertaVoz(`¡Atención! ${tipoVoz} en manzana ${ultimo.mza}, casa ${ultimo.casa}. Repito, ${tipoVoz} en manzana ${ultimo.mza}, casa ${ultimo.casa}.`);
     },400);
   }
+  
+  document.getElementById('panico-overlay').classList.add('visible');
+  initAudio();
+  iniciarSirena();
 }
 function cerrarPanico(){detenerSirena();const url=localStorage.getItem('nx_url');panicosPendientes.forEach(a=>{if(!url)return;fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({accion:'ack_panico',panicoId:a.panicoId})});});panicosPendientes=[];document.getElementById('panico-overlay').classList.remove('visible');}
 
@@ -2694,6 +2726,16 @@ function toggleVozAlertas(checked) {
   showToast(checked ? '📢 Alertas de voz activadas' : '🔕 Alertas de voz desactivadas');
 }
 
+// Pre-cargar voces de forma asíncrona para que estén listas al recibir alertas
+if ('speechSynthesis' in window) {
+  window.speechSynthesis.getVoices();
+  if (window.speechSynthesis.onvoiceschanged !== undefined) {
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.getVoices();
+    };
+  }
+}
+
 function emitirAlertaVoz(mensaje) {
   if (localStorage.getItem('nx_voz_alertas') === 'false') return;
   if (!('speechSynthesis' in window)) return;
@@ -2704,8 +2746,16 @@ function emitirAlertaVoz(mensaje) {
     utterance.rate = 0.9;
     utterance.pitch = 1.0;
     const voces = window.speechSynthesis.getVoices();
-    const vozEs = voces.find(v => v.lang.includes('es-AR')) || voces.find(v => v.lang.includes('es'));
-    if (vozEs) utterance.voice = vozEs;
+    const vozEs = voces.find(v => v.lang === 'es-AR') || 
+                  voces.find(v => v.lang.includes('es-AR')) || 
+                  voces.find(v => v.lang === 'es-MX') || 
+                  voces.find(v => v.lang.includes('es-MX')) ||
+                  voces.find(v => v.lang.startsWith('es-')) ||
+                  voces.find(v => v.lang.includes('es'));
+    if (vozEs) {
+      utterance.voice = vozEs;
+      utterance.lang = vozEs.lang;
+    }
     window.speechSynthesis.speak(utterance);
   } catch (e) {
     console.error('Error en TTS:', e);
@@ -2858,7 +2908,24 @@ function filtrarHistorialDia(){const q=(document.getElementById('busqueda-input'
     });
   }
 if(q)deDia=deDia.filter(r=>(r.pat||'').toUpperCase().includes(q)||(r.dni||'').includes(q));deDia.sort((a,b)=>(b.tsE||0)-(a.tsE||0));const totalTodos=deDia.length;const totalAdentro=deDia.filter(r=>!r.hS).length;const totalSalidos=deDia.filter(r=>r.hS).length;document.getElementById('busqueda-status').innerText=totalTodos+' registro(s) hoy'+((_historialHoySheet.length>0)?' · Sheet ✔':'');if(!deDia.length){document.getElementById('busqueda-resultados').innerHTML='<div class="empty-msg">Sin registros hoy</div>';return;}const resumenHtml=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;"><div style="background:var(--bg3);border-radius:10px;padding:10px;text-align:center;border:1px solid var(--cyan);"><div style="font-size:22px;font-weight:900;color:var(--cyan);">${totalTodos}</div><div style="font-size:10px;color:#666;font-weight:700;">TOTAL DÍA</div></div><div style="background:var(--bg3);border-radius:10px;padding:10px;text-align:center;border:1px solid var(--green);"><div style="font-size:22px;font-weight:900;color:var(--green);">${totalAdentro}</div><div style="font-size:10px;color:#666;font-weight:700;">ADENTRO</div></div><div style="background:var(--bg3);border-radius:10px;padding:10px;text-align:center;border:1px solid #888;"><div style="font-size:22px;font-weight:900;color:#888;">${totalSalidos}</div><div style="font-size:10px;color:#666;font-weight:700;">SALIDOS</div></div></div>`;document.getElementById('busqueda-resultados').innerHTML=resumenHtml+deDia.map(r=>{const tS=r.hS?true:false;return`<div class="modal-row" style="${tS?'opacity:0.7;border-left:4px solid #888':'border-left:4px solid var(--green)'}"><strong>${escHtml(r.pat)}</strong>${r.dni?` · DNI: ${escHtml(r.dni)}`:''}<br><span style="font-size:11px;color:#666">Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')} · ${escHtml(r.tipo)}</span><br><span style="font-size:11px;color:#888">Entró: ${escHtml(limpiarHora(r.hE))}</span><span style="float:right;font-size:12px;font-weight:bold;color:${tS?'#888':'var(--green)'}">${tS?'✅ Salió '+escHtml(limpiarHora(r.hS)):'🟢 Adentro'}</span></div>`;}).join('');}
-function abrirAlertas(){const hoy=new Date().toLocaleDateString('es-AR');const guardados=JSON.parse(localStorage.getItem('nx_alertas_hoy')||'[]');const todos=[...panicosPendientes,...guardados.filter(a=>!panicosPendientes.find(p=>p.panicoId===a.panicoId))];let html=todos.length?todos.map(a=>`<div class="modal-row" style="border-left:4px solid var(--red)"><strong style="color:var(--red)">🚨 EMERGENCIA</strong><span style="float:right;font-size:11px;color:#888">${escHtml(a.fecha||'')}</span><br><span style="font-size:14px;font-weight:800">🏠 Mza ${escHtml(a.mza||'')} — Casa ${escHtml(a.casa||'')}</span><br>${a.mapsUrl?`<a href="${escHtml(a.mapsUrl)}" target="_blank" style="color:var(--green);font-size:12px">📍 Ver en Maps</a>`:'<span style="font-size:11px;color:#555">Sin GPS</span>'}</div>`).join(''):'<div class="empty-msg">Sin alertas hoy 🟢</div>';document.getElementById('alertas-contenido').innerHTML=html;abrirModal('modal-alertas');}
+function abrirAlertas(){
+  const hoy=new Date().toLocaleDateString('es-AR');
+  const guardados=JSON.parse(localStorage.getItem('nx_alertas_hoy')||'[]');
+  const todos=[...panicosPendientes,...guardados.filter(a=>!panicosPendientes.find(p=>p.panicoId===a.panicoId))];
+  let html=todos.length?todos.map(a=>{
+    const info = obtenerInfoTipo(a.tipo);
+    return `<div class="modal-row" style="border-left:4px solid ${info.color}">
+      <strong style="color:${info.color}">${info.icono} ${info.texto}</strong>
+      <span style="float:right;font-size:11px;color:#888">${escHtml(a.fecha||'')}</span>
+      <br>
+      <span style="font-size:14px;font-weight:800">🏠 Mza ${escHtml(a.mza||'')} — Casa ${escHtml(a.casa||'')}</span>
+      <br>
+      ${a.mapsUrl?`<a href="${escHtml(a.mapsUrl)}" target="_blank" style="color:var(--green);font-size:12px">📍 Ver en Maps</a>`:'<span style="font-size:11px;color:#555">Sin GPS</span>'}
+    </div>`;
+  }).join(''):'<div class="empty-msg">Sin alertas hoy 🟢</div>';
+  document.getElementById('alertas-contenido').innerHTML=html;
+  abrirModal('modal-alertas');
+}
 function abrirTurno(){const ahora=new Date(),hoyStr=ahora.toLocaleDateString('es-AR'),horaStr=ahora.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});const vigNombre=sessionStorage.getItem('nx_vigilador')||'—';let del=0,vis=0,sal=0,sinSal=[];const deDia=DB.filter(r=>new Date(r.tsE||0).toLocaleDateString('es-AR')===hoyStr);deDia.forEach(r=>{if(r.tipo==='DELIVERY')del++;else vis++;if(r.hS)sal++;else sinSal.push(r);});document.getElementById('turno-resumen').innerHTML=`<div class="modal-stat"><span class="modal-stat-label">👤 Vigilador</span><span style="font-weight:800;color:var(--purple)">${escHtml(vigNombre)}</span></div><div class="modal-stat"><span class="modal-stat-label">📅 Fecha</span><span style="font-weight:700;color:#fff">${hoyStr}</span></div><div class="modal-stat"><span class="modal-stat-label">🕐 Hora de cierre</span><span style="font-weight:700;color:#fff">${horaStr}</span></div>` +
     (()=>{const ini=localStorage.getItem('nx_turno_inicio');if(!ini)return'';const diff=Math.floor((Date.now()-new Date(ini).getTime())/60000);const h=Math.floor(diff/60),m=diff%60;const dur=h>0?`${h}h ${String(m).padStart(2,'0')}min`:`${m}min`;return`<div class="modal-stat"><span class="modal-stat-label">⏱ Duración del turno</span><span style="font-weight:800;color:var(--purple)">${dur}</span></div>`;})() + `<div class="modal-stat"><span class="modal-stat-label">📋 Total ingresos</span><span class="modal-stat-val" style="color:var(--cyan)">${deDia.length}</span></div><div class="modal-stat"><span class="modal-stat-label">📤 Con salida</span><span class="modal-stat-val" style="color:var(--green)">${sal}</span></div><div class="modal-stat"><span class="modal-stat-label">🚨 Sin salida</span><span class="modal-stat-val" style="color:${sinSal.length>0?'var(--red)':'#888'}">${sinSal.length}</span></div>${sinSal.map(r=>`<div class="modal-row" style="border-left:3px solid var(--red)"><strong>${escHtml(r.pat)}</strong> · Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')}</div>`).join('')}`;document.getElementById('pdf-report').innerHTML=`<h2>NEXOS — Cierre de Turno</h2><p>${hoyStr} | ${horaStr} | Vigilador: ${escHtml(vigNombre)}</p><table><tr><th>Patente</th><th>DNI</th><th>Destino</th><th>Tipo</th><th>Entrada</th><th>Salida</th></tr>${deDia.map(r=>`<tr><td>${escHtml(r.pat)}</td><td>${escHtml(r.dni||'-')}</td><td>Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')}</td><td>${escHtml(r.tipo)}</td><td>${escHtml(limpiarHora(r.hE))}</td><td style="color:${r.hS?'#27ae60':'#e74c3c'}">${r.hS?escHtml(limpiarHora(r.hS)):'SIN SALIDA'}</td></tr>`).join('')}</table>`;abrirModal('modal-turno');}
 function imprimirTurno(){document.getElementById('pdf-report').style.display='block';setTimeout(()=>{window.print();setTimeout(()=>{document.getElementById('pdf-report').style.display='none';localStorage.removeItem('nx_turno_inicio');localStorage.removeItem('nx_turno_vigilador');},1000);},100);}
@@ -4400,8 +4467,9 @@ function pushTestLocal() {
 // ── HOOKS AUTOMÁTICOS ─────────────────────────────────────
 // Se llaman desde sincronizar() cuando llegan pánico/alertas
 function pushNotifPanico(alerta) {
+  const info = obtenerInfoTipo(alerta.tipo);
   pushNotifLocal(
-    '🚨 EMERGENCIA — NEXOS',
+    `${info.icono} ${info.texto} — NEXOS`,
     `Pánico: Mza ${alerta.mza} — Casa ${alerta.casa}`,
     'nexos-panico'
   );
