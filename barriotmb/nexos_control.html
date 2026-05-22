@@ -1223,22 +1223,52 @@
     .ia-empty-icon { font-size: 38px; display: block; margin-bottom: 12px; }
 
     /* ── INCIDENTS LIST ITEMS ── */
-    .inc-item { background: var(--bg3); border-radius: 16px; padding: 14px; margin-bottom: 10px; border-left: 5px solid var(--gold); border: 1px solid rgba(255,255,255,0.02); border-left: 5px solid var(--gold); position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-    .inc-item.grave { border-left-color: var(--red); background: rgba(239, 68, 68, 0.05); }
-    .inc-item.normal { border-left-color: var(--gold); }
-    .inc-item.info { border-left-color: var(--blue); }
-    .inc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 8px; }
-    .inc-hora { font-size: 11px; color: var(--text-muted); font-family: monospace; font-weight: 700; white-space: nowrap; }
-    .inc-tipo-badge { font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 20px; border: 1.5px solid transparent; white-space: nowrap; text-transform: uppercase; }
-    .inc-tipo-grave { background: rgba(239, 68, 68, 0.15); border-color: var(--red); color: var(--red); }
-    .inc-tipo-normal { background: rgba(245, 158, 11, 0.15); border-color: var(--gold); color: var(--gold); }
-    .inc-tipo-info { background: rgba(59, 130, 246, 0.15); border-color: var(--blue); color: var(--blue); }
-    .inc-desc { font-size: 14px; color: var(--text); line-height: 1.5; margin-bottom: 8px; word-break: break-word; }
-    .inc-vig { font-size: 11px; color: var(--text-muted); font-weight: 700; }
-    .inc-foto { width: 100%; max-height: 180px; object-fit: cover; border-radius: 12px; margin-top: 8px; cursor: pointer; border: 1px solid var(--border); }
-    .inc-del-btn { display: flex; align-items: center; gap: 5px; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); color: #ff7777; border-radius: 10px; padding: 7px 13px; font-size: 12px; font-weight: 800; cursor: pointer; transition: all 0.2s; }
-    .inc-del-btn:active { background: rgba(239, 68, 68, 0.2); }
-    .inc-actions-row { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .inc-item {
+      background: linear-gradient(135deg, rgba(25, 25, 35, 0.4) 0%, rgba(15, 15, 20, 0.4) 100%);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-left: 4px solid var(--gold);
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .inc-item:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+    }
+    .inc-item.grave {
+      border-left-color: #f43f5e;
+      background: linear-gradient(135deg, rgba(244, 63, 94, 0.06) 0%, rgba(15, 15, 20, 0.4) 100%);
+      box-shadow: 0 10px 30px rgba(244, 63, 94, 0.05);
+    }
+    .inc-item.normal {
+      border-left-color: #f59e0b;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.06) 0%, rgba(15, 15, 20, 0.4) 100%);
+      box-shadow: 0 10px 30px rgba(245, 158, 11, 0.05);
+    }
+    .inc-item.info {
+      border-left-color: #0ea5e9;
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.06) 0%, rgba(15, 15, 20, 0.4) 100%);
+      box-shadow: 0 10px 30px rgba(14, 165, 233, 0.05);
+    }
+    .inc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; }
+    .inc-hora { font-size: 11px; color: var(--text-muted); font-family: monospace; font-weight: 700; white-space: nowrap; opacity: 0.8; }
+    .inc-tipo-badge { font-size: 9px; font-weight: 900; padding: 3px 8px; border-radius: 6px; border: 1px solid transparent; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.5px; }
+    .inc-tipo-grave { background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.3); color: #ff647c; }
+    .inc-tipo-normal { background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.3); color: #fbbf24; }
+    .inc-tipo-info { background: rgba(14, 165, 233, 0.15); border-color: rgba(14, 165, 233, 0.3); color: #38bdf8; }
+    .inc-desc { font-size: 14px; color: #eee; line-height: 1.6; margin-bottom: 10px; word-break: break-word; font-weight: 500; }
+    .inc-vig { font-size: 11px; color: var(--text-muted); font-weight: 700; display: flex; align-items: center; gap: 4px; opacity: 0.85; margin-bottom: 4px; }
+    .inc-foto { width: 100%; max-height: 200px; object-fit: cover; border-radius: 12px; margin-top: 10px; cursor: pointer; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 6px 18px rgba(0,0,0,0.4); transition: transform 0.25s ease; }
+    .inc-foto:hover { transform: scale(1.01); }
+    .inc-del-btn { display: flex; align-items: center; gap: 6px; background: rgba(244, 63, 94, 0.08); border: 1px solid rgba(244, 63, 94, 0.3); color: #fda4af; border-radius: 10px; padding: 6px 12px; font-size: 11px; font-weight: 800; cursor: pointer; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 0.2px; }
+    .inc-del-btn:hover { background: rgba(244, 63, 94, 0.15); border-color: #f43f5e; color: #fff; }
+    .inc-del-btn:active { background: rgba(244, 63, 94, 0.25); }
+    .inc-actions-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
     
     .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9500; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
     .confirm-overlay.visible { display: flex; }
@@ -1260,24 +1290,178 @@
     .confirm-btn-cancel { padding: 14px; background: var(--bg3); border: 1px solid var(--border); color: var(--text-muted); border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; }
     .confirm-btn-delete { padding: 14px; background: var(--red); border: none; color: #fff; border-radius: 12px; font-weight: 900; font-size: 14px; cursor: pointer; }
     
-    .inc-wa-btn { display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; background: rgba(37, 211, 102, 0.12); border: 1px solid rgba(37, 211, 102, 0.45); color: #25d366; border-radius: 20px; padding: 5px 12px; font-size: 11px; font-weight: 800; cursor: pointer; transition: all 0.2s; }
+    .inc-wa-btn { display: inline-flex; align-items: center; gap: 6px; background: rgba(37, 211, 102, 0.08); border: 1px solid rgba(37, 211, 102, 0.3); color: #34d399; border-radius: 10px; padding: 6px 12px; font-size: 11px; font-weight: 800; cursor: pointer; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 0.2px; }
+    .inc-wa-btn:hover { background: rgba(37, 211, 102, 0.15); border-color: #25d366; color: #fff; }
     .inc-wa-btn:active { background: rgba(37, 211, 102, 0.25); }
-    .inc-wa-resumen-btn { width: 100%; border: none; border-radius: 14px; padding: 14px; font-weight: 900; font-size: 14px; cursor: pointer; margin-bottom: 8px; background: rgba(37, 211, 102, 0.15); border: 1px solid rgba(37, 211, 102, 0.5); color: #25d366; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
-    .inc-wa-resumen-btn:active { background: rgba(37, 211, 102, 0.28); }
+    .inc-wa-resumen-btn {
+      width: 100%;
+      border-radius: 14px;
+      padding: 14px;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      margin-top: 10px;
+      margin-bottom: 0;
+      background: rgba(37, 211, 102, 0.08);
+      border: 1px solid rgba(37, 211, 102, 0.4);
+      color: #34d399;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+      text-transform: uppercase;
+    }
+    .inc-wa-resumen-btn:hover {
+      background: rgba(37, 211, 102, 0.15);
+      border-color: #25d366;
+      color: #fff;
+      box-shadow: 0 0 15px rgba(37, 211, 102, 0.15);
+      transform: translateY(-1px);
+    }
+    .inc-wa-resumen-btn:active {
+      transform: translateY(1px);
+      box-shadow: none;
+    }
     
-    .inc-form { background: var(--bg2); border-radius: 20px; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); }
-    .inc-textarea { width: 100%; background: rgba(9, 9, 11, 0.5); border: 2px solid var(--border); border-radius: 12px; color: #fff; font-size: 15px; padding: 13px; resize: none; min-height: 80px; outline: none; line-height: 1.5; transition: border-color 0.2s; }
-    .inc-textarea:focus { border-color: var(--gold); }
-    .inc-tipo-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 10px 0; }
-    .inc-tipo-btn { border: 2px solid var(--border); border-radius: 12px; padding: 10px 4px; font-size: 12px; font-weight: 800; cursor: pointer; text-align: center; background: rgba(9,9,11,0.5); color: var(--text-muted); transition: all 0.2s; text-transform: uppercase; }
-    .inc-tipo-btn.sel-grave { border-color: var(--red); background: rgba(239, 68, 68, 0.15); color: var(--red); }
-    .inc-tipo-btn.sel-normal { border-color: var(--gold); background: rgba(245, 158, 11, 0.12); color: var(--gold); }
-    .inc-tipo-btn.sel-info { border-color: var(--blue); background: rgba(59, 130, 246, 0.12); color: var(--blue); }
-    .inc-foto-preview { width: 100%; max-height: 140px; object-fit: cover; border-radius: 10px; margin: 8px 0; display: none; border: 1.5px solid var(--border); }
-    .inc-foto-btn { display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(9,9,11,0.3); border: 2px dashed var(--border); border-radius: 12px; padding: 12px; color: var(--text-muted); font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; width: 100%; margin-bottom: 8px; }
-    .inc-foto-btn:active { border-color: var(--gold); color: var(--gold); }
-    .inc-guardar-btn { width: 100%; padding: 16px; background: var(--gold); color: #000; border: none; border-radius: 14px; font-weight: 900; font-size: 15px; cursor: pointer; transition: all 0.2s; }
-    .inc-guardar-btn:active { transform: scale(0.97); }
+    .inc-form {
+      background: rgba(30, 30, 38, 0.4);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 8px 32px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+    }
+    .inc-textarea {
+      width: 100%;
+      background: rgba(10, 10, 15, 0.6);
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      color: #fff;
+      font-size: 14px;
+      padding: 14px;
+      resize: none;
+      min-height: 90px;
+      outline: none;
+      line-height: 1.5;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+    }
+    .inc-textarea:focus {
+      background: rgba(15, 15, 22, 0.8);
+    }
+    .inc-tipo-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 16px 0; }
+    .inc-tipo-btn {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px 6px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      text-align: center;
+      background: rgba(25, 25, 30, 0.5);
+      color: var(--text-muted);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      user-select: none;
+    }
+    .inc-tipo-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .inc-tipo-btn.sel-grave {
+      border-color: #f43f5e;
+      background: rgba(244, 63, 94, 0.12);
+      color: #ff647c;
+      box-shadow: 0 0 14px rgba(244, 63, 94, 0.25), inset 0 1px 0 rgba(255,255,255,0.1);
+      text-shadow: 0 0 8px rgba(244, 63, 94, 0.4);
+    }
+    .inc-tipo-btn.sel-normal {
+      border-color: #f59e0b;
+      background: rgba(245, 158, 11, 0.12);
+      color: #fbbf24;
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.25), inset 0 1px 0 rgba(255,255,255,0.1);
+      text-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+    }
+    .inc-tipo-btn.sel-info {
+      border-color: #0ea5e9;
+      background: rgba(14, 165, 233, 0.12);
+      color: #38bdf8;
+      box-shadow: 0 0 14px rgba(14, 165, 233, 0.25), inset 0 1px 0 rgba(255,255,255,0.1);
+      text-shadow: 0 0 8px rgba(14, 165, 233, 0.4);
+    }
+    .inc-foto-preview {
+      width: 100%;
+      max-height: 160px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin: 10px 0;
+      display: none;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .inc-foto-preview:hover { transform: scale(1.02); }
+    .inc-foto-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1.5px dashed rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 14px;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      width: 100%;
+      margin-bottom: 12px;
+    }
+    .inc-foto-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.25);
+      color: #fff;
+    }
+    .inc-foto-btn:active { transform: scale(0.98); }
+    .inc-guardar-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #000;
+      border: none;
+      border-radius: 14px;
+      font-weight: 900;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-transform: uppercase;
+    }
+    .inc-guardar-btn:hover {
+      background: linear-gradient(135deg, #fbbf24 0%, #ea580c 100%);
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+      transform: translateY(-1px);
+    }
+    .inc-guardar-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 10px rgba(245, 158, 11, 0.2);
+    }
     .inc-empty { text-align: center; color: var(--text-muted); padding: 24px 0; font-size: 13px; }
     .inc-counter { display: inline-block; background: var(--red); color: #fff; border-radius: 50%; width: 16px; height: 16px; font-size: 9px; font-weight: 900; line-height: 16px; text-align: center; margin-left: 4px; vertical-align: middle; }
     
@@ -1496,6 +1680,73 @@
   </div>
 </div>
 
+<!-- PROPIETARIOS -->
+<div class="modal-overlay" id="modal-propietarios">
+  <div class="modal-box" style="max-width:550px;">
+    <button class="modal-close" onclick="cerrarModal('modal-propietarios')">✕</button>
+    <div class="modal-title" style="color:var(--green)">👥 DIRECTORIO DE PROPIETARIOS</div>
+    
+    <!-- VISTA PIN ACCESO -->
+    <div id="prop-vista-pin">
+      <p class="gpin-label">🔒 Ingresá la contraseña para acceder</p>
+      <div class="gpin-puntos" style="justify-content:center;margin-bottom:12px;">
+        <div class="gpin-punto" id="pp0"></div>
+        <div class="gpin-punto" id="pp1"></div>
+        <div class="gpin-punto" id="pp2"></div>
+        <div class="gpin-punto" id="pp3"></div>
+      </div>
+      <div class="gpin-teclado">
+        <div class="gpin-key" onclick="propPinTecla('1')">1</div><div class="gpin-key" onclick="propPinTecla('2')">2</div><div class="gpin-key" onclick="propPinTecla('3')">3</div>
+        <div class="gpin-key" onclick="propPinTecla('4')">4</div><div class="gpin-key" onclick="propPinTecla('5')">5</div><div class="gpin-key" onclick="propPinTecla('6')">6</div>
+        <div class="gpin-key" onclick="propPinTecla('7')">7</div><div class="gpin-key" onclick="propPinTecla('8')">8</div><div class="gpin-key" onclick="propPinTecla('9')">9</div>
+        <div class="gpin-key vacio"></div><div class="gpin-key" onclick="propPinTecla('0')">0</div><div class="gpin-key borra" onclick="propPinBorrar()">&#x232B;</div>
+      </div>
+      <div class="gpin-error" id="prop-pin-error"></div>
+    </div>
+    
+    <!-- VISTA LISTADO DE PROPIETARIOS -->
+    <div id="prop-vista-lista" style="display:none;">
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <input class="modal-search" id="prop-buscar-input" placeholder="🔍 Buscar por patente o nombre..." oninput="renderPropietarios()" style="margin-bottom:0; flex:1;">
+        <button class="btn-modal-action" style="background:var(--green);color:#000;font-weight:900;margin:0;width:auto;padding:0 16px;" onclick="mostrarPropForm(true)">➕ NUEVO</button>
+      </div>
+      <div id="prop-lista-contenido" style="max-height:45vh;overflow-y:auto;margin-top:10px;padding-right:4px;"></div>
+    </div>
+    
+    <!-- VISTA FORMULARIO DE ALTA -->
+    <div id="prop-vista-form" style="display:none;">
+      <div class="modal-title" style="font-size:16px;color:var(--green);margin-top:0;">📝 AGREGAR NUEVO PROPIETARIO</div>
+      
+      <div class="campo-label">PATENTE *</div>
+      <input class="modal-search" id="prop-pat" placeholder="PATENTE (ej: AA 123 BB)" oninput="autoformatearPatente(this)" autocomplete="off">
+      
+      <div class="campo-label">NOMBRE COMPLETO *</div>
+      <input class="modal-search" id="prop-nombre" placeholder="Nombre y Apellido">
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div>
+          <div class="campo-label">MANZANA *</div>
+          <input class="modal-search" id="prop-mza" placeholder="Ej: 5" inputmode="numeric">
+        </div>
+        <div>
+          <div class="campo-label">CASA *</div>
+          <input class="modal-search" id="prop-casa" placeholder="Ej: 12" inputmode="numeric">
+        </div>
+      </div>
+      
+      <div class="campo-label">OBSERVACIONES</div>
+      <input class="modal-search" id="prop-obs" placeholder="Ej: Lote central, vehículo principal...">
+      
+      <div class="gpin-error" id="prop-form-error"></div>
+      
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="btn-modal-action" style="background:var(--green);color:#000;font-weight:900;margin:0;" onclick="guardarNuevoPropietario()">💾 REGISTRAR</button>
+        <button class="btn-modal-action" style="background:var(--border);color:#888;margin:0;" onclick="mostrarPropForm(false)">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- HISTORIAL SHEET -->
 <div class="modal-overlay" id="modal-historial-sheet">
   <div class="modal-box" style="max-width:500px;">
@@ -1592,9 +1843,9 @@
 <!-- ══ INCIDENTES MODAL ══ -->
 <div class="modal-overlay" id="modal-incidentes" style="align-items:center;">
   <div class="modal-box" style="max-width:480px;padding-top:0;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;">
-    <div style="position:sticky;top:0;background:var(--bg2);z-index:10;padding:18px 22px 10px;margin:0 -22px;border-radius:20px 20px 0 0;display:flex;align-items:center;justify-content:space-between;">
+    <div style="position:sticky;top:0;background:rgba(18, 18, 24, 0.85);backdrop-filter:blur(20px);z-index:10;padding:18px 22px 12px;margin:0 -22px 16px;border-radius:20px 20px 0 0;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.05);">
       <div class="modal-title" style="margin:0;">📋 REGISTRO DE INCIDENTES</div>
-      <button onclick="cerrarModal('modal-incidentes')" style="background:none;border:none;color:#888;font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;border-radius:8px;flex-shrink:0;">✕</button>
+      <button onclick="cerrarModal('modal-incidentes')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text-muted);font-size:14px;cursor:pointer;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;" onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.color='var(--text-muted)';">✕</button>
     </div>
     <!-- Formulario nuevo incidente -->
     <div class="inc-form">
@@ -1653,7 +1904,7 @@
     <div class="qr-field-row"><span class="qr-field-label">PATENTE</span><input class="qr-field-input" id="qr-f-pat" placeholder="Patente" maxlength="10" oninput="this.value=this.value.toUpperCase()"></div>
     <div class="qr-field-row"><span class="qr-field-label">DNI</span><input class="qr-field-input" id="qr-f-dni" placeholder="DNI" inputmode="numeric" maxlength="9"></div>
     <div class="qr-dest-grid"><div class="qr-field-row"><span class="qr-field-label">MZA</span><input class="qr-field-input" id="qr-f-mza" placeholder="Mza" inputmode="numeric" maxlength="4"></div><div class="qr-field-row"><span class="qr-field-label">CASA</span><input class="qr-field-input" id="qr-f-casa" placeholder="Casa" inputmode="numeric" maxlength="4"></div></div>
-    <div class="qr-field-row" style="margin-bottom:0;"><span class="qr-field-label">TIPO</span><select class="qr-field-input" id="qr-f-tipo" style="cursor:pointer;"><option value="VISITA">VISITA</option><option value="DELIVERY">DELIVERY</option><option value="MANUAL">MANUAL</option></select></div>
+    <div class="qr-field-row" style="margin-bottom:0;"><span class="qr-field-label">TIPO</span><select class="qr-field-input" id="qr-f-tipo" style="cursor:pointer;"><option value="VISITA">VISITA</option><option value="DELIVERY">DELIVERY</option><option value="MANUAL">MANUAL</option><option value="PROPIETARIO">PROPIETARIO</option></select></div>
     <button class="qr-btn-confirm" id="qr-btn-confirm" onclick="confirmarIngresoQR()" style="margin-top:12px;">📥 REGISTRAR INGRESO</button>
     <button class="qr-btn-rescan" onclick="qrReescanear()">🔄 VOLVER A ESCANEAR</button>
     <div class="qr-raw-display" id="qr-raw-display"></div>
@@ -1709,6 +1960,7 @@
         <div class="menu-item" style="color:var(--gold);" onclick="abrirIncidentes()"><span class="menu-item-icon">📝</span>Registro de incidentes<span id="inc-menu-badge" style="display:none;margin-left:6px;background:var(--red);color:#fff;font-size:9px;font-weight:900;border-radius:20px;padding:2px 7px;"></span></div>
         <div class="menu-section-label">ADMINISTRACIÓN</div>
         <div class="menu-item" style="color:var(--purple);" onclick="abrirBaneo()"><span class="menu-item-icon">🚷</span>Baneo de vecinos</div>
+        <div class="menu-item" style="color:var(--green);" onclick="abrirPropietarios()"><span class="menu-item-icon">👥</span>Propietarios</div>
         <div class="menu-section-label">SISTEMA</div>
         <div class="menu-item danger" onclick="abrirReset()"><span class="menu-item-icon">📤</span>Dar salida general</div>
         <div class="menu-item" onclick="ver('config');cerrarMenu()"><span class="menu-item-icon">⚙️</span>Configuración</div>
@@ -2353,6 +2605,7 @@ async function sincronizar(manual=false){
     if(data.baneados)cargarBaneadosDesdeCloud(data.baneados);
     if(Array.isArray(data.listaNegra)&&data.listaNegra.length>0){LISTA_NEGRA=data.listaNegra;localStorage.setItem('nx_lista_negra',JSON.stringify(LISTA_NEGRA));}
     if(Array.isArray(data.vigiladores)&&data.vigiladores.length>0){VIGILADORES=data.vigiladores;localStorage.setItem('nx_vigiladores',JSON.stringify(VIGILADORES));}
+    if(Array.isArray(data.propietarios)){PROPIETARIOS=data.propietarios;localStorage.setItem('nx_propietarios',JSON.stringify(PROPIETARIOS));if(typeof renderPropietarios==='function')renderPropietarios();}
     if(Array.isArray(data.online)){_vigsOnline=data.online;renderVigsOnline();}
     // ── Desconexión forzada desde el Sheet ──
     const miNombre = sessionStorage.getItem('nx_vigilador') || '';
@@ -2641,11 +2894,73 @@ function autoformatearPatente(input) {
   const diff = formatted.length - prevLen;
   const newPos = Math.max(0, pos + diff);
   try { input.setSelectionRange(newPos, newPos); } catch(e) {}
+
+  // ── DETECTAR PROPIETARIO EN FORMULARIOS MANUALES ──
+  if (input.id === 'm-pat' || input.id === 'd-pat') {
+    const prop = verificarPropietario(formatted);
+    if (prop) {
+      const pre = input.id === 'm-pat' ? 'm-' : 'd-';
+      const mzaEl = document.getElementById(pre + 'mza');
+      const casaEl = document.getElementById(pre + 'casa');
+      if (mzaEl && casaEl && (!mzaEl.value || !casaEl.value)) {
+        mzaEl.value = prop.mza;
+        casaEl.value = prop.casa;
+        showToast("👥 Propietario: " + prop.nombre + " (Mza " + prop.mza + " Casa " + prop.casa + ")");
+      }
+    }
+  }
 }
 
 // ── REGISTROS ─────────────────────────────────────────────
-function registrarRapido(tipo){const val=document.getElementById('buscador').value.trim();if(!val)return;const hora=horaActual();let item;if(tipo==='ingreso'){verificarListaNegra(val,val);item={id:Date.now(),pat:val,tipo:'VISITA',hE:hora,hS:'',tsE:Date.now(),mza:'',casa:'',dni:'',vig:sessionStorage.getItem('nx_vigilador')||''};DB.push(item);lsSet('nx_db',JSON.stringify(DB));render();enviar(item);document.getElementById('buscador').value='';}else{// Verificar que exista antes de pedir confirmación
-const c=DB.filter(x=>x.pat===val&&!x.hS).sort((a,b)=>(b.tsE||0)-(a.tsE||0));if(!c.length){showToast("❌ NO ENCONTRADO");return;}pedirConfirmacionSalidaRapida(val);}}
+function registrarRapido(tipo){
+  const val=document.getElementById('buscador').value.trim().toUpperCase();
+  if(!val)return;
+  const hora=horaActual();
+  let item;
+  if(tipo==='ingreso'){
+    verificarListaNegra(val,val);
+    const prop = verificarPropietario(val);
+    if(prop){
+      item={
+        id:Date.now(),
+        pat:val,
+        tipo:'PROPIETARIO',
+        hE:hora,
+        hS:'',
+        tsE:Date.now(),
+        mza:prop.mza,
+        casa:prop.casa,
+        dni:'',
+        vig:sessionStorage.getItem('nx_vigilador')||''
+      };
+      showToast("🟢 INGRESO PROPIETARIO: Bienvenido " + prop.nombre);
+      emitirAlertaVoz('Ingreso propietario okey. Bienvenido ' + prop.nombre);
+    } else {
+      item={
+        id:Date.now(),
+        pat:val,
+        tipo:'VISITA',
+        hE:hora,
+        hS:'',
+        tsE:Date.now(),
+        mza:'',
+        casa:'',
+        dni:'',
+        vig:sessionStorage.getItem('nx_vigilador')||''
+      };
+    }
+    DB.push(item);
+    lsSet('nx_db',JSON.stringify(DB));
+    render();
+    enviar(item);
+    document.getElementById('buscador').value='';
+  } else {
+    // Verificar que exista antes de pedir confirmación
+    const c=DB.filter(x=>x.pat===val&&!x.hS).sort((a,b)=>(b.tsE||0)-(a.tsE||0));
+    if(!c.length){showToast("❌ NO ENCONTRADO");return;}
+    pedirConfirmacionSalidaRapida(val);
+  }
+}
 let _guardandoForm=false;
 function guardarForm(modo){
   if(_guardandoForm)return;
@@ -2983,6 +3298,206 @@ function ocultarFormBaneo(){document.getElementById('ban-vista-consulta').style.
 function confirmarBaneo(){const mza=document.getElementById('ban-mza').value.trim(),casa=document.getElementById('ban-casa').value.trim(),id=document.getElementById('ban-id').value.trim(),motivo=document.getElementById('ban-motivo').value.trim();const errEl=document.getElementById('ban-form-error');if(!mza||!casa){errEl.innerText='Manzana y Casa son obligatorios';return;}if(esBaneado(mza,casa)){errEl.innerText='Esta casa ya está baneada';return;}BANEADOS.push({mza,casa,id,motivo,ts:Date.now()});guardarBaneados();enviarBaneo({accion:'banear',mza,casa,id,motivo});showToast(`🚷 Mza ${mza} Casa ${casa} baneada`);ocultarFormBaneo();renderBaneados();}
 function enviarBaneo(datos){const url=localStorage.getItem('nx_url');if(!url)return;fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)}).catch(()=>{});}
 
+// ── PROPIETARIOS ───────────────────────────────────────────
+let PROPIETARIOS = [];
+let propPinActual = '';
+
+// Cargar desde localStorage o inicializar con datos mock para testing inmediato
+try {
+  const cachedProps = localStorage.getItem('nx_propietarios');
+  if (cachedProps) {
+    PROPIETARIOS = JSON.parse(cachedProps);
+  } else {
+    PROPIETARIOS = [
+      { patente: "AA 123 BB", nombre: "Carlos Gómez", mza: "5", casa: "12", observaciones: "Lote central", fecha: "2026-05-22" },
+      { patente: "AF 984 JK", nombre: "Mariela Fernández", mza: "3", casa: "24", observaciones: "Ingreso sin restricción", fecha: "2026-05-22" }
+    ];
+    localStorage.setItem('nx_propietarios', JSON.stringify(PROPIETARIOS));
+  }
+} catch (e) {
+  PROPIETARIOS = [];
+}
+
+function abrirPropietarios() {
+  cerrarMenu();
+  propPinActual = '';
+  actualizarPropPuntos();
+  document.getElementById('prop-pin-error').innerText = '';
+  document.getElementById('prop-vista-pin').style.display = 'block';
+  document.getElementById('prop-vista-lista').style.display = 'none';
+  document.getElementById('prop-vista-form').style.display = 'none';
+  abrirModal('modal-propietarios');
+}
+
+function actualizarPropPuntos() {
+  for (let i = 0; i < 4; i++) {
+    const el = document.getElementById('pp' + i);
+    if (el) el.classList.toggle('lleno', i < propPinActual.length);
+  }
+}
+
+function propPinTecla(d) {
+  if (propPinActual.length >= 4) return;
+  propPinActual += d;
+  actualizarPropPuntos();
+  if (propPinActual.length === 4) {
+    setTimeout(verificarPropPin, 120);
+  }
+}
+
+function propPinBorrar() {
+  propPinActual = propPinActual.slice(0, -1);
+  actualizarPropPuntos();
+  document.getElementById('prop-pin-error').innerText = '';
+}
+
+function verificarPropPin() {
+  if (propPinActual === '2401') {
+    document.getElementById('prop-vista-pin').style.display = 'none';
+    document.getElementById('prop-vista-lista').style.display = 'block';
+    document.getElementById('prop-buscar-input').value = '';
+    renderPropietarios();
+  } else {
+    document.getElementById('prop-pin-error').innerText = 'CONTRASEÑA INCORRECTA';
+    const box = document.querySelector('#modal-propietarios .modal-box');
+    if (box) {
+      box.style.borderColor = 'var(--red)';
+      box.style.boxShadow = '0 0 15px rgba(231,76,60,0.5)';
+      setTimeout(() => { 
+        box.style.borderColor = ''; 
+        box.style.boxShadow = '';
+      }, 500);
+    }
+    propPinActual = '';
+    actualizarPropPuntos();
+  }
+}
+
+function mostrarPropForm(visible) {
+  if (visible) {
+    document.getElementById('prop-vista-lista').style.display = 'none';
+    document.getElementById('prop-vista-form').style.display = 'block';
+    document.getElementById('prop-pat').value = '';
+    document.getElementById('prop-nombre').value = '';
+    document.getElementById('prop-mza').value = '';
+    document.getElementById('prop-casa').value = '';
+    document.getElementById('prop-obs').value = '';
+    document.getElementById('prop-form-error').innerText = '';
+  } else {
+    document.getElementById('prop-vista-form').style.display = 'none';
+    document.getElementById('prop-vista-lista').style.display = 'block';
+    renderPropietarios();
+  }
+}
+
+function renderPropietarios() {
+  const q = document.getElementById('prop-buscar-input').value.trim().toUpperCase();
+  const filtrados = PROPIETARIOS.filter(p => {
+    return !q || p.patente.toUpperCase().replace(/\s/g, '').includes(q.replace(/\s/g, '')) || p.nombre.toUpperCase().includes(q);
+  });
+  
+  const cont = document.getElementById('prop-lista-contenido');
+  if (!filtrados.length) {
+    cont.innerHTML = '<div class="empty-msg">No se encontraron propietarios</div>';
+    return;
+  }
+  
+  cont.innerHTML = filtrados.map(p => {
+    return `<div class="modal-row" style="border-left:4px solid var(--green); display:flex; justify-content:space-between; align-items:center; padding:10px 14px; margin-bottom:8px;">
+      <div>
+        <strong style="color:var(--green); font-size:15px; font-family: monospace;">🚗 ${escHtml(p.patente)}</strong>
+        <span style="color:#aaa; font-weight:800; font-size:12px; margin-left:8px;">Mza ${escHtml(p.mza)} - Casa ${escHtml(p.casa)}</span>
+        <br>
+        <span style="font-size:13px; font-weight:700; color:#fff;">👤 ${escHtml(p.nombre)}</span>
+        ${p.observaciones ? `<br><span style="font-size:11px; color:#888; font-style:italic;">💬 ${escHtml(p.observaciones)}</span>` : ''}
+        <br>
+        <span style="font-size:9px; color:#555;">Alta: ${escHtml(p.fecha || '')}</span>
+      </div>
+      <button class="ban-unban-btn" style="background:rgba(231,76,60,0.1); border:1px solid rgba(231,76,60,0.3); color:var(--red); padding:6px 12px; font-size:11px;" onclick="eliminarPropietarioLoc('${escHtml(p.patente)}')">ELIMINAR</button>
+    </div>`;
+  }).join('');
+}
+
+function guardarNuevoPropietario() {
+  const patInput = document.getElementById('prop-pat');
+  const pat = patInput.value.trim().toUpperCase();
+  const nom = document.getElementById('prop-nombre').value.trim();
+  const mza = document.getElementById('prop-mza').value.trim();
+  const casa = document.getElementById('prop-casa').value.trim();
+  const obs = document.getElementById('prop-obs').value.trim();
+  const errEl = document.getElementById('prop-form-error');
+  
+  if (!pat || !nom || !mza || !casa) {
+    errEl.innerText = 'Todos los campos marcados con * son obligatorios';
+    return;
+  }
+  
+  // Formatear la patente antes de guardar
+  const rawPat = pat.replace(/[^A-Z0-9]/g, '');
+  let patFormateada = pat;
+  if (rawPat.length >= 6) {
+    const startsWithTwoLetters = /^[A-Z]{2}/.test(rawPat);
+    const thirdIsLetter = rawPat.length >= 3 && /[A-Z]/.test(rawPat[2]);
+    if (startsWithTwoLetters && thirdIsLetter && rawPat.length === 6) {
+      patFormateada = rawPat.slice(0, 3) + ' ' + rawPat.slice(3, 6);
+    } else if (startsWithTwoLetters && rawPat.length === 7) {
+      patFormateada = rawPat.slice(0, 2) + ' ' + rawPat.slice(2, 5) + ' ' + rawPat.slice(5, 7);
+    }
+  }
+  
+  const index = PROPIETARIOS.findIndex(p => p.patente.replace(/\s/g,'') === patFormateada.replace(/\s/g,''));
+  const nuevo = {
+    patente: patFormateada,
+    nombre: nom,
+    mza: mza,
+    casa: casa,
+    observaciones: obs,
+    fecha: new Date().toISOString().split('T')[0]
+  };
+  
+  if (index !== -1) {
+    PROPIETARIOS[index] = nuevo;
+  } else {
+    PROPIETARIOS.push(nuevo);
+  }
+  
+  localStorage.setItem('nx_propietarios', JSON.stringify(PROPIETARIOS));
+  
+  enviar({
+    accion: 'agregar_propietario',
+    patente: patFormateada,
+    nombre: nom,
+    mza: mza,
+    casa: casa,
+    observaciones: obs,
+    fecha: nuevo.fecha
+  });
+  
+  showToast('👥 Propietario registrado con éxito');
+  mostrarPropForm(false);
+}
+
+function eliminarPropietarioLoc(patente) {
+  if (!confirm(`¿Eliminar al propietario con patente ${patente}?`)) return;
+  
+  PROPIETARIOS = PROPIETARIOS.filter(p => p.patente !== patente);
+  localStorage.setItem('nx_propietarios', JSON.stringify(PROPIETARIOS));
+  
+  enviar({
+    accion: 'eliminar_propietario',
+    patente: patente
+  });
+  
+  showToast('👥 Propietario eliminado localmente');
+  renderPropietarios();
+}
+
+function verificarPropietario(patente) {
+  if (!patente) return null;
+  const pSan = patente.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  return PROPIETARIOS.find(p => p.patente.toUpperCase().replace(/[^A-Z0-9]/g, '') === pSan) || null;
+}
+
 // ── HISTORIAL SHEET ────────────────────────────────────────
 let hsTabActual='fecha';
 function abrirHistorialSheet(){document.getElementById('hs-resultados').innerHTML='';document.getElementById('hs-status').innerText='';const hoy=new Date().toISOString().split('T')[0];document.getElementById('hs-fecha-input').value=hoy;document.getElementById('hs-pat-input').value='';hsTabs('fecha');abrirModal('modal-historial-sheet');}
@@ -3167,12 +3682,24 @@ function procesarPatenteObtenida(patente){
   document.getElementById('qr-f-casa').value='';
   document.getElementById('qr-f-tipo').value='VISITA';
   document.getElementById('qr-raw-display').innerText='🚗 Lector LPR';
+  
+  // ── DETECTAR PROPIETARIO ──
+  const prop = verificarPropietario(patente);
   const hist=DB.filter(r=>r.pat===patente&&r.mza&&r.casa).sort((a,b)=>(b.tsE||0)-(a.tsE||0))[0];
-  if(hist){
+  
+  if(prop){
+    document.getElementById('qr-f-mza').value=prop.mza;
+    document.getElementById('qr-f-casa').value=prop.casa;
+    document.getElementById('qr-f-tipo').value='PROPIETARIO';
+    document.getElementById('qr-raw-display').innerText='👥 Propietario: ' + prop.nombre;
+    showToast("🟢 Propietario detectado: Bienvenido " + prop.nombre);
+    emitirAlertaVoz('Ingreso propietario okey. Bienvenido ' + prop.nombre);
+  } else if(hist){
     document.getElementById('qr-f-mza').value=hist.mza;
     document.getElementById('qr-f-casa').value=hist.casa;
     showToast("💡 Auto-completado: Mza "+hist.mza+" Casa "+hist.casa);
   }
+  
   const lnW=document.getElementById('qr-ln-warn');
   lnW.style.display='none';
   const enLN=LISTA_NEGRA.find(r=>r.pat&&r.pat===patente);
@@ -3180,30 +3707,131 @@ function procesarPatenteObtenida(patente){
     lnW.style.display='block';
     lnW.innerText='🚫 LISTA NEGRA: '+enLN.pat+(enLN.motivo?' — '+enLN.motivo:'');
   }
+  
   const banW=document.getElementById('qr-ban-warn');
   banW.style.display='none';
-  if(hist&&esBaneado(hist.mza,hist.casa)){
+  const mzaVal = prop ? prop.mza : (hist ? hist.mza : '');
+  const casaVal = prop ? prop.casa : (hist ? hist.casa : '');
+  if(mzaVal && casaVal && esBaneado(mzaVal,casaVal)){
     banW.style.display='block';
   }
+  
   const fechaW=document.getElementById('qr-fecha-warn');
   fechaW.style.display='none';
   const icon=document.querySelector('.qr-result-icon');
   const titulo=document.querySelector('.qr-result-title');
   const btn=document.getElementById('qr-btn-confirm');
-  icon.innerText='🚗';
-  titulo.innerText='PATENTE DETECTADA — CONFIRMAR INGRESO';
-  titulo.style.color='var(--cyan)';
-  btn.disabled=false;
-  btn.style.opacity='1';
-  btn.innerText='📥 REGISTRAR INGRESO';
+  
+  if (prop) {
+    icon.innerText='🟢';
+    titulo.innerText='INGRESO PROPIETARIO OK';
+    titulo.style.color='var(--green)';
+    titulo.style.textShadow='0 0 10px rgba(46,204,113,0.5)';
+    btn.disabled=false;
+    btn.style.opacity='1';
+    btn.style.background='var(--green)';
+    btn.style.color='#000';
+    btn.innerText='📥 INGRESO PROPIETARIO OK';
+  } else {
+    icon.innerText='🚗';
+    titulo.innerText='PATENTE DETECTADA — CONFIRMAR INGRESO';
+    titulo.style.color='var(--cyan)';
+    titulo.style.textShadow='';
+    btn.disabled=false;
+    btn.style.opacity='1';
+    btn.style.background='';
+    btn.style.color='';
+    btn.innerText='📥 REGISTRAR INGRESO';
+  }
   document.getElementById('qr-result-panel').classList.add('visible');
   setTimeout(()=>{btn.focus();},100);
 }
 function qrParsear(raw){const r={pat:'',dni:'',mza:'',casa:'',nombre:'',fecha:'',raw};const txt=raw.trim();if(txt.toUpperCase().includes('NEXOS')||txt.toUpperCase().includes('PATENTE:')||txt.toUpperCase().includes('DNI:')){const lines=txt.split(/\n/);lines.forEach(line=>{const l=line.trim();const mPat=l.match(/^Patente[:\s]+([\w]+)/i);if(mPat)r.pat=mPat[1].trim().toUpperCase();const mDni=l.match(/^DNI[:\s]+([\d]+)/i);if(mDni)r.dni=mDni[1].trim();const mMza=l.match(/Mza[:\s]+([\d]+)/i);if(mMza)r.mza=mMza[1].trim();const mCasa=l.match(/Casa[:\s]+([\d]+)/i);if(mCasa)r.casa=mCasa[1].trim();const mVis=l.match(/^Visita[:\s]+(.+)/i);if(mVis)r.nombre=mVis[1].trim();const mFecha=l.match(/^Fecha[:\s]+([\d]{4}-[\d]{2}-[\d]{2})/i);if(mFecha)r.fecha=mFecha[1].trim();});if(r.pat||r.dni)return r;}if(txt.includes('@')){const parts=txt.split('@').map(p=>p.trim()).filter(p=>p);if(parts.length>=3){const posibleDni=(parts[2]||'').replace(/\D/g,'');if(posibleDni.length>=6)r.dni=posibleDni;r.nombre=((parts[1]||'')+' '+(parts[0]||'')).trim();}return r;}try{const obj=JSON.parse(txt);r.pat=(obj.pat||obj.patente||'').toUpperCase();r.dni=(obj.dni||'').replace(/\D/g,'');r.mza=(obj.mza||'').toString();r.casa=(obj.casa||'').toString();return r;}catch(e){}const san=txt.replace(/\s/g,'').toUpperCase();if(/^[A-Z]{2,3}\d{3}[A-Z]{0,2}$|^[A-Z]{3}\d{3}$/.test(san)){r.pat=san;return r;}if(/^\d{7,9}$/.test(txt.replace(/[.\s]/g,''))){r.dni=txt.replace(/[.\s]/g,'');return r;}return r;}
-function qrProcesar(raw){qrDetenerCamara();document.getElementById('qr-overlay').classList.remove('visible');const datos=qrParsear(raw);document.getElementById('qr-f-pat').value=datos.pat;document.getElementById('qr-f-dni').value=datos.dni;document.getElementById('qr-f-mza').value=datos.mza;document.getElementById('qr-f-casa').value=datos.casa;document.getElementById('qr-f-tipo').value='VISITA';document.getElementById('qr-raw-display').innerText=datos.nombre?'👤 '+datos.nombre:raw.length<200?'📋 '+raw:'';const lnW=document.getElementById('qr-ln-warn');lnW.style.display='none';const enLN=LISTA_NEGRA.find(r=>(datos.pat&&r.pat&&r.pat===datos.pat)||(datos.dni&&r.dni&&r.dni===datos.dni));if(enLN){lnW.style.display='block';lnW.innerText='🚫 LISTA NEGRA: '+(enLN.pat||enLN.dni)+(enLN.motivo?' — '+enLN.motivo:'');}const banW=document.getElementById('qr-ban-warn');banW.style.display=(datos.mza&&datos.casa&&esBaneado(datos.mza,datos.casa))?'block':'none';
-/* ── VALIDACIÓN DE FECHA ── */
-const fechaW=document.getElementById('qr-fecha-warn');const icon=document.querySelector('.qr-result-icon');const titulo=document.querySelector('.qr-result-title');const btn=document.getElementById('qr-btn-confirm');let qrVencido=false;if(datos.fecha){const hoy=new Date();const hoyStr=hoy.getFullYear()+'-'+String(hoy.getMonth()+1).padStart(2,'0')+'-'+String(hoy.getDate()).padStart(2,'0');qrVencido=datos.fecha!==hoyStr;}if(qrVencido){fechaW.style.display='block';fechaW.innerText='⏰ QR VENCIDO — Fecha del QR: '+datos.fecha.split('-').reverse().join('/');icon.innerText='❌';titulo.innerText='QR VENCIDO — ACCESO DENEGADO';titulo.style.color='var(--red)';btn.disabled=true;btn.style.opacity='0.35';btn.innerText='🚫 VENCIDO — NO PUEDE INGRESAR';}else{fechaW.style.display='none';icon.innerText='✅';titulo.innerText='QR LEÍDO — CONFIRMAR INGRESO';titulo.style.color='var(--cyan)';btn.disabled=false;btn.style.opacity='1';btn.innerText='📥 REGISTRAR INGRESO';}
-document.getElementById('qr-result-panel').classList.add('visible');}
+function qrProcesar(raw){
+  qrDetenerCamara();
+  document.getElementById('qr-overlay').classList.remove('visible');
+  const datos=qrParsear(raw);
+  document.getElementById('qr-f-pat').value=datos.pat;
+  document.getElementById('qr-f-dni').value=datos.dni;
+  document.getElementById('qr-f-mza').value=datos.mza;
+  document.getElementById('qr-f-casa').value=datos.casa;
+  document.getElementById('qr-f-tipo').value='VISITA';
+  document.getElementById('qr-raw-display').innerText=datos.nombre?'👤 '+datos.nombre:raw.length<200?'📋 '+raw:'';
+  
+  // ── DETECTAR PROPIETARIO ──
+  const prop = verificarPropietario(datos.pat);
+  if(prop){
+    document.getElementById('qr-f-mza').value=prop.mza;
+    document.getElementById('qr-f-casa').value=prop.casa;
+    document.getElementById('qr-f-tipo').value='PROPIETARIO';
+    document.getElementById('qr-raw-display').innerText='👥 Propietario: ' + prop.nombre;
+    showToast("🟢 Propietario detectado: Bienvenido " + prop.nombre);
+    emitirAlertaVoz('Ingreso propietario okey. Bienvenido ' + prop.nombre);
+  }
+  
+  const lnW=document.getElementById('qr-ln-warn');
+  lnW.style.display='none';
+  const enLN=LISTA_NEGRA.find(r=>(datos.pat&&r.pat&&r.pat===datos.pat)||(datos.dni&&r.dni&&r.dni===datos.dni));
+  if(enLN){
+    lnW.style.display='block';
+    lnW.innerText='🚫 LISTA NEGRA: '+(enLN.pat||enLN.dni)+(enLN.motivo?' — '+enLN.motivo:'');
+  }
+  
+  const banW=document.getElementById('qr-ban-warn');
+  const finalMza = prop ? prop.mza : datos.mza;
+  const finalCasa = prop ? prop.casa : datos.casa;
+  banW.style.display=(finalMza&&finalCasa&&esBaneado(finalMza,finalCasa))?'block':'none';
+  
+  /* ── VALIDACIÓN DE FECHA ── */
+  const fechaW=document.getElementById('qr-fecha-warn');
+  const icon=document.querySelector('.qr-result-icon');
+  const titulo=document.querySelector('.qr-result-title');
+  const btn=document.getElementById('qr-btn-confirm');
+  let qrVencido=false;
+  if(datos.fecha){
+    const hoy=new Date();
+    const hoyStr=hoy.getFullYear()+'-'+String(hoy.getMonth()+1).padStart(2,'0')+'-'+String(hoy.getDate()).padStart(2,'0');
+    qrVencido=datos.fecha!==hoyStr;
+  }
+  
+  if(qrVencido){
+    fechaW.style.display='block';
+    fechaW.innerText='⏰ QR VENCIDO — Fecha del QR: '+datos.fecha.split('-').reverse().join('/');
+    icon.innerText='❌';
+    titulo.innerText='QR VENCIDO — ACCESO DENEGADO';
+    titulo.style.color='var(--red)';
+    titulo.style.textShadow='';
+    btn.disabled=true;
+    btn.style.opacity='0.35';
+    btn.style.background='';
+    btn.style.color='';
+    btn.innerText='🚫 VENCIDO — NO PUEDE INGRESAR';
+  } else {
+    fechaW.style.display='none';
+    if(prop){
+      icon.innerText='🟢';
+      titulo.innerText='INGRESO PROPIETARIO OK';
+      titulo.style.color='var(--green)';
+      titulo.style.textShadow='0 0 10px rgba(46,204,113,0.5)';
+      btn.disabled=false;
+      btn.style.opacity='1';
+      btn.style.background='var(--green)';
+      btn.style.color='#000';
+      btn.innerText='📥 INGRESO PROPIETARIO OK';
+    } else {
+      icon.innerText='✅';
+      titulo.innerText='QR LEÍDO — CONFIRMAR INGRESO';
+      titulo.style.color='var(--cyan)';
+      titulo.style.textShadow='';
+      btn.disabled=false;
+      btn.style.opacity='1';
+      btn.style.background='';
+      btn.style.color='';
+      btn.innerText='📥 REGISTRAR INGRESO';
+    }
+  }
+  document.getElementById('qr-result-panel').classList.add('visible');
+}
 function confirmarIngresoQR(){const pat=document.getElementById('qr-f-pat').value.trim().toUpperCase();const dni=document.getElementById('qr-f-dni').value.trim();const mza=document.getElementById('qr-f-mza').value.trim();const casa=document.getElementById('qr-f-casa').value.trim();const tipo=document.getElementById('qr-f-tipo').value;if(!pat&&!dni){showToast('⚠️ Ingresá al menos patente o DNI');return;}const btn=document.getElementById('qr-btn-confirm');btn.disabled=true;btn.innerText='⏳ Registrando...';const item={id:Date.now(),pat,dni,mza,casa,tipo,hE:horaActual(),hS:'',tsE:Date.now(),vig:sessionStorage.getItem('nx_vigilador')||''};DB.push(item);lsSet('nx_db',JSON.stringify(DB));render();enviar(item);document.getElementById('qr-result-panel').classList.remove('visible');showToast('📥 QR: '+(pat||'DNI '+dni)+' — INGRESO OK');btn.disabled=false;btn.innerText='📥 REGISTRAR INGRESO';}
 function qrReescanear(){document.getElementById('qr-result-panel').classList.remove('visible');abrirEscanerQR();}
 function cerrarEscanerQR(){qrDetenerCamara();document.getElementById('qr-overlay').classList.remove('visible');document.getElementById('qr-result-panel').classList.remove('visible');}
@@ -3503,10 +4131,16 @@ function incSelTipo(tipo) {
     const btn = document.getElementById('inc-btn-' + t);
     btn.className = 'inc-tipo-btn' + (t === tipo ? ' sel-' + t : '');
   });
-  // Cambiar borde del textarea
+  // Cambiar borde del textarea y agregar glow dinámico
   const ta = document.getElementById('inc-texto');
-  const colores = {grave:'var(--red)', normal:'var(--gold)', info:'var(--blue)'};
+  const colores = {grave:'#f43f5e', normal:'#f59e0b', info:'#0ea5e9'};
+  const shadows = {
+    grave: 'inset 0 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(244, 63, 94, 0.15)',
+    normal: 'inset 0 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(245, 158, 11, 0.15)',
+    info: 'inset 0 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(14, 165, 233, 0.15)'
+  };
   ta.style.borderColor = colores[tipo];
+  ta.style.boxShadow = shadows[tipo];
 }
 
 function incPreviewFoto(input) {
@@ -4640,6 +5274,103 @@ if (sessionStorage.getItem('nx_auth') === '1') {
  *      .setMimeType(ContentService.MimeType.JSON);
  *  }
  *
+ * ══════════════════════════════════════════════════════════════════
+ */
+
+/*
+ * ══════════════════════════════════════════════════════════════════
+ *  👥  INTEGRACIÓN DE PROPIETARIOS EN EL GOOGLE APS SCRIPT (GAS)
+ * ══════════════════════════════════════════════════════════════════
+ *
+ *  [1] ACTUALIZAR EL doGet(e) PARA LEER PROPIETARIOS:
+ *  -------------------------------------------------------------
+ *  // Agregá esta sección para retornar la lista de propietarios 
+ *  // dentro del objeto JSON de respuesta de tu doGet():
+ *  
+ *  const sheetProp = ss.getSheetByName("Propietarios");
+ *  let listaPropietarios = [];
+ *  if (sheetProp) {
+ *    const rowsProp = sheetProp.getDataRange().getValues();
+ *    for (let i = 1; i < rowsProp.length; i++) {
+ *      listaPropietarios.push({
+ *        patente: String(rowsProp[i][0]).trim().toUpperCase(),
+ *        nombre: String(rowsProp[i][1]).trim(),
+ *        mza: String(rowsProp[i][2]).trim(),
+ *        casa: String(rowsProp[i][3]).trim(),
+ *        observaciones: String(rowsProp[i][4]).trim(),
+ *        fecha: String(rowsProp[i][5]).trim()
+ *      });
+ *    }
+ *  }
+ *  
+ *  // Asegúrate de inyectar 'propietarios: listaPropietarios' 
+ *  // en el JSON final que retorna tu doGet(). Ejemplo:
+ *  // return ContentService.createTextOutput(JSON.stringify({
+ *  //   activos: ...,
+ *  //   baneados: ...,
+ *  //   listaNegra: ...,
+ *  //   vigiladores: ...,
+ *  //   propietarios: listaPropietarios
+ *  // })).setMimeType(ContentService.MimeType.JSON);
+ *
+ *  [2] ACTUALIZAR EL doPost(e) PARA GUARDAR Y BORRAR PROPIETARIOS:
+ *  -------------------------------------------------------------
+ *  // Dentro de tu doPost(e), lee los datos JSON recibidos y agrega estos cases:
+ *  
+ *  const datos = JSON.parse(e.postData.contents);
+ *  
+ *  if (datos.accion === 'agregar_propietario') {
+ *    const ss = SpreadsheetApp.getActiveSpreadsheet();
+ *    let sheetProp = ss.getSheetByName("Propietarios");
+ *    if (!sheetProp) {
+ *      sheetProp = ss.insertSheet("Propietarios");
+ *      sheetProp.appendRow(["PATENTE", "NOMBRE", "MZA", "CASA", "OBSERVACIONES", "FECHA"]);
+ *      sheetProp.getRange("A1:F1").setFontWeight("bold").setBackground("#d9ead3");
+ *    }
+ *    
+ *    // Evitar duplicados por patente
+ *    const rows = sheetProp.getDataRange().getValues();
+ *    const patUpper = String(datos.patente).trim().toUpperCase();
+ *    let filaExistente = -1;
+ *    for (let i = 1; i < rows.length; i++) {
+ *      if (String(rows[i][0]).trim().toUpperCase() === patUpper) {
+ *        filaExistente = i + 1;
+ *        break;
+ *      }
+ *    }
+ *    
+ *    const filaDatos = [
+ *      patUpper,
+ *      datos.nombre || '',
+ *      datos.mza || '',
+ *      datos.casa || '',
+ *      datos.observaciones || '',
+ *      datos.fecha || new Date().toISOString().split('T')[0]
+ *    ];
+ *    
+ *    if (filaExistente !== -1) {
+ *      sheetProp.getRange(filaExistente, 1, 1, 6).setValues([filaDatos]);
+ *    } else {
+ *      sheetProp.appendRow(filaDatos);
+ *    }
+ *    return ContentService.createTextOutput(JSON.stringify({ resultado: "OK" })).setMimeType(ContentService.MimeType.JSON);
+ *  }
+ *  
+ *  if (datos.accion === 'eliminar_propietario') {
+ *    const ss = SpreadsheetApp.getActiveSpreadsheet();
+ *    const sheetProp = ss.getSheetByName("Propietarios");
+ *    if (sheetProp) {
+ *      const rows = sheetProp.getDataRange().getValues();
+ *      const patUpper = String(datos.patente).trim().toUpperCase();
+ *      for (let i = 1; i < rows.length; i++) {
+ *        if (String(rows[i][0]).trim().toUpperCase() === patUpper) {
+ *          sheetProp.deleteRow(i + 1);
+ *          break;
+ *        }
+ *      }
+ *    }
+ *    return ContentService.createTextOutput(JSON.stringify({ resultado: "OK" })).setMimeType(ContentService.MimeType.JSON);
+ *  }
  * ══════════════════════════════════════════════════════════════════
  */
 
