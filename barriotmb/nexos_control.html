@@ -1648,11 +1648,14 @@
   <div class="panico-titulo">¡ EMERGENCIA !</div>
   <div class="panico-sub">Solicitud de ayuda recibida</div>
   <div class="panico-lista" id="panico-lista"></div>
-  <button class="btn-sos-baliza" id="btn-sos-baliza" onclick="toggleSOSBeacon()" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:14px;padding:12px 20px;font-size:12px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;cursor:pointer;transition:all 0.3s;margin-top:14px;width:100%;max-width:360px;-webkit-tap-highlight-color:transparent;">
-    <span class="beacon-led" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef4444;"></span>
-    🔦 Activar Baliza SOS Nocturna
-  </button>
   <button class="panico-btn" onclick="cerrarPanico()">✔ ATENDIDO</button>
+</div>
+
+<!-- OVERLAY BALIZA SOS STANDALONE (HERRAMIENTA) -->
+<div class="panico-overlay" id="baliza-sos-overlay" onclick="toggleSOSBeacon()">
+  <div class="panico-icono" style="animation: pulso 0.5s infinite alternate ease-in-out;">🔦</div>
+  <div class="panico-titulo" style="text-shadow: 0 0 15px #ef4444;">BALIZA SOS ACTIVA</div>
+  <div class="panico-sub" style="font-size:16px; opacity:0.8; margin-bottom:40px; line-height: 1.6;">El flash y la pantalla están destellando.<br><br>👉 TOCA EN CUALQUIER PARTE PARA APAGAR</div>
 </div>
 
 <!-- MODALES BASE -->
@@ -2016,6 +2019,9 @@
         </div>
         <div class="menu-item" style="color:var(--cyan);background:rgba(0,212,212,0.06);" onclick="abrirEscanerQR()">
           <span class="menu-item-icon">📷</span>Escanear QR / DNI
+        </div>
+        <div class="menu-item" style="color:#ef4444;" onclick="cerrarMenu(); toggleSOSBeacon()">
+          <span class="menu-item-icon">🔦</span>Baliza SOS Nocturna
         </div>
         <div class="menu-item" onclick="abrirBusqueda()"><span class="menu-item-icon">📋</span>Historial del día</div>
         <div class="menu-item gold-item" onclick="abrirTurno()"><span class="menu-item-icon">🖨️</span>Cierre de turno / PDF</div>
@@ -2781,9 +2787,6 @@ function mostrarPanico(alertas){
   iniciarSirena();
 }
 function cerrarPanico(){
-  if (sosBeaconActive) {
-    toggleSOSBeacon();
-  }
   detenerSirena();
   const url=localStorage.getItem('nx_url');
   panicosPendientes.forEach(a=>{
@@ -2800,17 +2803,12 @@ let mediaTrack = null;
 
 async function toggleSOSBeacon() {
   sosBeaconActive = !sosBeaconActive;
-  const btn = document.getElementById('btn-sos-baliza');
-  const panel = document.getElementById('panico-overlay');
-  if (!btn || !panel) return;
+  const overlay = document.getElementById('baliza-sos-overlay');
+  if (!overlay) return;
 
   if (sosBeaconActive) {
     showToast("🔦 Baliza SOS Nocturna activada");
-    btn.innerHTML = `<span class="beacon-led" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 8px #10b981;animation: ledPulse 0.5s infinite alternate;"></span> 🔦 BALIZA SOS ACTIVA`;
-    btn.style.borderColor = 'rgba(16, 185, 129, 0.4)';
-    btn.style.background = 'rgba(16, 185, 129, 0.08)';
-    btn.style.color = '#34d399';
-    panel.classList.add('sos-flashing');
+    overlay.classList.add('visible', 'sos-flashing');
 
     // Strobe camera flashlight (Android/Chrome WebRTC)
     try {
@@ -2833,9 +2831,8 @@ async function toggleSOSBeacon() {
       // Silent fallback
     }
   } else {
-    btn.innerHTML = `<span class="beacon-led" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef4444;"></span> 🔦 Activar Baliza SOS Nocturna`;
-    btn.removeAttribute('style');
-    panel.classList.remove('sos-flashing');
+    showToast("🔦 Baliza SOS apagada");
+    overlay.classList.remove('visible', 'sos-flashing');
 
     if (sosFlashInterval) {
       clearInterval(sosFlashInterval);
