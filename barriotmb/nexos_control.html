@@ -795,9 +795,9 @@
     }
     @keyframes menuIn { from { opacity: 0; transform: translateY(-8px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
     .logo-menu.visible { display: block; }
-    .menu-section-label { font-size: 9px; letter-spacing: 2px; color: var(--text-muted); padding: 14px 16px 6px; font-weight: 800; text-transform: uppercase; border-top: 1px solid rgba(255,255,255,0.02); }
+    .menu-section-label { font-size: 11px; letter-spacing: 2px; color: var(--text-muted); padding: 14px 16px 6px; font-weight: 800; text-transform: uppercase; border-top: 1px solid rgba(255,255,255,0.02); }
     .menu-section-label:first-child { border-top: none; }
-    .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--text); font-size: 13px; font-weight: 700; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); transition: all 0.2s; }
+    .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--text); font-size: 14.5px; font-weight: 700; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); transition: all 0.2s; }
     .menu-item:last-child { border-bottom: none; }
     .menu-item:active { background: var(--bg3); color: #fff; }
     .menu-item-icon { font-size: 16px; width: 20px; text-align: center; }
@@ -972,7 +972,7 @@
     }
     .submenu-container .menu-item {
       padding: 10px 16px 10px 28px !important;
-      font-size: 12px !important;
+      font-size: 13.5px !important;
       border-bottom: 1px solid rgba(255,255,255,0.01) !important;
       background: rgba(0,0,0,0.15);
     }
@@ -1685,6 +1685,8 @@
   <button class="panico-btn" onclick="cerrarPanico()">✔ ATENDIDO</button>
 </div>
 
+
+
 <!-- OVERLAY BALIZA SOS STANDALONE (HERRAMIENTA) -->
 <div class="panico-overlay" id="baliza-sos-overlay" onclick="toggleSOSBeacon()">
   <div class="panico-icono" style="animation: pulso 0.5s infinite alternate ease-in-out;">🔦</div>
@@ -1768,9 +1770,13 @@
       </div>
       
       <div style="font-size:24px; font-weight:950; color:#fff; letter-spacing:1px; margin-bottom:4px;"><span id="compass-degrees">0</span>° <span id="compass-cardinal" style="color:#ef4444;">N</span></div>
+      <p id="compass-lock-display" style="font-size:11px; color:var(--gold); font-weight:800; margin-top:2px; margin-bottom:6px; min-height:16px; transition: opacity 0.2s; opacity:0; text-shadow:0 0 8px rgba(245,158,11,0.25);">📍 RUMBO FIJADO: --°</p>
       <p id="compass-source-label" style="font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:14px;">Modo Simulación (Arrastre táctil)</p>
       
-      <button class="btn-modal-action btn-green" id="btn-compass-permission" onclick="solicitarPermisoSensores()" style="display:none; max-width:240px; margin:0 auto;">🔑 Activar Giroscopio Móvil</button>
+      <div style="display:flex; gap:10px; justify-content:center; width:100%; max-width:320px; margin-bottom:10px;">
+        <button class="btn-modal-action btn-gold" onclick="toggleCompassLock()" style="padding:10px 16px; font-size:12px; font-weight:800; margin:0; border-radius:10px;">🎯 Fijar Rumbo</button>
+        <button class="btn-modal-action btn-green" id="btn-compass-permission" onclick="solicitarPermisoSensores()" style="display:none; padding:10px 16px; font-size:12px; font-weight:800; margin:0; border-radius:10px;">🔑 Giroscopio Móvil</button>
+      </div>
     </div>
   </div>
 </div>
@@ -2168,6 +2174,9 @@
         <span class="logo-arrow" id="logo-arrow">&#x25BC;</span>
       </button>
       <div class="logo-menu" id="logo-menu">
+        <div style="padding:10px 14px 6px; position:sticky; top:0; background:rgba(20,20,25,0.95); z-index:10; border-bottom:1px solid rgba(255,255,255,0.04);">
+          <input class="search-input" id="menu-search-input" placeholder="🔍 Buscar herramienta..." oninput="filtrarMenuPrincipal(this.value)" style="margin-bottom:0; font-size:12px; padding:8px 12px; border-radius:10px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.06); color:#fff; width:100%; box-sizing:border-box;" autocomplete="off" spellcheck="false">
+        </div>
         <div class="menu-section-label">INFORMACIÓN</div>
         <div class="menu-item" onclick="abrirResumen()"><span class="menu-item-icon">📊</span>Resumen del día</div>
         <div class="menu-item" onclick="abrirVehiculos()"><span class="menu-item-icon">🚗</span>Vehículos en el barrio</div>
@@ -2823,12 +2832,18 @@ function cerrarMenu(){
   if(arrow){
     arrow.style.transform='rotate(0deg)';
   }
+  const searchInput=document.getElementById('menu-search-input');
+  if(searchInput){
+    searchInput.value='';
+    if(typeof filtrarMenuPrincipal === 'function') filtrarMenuPrincipal('');
+  }
 }
 
 // ── MODALES ────────────────────────────────────────────────
 function abrirModal(id){
   document.getElementById(id).classList.add('visible');
   cerrarMenu();
+  if (typeof playSynthSweep === 'function') playSynthSweep();
   if (id === 'modal-clima-tactico') {
     obtenerClimaTacticoDetallado();
   }
@@ -2911,7 +2926,7 @@ document.addEventListener('click',initAudio,{once:true});
 
 // ── PÁNICO ─────────────────────────────────────────────────
 function obtenerInfoTipo(tipo) {
-  const tKey = String(tipo || 'emergencia').trim().toLowerCase();
+  const tKey = String(tipo || 'emergencia').trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   const MAPA_TIPOS = {
     'emergencia': { texto: 'EMERGENCIA GENERAL', icono: '🚨', color: '#ef4444', glow: 'rgba(239, 68, 68, 0.25)' },
     'robo': { texto: 'ROBO / INTRUSO', icono: '🔒', color: '#ef4444', glow: 'rgba(239, 68, 68, 0.28)' },
@@ -2943,8 +2958,9 @@ function mostrarPanico(alertas){
     const info = obtenerInfoTipo(ultimo.tipo);
     
     const overlay = document.getElementById('panico-overlay');
+    const tKey = String(ultimo.tipo || 'emergencia').trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    
     if (overlay) {
-      const tKey = String(ultimo.tipo || 'emergencia').trim().toLowerCase();
       let flashFrom = '#880000';
       let flashTo = '#1e0000';
       let btnColor = '#880000';
@@ -2980,7 +2996,6 @@ function mostrarPanico(alertas){
     const mainTitle = document.querySelector('#panico-overlay .panico-titulo');
     if (mainTitle) mainTitle.innerText = `¡ ${info.texto} !`;
     
-    const tKey = String(ultimo.tipo || 'emergencia').trim().toLowerCase();
     let tipoVoz = "emergencia";
     if (tKey === 'robo') tipoVoz = "emergencia de robo";
     else if (tKey === 'medica') tipoVoz = "emergencia médica";
@@ -3060,6 +3075,160 @@ async function toggleSOSBeacon() {
 
 
 // ── SUITE TÁCTICA PREMIUM JS CONTROLLERS ───────────────────
+// ── MENÚ BUSCADOR PREDICTIVO Y AUDIO SCIFI ──────────────────
+function filtrarMenuPrincipal(q) {
+  const query = q.trim().toLowerCase();
+  const items = document.querySelectorAll('#logo-menu .menu-item');
+  const labels = document.querySelectorAll('#logo-menu .menu-section-label');
+  const submenu = document.getElementById('herramientas-submenu');
+  let matchesSubmenu = false;
+  
+  items.forEach(item => {
+    if (item.getAttribute('onclick') && item.getAttribute('onclick').includes('toggleSubmenu')) {
+      item.style.display = query ? 'none' : 'flex';
+      return;
+    }
+    
+    const text = item.textContent.toLowerCase();
+    const matches = text.includes(query);
+    item.style.display = matches ? 'flex' : 'none';
+    
+    if (matches && item.parentNode && item.parentNode.id === 'herramientas-submenu') {
+      matchesSubmenu = true;
+    }
+  });
+  
+  labels.forEach(label => {
+    label.style.display = query ? 'none' : 'block';
+  });
+  
+  if (submenu) {
+    if (query) {
+      if (matchesSubmenu) {
+        submenu.style.display = 'block';
+        submenu.style.maxHeight = '500px';
+      } else {
+        submenu.style.display = 'none';
+        submenu.style.maxHeight = '0px';
+      }
+    } else {
+      submenu.style.display = 'none';
+      submenu.style.maxHeight = '';
+    }
+  }
+}
+
+function playSynthSweep() {
+  try {
+    initAudio();
+    if (!audioCtx) return;
+    
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+    
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    osc.type = 'sine';
+    const now = audioCtx.currentTime;
+    
+    osc.frequency.setValueAtTime(220, now);
+    osc.frequency.exponentialRampToValueAtTime(580, now + 0.15);
+    
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(800, now);
+    filter.frequency.exponentialRampToValueAtTime(2500, now + 0.15);
+    
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.06, now + 0.04);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+    
+    osc.start(now);
+    osc.stop(now + 0.16);
+  } catch (e) {
+    console.warn("Audio Context sweep play blocked:", e);
+  }
+}
+
+let lockedAngle = null;
+function toggleCompassLock() {
+  const display = document.getElementById('compass-lock-display');
+  const degrees = parseInt(document.getElementById('compass-degrees').innerText) || 0;
+  
+  if (lockedAngle === null) {
+    lockedAngle = degrees;
+    if (display) {
+      display.innerText = `📍 RUMBO FIJADO: ${lockedAngle}° (${document.getElementById('compass-cardinal').innerText})`;
+      display.style.opacity = '1';
+    }
+    showToast(`🎯 Rumbo fijado a ${lockedAngle}°`);
+    
+    initAudio();
+    if (audioCtx) {
+      const now = audioCtx.currentTime;
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type = 'sine'; o.frequency.setValueAtTime(880, now);
+      o.frequency.exponentialRampToValueAtTime(1320, now + 0.1);
+      g.gain.setValueAtTime(0.08, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+      o.start(now); o.stop(now + 0.11);
+    }
+    
+    const dial = document.getElementById('compass-dial');
+    let lockLine = document.getElementById('compass-lock-line');
+    if (!lockLine) {
+      lockLine = document.createElement('div');
+      lockLine.id = 'compass-lock-line';
+      lockLine.style.position = 'absolute';
+      lockLine.style.top = '50%';
+      lockLine.style.left = '50%';
+      lockLine.style.width = '3px';
+      lockLine.style.height = '110px';
+      lockLine.style.background = 'repeating-linear-gradient(to bottom, var(--gold) 0px, var(--gold) 4px, transparent 4px, transparent 8px)';
+      lockLine.style.borderRadius = '1.5px';
+      lockLine.style.zIndex = '4';
+      dial.appendChild(lockLine);
+    }
+    lockLine.style.display = 'block';
+    lockLine.style.transform = `translate(-50%, -50%) rotate(${lockedAngle}deg)`;
+  } else {
+    lockedAngle = null;
+    if (display) {
+      display.style.opacity = '0';
+    }
+    showToast("🎯 Rumbo liberado");
+    
+    initAudio();
+    if (audioCtx) {
+      const now = audioCtx.currentTime;
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type = 'sine'; o.frequency.setValueAtTime(1320, now);
+      o.frequency.exponentialRampToValueAtTime(880, now + 0.1);
+      g.gain.setValueAtTime(0.08, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+      o.start(now); o.stop(now + 0.11);
+    }
+    
+    const lockLine = document.getElementById('compass-lock-line');
+    if (lockLine) lockLine.style.display = 'none';
+  }
+}
+
+function getVehiculoIcon(pat, tipo) {
+  if (tipo === 'DELIVERY') return '🛵';
+  if (pat) {
+    const clean = pat.replace(/[\s-]/g, '').toUpperCase();
+    const regexMercosur = /^[A-Z]\d{3}[A-Z]{3}$/;
+    const regexNacional = /^\d{3}[A-Z]{3}$/;
+    if (regexMercosur.test(clean) || regexNacional.test(clean)) {
+      return '🏍️';
+    }
+  }
+  return '🚗';
+}
+
 function abrirConfiguracion() {
   cerrarMenu();
   const clave = prompt("🔑 Ingrese la clave de administrador para acceder a Configuración:");
@@ -3072,6 +3241,7 @@ function abrirConfiguracion() {
 
 function toggleSubmenu(id, event) {
   if (event) event.stopPropagation();
+  if (typeof playSynthSweep === 'function') playSynthSweep();
   const submenu = document.getElementById(id);
   const arrow = document.getElementById('herramientas-arrow');
   if (!submenu) return;
@@ -3929,7 +4099,7 @@ function darSalida(id){
   _salidaPendienteId=id;
   _salidaRapidaPendiente=false;
   const pat=item.pat||'—';
-  const tipo=item.tipo==='DELIVERY'?'🛵':'🚗';
+  const tipo=getVehiculoIcon(item.pat, item.tipo);
   document.getElementById('confirm-salida-desc').innerText=tipo+' '+pat;
   document.getElementById('confirm-salida-overlay').classList.add('visible');
 }
@@ -4043,7 +4213,7 @@ function render(){
     const isLN=LISTA_NEGRA.find(ln=>(ln.pat&&ln.pat===r.pat)||(ln.dni&&ln.dni===r.dni&&r.dni));
     const lnBadge=isLN?`<span class="ln-badge">🚫 LISTA NEGRA</span><br>`:'';
     const dniInfo=r.dni?` · DNI: ${escHtml(r.dni)}`:'';const vigInfo=r.vig?` · 👤${escHtml(r.vig)}`:''
-    const tipoIcon=r.tipo==='DELIVERY'?'🛵':'🚗';
+    const tipoIcon=getVehiculoIcon(r.pat, r.tipo);
     const timeBg=isA?'var(--red)':mins>=10?'rgba(245,200,66,0.85)':'rgba(46,204,113,0.75)';
     const timeColor='#000';
     const timeTxt=mins<60?`${mins}m`:`${Math.floor(mins/60)}h${String(mins%60).padStart(2,'0')}`;
@@ -4191,7 +4361,7 @@ function abrirTurno(){const ahora=new Date(),hoyStr=ahora.toLocaleDateString('es
     (()=>{const ini=localStorage.getItem('nx_turno_inicio');if(!ini)return'';const diff=Math.floor((Date.now()-new Date(ini).getTime())/60000);const h=Math.floor(diff/60),m=diff%60;const dur=h>0?`${h}h ${String(m).padStart(2,'0')}min`:`${m}min`;return`<div class="modal-stat"><span class="modal-stat-label">⏱ Duración del turno</span><span style="font-weight:800;color:var(--purple)">${dur}</span></div>`;})() + `<div class="modal-stat"><span class="modal-stat-label">📋 Total ingresos</span><span class="modal-stat-val" style="color:var(--cyan)">${deDia.length}</span></div><div class="modal-stat"><span class="modal-stat-label">📤 Con salida</span><span class="modal-stat-val" style="color:var(--green)">${sal}</span></div><div class="modal-stat"><span class="modal-stat-label">🚨 Sin salida</span><span class="modal-stat-val" style="color:${sinSal.length>0?'var(--red)':'#888'}">${sinSal.length}</span></div>${sinSal.map(r=>`<div class="modal-row" style="border-left:3px solid var(--red)"><strong>${escHtml(r.pat)}</strong> · Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')}</div>`).join('')}`;document.getElementById('pdf-report').innerHTML=`<h2>NEXOS — Cierre de Turno</h2><p>${hoyStr} | ${horaStr} | Vigilador: ${escHtml(vigNombre)}</p><table><tr><th>Patente</th><th>DNI</th><th>Destino</th><th>Tipo</th><th>Entrada</th><th>Salida</th></tr>${deDia.map(r=>`<tr><td>${escHtml(r.pat)}</td><td>${escHtml(r.dni||'-')}</td><td>Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')}</td><td>${escHtml(r.tipo)}</td><td>${escHtml(limpiarHora(r.hE))}</td><td style="color:${r.hS?'#27ae60':'#e74c3c'}">${r.hS?escHtml(limpiarHora(r.hS)):'SIN SALIDA'}</td></tr>`).join('')}</table>`;abrirModal('modal-turno');}
 function imprimirTurno(){document.getElementById('pdf-report').style.display='block';setTimeout(()=>{window.print();setTimeout(()=>{document.getElementById('pdf-report').style.display='none';localStorage.removeItem('nx_turno_inicio');localStorage.removeItem('nx_turno_vigilador');},1000);},100);}
 function abrirDeliveryActivos(){const ahora=Date.now();const activos=DB.filter(r=>r.tipo==='DELIVERY'&&!r.hS&&(ahora-(r.tsE||0)<=900000)).sort((a,b)=>(a.tsE||0)-(b.tsE||0));let html=activos.length?activos.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);return`<div class="modal-row" style="border-left:4px solid var(--gold)"><strong style="color:var(--gold);font-size:16px;">🛵 ${escHtml(r.pat)}</strong><span style="float:right;background:var(--gold);color:black;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">${mins} min</span><br><span style="font-size:12px;color:#aaa;">Mza ${escHtml(r.mza||'-')} — Casa ${escHtml(r.casa||'-')}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-delivery-activos');" style="margin-top:8px;background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;}).join(''):'<div class="empty-msg">Sin delivery activos 🟢</div>';document.getElementById('delivery-activos-contenido').innerHTML=html;abrirModal('modal-delivery-activos');}
-function abrirVisitasActivas(){const ahora=Date.now();const visitas=DB.filter(r=>r.tipo!=='DELIVERY'&&!r.hS).sort((a,b)=>(a.tsE||0)-(b.tsE||0));let html=visitas.length?visitas.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);return`<div class="modal-row" style="border-left:4px solid var(--green)"><strong style="color:var(--green);font-size:16px;">🚗 ${escHtml(r.pat)}</strong><span style="float:right;background:var(--green);color:black;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">${mins} min</span><br><span style="font-size:12px;color:#aaa;">Mza ${escHtml(r.mza||'-')} — Casa ${escHtml(r.casa||'-')}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-visitas-activas');" style="margin-top:8px;background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;}).join(''):'<div class="empty-msg">Sin visitas activas 🟢</div>';document.getElementById('visitas-activas-contenido').innerHTML=html;abrirModal('modal-visitas-activas');}
+function abrirVisitasActivas(){const ahora=Date.now();const visitas=DB.filter(r=>r.tipo!=='DELIVERY'&&!r.hS).sort((a,b)=>(a.tsE||0)-(b.tsE||0));let html=visitas.length?visitas.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);return`<div class="modal-row" style="border-left:4px solid var(--green)"><strong style="color:var(--green);font-size:16px;">${getVehiculoIcon(r.pat, r.tipo)} ${escHtml(r.pat)}</strong><span style="float:right;background:var(--green);color:black;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">${mins} min</span><br><span style="font-size:12px;color:#aaa;">Mza ${escHtml(r.mza||'-')} — Casa ${escHtml(r.casa||'-')}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-visitas-activas');" style="margin-top:8px;background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;}).join(''):'<div class="empty-msg">Sin visitas activas 🟢</div>';document.getElementById('visitas-activas-contenido').innerHTML=html;abrirModal('modal-visitas-activas');}
 function abrirDeliveryAlertas(){const ahora=Date.now();const enAlerta=DB.filter(r=>r.tipo==='DELIVERY'&&!r.hS&&(ahora-(r.tsE||0)>900000)).sort((a,b)=>(a.tsE||0)-(b.tsE||0));let html=enAlerta.length?enAlerta.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);return`<div class="modal-row" style="border-left:4px solid var(--red);background:rgba(231,76,60,0.08)"><strong style="color:var(--red);font-size:16px;">🛵 ${escHtml(r.pat)}</strong><span style="float:right;background:var(--red);color:white;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">+${mins} min</span><br><span style="font-size:12px;color:#aaa;">Mza ${escHtml(r.mza||'-')} — Casa ${escHtml(r.casa||'-')}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-delivery-alertas');" style="margin-top:8px;background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;}).join(''):'<div class="empty-msg">Sin alertas 🟢</div>';document.getElementById('delivery-alertas-contenido').innerHTML=html;abrirModal('modal-delivery-alertas');}
 const SOS_NUMEROS=[{icon:'🚔',nombre:'Policía',desc:'Emergencias policiales',num:'911'},{icon:'🔥',nombre:'Bomberos',desc:'Incendios y rescates',num:'100'},{icon:'🚑',nombre:'Emergencia Médica',desc:'SAME / Ambulancias',num:'107'},{icon:'🛡️',nombre:'Defensa Civil',desc:'Inundaciones, desastres',num:'103'},{icon:'⚡',nombre:'Edesur / Edenor',desc:'Corte de luz',num:'0800-333-3787'},{icon:'💧',nombre:'AySA',desc:'Agua y cloacas',num:'0800-321-2482'},{icon:'🚨',nombre:'Violencia de Gén.',desc:'Línea gratuita 24h',num:'144'},{icon:'👶',nombre:'Niñez y Adolesc.',desc:'Vulneración de derechos',num:'102'}];
 function abrirSOS(){document.getElementById('sos-contenido').innerHTML='<div class="sos-header">Tocá el número para llamar</div>'+SOS_NUMEROS.map(s=>`<a class="sos-item" href="tel:${s.num}"><div class="sos-item-left"><span class="sos-item-icon">${s.icon}</span><div><div class="sos-item-nombre">${s.nombre}</div><div class="sos-item-desc">${s.desc}</div></div></div><span class="sos-item-num">${s.num}</span></a>`).join('');abrirModal('modal-sos');}
@@ -4351,7 +4521,7 @@ function renderPropietarios() {
   cont.innerHTML = filtrados.map(p => {
     return `<div class="modal-row" style="border-left:4px solid var(--green); display:flex; justify-content:space-between; align-items:center; padding:10px 14px; margin-bottom:8px;">
       <div>
-        <strong style="color:var(--green); font-size:15px; font-family: monospace;">🚗 ${escHtml(p.patente)}</strong>
+        <strong style="color:var(--green); font-size:15px; font-family: monospace;">${getVehiculoIcon(p.patente, 'VISITA')} ${escHtml(p.patente)}</strong>
         <span style="color:#aaa; font-weight:800; font-size:12px; margin-left:8px;">Mza ${escHtml(p.mza)} - Casa ${escHtml(p.casa)}</span>
         <br>
         <span style="font-size:13px; font-weight:700; color:#fff;">👤 ${escHtml(p.nombre)}</span>
