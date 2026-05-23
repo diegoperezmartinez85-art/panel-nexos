@@ -942,9 +942,26 @@
       padding: 30px;
       overflow-y: auto;
       animation: parpadeo 1.2s infinite alternate cubic-bezier(0.4, 0, 0.6, 1);
+      /* Default flashing variables */
+      --flash-from: #880000;
+      --flash-to: #1e0000;
     }
     .panico-overlay.visible { display: flex; }
-    @keyframes parpadeo { from { background: #880000; } to { background: #1e0000; } }
+    .panico-overlay.sos-flashing {
+      animation: sosFlashScreen 0.6s infinite steps(2, start) !important;
+    }
+    @keyframes parpadeo {
+      from { background: var(--flash-from); }
+      to { background: var(--flash-to); }
+    }
+    @keyframes sosFlashScreen {
+      0% { background: #09090b !important; }
+      50% { background: #7f1d1d !important; }
+    }
+    @keyframes ledPulse {
+      from { opacity: 0.4; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1.1); }
+    }
     .panico-icono { font-size: 72px; margin-bottom: 16px; animation: pulso 0.8s infinite alternate ease-in-out; }
     @keyframes pulso { from { transform: scale(1); } to { transform: scale(1.15); } }
     .panico-titulo { font-size: 32px; font-weight: 950; color: white; letter-spacing: 2px; margin-bottom: 6px; text-shadow: 0 4px 15px rgba(0,0,0,0.8); }
@@ -1631,6 +1648,10 @@
   <div class="panico-titulo">¡ EMERGENCIA !</div>
   <div class="panico-sub">Solicitud de ayuda recibida</div>
   <div class="panico-lista" id="panico-lista"></div>
+  <button class="btn-sos-baliza" id="btn-sos-baliza" onclick="toggleSOSBeacon()" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:14px;padding:12px 20px;font-size:12px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;cursor:pointer;transition:all 0.3s;margin-top:14px;width:100%;max-width:360px;-webkit-tap-highlight-color:transparent;">
+    <span class="beacon-led" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef4444;"></span>
+    🔦 Activar Baliza SOS Nocturna
+  </button>
   <button class="panico-btn" onclick="cerrarPanico()">✔ ATENDIDO</button>
 </div>
 
@@ -2705,6 +2726,38 @@ function mostrarPanico(alertas){
     const ultimo=alertas[alertas.length-1];
     const info = obtenerInfoTipo(ultimo.tipo);
     
+    const overlay = document.getElementById('panico-overlay');
+    if (overlay) {
+      const tKey = String(ultimo.tipo || 'emergencia').trim().toLowerCase();
+      let flashFrom = '#880000';
+      let flashTo = '#1e0000';
+      let btnColor = '#880000';
+      
+      if (tKey === 'incendio') {
+        flashFrom = '#c2410c';
+        flashTo = '#2c0c00';
+        btnColor = '#c2410c';
+      } else if (tKey === 'medica') {
+        flashFrom = '#0e7490';
+        flashTo = '#06262e';
+        btnColor = '#0e7490';
+      } else if (tKey === 'otra') {
+        flashFrom = '#b45309';
+        flashTo = '#241200';
+        btnColor = '#b45309';
+      } else if (tKey === 'robo') {
+        flashFrom = '#991b1b';
+        flashTo = '#200000';
+        btnColor = '#991b1b';
+      }
+      
+      overlay.style.setProperty('--flash-from', flashFrom);
+      overlay.style.setProperty('--flash-to', flashTo);
+      
+      const pBtn = overlay.querySelector('.panico-btn');
+      if (pBtn) pBtn.style.color = btnColor;
+    }
+    
     const mainIcon = document.querySelector('#panico-overlay .panico-icono');
     if (mainIcon) mainIcon.innerText = info.icono;
     
@@ -2727,7 +2780,76 @@ function mostrarPanico(alertas){
   initAudio();
   iniciarSirena();
 }
-function cerrarPanico(){detenerSirena();const url=localStorage.getItem('nx_url');panicosPendientes.forEach(a=>{if(!url)return;fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({accion:'ack_panico',panicoId:a.panicoId})});});panicosPendientes=[];document.getElementById('panico-overlay').classList.remove('visible');}
+function cerrarPanico(){
+  if (sosBeaconActive) {
+    toggleSOSBeacon();
+  }
+  detenerSirena();
+  const url=localStorage.getItem('nx_url');
+  panicosPendientes.forEach(a=>{
+    if(!url)return;
+    fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({accion:'ack_panico',panicoId:a.panicoId})});
+  });
+  panicosPendientes=[];
+  document.getElementById('panico-overlay').classList.remove('visible');
+}
+
+let sosBeaconActive = false;
+let sosFlashInterval = null;
+let mediaTrack = null;
+
+async function toggleSOSBeacon() {
+  sosBeaconActive = !sosBeaconActive;
+  const btn = document.getElementById('btn-sos-baliza');
+  const panel = document.getElementById('panico-overlay');
+  if (!btn || !panel) return;
+
+  if (sosBeaconActive) {
+    showToast("🔦 Baliza SOS Nocturna activada");
+    btn.innerHTML = `<span class="beacon-led" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 8px #10b981;animation: ledPulse 0.5s infinite alternate;"></span> 🔦 BALIZA SOS ACTIVA`;
+    btn.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+    btn.style.background = 'rgba(16, 185, 129, 0.08)';
+    btn.style.color = '#34d399';
+    panel.classList.add('sos-flashing');
+
+    // Strobe camera flashlight (Android/Chrome WebRTC)
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' }
+      });
+      mediaTrack = stream.getVideoTracks()[0];
+      const capabilities = mediaTrack.getCapabilities();
+      
+      if (capabilities.torch) {
+        let torchOn = false;
+        sosFlashInterval = setInterval(async () => {
+          torchOn = !torchOn;
+          await mediaTrack.applyConstraints({
+            advanced: [{ torch: torchOn }]
+          });
+        }, 300);
+      }
+    } catch (e) {
+      // Silent fallback
+    }
+  } else {
+    btn.innerHTML = `<span class="beacon-led" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef4444;"></span> 🔦 Activar Baliza SOS Nocturna`;
+    btn.removeAttribute('style');
+    panel.classList.remove('sos-flashing');
+
+    if (sosFlashInterval) {
+      clearInterval(sosFlashInterval);
+      sosFlashInterval = null;
+    }
+    if (mediaTrack) {
+      try {
+        await mediaTrack.applyConstraints({ advanced: [{ torch: false }] });
+        mediaTrack.stop();
+      } catch(e){}
+      mediaTrack = null;
+    }
+  }
+}
 
 // ── SINCRONIZAR ────────────────────────────────────────────
 async function sincronizar(manual=false){

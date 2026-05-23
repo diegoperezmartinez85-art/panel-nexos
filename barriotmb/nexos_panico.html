@@ -646,14 +646,6 @@
     .enviado.visible {
       display: flex;
     }
-    /* Flashing beacon animation */
-    .enviado.sos-flashing {
-      animation: sosFlashScreen 0.6s infinite steps(2, start) !important;
-    }
-    @keyframes sosFlashScreen {
-      0% { background: #09090b !important; }
-      50% { background: #7f1d1d !important; }
-    }
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.95); }
       to { opacity: 1; transform: scale(1); }
@@ -1631,10 +1623,6 @@
   <div class="enviado-icono">✅</div>
   <div class="enviado-titulo">¡ALERTA ENVIADA!</div>
   <div class="enviado-sub">El vigilador fue notificado.<br>Quedate tranquilo, ya están al tanto.<br><span id="enviado-tipo" style="font-size:14px;color:#00d4d4;font-weight:800;letter-spacing:1px;"></span></div>
-  <button class="btn-sos-baliza" id="btn-sos-baliza" onclick="toggleSOSBeacon()" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;border-radius:14px;padding:12px 20px;font-size:12px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;cursor:pointer;transition:all 0.3s;margin-bottom:18px;width:100%;max-width:280px;-webkit-tap-highlight-color:transparent;">
-    <span class="beacon-led" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef4444;"></span>
-    🔦 Activar Baliza SOS Nocturna
-  </button>
   <button class="btn-volver shimmer-effect" onclick="volverAlPanico()">Volver</button>
 </div>
 
@@ -2438,68 +2426,7 @@
   }
   window.addEventListener('online', enviarColaOffline);
 
-  let sosBeaconActive = false;
-  let sosFlashInterval = null;
-  let mediaTrack = null;
-
-  async function toggleSOSBeacon() {
-    sosBeaconActive = !sosBeaconActive;
-    const btn = document.getElementById('btn-sos-baliza');
-    const panel = document.getElementById('pantalla-enviado');
-    if (!btn || !panel) return;
-
-    if (sosBeaconActive) {
-      triggerHaptic('confirm');
-      btn.innerHTML = `<span class="beacon-led" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 8px #10b981;animation: ledPulse 0.5s infinite alternate;"></span> 🔦 BALIZA SOS ACTIVA`;
-      btn.style.borderColor = 'rgba(16, 185, 129, 0.4)';
-      btn.style.background = 'rgba(16, 185, 129, 0.08)';
-      btn.style.color = '#34d399';
-      panel.classList.add('sos-flashing');
-
-      // Intento de strobe de linterna (Android/Chrome WebRTC)
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment' }
-        });
-        mediaTrack = stream.getVideoTracks()[0];
-        const capabilities = mediaTrack.getCapabilities();
-        
-        if (capabilities.torch) {
-          let torchOn = false;
-          sosFlashInterval = setInterval(async () => {
-            torchOn = !torchOn;
-            await mediaTrack.applyConstraints({
-              advanced: [{ torch: torchOn }]
-            });
-          }, 300);
-        }
-      } catch (e) {
-        // Fallback silencioso (el destello de pantalla neón-roja sigue funcionando al 100% en todos los dispositivos)
-      }
-    } else {
-      triggerHaptic('soft');
-      btn.innerHTML = `<span class="beacon-led" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef4444;"></span> 🔦 Activar Baliza SOS Nocturna`;
-      btn.removeAttribute('style');
-      panel.classList.remove('sos-flashing');
-
-      if (sosFlashInterval) {
-        clearInterval(sosFlashInterval);
-        sosFlashInterval = null;
-      }
-      if (mediaTrack) {
-        try {
-          await mediaTrack.applyConstraints({ advanced: [{ torch: false }] });
-          mediaTrack.stop();
-        } catch(e){}
-        mediaTrack = null;
-      }
-    }
-  }
-
   function volverAlPanico(){
-    if (sosBeaconActive) {
-      toggleSOSBeacon();
-    }
     document.getElementById('pantalla-enviado').classList.remove('visible');
     inicializar();
   }
