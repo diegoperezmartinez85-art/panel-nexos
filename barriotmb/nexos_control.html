@@ -962,6 +962,40 @@
       from { opacity: 0.4; transform: scale(0.9); }
       to { opacity: 1; transform: scale(1.1); }
     }
+    
+    /* ── SUBMENÚ COLAPSABLE Y SUITE TÁCTICA ── */
+    .submenu-container {
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+      border-radius: 12px;
+      margin: 2px 8px;
+    }
+    .submenu-container .menu-item {
+      padding: 10px 16px 10px 28px !important;
+      font-size: 12px !important;
+      border-bottom: 1px solid rgba(255,255,255,0.01) !important;
+      background: rgba(0,0,0,0.15);
+    }
+    .panico-overlay.strobe-fast-flashing, .modal-overlay.strobe-fast-flashing {
+      animation: blindFlash 0.08s infinite steps(2, start) !important;
+    }
+    @keyframes blindFlash {
+      0% { background: #ffffff !important; }
+      50% { background: #000000 !important; }
+    }
+    @keyframes parpadeoHM {
+      from { background: #7f1d1d !important; }
+      to { background: #4c1d95 !important; }
+    }
+    .btn-hm-interval {
+      transition: all 0.2s;
+    }
+    .btn-hm-interval.active {
+      border-color: var(--gold) !important;
+      color: var(--gold) !important;
+      background: rgba(245, 158, 11, 0.08) !important;
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.2);
+    }
     .panico-icono { font-size: 72px; margin-bottom: 16px; animation: pulso 0.8s infinite alternate ease-in-out; }
     @keyframes pulso { from { transform: scale(1); } to { transform: scale(1.15); } }
     .panico-titulo { font-size: 32px; font-weight: 950; color: white; letter-spacing: 2px; margin-bottom: 6px; text-shadow: 0 4px 15px rgba(0,0,0,0.8); }
@@ -1669,6 +1703,133 @@
 <div class="modal-overlay" id="modal-delivery-alertas"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-delivery-alertas')">✕</button><div class="modal-title">⚠️ DELIVERY +15 MIN</div><div id="delivery-alertas-contenido"></div></div></div>
 <div class="modal-overlay" id="modal-sos"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-sos')">✕</button><div class="modal-title">🆘 DIRECTORIO SOS</div><div id="sos-contenido"></div></div></div>
 
+<!-- ══════════════════════════════════════════════════════════
+     ── MODALES BASE SUITE TÁCTICA PREMIUM ───────────────────
+     ══════════════════════════════════════════════════════════ -->
+
+<!-- Modal Strobe Cegador -->
+<div class="modal-overlay" id="modal-strobe">
+  <div class="modal-box" style="border: 2.5px dashed #f43f5e; box-shadow: 0 0 25px rgba(244, 63, 94, 0.4); max-width: 400px;">
+    <button class="modal-close" onclick="cerrarModal('modal-strobe')">✕</button>
+    <div class="modal-title" style="color:#f43f5e; text-shadow:0 0 10px rgba(244,63,94,0.3);">⚡ STROBE CEGADOR TÁCTICO</div>
+    <div style="text-align:center; padding:20px 0;">
+      <div style="font-size: 54px; margin-bottom: 20px; animation: pulso 0.4s infinite alternate ease-in-out;">⚡</div>
+      <p style="font-size:13px; color:var(--text-muted); line-height: 1.6; margin-bottom: 30px;">
+        Esta herramienta destellará la pantalla completa y el flash LED de la cámara trasera cada 80ms para disuasión nocturna inmediata.
+      </p>
+      <button class="btn-modal-action btn-red" id="btn-strobe-cegador-trigger" onclick="toggleStrobeCegador()" style="background:linear-gradient(135deg, #f43f5e 0%, #be123c 100%); box-shadow:0 0 15px rgba(244,63,94,0.4); font-weight:900; border-radius:15px; padding:16px;">⚡ ENTRAR EN MODO STROBE</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Megáfono y Sirena -->
+<div class="modal-overlay" id="modal-megafono">
+  <div class="modal-box" style="max-width: 440px;">
+    <button class="modal-close" onclick="cerrarModal('modal-megafono')">✕</button>
+    <div class="modal-title" style="color:#0ea5e9; text-shadow:0 0 10px rgba(14,165,233,0.3);">📣 MEGÁFONO & SIRENA TÁCTICA</div>
+    <div style="padding-top:10px;">
+      <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.05); border-radius:16px; padding:14px; margin-bottom:16px; text-align:center;">
+        <span style="font-size:12px; font-weight:800; color:var(--text-muted); display:block; margin-bottom:10px; letter-spacing:1px; text-transform:uppercase;">🚨 Alarma de Advertencia Garita</span>
+        <button class="btn-modal-action" id="btn-sirena-manual" onmousedown="tocarSirenaManual()" onmouseup="pararSirenaManual()" ontouchstart="tocarSirenaManual(event)" ontouchend="pararSirenaManual(event)" style="background:rgba(239,68,68,0.1); border:1.5px solid #ef4444; color:#ef4444; font-weight:900; font-size:14px; border-radius:12px; transition: all 0.2s; user-select:none; -webkit-user-select:none; width:100%; max-width:280px; margin:0 auto 6px;">👉 MANTENER PARA SONAR</button>
+      </div>
+      
+      <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.05); border-radius:16px; padding:14px;">
+        <span style="font-size:12px; font-weight:800; color:var(--text-muted); display:block; margin-bottom:10px; letter-spacing:1px; text-transform:uppercase;">📣 Megáfono / Altavoz Local</span>
+        <input class="modal-search" id="megafono-input" placeholder="Escribe un anuncio para vocalizar..." style="margin-bottom:12px;">
+        <button class="btn-modal-action btn-cyan" onclick="tocarMegafonoTexto(document.getElementById('megafono-input').value)" style="margin-bottom:14px;">📣 REPRODUCIR TEXTO</button>
+        
+        <span style="font-size:10px; font-weight:800; color:var(--text-muted); display:block; margin-bottom:8px; letter-spacing:0.5px; text-transform:uppercase;">Accesos Rápidos autorativos</span>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">
+          <button onclick="tocarMegafonoTexto('¡Identifíquese por favor!')" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:30px; padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.2s;">🔍 Identifíquese</button>
+          <button onclick="tocarMegafonoTexto('¡Detenga el vehículo en la barrera!')" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:30px; padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.2s;">🚗 Detenga vehículo</button>
+          <button onclick="tocarMegafonoTexto('¡Acceso restringido, retírese por favor!')" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:30px; padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.2s;">🚫 Acceso Restringido</button>
+          <button onclick="tocarMegafonoTexto('¡Aviso! Patrulla de seguridad en camino')" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:30px; padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.2s;">👮 Patrulla en camino</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Brújula Táctica -->
+<div class="modal-overlay" id="modal-brujula">
+  <div class="modal-box" style="max-width: 400px; text-align:center;">
+    <button class="modal-close" onclick="cerrarModal('modal-brujula')">✕</button>
+    <div class="modal-title" style="color:#10b981; text-shadow:0 0 10px rgba(16,185,129,0.3);">🧭 BRÚJULA TÁCTICA DE RONDA</div>
+    <div style="padding:20px 0 10px; display:flex; flex-direction:column; align-items:center;">
+      
+      <!-- Premium Glass Compass Dial -->
+      <div id="compass-container" style="position:relative; width:220px; height:220px; border-radius:50%; background:rgba(0,0,0,0.4); border:2.5px solid rgba(16,185,129,0.25); box-shadow:0 0 20px rgba(16,185,129,0.15); display:flex; align-items:center; justify-content:center; margin-bottom:20px; cursor:grab;" onmousedown="empezarRotacionSimulada(event)" onmousemove="moverRotacionSimulada(event)" onmouseup="pararRotacionSimulada()" onmouseleave="pararRotacionSimulada()" ontouchstart="empezarRotacionSimulada(event)" ontouchmove="moverRotacionSimulada(event)" ontouchend="pararRotacionSimulada()">
+        <div id="compass-dial" style="width:100%; height:100%; border-radius:50%; position:absolute; transition: transform 0.1s ease-out; background-image: radial-gradient(circle, transparent 65%, rgba(16,185,129,0.05) 66%), url('data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;220&quot; height=&quot;220&quot; viewBox=&quot;0 0 220 220&quot;><circle cx=&quot;110&quot; cy=&quot;110&quot; r=&quot;105&quot; fill=&quot;none&quot; stroke=&quot;rgba(16,185,129,0.1)&quot; stroke-width=&quot;1.5&quot;/><text x=&quot;110&quot; y=&quot;25&quot; fill=&quot;%23ef4444&quot; font-family=&quot;sans-serif&quot; font-size=&quot;16&quot; font-weight=&quot;900&quot; text-anchor=&quot;middle&quot;>N</text><text x=&quot;110&quot; y=&quot;205&quot; fill=&quot;%2310b981&quot; font-family=&quot;sans-serif&quot; font-size=&quot;14&quot; font-weight=&quot;700&quot; text-anchor=&quot;middle&quot;>S</text><text x=&quot;202&quot; y=&quot;115&quot; fill=&quot;%2310b981&quot; font-family=&quot;sans-serif&quot; font-size=&quot;14&quot; font-weight=&quot;700&quot; text-anchor=&quot;middle&quot;>E</text><text x=&quot;18&quot; y=&quot;115&quot; fill=&quot;%2310b981&quot; font-family=&quot;sans-serif&quot; font-size=&quot;14&quot; font-weight=&quot;700&quot; text-anchor=&quot;middle&quot;>O</text></svg>'); background-size:contain;">
+          <!-- Compass needle pointer -->
+          <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:4px; height:110px; background:linear-gradient(to bottom, #ef4444 50%, #10b981 50%); border-radius:2px;"></div>
+        </div>
+        <!-- Static Center Hub -->
+        <div style="width:18px; height:18px; border-radius:50%; background:#fff; box-shadow:0 0 8px #ef4444; border:2.5px solid #09090b; z-index:5;"></div>
+      </div>
+      
+      <div style="font-size:24px; font-weight:950; color:#fff; letter-spacing:1px; margin-bottom:4px;"><span id="compass-degrees">0</span>° <span id="compass-cardinal" style="color:#ef4444;">N</span></div>
+      <p id="compass-source-label" style="font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:14px;">Modo Simulación (Arrastre táctil)</p>
+      
+      <button class="btn-modal-action btn-green" id="btn-compass-permission" onclick="solicitarPermisoSensores()" style="display:none; max-width:240px; margin:0 auto;">🔑 Activar Giroscopio Móvil</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Alerta Hombre Muerto -->
+<div class="modal-overlay" id="modal-hombre-muerto">
+  <div class="modal-box" style="max-width: 400px; text-align:center;">
+    <button class="modal-close" onclick="cerrarModal('modal-hombre-muerto')">✕</button>
+    <div class="modal-title" style="color:#f59e0b; text-shadow:0 0 10px rgba(245,158,11,0.3);">⏳ ALERTA DE HOMBRE MUERTO</div>
+    <div style="padding:15px 0 10px;">
+      <div id="hm-setup-view">
+        <p style="font-size:12px; color:var(--text-muted); line-height: 1.6; margin-bottom: 20px;">
+          Esta herramienta preventora nocturna de seguridad exige una confirmación periódica para validar tu estado. Si transcurre el lapso sin respuesta, se enviará una alerta automática S.O.S al chat global de vigiladores en red.
+        </p>
+        
+        <span style="font-size:11px; font-weight:800; color:var(--text-muted); display:block; margin-bottom:10px; letter-spacing:1px; text-transform:uppercase;">Selecciona Intervalo de Rondas</span>
+        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; margin-bottom:20px;">
+          <button onclick="seleccionarIntervaloHM(15, this)" class="btn-hm-interval active" style="background:rgba(255,255,255,0.04); border:1px solid var(--gold); color:var(--gold); border-radius:10px; padding:10px 4px; font-size:11px; font-weight:800; cursor:pointer;">15m</button>
+          <button onclick="seleccionarIntervaloHM(30, this)" class="btn-hm-interval" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:10px; padding:10px 4px; font-size:11px; font-weight:800; cursor:pointer;">30m</button>
+          <button onclick="seleccionarIntervaloHM(45, this)" class="btn-hm-interval" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:10px; padding:10px 4px; font-size:11px; font-weight:800; cursor:pointer;">45m</button>
+          <button onclick="seleccionarIntervaloHM(60, this)" class="btn-hm-interval" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:10px; padding:10px 4px; font-size:11px; font-weight:800; cursor:pointer;">60m</button>
+        </div>
+        
+        <button class="btn-modal-action btn-gold" onclick="iniciarHombreMuerto()">🟢 ACTIVAR VIGILANCIA</button>
+      </div>
+      
+      <div id="hm-active-view" style="display:none;">
+        <div style="font-size: 54px; margin-bottom: 12px; animation: pulso 1.5s infinite alternate ease-in-out;">⏳</div>
+        <span style="font-size:11px; font-weight:800; color:var(--text-muted); display:block; margin-bottom:4px; letter-spacing:0.5px; text-transform:uppercase;">Vigilancia Activa</span>
+        <div id="hm-countdown-display" style="font-size:36px; font-weight:950; color:var(--gold); letter-spacing:1px; margin-bottom:14px; font-variant-numeric: tabular-nums;">15:00</div>
+        
+        <button class="btn-modal-action btn-red" onclick="detenerHombreMuerto()">🔴 DESACTIVAR VIGILANCIA</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Clima Táctico Avanzado -->
+<div class="modal-overlay" id="modal-clima-tactico">
+  <div class="modal-box" style="max-width: 440px;">
+    <button class="modal-close" onclick="cerrarModal('modal-clima-tactico')">✕</button>
+    <div class="modal-title" style="color:#a855f7; text-shadow:0 0 10px rgba(168,85,247,0.3);">⛈️ REPORTE METEOROLÓGICO CRÍTICO</div>
+    <div style="padding-top:10px;" id="clima-tactico-contenido">
+      <div style="text-align:center; padding:10px 0;">
+        <span style="font-size:12px; color:var(--text-muted);">Cargando reporte de clima en garita...</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY HOMBRE MUERTO ALARMA CRITICA -->
+<div class="panico-overlay" id="hombre-muerto-alarma-screen" style="z-index: 10000; animation: parpadeoHM 0.6s infinite alternate steps(2, start) !important;">
+  <div class="panico-icono" style="animation: pulso 0.4s infinite alternate ease-in-out;">🚨</div>
+  <div class="panico-titulo" style="font-size:28px; text-shadow: 0 0 15px #ef4444; color:#fff;">¿SE ENCUENTRA SEGURO?</div>
+  <div class="panico-sub" style="font-size:14px; opacity:0.9; margin-bottom:20px; line-height:1.6;">ALERTA DE CONTROL HOMBRE MUERTO VENCIDA.<br>Para cancelar el aviso automático de auxilio al barrio:</div>
+  <button class="panico-btn" onclick="confirmarEstadoSeguro()" style="background:#10b981; color:#fff; box-shadow:0 0 20px #10b981; max-width:320px; font-size:16px;">🟢 ESTOY SEGURO / ACTIVO</button>
+  <div style="font-size:11px; color:rgba(255,255,255,0.6); margin-top:16px;">El aviso S.O.S de auxilio se enviará en: <strong id="hm-fail-timer" style="color:#ef4444;">120s</strong></div>
+</div>
+
 <!-- LISTA NEGRA -->
 <div class="modal-overlay" id="modal-ln">
   <div class="modal-box">
@@ -2020,8 +2181,28 @@
         <div class="menu-item" style="color:var(--cyan);background:rgba(0,212,212,0.06);" onclick="abrirEscanerQR()">
           <span class="menu-item-icon">📷</span>Escanear QR / DNI
         </div>
-        <div class="menu-item" style="color:#ef4444;" onclick="cerrarMenu(); toggleSOSBeacon()">
-          <span class="menu-item-icon">🔦</span>Baliza SOS Nocturna
+        <div class="menu-item" onclick="toggleSubmenu('herramientas-submenu', event)" style="color:var(--cyan); font-weight:800; border-bottom:1px solid rgba(0,212,212,0.12); background:rgba(0,212,212,0.03);">
+          <span class="menu-item-icon">🛠️</span>Herramientas Tácticas <span id="herramientas-arrow" style="margin-left:auto;font-size:10px;transition:transform 0.3s;transform:rotate(0deg);display:inline-block;">▼</span>
+        </div>
+        <div class="submenu-container" id="herramientas-submenu" style="display:none; background:rgba(0,0,0,0.3); border-left:3px solid var(--cyan); padding-left:4px;">
+          <div class="menu-item" style="color:#ef4444;" onclick="cerrarMenu(); toggleSOSBeacon()">
+            <span class="menu-item-icon">🔦</span>Baliza SOS Nocturna
+          </div>
+          <div class="menu-item" style="color:#f43f5e;" onclick="cerrarMenu(); abrirModal('modal-strobe')">
+            <span class="menu-item-icon">⚡</span>Strobe Cegador
+          </div>
+          <div class="menu-item" style="color:#0ea5e9;" onclick="cerrarMenu(); abrirModal('modal-megafono')">
+            <span class="menu-item-icon">📣</span>Megáfono y Sirena
+          </div>
+          <div class="menu-item" style="color:#10b981;" onclick="cerrarMenu(); abrirModal('modal-brujula')">
+            <span class="menu-item-icon">🧭</span>Brújula de Patrullaje
+          </div>
+          <div class="menu-item" style="color:#f59e0b;" onclick="cerrarMenu(); abrirModal('modal-hombre-muerto')">
+            <span class="menu-item-icon">⏳</span>Alerta Hombre Muerto
+          </div>
+          <div class="menu-item" style="color:#a855f7;" onclick="cerrarMenu(); abrirModal('modal-clima-tactico')">
+            <span class="menu-item-icon">⛈️</span>Clima y Ráfagas
+          </div>
         </div>
         <div class="menu-item" onclick="abrirBusqueda()"><span class="menu-item-icon">📋</span>Historial del día</div>
         <div class="menu-item gold-item" onclick="abrirTurno()"><span class="menu-item-icon">🖨️</span>Cierre de turno / PDF</div>
@@ -2035,7 +2216,7 @@
         <div class="menu-item" style="color:var(--green);" onclick="abrirPropietarios()"><span class="menu-item-icon">👥</span>Propietarios</div>
         <div class="menu-section-label">SISTEMA</div>
         <div class="menu-item danger" onclick="abrirReset()"><span class="menu-item-icon">📤</span>Dar salida general</div>
-        <div class="menu-item" onclick="ver('config');cerrarMenu()"><span class="menu-item-icon">⚙️</span>Configuración</div>
+        <div class="menu-item" onclick="abrirConfiguracion()"><span class="menu-item-icon">⚙️</span>Configuración</div>
         <div class="menu-item danger" style="border-top:2px solid rgba(231,76,60,0.25);margin-top:4px;" onclick="if(confirm('¿Cerrar sesión?')){cerrarMenu();cerrarSesion();}"><span class="menu-item-icon">🔒</span>Cerrar sesión</div>
       </div>
     </div>
@@ -2628,12 +2809,41 @@ function verificarPin(){
 let menuAbierto=false;
 function toggleMenu(event){if(event)event.stopPropagation();menuAbierto=!menuAbierto;document.getElementById('logo-menu').classList.toggle('visible',menuAbierto);document.getElementById('logo-arrow').innerText=menuAbierto?'▲':'▼';}
 document.addEventListener('click',e=>{const btn=document.getElementById('logo-btn'),menu=document.getElementById('logo-menu');if(btn&&menu&&!btn.contains(e.target)&&!menu.contains(e.target)){menuAbierto=false;menu.classList.remove('visible');document.getElementById('logo-arrow').innerText='▼';}});
-function cerrarMenu(){menuAbierto=false;const m=document.getElementById('logo-menu');if(m)m.classList.remove('visible');document.getElementById('logo-arrow').innerText='▼';}
+function cerrarMenu(){
+  menuAbierto=false;
+  const m=document.getElementById('logo-menu');
+  if(m)m.classList.remove('visible');
+  document.getElementById('logo-arrow').innerText='▼';
+  const submenu=document.getElementById('herramientas-submenu');
+  if(submenu){
+    submenu.style.display='none';
+    submenu.style.maxHeight='';
+  }
+  const arrow=document.getElementById('herramientas-arrow');
+  if(arrow){
+    arrow.style.transform='rotate(0deg)';
+  }
+}
 
 // ── MODALES ────────────────────────────────────────────────
-function abrirModal(id){document.getElementById(id).classList.add('visible');cerrarMenu();}
+function abrirModal(id){
+  document.getElementById(id).classList.add('visible');
+  cerrarMenu();
+  if (id === 'modal-clima-tactico') {
+    obtenerClimaTacticoDetallado();
+  }
+}
 function cerrarModal(id){
   document.getElementById(id).classList.remove('visible');
+  if (id === 'modal-strobe' && typeof strobeActive !== 'undefined' && strobeActive) {
+    toggleStrobeCegador();
+  }
+  if (id === 'modal-megafono') {
+    if (typeof pararSirenaManual === 'function') pararSirenaManual();
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+  }
   if (id === 'modal-vigs-online') {
     const bn = document.getElementById('bottom-nav');
     if (bn && bn.dataset.hiddenByVigs === '1') {
@@ -2847,6 +3057,483 @@ async function toggleSOSBeacon() {
     }
   }
 }
+
+
+// ── SUITE TÁCTICA PREMIUM JS CONTROLLERS ───────────────────
+function abrirConfiguracion() {
+  cerrarMenu();
+  const clave = prompt("🔑 Ingrese la clave de administrador para acceder a Configuración:");
+  if (clave === "2401") {
+    ver('config');
+  } else if (clave !== null) {
+    showToast("⚠️ Clave de configuración incorrecta");
+  }
+}
+
+function toggleSubmenu(id, event) {
+  if (event) event.stopPropagation();
+  const submenu = document.getElementById(id);
+  const arrow = document.getElementById('herramientas-arrow');
+  if (!submenu) return;
+  
+  const isHidden = submenu.style.display === 'none';
+  if (isHidden) {
+    submenu.style.display = 'block';
+    submenu.style.maxHeight = '0px';
+    submenu.scrollHeight; // Force reflow
+    submenu.style.maxHeight = submenu.scrollHeight + 'px';
+    if (arrow) arrow.style.transform = 'rotate(180deg)';
+  } else {
+    submenu.style.maxHeight = '0px';
+    submenu.addEventListener('transitionend', function handler() {
+      if (submenu.style.maxHeight === '0px') {
+        submenu.style.display = 'none';
+      }
+      submenu.removeEventListener('transitionend', handler);
+    });
+    if (arrow) arrow.style.transform = 'rotate(0deg)';
+  }
+}
+
+// 📣 Megáfono & Sirena
+let manualSirenOsc = null;
+let manualSirenGain = null;
+let manualSirenInterval = null;
+
+function tocarSirenaManual(event) {
+  if (event) event.preventDefault();
+  initAudio();
+  if (manualSirenOsc) return;
+  if (!audioCtx) return;
+  
+  const now = audioCtx.currentTime;
+  manualSirenOsc = audioCtx.createOscillator();
+  manualSirenGain = audioCtx.createGain();
+  manualSirenOsc.type = 'sawtooth';
+  manualSirenOsc.frequency.setValueAtTime(1000, now);
+  manualSirenOsc.connect(manualSirenGain);
+  manualSirenGain.connect(audioCtx.destination);
+  manualSirenGain.gain.setValueAtTime(0.3, now);
+  manualSirenOsc.start();
+  
+  let high = false;
+  manualSirenInterval = setInterval(() => {
+    if (!audioCtx || !manualSirenOsc) return;
+    const t = audioCtx.currentTime;
+    high = !high;
+    const freq = high ? 1000 : 800;
+    manualSirenOsc.frequency.linearRampToValueAtTime(freq, t + 0.35);
+  }, 400);
+}
+
+function pararSirenaManual(event) {
+  if (event) event.preventDefault();
+  if (manualSirenInterval) {
+    clearInterval(manualSirenInterval);
+    manualSirenInterval = null;
+  }
+  if (manualSirenOsc) {
+    try { manualSirenOsc.stop(); } catch(e){}
+    manualSirenOsc = null;
+  }
+  manualSirenGain = null;
+}
+
+function tocarMegafonoTexto(texto) {
+  if (!texto) return;
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(texto);
+    utterance.lang = 'es-AR';
+    utterance.pitch = 0.8;
+    utterance.rate = 0.85;
+    window.speechSynthesis.speak(utterance);
+  } else {
+    showToast("⚠️ El megáfono no es soportado por este navegador.");
+  }
+}
+
+// 🧭 Brújula de Patrullaje
+let orientActive = false;
+let dragStartAngle = 0;
+let currentAngle = 0;
+let isDraggingDial = false;
+
+function solicitarPermisoSensores() {
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    DeviceOrientationEvent.requestPermission().then(state => {
+      if (state === 'granted') {
+        iniciarOrientacion();
+      } else {
+        showToast("⚠️ Permiso giroscopio denegado");
+      }
+    }).catch(e => {
+      console.warn("Sensor request error:", e);
+    });
+  } else {
+    iniciarOrientacion();
+  }
+}
+
+function iniciarOrientacion() {
+  window.addEventListener('deviceorientation', (e) => {
+    let alpha = e.alpha;
+    if (e.webkitCompassHeading) alpha = e.webkitCompassHeading;
+    if (alpha === null || alpha === undefined) return;
+    
+    orientActive = true;
+    const label = document.getElementById('compass-source-label');
+    if (label) label.innerText = 'Sensor Giroscópico Activo';
+    
+    const btn = document.getElementById('btn-compass-permission');
+    if (btn) btn.style.display = 'none';
+    
+    actualizarBrujula(Math.round(alpha));
+  }, true);
+  
+  setTimeout(() => {
+    if (!orientActive && typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+      const btn = document.getElementById('btn-compass-permission');
+      if (btn) btn.style.display = 'inline-block';
+    }
+  }, 1000);
+}
+
+function actualizarBrujula(grad) {
+  const dial = document.getElementById('compass-dial');
+  if (dial) dial.style.transform = `rotate(${-grad}deg)`;
+  
+  const degEl = document.getElementById('compass-degrees');
+  if (degEl) degEl.innerText = grad;
+  
+  let cardinal = 'N';
+  if (grad >= 337.5 || grad < 22.5) cardinal = 'N';
+  else if (grad >= 22.5 && grad < 67.5) cardinal = 'NE';
+  else if (grad >= 67.5 && grad < 112.5) cardinal = 'E';
+  else if (grad >= 112.5 && grad < 157.5) cardinal = 'SE';
+  else if (grad >= 157.5 && grad < 202.5) cardinal = 'S';
+  else if (grad >= 202.5 && grad < 247.5) cardinal = 'SO';
+  else if (grad >= 247.5 && grad < 292.5) cardinal = 'O';
+  else if (grad >= 292.5 && grad < 337.5) cardinal = 'NO';
+  
+  const cardEl = document.getElementById('compass-cardinal');
+  if (cardEl) cardEl.innerText = cardinal;
+}
+
+function empezarRotacionSimulada(e) {
+  if (orientActive) return;
+  isDraggingDial = true;
+  const container = document.getElementById('compass-container');
+  if (!container) return;
+  const rect = container.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  dragStartAngle = Math.atan2(clientY - cy, clientX - cx) * (180 / Math.PI) - currentAngle;
+}
+
+function moverRotacionSimulada(e) {
+  if (!isDraggingDial) return;
+  const container = document.getElementById('compass-container');
+  if (!container) return;
+  const rect = container.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  let angle = Math.atan2(clientY - cy, clientX - cx) * (180 / Math.PI) - dragStartAngle;
+  angle = (angle + 360) % 360;
+  currentAngle = angle;
+  actualizarBrujula(Math.round(angle));
+}
+
+function pararRotacionSimulada() {
+  isDraggingDial = false;
+}
+
+// ⚡ Strobe Cegador
+let strobeActive = false;
+let strobeFlashInterval = null;
+let strobeTrack = null;
+
+async function toggleStrobeCegador() {
+  strobeActive = !strobeActive;
+  const btn = document.getElementById('btn-strobe-cegador-trigger');
+  const overlay = document.getElementById('modal-strobe');
+  if (!overlay) return;
+
+  if (strobeActive) {
+    if (btn) btn.innerText = '⚡ DETENER STROBE CEGADOR';
+    overlay.classList.add('strobe-fast-flashing');
+    showToast("⚡ Strobe Cegador activado");
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' }
+      });
+      strobeTrack = stream.getVideoTracks()[0];
+      const capabilities = strobeTrack.getCapabilities();
+      
+      if (capabilities.torch) {
+        let torchOn = false;
+        strobeFlashInterval = setInterval(async () => {
+          if (!strobeTrack) return;
+          torchOn = !torchOn;
+          await strobeTrack.applyConstraints({
+            advanced: [{ torch: torchOn }]
+          });
+        }, 80);
+      }
+    } catch (e) {
+      console.warn("Flashlight strobe failed/blocked:", e);
+    }
+  } else {
+    if (btn) btn.innerText = '⚡ ENTRAR EN MODO STROBE';
+    overlay.classList.remove('strobe-fast-flashing');
+    showToast("⚡ Strobe Cegador apagado");
+
+    if (strobeFlashInterval) {
+      clearInterval(strobeFlashInterval);
+      strobeFlashInterval = null;
+    }
+    if (strobeTrack) {
+      try {
+        await strobeTrack.applyConstraints({ advanced: [{ torch: false }] });
+        strobeTrack.stop();
+      } catch(e){}
+      strobeTrack = null;
+    }
+  }
+}
+
+// ⏳ Alerta Hombre Muerto
+let hmInterval = 15;
+let hmTimer = null;
+let hmAlarmaTimer = null;
+let hmCountdown = 120;
+
+function seleccionarIntervaloHM(min, btn) {
+  hmInterval = min;
+  document.querySelectorAll('.btn-hm-interval').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  
+  const display = document.getElementById('hm-countdown-display');
+  if (display) display.innerText = `${hmInterval}:00`;
+}
+
+function iniciarHombreMuerto() {
+  document.getElementById('hm-setup-view').style.display = 'none';
+  document.getElementById('hm-active-view').style.display = 'block';
+  
+  showToast("⏳ Alerta Hombre Muerto iniciada (" + hmInterval + " min)");
+  iniciarContadorHM(hmInterval * 60);
+}
+
+function iniciarContadorHM(totalSegundos) {
+  if (hmTimer) clearInterval(hmTimer);
+  let segsRestantes = totalSegundos;
+  
+  hmTimer = setInterval(() => {
+    segsRestantes--;
+    if (segsRestantes <= 0) {
+      clearInterval(hmTimer);
+      hmTimer = null;
+      dispararAlertaHombreMuerto();
+    } else {
+      const m = Math.floor(segsRestantes / 60);
+      const s = segsRestantes % 60;
+      const display = document.getElementById('hm-countdown-display');
+      if (display) display.innerText = `${m}:${String(s).padStart(2,'0')}`;
+    }
+  }, 1000);
+}
+
+function dispararAlertaHombreMuerto() {
+  initAudio();
+  
+  cerrarModal('modal-hombre-muerto');
+  const overlay = document.getElementById('hombre-muerto-alarma-screen');
+  if (overlay) overlay.classList.add('visible');
+  
+  tocarSirena();
+  window._hmAlarmSiren = setInterval(tocarSirena, 3800);
+  
+  hmCountdown = 120;
+  const failTimer = document.getElementById('hm-fail-timer');
+  if (failTimer) failTimer.innerText = `${hmCountdown}s`;
+  
+  if (hmAlarmaTimer) clearInterval(hmAlarmaTimer);
+  hmAlarmaTimer = setInterval(() => {
+    hmCountdown--;
+    if (failTimer) failTimer.innerText = `${hmCountdown}s`;
+    if (hmCountdown <= 0) {
+      clearInterval(hmAlarmaTimer);
+      hmAlarmaTimer = null;
+      dispararFailsafeHombreMuerto();
+    }
+  }, 1000);
+}
+
+function confirmarEstadoSeguro() {
+  if (window._hmAlarmSiren) {
+    clearInterval(window._hmAlarmSiren);
+    window._hmAlarmSiren = null;
+  }
+  if (hmAlarmaTimer) {
+    clearInterval(hmAlarmaTimer);
+    hmAlarmaTimer = null;
+  }
+  
+  const overlay = document.getElementById('hombre-muerto-alarma-screen');
+  if (overlay) overlay.classList.remove('visible');
+  
+  showToast("🟢 Confirmación recibida. Guardia activo.");
+  
+  abrirModal('modal-hombre-muerto');
+  iniciarContadorHM(hmInterval * 60);
+}
+
+function detenerHombreMuerto() {
+  if (hmTimer) {
+    clearInterval(hmTimer);
+    hmTimer = null;
+  }
+  if (hmAlarmaTimer) {
+    clearInterval(hmAlarmaTimer);
+    hmAlarmaTimer = null;
+  }
+  if (window._hmAlarmSiren) {
+    clearInterval(window._hmAlarmSiren);
+    window._hmAlarmSiren = null;
+  }
+  
+  const display = document.getElementById('hm-countdown-display');
+  if (display) display.innerText = `${hmInterval}:00`;
+  
+  document.getElementById('hm-setup-view').style.display = 'block';
+  document.getElementById('hm-active-view').style.display = 'none';
+  
+  const overlay = document.getElementById('hombre-muerto-alarma-screen');
+  if (overlay) overlay.classList.remove('visible');
+  
+  showToast("⏳ Alerta Hombre Muerto desactivada");
+}
+
+function dispararFailsafeHombreMuerto() {
+  if (window._hmAlarmSiren) {
+    clearInterval(window._hmAlarmSiren);
+    window._hmAlarmSiren = null;
+  }
+  if (hmAlarmaTimer) {
+    clearInterval(hmAlarmaTimer);
+    hmAlarmaTimer = null;
+  }
+  
+  const overlay = document.getElementById('hombre-muerto-alarma-screen');
+  if (overlay) overlay.classList.remove('visible');
+  
+  document.getElementById('hm-setup-view').style.display = 'block';
+  document.getElementById('hm-active-view').style.display = 'none';
+  
+  const yo = sessionStorage.getItem('nx_vigilador') || 'Vigilador';
+  const msg = `[🚨 ALERTA S.O.S. HOMBRE MUERTO] - Sin respuesta de guardia ${yo} en garita.`;
+  const url = localStorage.getItem('nx_url');
+  
+  if (url && typeof VIGILADORES !== 'undefined' && VIGILADORES.length > 0) {
+    VIGILADORES.forEach(vig => {
+      if (vig.nombre && vig.nombre.trim().toLowerCase() !== yo.trim().toLowerCase()) {
+        const clave = chatClave(yo, vig.nombre);
+        const payload = {
+          accion: 'chat',
+          de: 'SISTEMA',
+          para: vig.nombre,
+          texto: msg,
+          ts: Date.now(),
+          clave: clave
+        };
+        fetch(url, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(e => console.warn("Error sending failsafe to " + vig.nombre, e));
+      }
+    });
+    showToast("🚨 Alerta S.O.S Hombre Muerto enviada a la red");
+  } else {
+    showToast("🚨 Alerta disparada localmente (URL no configurada)");
+  }
+}
+
+// ⛈️ Clima Crítico & Ráfagas
+async function obtenerClimaTacticoDetallado() {
+  const panel = document.getElementById('clima-tactico-contenido');
+  if (!panel) return;
+  panel.innerHTML = `<div style="text-align:center;padding:10px 0;"><span style="font-size:12px;color:var(--text-muted);">Cargando reporte meteorológico...</span></div>`;
+  
+  try {
+    let lat = localStorage.getItem('nx_lat') || '-32.89';
+    let lng = localStorage.getItem('nx_lng') || '-68.84';
+    
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        lat = pos.coords.latitude.toFixed(4);
+        lng = pos.coords.longitude.toFixed(4);
+        await fetchClimaApi(lat, lng, panel);
+      }, async (err) => {
+        console.warn("Geolocation blocked/failed, using fallback:", err);
+        await fetchClimaApi(lat, lng, panel);
+      }, { timeout: 4000 });
+    } else {
+      await fetchClimaApi(lat, lng, panel);
+    }
+  } catch(e) {
+    console.warn("Error in weather init:", e);
+    panel.innerHTML = `<div style="text-align:center;padding:10px 0;"><span style="font-size:11px;color:#ef4444;">Error al iniciar consulta climatológica.</span></div>`;
+  }
+}
+
+async function fetchClimaApi(lat, lng, panel) {
+  try {
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_gusts_10m&hourly=uv_index&timezone=auto&forecast_days=1`);
+    if (!res.ok) throw new Error("HTTP error " + res.status);
+    const data = await res.json();
+    
+    const current = data.current;
+    if (!current) throw new Error("No current weather data");
+    
+    const uv = data.hourly && data.hourly.uv_index ? data.hourly.uv_index[new Date().getHours()] : 0;
+    
+    let windAlert = '';
+    if (current.wind_gusts_10m > 40) {
+      windAlert = `<div style="background:rgba(239,68,68,0.15); border:1.5px solid #ef4444; border-radius:12px; padding:10px; color:#fff; font-size:12px; font-weight:800; text-align:center; margin-bottom:14px; animation: ledPulse 1s infinite alternate;">⚠️ RÁFAGAS CRÍTICAS: ${current.wind_gusts_10m} km/h<br><span style="font-size:10px; font-weight:500; opacity:0.8;">Asegurar portones mecánicos y barreras de seguridad.</span></div>`;
+    }
+    
+    let uvRec = 'Exposición solar normal';
+    if (uv >= 8) uvRec = '🔴 Exposición extrema: Garita recomendada, usar protección física.';
+    else if (uv >= 6) uvRec = '🟡 Exposición alta: Usar gorra y protector.';
+    
+    panel.innerHTML = `
+      ${windAlert}
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; background:rgba(0,0,0,0.25); border:1.5px solid rgba(255,255,255,0.05); border-radius:16px; padding:14px;">
+        <div style="font-size:11px; color:var(--text-muted);">Temperatura: <strong style="color:#fff; font-size:13px; display:block; margin-top:2px;">${current.temperature_2m}°C</strong></div>
+        <div style="font-size:11px; color:var(--text-muted);">Sensación térmica: <strong style="color:#fff; font-size:13px; display:block; margin-top:2px;">${current.apparent_temperature}°C</strong></div>
+        <div style="font-size:11px; color:var(--text-muted);">Humedad: <strong style="color:#fff; font-size:13px; display:block; margin-top:2px;">${current.relative_humidity_2m}%</strong></div>
+        <div style="font-size:11px; color:var(--text-muted);">Velocidad de viento: <strong style="color:#fff; font-size:13px; display:block; margin-top:2px;">${current.wind_speed_10m} km/h</strong></div>
+        <div style="font-size:11px; color:var(--text-muted);">Ráfagas máximas: <strong style="color:#f59e0b; font-size:13px; display:block; margin-top:2px;">${current.wind_gusts_10m} km/h</strong></div>
+        <div style="font-size:11px; color:var(--text-muted);">Índice UV actual: <strong style="color:#a855f7; font-size:13px; display:block; margin-top:2px;">${uv}</strong></div>
+      </div>
+      <p style="font-size:10px; color:var(--text-muted); text-align:center; margin-top:12px; line-height:1.4;">${uvRec}</p>
+    `;
+  } catch(e) {
+    console.warn("Weather API load error:", e);
+    panel.innerHTML = `<div style="text-align:center;padding:10px 0;"><span style="font-size:11px;color:#ef4444;">Error al conectar con el satélite climatológico.</span></div>`;
+  }
+}
+
+// Autostart orientation checking
+iniciarOrientacion();
 
 // ── SINCRONIZAR ────────────────────────────────────────────
 async function sincronizar(manual=false){
