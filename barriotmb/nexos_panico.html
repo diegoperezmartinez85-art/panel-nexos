@@ -646,6 +646,14 @@
     .enviado.visible {
       display: flex;
     }
+    /* Flashing beacon animation */
+    .enviado.sos-flashing {
+      animation: sosFlashScreen 0.6s infinite steps(2, start) !important;
+    }
+    @keyframes sosFlashScreen {
+      0% { background: #09090b !important; }
+      50% { background: #7f1d1d !important; }
+    }
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.95); }
       to { opacity: 1; transform: scale(1); }
@@ -1226,17 +1234,35 @@
       font-weight: 900;
       letter-spacing: 1px;
       cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 20px rgba(239, 68, 68, 0.35);
+      position: relative;
+      overflow: hidden;
       display: none;
+      box-shadow: 0 4px 20px rgba(239, 68, 68, 0.35);
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      touch-action: none;
     }
     .tipo-confirmar.visible {
       display: block;
       animation: fadeIn 0.2s ease;
     }
-    .tipo-confirmar:active {
-      transform: scale(0.97);
-      background: #96281b;
+    .tipo-confirmar-progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 0%;
+      background: rgba(255, 255, 255, 0.25);
+      pointer-events: none;
+      z-index: 1;
+      transition: none;
+    }
+    .tipo-confirmar-text {
+      position: relative;
+      z-index: 2;
+      pointer-events: none;
+      display: block;
+      text-align: center;
     }
     .tipo-cancelar {
       text-align: center;
@@ -1605,6 +1631,10 @@
   <div class="enviado-icono">✅</div>
   <div class="enviado-titulo">¡ALERTA ENVIADA!</div>
   <div class="enviado-sub">El vigilador fue notificado.<br>Quedate tranquilo, ya están al tanto.<br><span id="enviado-tipo" style="font-size:14px;color:#00d4d4;font-weight:800;letter-spacing:1px;"></span></div>
+  <button class="btn-sos-baliza" id="btn-sos-baliza" onclick="toggleSOSBeacon()" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;border-radius:14px;padding:12px 20px;font-size:12px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;cursor:pointer;transition:all 0.3s;margin-bottom:18px;width:100%;max-width:280px;-webkit-tap-highlight-color:transparent;">
+    <span class="beacon-led" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef4444;"></span>
+    🔦 Activar Baliza SOS Nocturna
+  </button>
   <button class="btn-volver shimmer-effect" onclick="volverAlPanico()">Volver</button>
 </div>
 
@@ -1668,7 +1698,10 @@
         <span class="tipo-btn-label">OTRA</span>
       </button>
     </div>
-    <button class="tipo-confirmar" id="tipo-confirmar" onclick="confirmarTipo()">🆘&nbsp;&nbsp;ENVIAR ALERTA</button>
+    <button class="tipo-confirmar" id="tipo-confirmar">
+      <span class="tipo-confirmar-progress" id="tipo-confirmar-progress"></span>
+      <span class="tipo-confirmar-text" id="tipo-confirmar-text">🆘&nbsp;&nbsp;MANTENÉ PRESIONADO</span>
+    </button>
     <div class="tipo-cancelar" onclick="cerrarTipo()">Cancelar</div>
   </div>
 </div>
@@ -2173,11 +2206,75 @@
     btn.addEventListener('mousedown',   lpStart, { passive: false });
     btn.addEventListener('mouseup',     lpEnd,   { passive: true });
     btn.addEventListener('mouseleave',  lpEnd,   { passive: true });
+
+    const btnConf = document.getElementById('tipo-confirmar');
+    if (btnConf) {
+      btnConf.addEventListener('touchstart',  tipoLpStart, { passive: false });
+      btnConf.addEventListener('touchend',    tipoLpEnd,   { passive: true });
+      btnConf.addEventListener('touchcancel', tipoLpEnd,   { passive: true });
+      btnConf.addEventListener('mousedown',   tipoLpStart, { passive: false });
+      btnConf.addEventListener('mouseup',     tipoLpEnd,   { passive: true });
+      btnConf.addEventListener('mouseleave',  tipoLpEnd,   { passive: true });
+    }
   }
 
   // ── MODAL TIPO ─────────────────────────────────────────
   let _tipoSeleccionado = null;
   let _tipoEvent        = null;
+
+  const TIPO_LP_DURATION = 1500; // ms
+  let _tipoLpTimer = null;
+  let _tipoLpStart = null;
+  let _tipoLpRAF   = null;
+
+  function tipoLpTick() {
+    const elapsed = Date.now() - _tipoLpStart;
+    const progress = Math.min(elapsed / TIPO_LP_DURATION, 1);
+    const fill = document.getElementById('tipo-confirmar-progress');
+    if (fill) fill.style.width = (progress * 100) + '%';
+    if (progress < 1) {
+      _tipoLpRAF = requestAnimationFrame(tipoLpTick);
+    }
+  }
+
+  function tipoLpStart(e) {
+    const btn = document.getElementById('tipo-confirmar');
+    if (btn.disabled) return;
+    e.preventDefault();
+    _tipoLpStart = Date.now();
+    const textEl = document.getElementById('tipo-confirmar-text');
+    if (textEl) textEl.innerText = 'Soltá para cancelar...';
+    btn.style.transform = 'scale(0.97)';
+    if (navigator.vibrate) navigator.vibrate(20);
+    _tipoLpRAF = requestAnimationFrame(tipoLpTick);
+    _tipoLpTimer = setTimeout(() => {
+      tipoLpComplete();
+    }, TIPO_LP_DURATION);
+  }
+
+  function tipoLpEnd(e) {
+    if (_tipoLpTimer) { clearTimeout(_tipoLpTimer); _tipoLpTimer = null; }
+    if (_tipoLpRAF) { cancelAnimationFrame(_tipoLpRAF); _tipoLpRAF = null; }
+    const fill = document.getElementById('tipo-confirmar-progress');
+    if (fill) fill.style.width = '0%';
+    const btn = document.getElementById('tipo-confirmar');
+    if (btn) {
+      btn.style.transform = '';
+      const textEl = document.getElementById('tipo-confirmar-text');
+      if (textEl) textEl.innerText = '🆘  MANTENÉ PRESIONADO';
+    }
+    _tipoLpStart = null;
+  }
+
+  function tipoLpComplete() {
+    if (_tipoLpRAF) { cancelAnimationFrame(_tipoLpRAF); _tipoLpRAF = null; }
+    const fill = document.getElementById('tipo-confirmar-progress');
+    if (fill) fill.style.width = '100%';
+    const textEl = document.getElementById('tipo-confirmar-text');
+    if (textEl) textEl.innerText = '🆘  MANTENÉ PRESIONADO';
+    _tipoLpStart = null;
+    confirmarTipo();
+  }
 
   function abrirTipo(e) {
     _tipoSeleccionado = null;
@@ -2199,6 +2296,10 @@
     ['robo','medica','incendio','otra'].forEach(t => {
       document.getElementById('tipo-'+t).classList.toggle('sel', t === tipo);
     });
+    const textEl = document.getElementById('tipo-confirmar-text');
+    if (textEl) textEl.innerText = '🆘  MANTENÉ PRESIONADO';
+    const fill = document.getElementById('tipo-confirmar-progress');
+    if (fill) fill.style.width = '0%';
     document.getElementById('tipo-confirmar').classList.add('visible');
     triggerHaptic('soft');
   }
@@ -2206,8 +2307,9 @@
   function confirmarTipo() {
     if (!_tipoSeleccionado) return;
     triggerHaptic('confirm');
+    const tipo = _tipoSeleccionado; // guardar antes de cerrar
     cerrarTipo();
-    enviarPanico(_tipoEvent, _tipoSeleccionado);
+    enviarPanico(_tipoEvent, tipo);
   }
 
   // ── ENVÍO ──────────────────────────────────────────────
@@ -2336,7 +2438,68 @@
   }
   window.addEventListener('online', enviarColaOffline);
 
+  let sosBeaconActive = false;
+  let sosFlashInterval = null;
+  let mediaTrack = null;
+
+  async function toggleSOSBeacon() {
+    sosBeaconActive = !sosBeaconActive;
+    const btn = document.getElementById('btn-sos-baliza');
+    const panel = document.getElementById('pantalla-enviado');
+    if (!btn || !panel) return;
+
+    if (sosBeaconActive) {
+      triggerHaptic('confirm');
+      btn.innerHTML = `<span class="beacon-led" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 8px #10b981;animation: ledPulse 0.5s infinite alternate;"></span> 🔦 BALIZA SOS ACTIVA`;
+      btn.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+      btn.style.background = 'rgba(16, 185, 129, 0.08)';
+      btn.style.color = '#34d399';
+      panel.classList.add('sos-flashing');
+
+      // Intento de strobe de linterna (Android/Chrome WebRTC)
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment' }
+        });
+        mediaTrack = stream.getVideoTracks()[0];
+        const capabilities = mediaTrack.getCapabilities();
+        
+        if (capabilities.torch) {
+          let torchOn = false;
+          sosFlashInterval = setInterval(async () => {
+            torchOn = !torchOn;
+            await mediaTrack.applyConstraints({
+              advanced: [{ torch: torchOn }]
+            });
+          }, 300);
+        }
+      } catch (e) {
+        // Fallback silencioso (el destello de pantalla neón-roja sigue funcionando al 100% en todos los dispositivos)
+      }
+    } else {
+      triggerHaptic('soft');
+      btn.innerHTML = `<span class="beacon-led" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef4444;"></span> 🔦 Activar Baliza SOS Nocturna`;
+      btn.removeAttribute('style');
+      panel.classList.remove('sos-flashing');
+
+      if (sosFlashInterval) {
+        clearInterval(sosFlashInterval);
+        sosFlashInterval = null;
+      }
+      if (mediaTrack) {
+        try {
+          await mediaTrack.applyConstraints({ advanced: [{ torch: false }] });
+          mediaTrack.stop();
+        } catch(e){}
+        mediaTrack = null;
+      }
+    }
+  }
+
   function volverAlPanico(){
+    if (sosBeaconActive) {
+      toggleSOSBeacon();
+    }
     document.getElementById('pantalla-enviado').classList.remove('visible');
     inicializar();
   }
@@ -2464,31 +2627,31 @@
     return FASES[Math.floor((faseNorm / CICLO) * 8) % 8];
   }
 
-  // Mapa completo de íconos nocturnos: luna + fenómeno climático
+  // Mapa completo de íconos nocturnos: luna + fenómeno climático (sin sol)
   function iconosNoche() {
     const luna = faselunar();
     return {
-      0:  luna,          // despejado → fase pura
-      1:  '🌙',          // principalmente despejado
-      2:  '🌛',          // parcialmente nublado
-      3:  '☁️',          // cubierto
+      0:  luna,          // despejado → fase lunar real
+      1:  luna,          // principalmente despejado → fase lunar real sin sol
+      2:  luna + '☁️',    // parcialmente nublado → fase lunar real + nube
+      3:  '☁️',          // cubierto → nube sin sol
       45: '🌫️',          // niebla
       48: '🌫️',          // niebla con escarcha
-      51: luna+'🌦️',    // llovizna leve
-      53: luna+'🌦️',    // llovizna moderada
-      55: luna+'🌧️',    // llovizna intensa
-      61: luna+'🌧️',    // lluvia leve
-      63: luna+'🌧️',    // lluvia moderada
-      65: luna+'🌧️',    // lluvia intensa
-      71: luna+'❄️',    // nieve leve
-      73: luna+'❄️',    // nieve moderada
-      75: luna+'❄️',    // nieve intensa
-      80: luna+'🌦️',    // chubascos débiles
-      81: luna+'🌧️',    // chubascos moderados
-      82: luna+'⛈️',    // chubascos fuertes
-      95: luna+'⛈️',    // tormenta
-      96: luna+'⛈️',    // tormenta con granizo
-      99: luna+'⛈️',    // tormenta con granizo fuerte
+      51: luna + '🌧️',    // llovizna leve → fase lunar real + lluvia (sin sol)
+      53: luna + '🌧️',    // llovizna moderada → fase lunar real + lluvia (sin sol)
+      55: luna + '🌧️',    // llovizna intensa → fase lunar real + lluvia (sin sol)
+      61: luna + '🌧️',    // lluvia leve → fase lunar real + lluvia (sin sol)
+      63: luna + '🌧️',    // lluvia de media intensidad → fase lunar real + lluvia (sin sol)
+      65: luna + '🌧️',    // lluvia fuerte → fase lunar real + lluvia (sin sol)
+      71: luna + '🌨️',    // nieve leve → fase lunar real + nieve (sin sol)
+      73: luna + '🌨️',    // nieve moderada → fase lunar real + nieve (sin sol)
+      75: luna + '🌨️',    // nieve intensa → fase lunar real + nieve (sin sol)
+      80: luna + '🌧️',    // chubascos débiles → fase lunar real + lluvia (sin sol)
+      81: luna + '🌧️',    // chubascos moderados → fase lunar real + lluvia (sin sol)
+      82: luna + '⛈️',    // chubascos fuertes → fase lunar real + tormenta (sin sol)
+      95: luna + '⛈️',    // tormenta → fase lunar real + tormenta (sin sol)
+      96: luna + '⛈️',    // tormenta con granizo → fase lunar real + tormenta (sin sol)
+      99: luna + '⛈️',    // tormenta con granizo fuerte → fase lunar real + tormenta (sin sol)
     };
   }
 
@@ -2503,15 +2666,24 @@
     return CLIMA_ICONS[code] || '🌤️';
   }
 
-  // Aplica clase 'doble' al chip-icon si el ícono tiene 2 emojis
+  // Aplica clase 'doble' al chip-icon si el ícono tiene 2 emojis (con fallback robusto)
   function ajustarIconoChip(icono) {
     const el = document.getElementById('chip-icon');
     if (!el) return;
-    const segs = [...new Intl.Segmenter(undefined, {granularity:'grapheme'}).segment(icono)];
+    let segs = [];
+    if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+      try {
+        segs = [...new Intl.Segmenter(undefined, {granularity:'grapheme'}).segment(icono)].map(s => s.segment);
+      } catch (e) {
+        segs = [...icono];
+      }
+    } else {
+      segs = [...icono];
+    }
     const esDoble = segs.length > 1;
     el.classList.toggle('doble', esDoble);
     if (esDoble) {
-      el.innerHTML = `<span>${segs[0].segment}</span><span>${segs[1].segment}</span>`;
+      el.innerHTML = `<span>${segs[0]}</span><span>${segs[1]}</span>`;
     } else {
       el.textContent = icono;
     }
