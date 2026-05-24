@@ -31,7 +31,7 @@
       justify-content: center;
       padding: 24px;
       padding-top: calc(24px + env(safe-area-inset-top));
-      padding-bottom: calc(24px + env(safe-area-inset-bottom));
+      padding-bottom: calc(90px + env(safe-area-inset-bottom));
       user-select: none;
       overflow-x: hidden;
       position: relative;
@@ -117,25 +117,7 @@
       transition: all 0.8s ease;
     }
 
-    /* ── CYBER SCANLINE FOR INPUT SCREENS ── */
-    .cyber-scanline {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 3px;
-      background: linear-gradient(to right, transparent, #ef4444, transparent);
-      box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
-      opacity: 0.5;
-      pointer-events: none;
-      z-index: 10;
-      animation: scanMobile 6s linear infinite;
-    }
-    @keyframes scanMobile {
-      0% { top: 0%; }
-      50% { top: 100%; }
-      100% { top: 0%; }
-    }
+
     .pantalla {
       width: 100%;
       max-width: 380px;
@@ -540,29 +522,36 @@
 
     .btn-cfg-main,
     .btn-volver {
-      background: rgba(39, 39, 42, 0.4);
+      background: rgba(30, 30, 32, 0.5);
       color: #06b6d4;
-      border: 1px solid rgba(6, 182, 212, 0.3);
-      border-radius: 50px;
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      border-radius: 16px;
       padding: 14px 36px;
       font-size: 14px;
       font-weight: 800;
       cursor: pointer;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
     .btn-cfg-main:active,
     .btn-volver:active {
-      transform: scale(0.97);
-      background: #06b6d4;
-      color: #09090b;
-      box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+      transform: scale(0.96);
+      background: rgba(6, 182, 212, 0.15);
+      color: #06b6d4;
+      border-color: #06b6d4;
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     }
     .btn-tipo-trigger {
       background: rgba(245, 158, 11, 0.05);
       color: #f59e0b;
-      border: 1.5px solid rgba(245, 158, 11, 0.35);
-      border-radius: 50px;
+      border: 1.5px solid rgba(245, 158, 11, 0.3);
+      border-radius: 16px;
       padding: 16px 42px;
       font-size: 15px;
       font-weight: 800;
@@ -581,20 +570,151 @@
     }
     .btn-tipo-trigger:active {
       transform: scale(0.96);
-      background: rgba(245, 158, 11, 0.22);
+      background: rgba(245, 158, 11, 0.2);
       border-color: #f59e0b;
-      box-shadow: 0 0 20px rgba(245, 158, 11, 0.45);
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
     }
     @keyframes btnTriggerPulse {
       0%, 100% {
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35), 0 0 10px rgba(245, 158, 11, 0.08);
-        border-color: rgba(245, 158, 11, 0.35);
+        border-color: rgba(245, 158, 11, 0.3);
       }
       50% {
         box-shadow: 0 4px 25px rgba(0, 0, 0, 0.45), 0 0 20px rgba(245, 158, 11, 0.22);
-        border-color: rgba(245, 158, 11, 0.6);
+        border-color: rgba(245, 158, 11, 0.65);
       }
     }
+
+    .btn-visita-trigger {
+      background: rgba(6, 182, 212, 0.05);
+      color: #06b6d4;
+      border: 1.5px solid rgba(6, 182, 212, 0.3);
+      border-radius: 16px;
+      padding: 16px 42px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 14px;
+      width: 100%;
+      max-width: 320px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      letter-spacing: 0.5px;
+    }
+    .btn-visita-trigger:active {
+      transform: scale(0.96);
+      background: rgba(6, 182, 212, 0.2);
+      border-color: #06b6d4;
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+    }
+
+    /* ── PANEL INVITACIONES QR (TALLY IFRAME) ── */
+    .invitaciones-panel {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(9, 9, 11, 0.98);
+      z-index: 100000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .invitaciones-panel.visible {
+      display: flex;
+    }
+    .invitaciones-content {
+      width: 100%;
+      height: 100%;
+      max-width: 480px;
+      background: #09090b;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .invitaciones-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: rgba(20, 20, 25, 0.85);
+      border-bottom: 1px solid rgba(6, 182, 212, 0.25);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .invitaciones-title {
+      font-size: 15px;
+      font-weight: 900;
+      color: #06b6d4;
+      letter-spacing: 1px;
+      text-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+    }
+    .invitaciones-cerrar {
+      font-size: 16px;
+      color: #a1a1aa;
+      cursor: pointer;
+      padding: 6px;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .invitaciones-cerrar:active {
+      color: #06b6d4;
+    }
+    .invitaciones-body {
+      flex: 1;
+      position: relative;
+      background: #09090b;
+      overflow: hidden;
+    }
+    .tally-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: transparent;
+      display: block;
+    }
+    .invitaciones-loader {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #09090b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      color: #a1a1aa;
+      font-size: 13px;
+      z-index: 5;
+      transition: opacity 0.4s ease;
+    }
+    .loader-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(6, 182, 212, 0.15);
+      border-top: 3px solid #06b6d4;
+      border-radius: 50%;
+      animation: spinLoader 0.8s linear infinite;
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.15);
+    }
+    @keyframes spinLoader {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     .btn-setup {
       width: 100%;
       background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
@@ -610,7 +730,7 @@
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .btn-setup:active {
-      transform: scale(0.97);
+      transform: scale(0.96);
       box-shadow: 0 2px 10px rgba(239, 68, 68, 0.2);
       filter: brightness(0.9);
     }
@@ -765,7 +885,7 @@
       box-shadow: 0 4px 15px rgba(239, 68, 68, 0.25);
     }
     .cfg-btn:active {
-      transform: scale(0.98);
+      transform: scale(0.96);
       box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
       filter: brightness(0.9);
     }
@@ -870,7 +990,7 @@
       box-shadow: 0 4px 15px rgba(239, 68, 68, 0.25);
     }
     .pin-btn:active {
-      transform: scale(0.98);
+      transform: scale(0.96);
       box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
       filter: brightness(0.9);
     }
@@ -1037,7 +1157,7 @@
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .access-btn:active {
-      transform: scale(0.97);
+      transform: scale(0.96);
       box-shadow: 0 2px 10px rgba(239, 68, 68, 0.2);
     }
     .access-error {
@@ -1176,7 +1296,7 @@
     .tipo-btn {
       background: rgba(39, 39, 42, 0.4);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 20px;
+      border-radius: 16px;
       padding: 24px 16px;
       display: flex;
       flex-direction: column;
@@ -1187,7 +1307,7 @@
       -webkit-tap-highlight-color: transparent;
     }
     .tipo-btn:active {
-      transform: scale(0.95);
+      transform: scale(0.96);
       background: rgba(39, 39, 42, 0.7);
     }
     .tipo-btn.sel {
@@ -1591,7 +1711,7 @@
       background: rgba(6, 182, 212, 0.1);
       border: 1px solid rgba(6, 182, 212, 0.4);
       color: #06b6d4;
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 14px;
       font-size: 13px;
       font-weight: 800;
@@ -1601,7 +1721,661 @@
     }
     .pwa-duplicado-btn:active {
       background: rgba(6, 182, 212, 0.2);
-      transform: scale(0.98);
+      transform: scale(0.96);
+    }
+
+    /* ── PWA SMART INSTALL GUIDE BANNER ── */
+    .pwa-guia {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%) translateY(180%);
+      width: calc(100% - 32px);
+      max-width: 380px;
+      background: rgba(20, 20, 22, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 18px;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      padding: 16px;
+      z-index: 9000;
+      margin-bottom: env(safe-area-inset-bottom, 0px);
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .pwa-guia.visible {
+      transform: translateX(-50%) translateY(0);
+    }
+    .pwa-guia-content {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .pwa-guia-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+    }
+    .pwa-guia-icon {
+      font-size: 26px;
+      filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
+    }
+    .pwa-guia-txt-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding-right: 20px;
+    }
+    .pwa-guia-titulo {
+      font-size: 14px;
+      font-weight: 800;
+      color: #06b6d4;
+      letter-spacing: 0.5px;
+      text-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+    }
+    .pwa-guia-sub {
+      font-size: 11.5px;
+      line-height: 1.4;
+      color: #d4d4d8;
+    }
+    .pwa-guia-cerrar {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: none;
+      border: none;
+      color: #71717a;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 6px;
+      transition: all 0.2s;
+    }
+    .pwa-guia-cerrar:active {
+      transform: scale(0.85);
+      color: #ef4444;
+    }
+
+    /* ── CLIMA LUNA CARD ── */
+    .clima-luna-card {
+      margin-top: 14px;
+      background: rgba(6, 182, 212, 0.05);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 12.5px;
+      color: #e4e4e7;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* ── SYSTEM SCREENS (TABS) ── */
+    .pantalla-comunicados,
+    .pantalla-directorio {
+      width: 100%;
+      max-width: 380px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .pantalla-comunicados.visible,
+    .pantalla-directorio.visible {
+      display: flex;
+      animation: slideInUp 0.3s ease;
+    }
+    
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      color: #06b6d4;
+    }
+    .panel-header h2 {
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      margin: 0;
+    }
+    .panel-header-icon {
+      filter: drop-shadow(0 0 5px rgba(6, 182, 212, 0.4));
+    }
+
+    /* ── BOTTOM NAVIGATION BAR ── */
+    .nav-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 420px;
+      height: 70px;
+      background: rgba(18, 18, 20, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 8500;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.5);
+    }
+    .nav-item {
+      background: none;
+      border: none;
+      color: #71717a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      flex: 1;
+      height: 100%;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-item svg {
+      transition: transform 0.2s ease;
+    }
+    .nav-item:active svg {
+      transform: scale(0.9);
+    }
+    .nav-item.active {
+      color: #06b6d4;
+      text-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+    }
+    .nav-item.active svg {
+      filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.5));
+    }
+    .nav-icon-badge-wrap {
+      position: relative;
+    }
+    .nav-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 8px;
+      height: 8px;
+      background: #ef4444;
+      border-radius: 50%;
+      display: none;
+      box-shadow: 0 0 6px #ef4444;
+    }
+    .nav-badge.active {
+      display: block;
+    }
+
+    /* ── COMUNICADOS (MURAL) STYLE ── */
+    .comunicados-lista {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-height: calc(100vh - 200px);
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .comunicados-lista::-webkit-scrollbar {
+      width: 4px;
+    }
+    .comunicados-lista::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    .comunicado-card {
+      background: rgba(28, 28, 30, 0.45);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 18px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: left;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      animation: slideInUp 0.4s ease both;
+    }
+    .comunicado-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .comunicado-card-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.3;
+    }
+    .comunicado-card-date {
+      font-size: 10.5px;
+      color: #a1a1aa;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .comunicado-card-body {
+      font-size: 12px;
+      line-height: 1.5;
+      color: #d4d4d8;
+    }
+
+    /* ── DIRECTORIO STYLE ── */
+    .directorio-lista {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: calc(100vh - 200px);
+      overflow-y: auto;
+    }
+    .dir-card-link {
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .dir-card {
+      background: rgba(28, 28, 30, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 18px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-align: left;
+      transition: all 0.2s;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    .dir-card:active {
+      transform: scale(0.97);
+      background: rgba(var(--dcolor), 0.08);
+      border-color: rgba(var(--dcolor), 0.35);
+      box-shadow: 0 0 15px var(--dcglow);
+    }
+    .dir-card-icon {
+      font-size: 24px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+    }
+    .dir-card-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .dir-card-name {
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .dir-card-sub {
+      font-size: 11px;
+      color: #a1a1aa;
+    }
+    .dir-card-call-btn {
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+    .dir-card:active .dir-card-call-btn {
+      background: rgba(var(--dcolor), 0.2);
+      border-color: rgba(var(--dcolor), 0.4);
+      color: #fff;
+    }
+    
+    @keyframes slideInUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* ── PANTALLA RESERVAS ── */
+    .pantalla-reservas {
+      width: 100%;
+      max-width: 380px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .pantalla-reservas.visible {
+      display: flex;
+      animation: slideInUp 0.3s ease;
+    }
+
+    /* Amenities Selector */
+    .reserva-amenities-selector {
+      display: flex;
+      width: 100%;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .reserva-amenities-selector button {
+      flex: 1;
+      background: rgba(28, 28, 30, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 12px 6px;
+      color: #a1a1aa;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.25s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .reserva-amenities-selector button:active {
+      transform: scale(0.95);
+    }
+    .reserva-amenities-selector button.active-amenity {
+      background: rgba(6, 182, 212, 0.1);
+      border-color: rgba(6, 182, 212, 0.4);
+      color: #06b6d4;
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+    }
+    .reserva-amenities-selector button.active-amenity span.icon {
+      filter: drop-shadow(0 0 5px rgba(6, 182, 212, 0.5));
+    }
+    .reserva-amenities-selector button span.icon {
+      font-size: 18px;
+    }
+
+    /* Calendario */
+    .reserva-calendario-container {
+      width: 100%;
+      background: rgba(24, 24, 27, 0.55);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    }
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 0 4px;
+    }
+    .calendar-header button {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+    .calendar-header button:active {
+      transform: scale(0.9);
+      background: rgba(6, 182, 212, 0.15);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+    .calendar-header span {
+      color: #fff;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-transform: capitalize;
+    }
+    .calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      margin-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 6px;
+    }
+    .calendar-weekdays span {
+      color: #71717a;
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .calendar-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #e4e4e7;
+      border-radius: 10px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .calendar-day:active:not(.inactive) {
+      transform: scale(0.9);
+    }
+    .calendar-day.inactive {
+      color: #3f3f46;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .calendar-day.today {
+      border: 1.5px dashed rgba(6, 182, 212, 0.5);
+      color: #06b6d4;
+    }
+    .calendar-day.selected {
+      background: #06b6d4;
+      color: #09090b !important;
+      font-weight: 800;
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.6);
+      border: none !important;
+    }
+
+    /* Turnos */
+    .reserva-turnos-container {
+      width: 100%;
+      background: rgba(28, 28, 30, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .section-title {
+      font-size: 12px;
+      font-weight: 900;
+      color: #a1a1aa;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding-left: 2px;
+    }
+    .turnos-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      max-height: 160px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+    .turno-btn {
+      background: rgba(9, 9, 11, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 10px 6px;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .turno-btn:active:not(.reservado) {
+      transform: scale(0.96);
+    }
+    .turno-btn.disponible {
+      border-color: rgba(16, 185, 129, 0.15);
+    }
+    .turno-btn.disponible.selected {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: #10b981;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);
+    }
+    .turno-btn.reservado {
+      background: rgba(239, 68, 68, 0.03);
+      border-color: rgba(239, 68, 68, 0.12);
+      color: #71717a;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    .turno-time {
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .turno-status {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .turno-btn.disponible .turno-status {
+      color: #10b981;
+    }
+    .turno-btn.reservado .turno-status {
+      color: #ef4444;
+    }
+
+    /* Confirm Box */
+    .reserva-confirm-box {
+      width: 100%;
+      background: rgba(6, 182, 212, 0.04);
+      border: 1px solid rgba(6, 182, 212, 0.15);
+      border-radius: 18px;
+      padding: 14px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      text-align: center;
+      animation: slideInUp 0.25s ease;
+    }
+    .reserva-confirm-box.visible {
+      display: flex;
+    }
+    .reserva-confirm-details {
+      font-size: 12px;
+      color: #e4e4e7;
+      line-height: 1.5;
+    }
+    .reserva-confirm-details strong {
+      color: #06b6d4;
+    }
+    .btn-confirmar-reserva {
+      width: 100%;
+      background: #06b6d4;
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      color: #09090b;
+      font-size: 12.5px;
+      font-weight: 900;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 15px rgba(6, 182, 212, 0.25);
+      transition: all 0.2s;
+    }
+    .btn-confirmar-reserva:active {
+      transform: scale(0.97);
+    }
+
+    /* Mis Reservas */
+    .reserva-mis-reservas-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .mis-reservas-lista {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+    .mi-reserva-card {
+      background: rgba(28, 28, 30, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .mi-reserva-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      text-align: left;
+    }
+    .mi-reserva-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .mi-reserva-date {
+      font-size: 10px;
+      color: #a1a1aa;
+    }
+    .btn-cancelar-reserva {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-cancelar-reserva:active {
+      transform: scale(0.92);
+      background: rgba(239, 68, 68, 0.2);
+    }
+    .no-reservas {
+      font-size: 11px;
+      color: #71717a;
+      text-align: center;
+      padding: 12px 0;
+      border: 1px dashed rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
     }
   </style>
 </head>
@@ -1610,7 +2384,6 @@
 <!-- OVERLAY YA INSTALADO (PWA DEDUPLICATION) -->
 <div class="pwa-duplicado-overlay" id="pwa-duplicado-overlay">
   <div class="pwa-duplicado-content">
-    <div class="cyber-scanline"></div>
     <div class="pwa-duplicado-logo-wrap">
       <img class="pwa-duplicado-logo-img" id="pwa-duplicado-logo-img" src="" alt="NEXOS">
     </div>
@@ -1639,8 +2412,6 @@
 
 <!-- ACCESS PANEL -->
 <div class="access-panel" id="access-panel">
-  <!-- Biometric Scanline -->
-  <div class="cyber-scanline"></div>
   
   <div class="access-logo-wrap">
     <img class="access-logo-img" id="access-logo-img" src="" alt="NEXOS">
@@ -1723,16 +2494,182 @@
     </button>
   </div>
   <div class="lp-hint" id="lp-hint">Mantené presionado para activar</div>
-  <button class="btn-tipo-trigger shimmer-effect" id="btn-tipo-trigger" onclick="abrirTipo(event)">⚠️ Reportar Tipo de Alerta</button>
+  <button class="btn-tipo-trigger shimmer-effect" id="btn-tipo-trigger" onclick="abrirTipo(event)">
+    <svg class="btn-icon-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+    </svg>
+    Reportar Tipo de Alerta
+  </button>
+  <button class="btn-visita-trigger shimmer-effect" id="btn-visita-trigger" onclick="abrirInvitaciones()">
+    <svg class="btn-icon-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1"/>
+      <rect x="14" y="3" width="7" height="7" rx="1"/>
+      <rect x="3" y="14" width="7" height="7" rx="1"/>
+      <path d="M14 14h1M18 14h3M14 18h3M18 18h3M14 21h7"/>
+    </svg>
+    Pre-autorizar Visita (QR)
+  </button>
   <div class="aviso-cooldown" id="aviso-cooldown">
     ✅ Alerta recibida por el vigilador.<br>
     Podés volver a enviar en <span id="cooldown-restante">15:00</span>
   </div>
-  <button class="btn-cfg-main shimmer-effect" onclick="pedirPinParaCambiar()">📍 Cambiar ubicación</button>
+  <button class="btn-cfg-main shimmer-effect" onclick="pedirPinParaCambiar()">
+    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+      <circle cx="12" cy="10" r="3"/>
+    </svg>
+    Cambiar ubicación
+  </button>
   <a class="ig-link" href="https://www.instagram.com/nexosmaps?igsh=MThvc241Y2JhNmhvcQ%3D%3D&utm_source=qr" target="_blank" rel="noopener">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
     @nexosmaps
   </a>
+</div>
+
+<!-- MURAL DE COMUNICADOS (Cartelera Digital) -->
+<div class="pantalla-comunicados" id="pantalla-comunicados">
+  <div class="panel-header">
+    <svg class="panel-header-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+      <polyline points="22,6 12,13 2,6"/>
+    </svg>
+    <h2>MURAL DE COMUNICADOS</h2>
+  </div>
+  <div class="comunicados-lista" id="comunicados-lista">
+    <!-- Cargados por JS -->
+  </div>
+</div>
+
+<!-- DIRECTORIO TELEFÓNICO DE EMERGENCIAS -->
+<div class="pantalla-directorio" id="pantalla-directorio">
+  <div class="panel-header">
+    <svg class="panel-header-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+    </svg>
+    <h2>DIRECTORIO DE EMERGENCIAS</h2>
+  </div>
+  <div class="directorio-lista">
+    <a href="tel:911" class="dir-card-link" onclick="triggerHaptic('soft'); playSound('tap')">
+      <div class="dir-card" style="--dcolor: 231,76,60; --dcglow: rgba(231,76,60,0.15)">
+        <div class="dir-card-icon">🚨</div>
+        <div class="dir-card-info">
+          <div class="dir-card-name">Emergencia Policial (911)</div>
+          <div class="dir-card-sub">Línea de emergencia oficial nacional</div>
+        </div>
+        <div class="dir-card-call-btn">📞</div>
+      </div>
+    </a>
+    <a href="tel:107" class="dir-card-link" onclick="triggerHaptic('soft'); playSound('tap')">
+      <div class="dir-card" style="--dcolor: 52,152,219; --dcglow: rgba(52,152,219,0.15)">
+        <div class="dir-card-icon">🩺</div>
+        <div class="dir-card-info">
+          <div class="dir-card-name">Urgencias Médicas (107)</div>
+          <div class="dir-card-sub">Ambulancias y asistencia del sistema público</div>
+        </div>
+        <div class="dir-card-call-btn">📞</div>
+      </div>
+    </a>
+    <a href="tel:100" class="dir-card-link" onclick="triggerHaptic('soft'); playSound('tap')">
+      <div class="dir-card" style="--dcolor: 230,126,34; --dcglow: rgba(230,126,34,0.15)">
+        <div class="dir-card-icon">🔥</div>
+        <div class="dir-card-info">
+          <div class="dir-card-name">Bomberos Voluntarios (100)</div>
+          <div class="dir-card-sub">Central de incendios, rescates y siniestros</div>
+        </div>
+        <div class="dir-card-call-btn">📞</div>
+      </div>
+    </a>
+    <a href="tel:#" class="dir-card-link" id="dir-guardia-link" onclick="triggerHaptic('soft'); playSound('tap')">
+      <div class="dir-card" style="--dcolor: 46,204,113; --dcglow: rgba(46,204,113,0.15)">
+        <div class="dir-card-icon">🛡️</div>
+        <div class="dir-card-info">
+          <div class="dir-card-name">Garita de Seguridad (Fijo)</div>
+          <div class="dir-card-sub">Contacto directo con la guardia de entrada</div>
+        </div>
+        <div class="dir-card-call-btn">📞</div>
+      </div>
+    </a>
+    <a href="tel:#" class="dir-card-link" id="dir-admin-link" onclick="triggerHaptic('soft'); playSound('tap')">
+      <div class="dir-card" style="--dcolor: 155,89,182; --dcglow: rgba(155,89,182,0.15)">
+        <div class="dir-card-icon">💼</div>
+        <div class="dir-card-info">
+          <div class="dir-card-name">Administración del Barrio</div>
+          <div class="dir-card-sub">Consultas administrativas, trámites y gestiones</div>
+        </div>
+        <div class="dir-card-call-btn">📞</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- RESERVAS DE AMENITIES -->
+<div class="pantalla-reservas" id="pantalla-reservas">
+  <div class="panel-header">
+    <svg class="panel-header-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+      <line x1="16" y1="2" x2="16" y2="6"/>
+      <line x1="8" y1="2" x2="8" y2="6"/>
+      <line x1="3" y1="10" x2="21" y2="10"/>
+    </svg>
+    <h2>RESERVAS DE AMENITIES</h2>
+  </div>
+
+  <!-- Selector de Amenity -->
+  <div class="reserva-amenities-selector">
+    <button class="active-amenity" id="btn-amenity-sum" onclick="seleccionarAmenity('SUM')">
+      <span class="icon">🏢</span>
+      <span>SUM</span>
+    </button>
+    <button id="btn-amenity-tenis" onclick="seleccionarAmenity('Tenis')">
+      <span class="icon">🎾</span>
+      <span>Tenis</span>
+    </button>
+    <button id="btn-amenity-quincho" onclick="seleccionarAmenity('Quincho')">
+      <span class="icon">🍖</span>
+      <span>Quincho</span>
+    </button>
+  </div>
+
+  <!-- Calendario esmerilado -->
+  <div class="reserva-calendario-container">
+    <div class="calendar-header">
+      <button onclick="cambiarMesCalendario(-1)">◀</button>
+      <span id="calendar-mes-ano">Mayo 2026</span>
+      <button onclick="cambiarMesCalendario(1)">▶</button>
+    </div>
+    <div class="calendar-weekdays">
+      <span>D</span><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span>
+    </div>
+    <div class="calendar-days" id="calendar-dias-grilla">
+      <!-- Celdas cargadas dinámicamente -->
+    </div>
+  </div>
+
+  <!-- Turnos disponibles -->
+  <div class="reserva-turnos-container">
+    <div class="section-title">🕒 Turnos para el <span id="turno-fecha-titulo">--/--/----</span></div>
+    <div class="turnos-grid" id="turnos-contenedor">
+      <!-- Botones de turnos cargados dinámicamente -->
+    </div>
+  </div>
+
+  <!-- Panel de Confirmación Flotante -->
+  <div class="reserva-confirm-box" id="reserva-confirm-box">
+    <div class="reserva-confirm-details">
+      Confirmar reserva de <strong id="conf-amenity">--</strong><br>
+      para el <strong id="conf-fecha">--</strong> a las <strong id="conf-horario">--</strong>
+    </div>
+    <button class="btn-confirmar-reserva" onclick="solicitarReserva()">CONFIRMAR RESERVA</button>
+  </div>
+
+  <!-- Mis Reservas Activas -->
+  <div class="reserva-mis-reservas-container">
+    <div class="section-title">📋 Mis Reservas Activas</div>
+    <div class="mis-reservas-lista" id="mis-reservas-lista">
+      <!-- Listado cargado por JS -->
+    </div>
+  </div>
 </div>
 
 <!-- CONFIRMACIÓN -->
@@ -1758,8 +2695,6 @@
 
 <!-- PIN PARA CAMBIAR UBICACIÓN -->
 <div class="pin-panel" id="pin-panel">
-  <!-- Biometric Scanline -->
-  <div class="cyber-scanline"></div>
   
   <div class="pin-content">
     <div class="pin-title">🔑 PIN de administrador</div>
@@ -1776,7 +2711,7 @@
   <div class="clima-sheet">
     <div class="clima-handle"></div>
     <div id="clima-contenido"><div class="clima-loading">⏳ Cargando pronóstico...</div></div>
-    <div class="clima-cerrar" onclick="document.getElementById('clima-overlay').classList.remove('visible')">Cerrar</div>
+    <div class="clima-cerrar" onclick="cerrarPronosticoManual()">Cerrar</div>
   </div>
 </div>
 
@@ -1811,7 +2746,101 @@
   </div>
 </div>
 
+<!-- PANEL INVITACIONES QR (TALLY IFRAME) -->
+<div class="invitaciones-panel" id="invitaciones-panel">
+  <div class="invitaciones-content">
+    <div class="invitaciones-header">
+      <div class="invitaciones-title">🎫 PRE-AUTORIZAR VISITA</div>
+      <div class="invitaciones-cerrar" onclick="cerrarInvitaciones()">✖️</div>
+    </div>
+    <div class="invitaciones-body">
+      <div class="invitaciones-loader" id="invitaciones-loader">
+        <div class="loader-spinner"></div>
+        <span>Cargando formulario de invitaciones...</span>
+      </div>
+      <iframe class="tally-iframe" id="tally-iframe" src="" title="Pre-autorizar Visita"></iframe>
+    </div>
+  </div>
+</div>
+
+<!-- GUIA DE INSTALACION PWA (Premium OS Smart Assist) -->
+<div class="pwa-guia" id="pwa-guia-instalacion">
+  <div class="pwa-guia-content">
+    <div class="pwa-guia-header">
+      <span class="pwa-guia-icon">📲</span>
+      <div class="pwa-guia-txt-wrap">
+        <div class="pwa-guia-titulo">Instalá NEXOS en tu pantalla</div>
+        <div class="pwa-guia-sub" id="pwa-guia-instrucciones">Cargando instrucciones de instalación...</div>
+      </div>
+      <button class="pwa-guia-cerrar" onclick="cerrarGuiaPwa(true)">✖️</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAVIGATION BAR (Ultra-Premium Glassmorphic) -->
+<div class="nav-bar" id="app-nav-bar" style="display: none;">
+  <button class="nav-item active" onclick="cambiarPantalla('panico')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/>
+      <line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+    <span>Pánico</span>
+  </button>
+  <button class="nav-item" onclick="cambiarPantalla('comunicados')">
+    <div class="nav-icon-badge-wrap">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
+      <span class="nav-badge" id="nav-comunicados-badge"></span>
+    </div>
+    <span>Mural</span>
+  </button>
+  <button class="nav-item" onclick="cambiarPantalla('directorio')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+    </svg>
+    <span>Directorio</span>
+  </button>
+  <button class="nav-item" onclick="cambiarPantalla('reservas')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+      <line x1="16" y1="2" x2="16" y2="6"/>
+      <line x1="8" y1="2" x2="8" y2="6"/>
+      <line x1="3" y1="10" x2="21" y2="10"/>
+    </svg>
+    <span>Reservas</span>
+  </button>
+</div>
+
 <script>
+  // ══════════════════════════════════════════════════════
+  // CONFIGURACIÓN DE TERCEROS & CONTACTOS (Para clonado rápido)
+  // ══════════════════════════════════════════════════════
+  const NUMERO_GUARDIA = '5551234';
+  const NUMERO_ADMIN   = '5555678';
+  const COMUNICADOS_CSV_URL = ''; // publicá tu hoja Comunicados de Sheets como CSV e insertá el link acá
+
+  // Fallbacks de comunicados si no hay Sheets conectado
+  const DEFAULT_COMUNICADOS = [
+    {
+      titulo: '💧 Corte de agua por mantenimiento',
+      cuerpo: 'El próximo Martes 26/05 entre las 09:00 y las 13:00 se realizará un corte general de agua en todo el barrio por reparaciones en la bomba principal de presión.',
+      fecha: 'Hoy'
+    },
+    {
+      titulo: '🏊 Nuevos horarios de piscina',
+      cuerpo: 'A partir de este mes, la piscina y el área de solárium estarán abiertos desde las 08:00 hasta las 22:00. Solicitamos respetar las normas de convivencia del sector.',
+      fecha: 'Ayer'
+    },
+    {
+      titulo: '🎫 Registro de visitas e invitados',
+      cuerpo: 'Recuerden que para agilizar el ingreso vehicular, pueden pre-autorizar visitas generando códigos QR rápidos en esta misma app desde la sección central de Pánico.',
+      fecha: '22 Mayo'
+    }
+  ];
+
   // ══════════════════════════════════════════════════════
   // DEVICE FINGERPRINT
   // ══════════════════════════════════════════════════════
@@ -1936,9 +2965,6 @@
     try { sessionStorage.setItem('nx_lp_s', tsStr); } catch(e) {}
   }
 
-  // ══════════════════════════════════════════════════════
-  // ENDPOINT OFUSCADO — fragmentado en base64
-  // ══════════════════════════════════════════════════════
   const PANIC_URL = 'https://script.google.com/macros/s/AKfycbyhFaXVBfNsFdCDN6ckegcBBiDtBg0xEZXC-2sl1f03sgp4xeUG-of09tFnnNWZUU4bkA/exec';
 
   if ('serviceWorker' in navigator) {
@@ -1952,35 +2978,35 @@
   window.addEventListener('offline', actualizarOffline);
   actualizarOffline();
 
-  // ══════════════════════════════════════════════════════
-  // CÓDIGO DE ACCESO — XOR ofuscado (key 0x4E)
-  // El valor real es derivado en runtime, nunca aparece en texto plano
-  // ══════════════════════════════════════════════════════
   const ACCESS_KEY = 'nx_access_ok';
-
-  // Hash djb2 del código de acceso — generado fuera del browser
-  // Se compara contra el hash de lo que ingresa el usuario
   function _xd(s){ return s.match(/.{2}/g).map(h=>String.fromCharCode(parseInt(h,16)^0x4E)).join(''); }
   const _ac = '7e787f79';
-  // Nunca almacenamos el código plano; solo comparamos hashes
   function hashAccess(code){
     let h=5381;
     for(let i=0;i<code.length;i++){h=((h<<5)+h)^code.charCodeAt(i);h|=0;}
     return String(h>>>0);
   }
-  // El hash de referencia se computa UNA vez al cargar, desde la forma ofuscada
   const ACCESS_HASH = (()=>{ return hashAccess(_xd(_ac)); })();
 
   function verificarAcceso(){
     const val = document.getElementById('access-input').value.trim();
     const err = document.getElementById('access-error');
-    if(!val){err.innerText='Ingresá el código';return;}
+    if(!val){
+      err.innerText='Ingresá el código';
+      triggerHaptic('error');
+      playSound('error');
+      return;
+    }
     if(hashAccess(val)===ACCESS_HASH){
       localStorage.setItem(ACCESS_KEY,'1');
+      triggerHaptic('confirm');
+      playSound('success');
       document.getElementById('access-panel').classList.remove('visible');
       inicializar();
     } else {
       err.innerText='❌ Código incorrecto';
+      triggerHaptic('error');
+      playSound('error');
       document.getElementById('access-input').value='';
       actualizarDots('');
       setTimeout(()=>{err.innerText='';},2500);
@@ -1988,15 +3014,14 @@
   }
 
   function actualizarDots(val){
+    triggerHaptic('digit');
+    playSound('tap');
     for(let i=0;i<4;i++){
       const d=document.getElementById('dot-'+i);
       if(d) d.classList.toggle('filled', i<val.length);
     }
   }
 
-  // ══════════════════════════════════════════════════════
-  // SISTEMA DE BANEO
-  // ══════════════════════════════════════════════════════
   let BANEADOS_LOCAL = JSON.parse(localStorage.getItem('nx_baneados_vecino') || '[]');
   let DEVICES_BANEADOS = JSON.parse(localStorage.getItem('nx_devices_baneados') || '[]');
 
@@ -2030,7 +3055,6 @@
     return null;
   }
 
-  // ── INIT ───────────────────────────────────────────────
   async function inicializar(){
     const mza  = localStorage.getItem('nx_manzana');
     const casa = localStorage.getItem('nx_casa');
@@ -2045,6 +3069,7 @@
       const banFresh = esBaneado(mza, casa);
       if (banFresh) mostrarPantallaBaneado(banFresh);
     }).catch(() => {});
+    document.getElementById('clima-lunar').innerText = obtenerFaseLunar();
   }
 
   function mostrarSetup(){
@@ -2089,16 +3114,14 @@
     inicializar();
   }
 
-  // ── COOLDOWN ───────────────────────────────────────────
   function verificarCooldown(){
-    // Si detectamos manipulación, forzamos cooldown completo como penalidad
     if (cooldownManipulado()) {
-      guardarTimestampCooldown(Date.now());
+      guardarTimestampCooldown(obtenerHoraCalibrada());
       activarUI_Cooldown(COOLDOWN_MS);
       return;
     }
     const ts   = parseInt(localStorage.getItem('nx_last_panico') || '0');
-    const diff = Date.now() - ts;
+    const diff = obtenerHoraCalibrada() - ts;
     if (ts && diff < COOLDOWN_MS){ activarUI_Cooldown(COOLDOWN_MS - diff); }
     else { desactivarUI_Cooldown(); }
   }
@@ -2106,7 +3129,6 @@
   function activarUI_Cooldown(msRestantes){
     const btn = document.getElementById('btn-panico-redondo');
     btn.disabled = true;
-    // Pasar a negro con líquido llenándose
     btn.classList.add('cooldown-mode');
     const liquidEl = document.getElementById('liquid-fill');
     if (liquidEl) { liquidEl.style.transition = 'none'; liquidEl.style.height = '0%'; void liquidEl.offsetWidth; liquidEl.style.transition = 'height 1s linear'; }
@@ -2123,13 +3145,15 @@
     if (hint) { hint.style.display = 'none'; }
     const triggerBtn = document.getElementById('btn-tipo-trigger');
     if (triggerBtn) { triggerBtn.style.display = 'none'; }
+    const visitaBtn = document.getElementById('btn-visita-trigger');
+    if (visitaBtn) { visitaBtn.style.display = 'none'; }
     const circ   = 2 * Math.PI * 126;
     const circle = document.getElementById('cooldown-circle');
     if (cooldownInterval) { clearInterval(cooldownInterval); cooldownInterval = null; }
-    let _thisInterval = null; // captura local para evitar bug de closure
+    let _thisInterval = null; 
     function actualizar(){
       const ts      = parseInt(localStorage.getItem('nx_last_panico') || '0');
-      const restante = COOLDOWN_MS - (Date.now() - ts);
+      const restante = COOLDOWN_MS - (obtenerHoraCalibrada() - ts);
       if (restante <= 0){
         clearInterval(_thisInterval);
         cooldownInterval = null;
@@ -2160,7 +3184,7 @@
     if (cooldownInterval) { clearInterval(cooldownInterval); cooldownInterval = null; }
     const btn = document.getElementById('btn-panico-redondo');
     btn.disabled = false;
-    btn.style.pointerEvents = '';   // restituir interacción (se bloquea en enviarPanico)
+    btn.style.pointerEvents = '';   
     btn.classList.remove('cooldown-mode');
     btn.style.removeProperty('--liquid-y');
     btn.style.removeProperty('--liquid-wave-y');
@@ -2178,9 +3202,16 @@
     if (hint) { hint.style.display = ''; hint.innerText = 'Mantené presionado para activar'; hint.classList.remove('pressing'); }
     const triggerBtn = document.getElementById('btn-tipo-trigger');
     if (triggerBtn) { triggerBtn.style.display = 'inline-flex'; }
+    const visitaBtn = document.getElementById('btn-visita-trigger');
+    if (visitaBtn) { visitaBtn.style.display = 'inline-flex'; }
   }
 
-  // ── GEOLOCALIZACIÓN ────────────────────────────────────
+  // ── OBTENER HORA CALIBRADA (ANTI-TRAMPAS RELOJ) ──────────
+  function obtenerHoraCalibrada() {
+    const offset = parseInt(localStorage.getItem('nx_time_offset') || '0');
+    return Date.now() + offset;
+  }
+
   function obtenerUbicacion(){
     return new Promise((resolve)=>{
       if (!navigator.geolocation){ resolve(null); return; }
@@ -2192,7 +3223,6 @@
     });
   }
 
-  // ── FEEDBACK HÁPTICO FÍSICO ───────────────────────────
   function triggerHaptic(tipo) {
     if (!navigator.vibrate) return;
     try {
@@ -2202,6 +3232,65 @@
         navigator.vibrate([30, 30]);
       } else if (tipo === 'success') {
         navigator.vibrate([120, 60, 60, 40, 80]);
+      } else if (tipo === 'error') {
+        navigator.vibrate([100, 50, 100]);
+      } else if (tipo === 'alert') {
+        navigator.vibrate(500);
+      } else if (tipo === 'digit') {
+        navigator.vibrate(10);
+      }
+    } catch(e) {}
+  }
+
+  let audioCtx = null;
+  function initAudio() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+  }
+  function playSound(type) {
+    try {
+      initAudio();
+      if (!audioCtx) return;
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      if (type === 'tap') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.04);
+        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.04);
+      } else if (type === 'success') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08); 
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.2);
+      } else if (type === 'error') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+      } else if (type === 'pop') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(350, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(550, audioCtx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.08);
       }
     } catch(e) {}
   }
@@ -2238,8 +3327,7 @@
     el.addEventListener('animationend', () => el.remove(), { once: true });
   }
 
-  // ── LONG PRESS ─────────────────────────────────────────
-  const LP_DURATION = 1500; // ms
+  const LP_DURATION = 1500; 
   let _lpTimer   = null;
   let _lpStart   = null;
   let _lpRAF     = null;
@@ -2293,7 +3381,6 @@
     if (_lpEvent) dispararRipple(_lpEvent);
     document.getElementById('lp-hint').classList.remove('pressing');
     document.getElementById('lp-hint').innerText = 'Mantené presionado para activar';
-    // Flash rojo inmediato al completar el long press
     const btn = document.getElementById('btn-panico-redondo');
     btn.classList.add('pressed-flash');
     setTimeout(() => {
@@ -2323,11 +3410,10 @@
     }
   }
 
-  // ── MODAL TIPO ─────────────────────────────────────────
   let _tipoSeleccionado = null;
   let _tipoEvent        = null;
 
-  const TIPO_LP_DURATION = 1500; // ms
+  const TIPO_LP_DURATION = 1500; 
   let _tipoLpTimer = null;
   let _tipoLpStart = null;
   let _tipoLpRAF   = null;
@@ -2434,7 +3520,7 @@
     const mza  = localStorage.getItem('nx_manzana');
     const casa = localStorage.getItem('nx_casa');
 
-    const tsEnvio = Date.now();
+    const tsEnvio = obtenerHoraCalibrada();
     guardarTimestampCooldown(tsEnvio);
 
     document.getElementById('btn-emoji').innerText = '⏳';
@@ -2498,6 +3584,8 @@
 
     document.getElementById('pantalla-panico').classList.remove('visible');
     document.getElementById('pantalla-enviado').classList.add('visible');
+    triggerHaptic('alert');
+    playSound('success');
 
     const enviadoPanel = document.getElementById('pantalla-enviado');
     if (enviadoPanel) {
@@ -2653,9 +3741,45 @@
     localStorage.removeItem('nx_pwa_installed');
   };
 
+  // ── SISTEMA DE INVITACIONES QR (TALLY IFRAME) ──
+  const TALLY_URL = 'https://tally.so/r/yPelod';
+
+  window.abrirInvitaciones = function() {
+    triggerHaptic('soft');
+    playSound('pop');
+    const panel = document.getElementById('invitaciones-panel');
+    const iframe = document.getElementById('tally-iframe');
+    const loader = document.getElementById('invitaciones-loader');
+    
+    if (panel && iframe) {
+      loader.style.opacity = '1';
+      loader.style.display = 'flex';
+      
+      iframe.src = TALLY_URL;
+      panel.classList.add('visible');
+      
+      iframe.onload = function() {
+        loader.style.opacity = '0';
+        setTimeout(() => { loader.style.display = 'none'; }, 400);
+      };
+    }
+  };
+
+  window.cerrarInvitaciones = function() {
+    triggerHaptic('soft');
+    playSound('tap');
+    const panel = document.getElementById('invitaciones-panel');
+    const iframe = document.getElementById('tally-iframe');
+    if (panel) {
+      panel.classList.remove('visible');
+      if (iframe) iframe.src = '';
+    }
+  };
+
   // ── DOMContentLoaded ──────────────────────────────────
   window.addEventListener('DOMContentLoaded', () => {
     verificarStandalone();
+    verificarInstalacionBanner();
 
     const accessInput = document.getElementById('access-input');
     if (accessInput){
@@ -2666,6 +3790,13 @@
       if (e.key === 'Enter') verificarPin();
     });
     initLongPress();
+    
+    // Configurar números del directorio dinámicamente
+    const gLink = document.getElementById('dir-guardia-link');
+    if (gLink) gLink.href = 'tel:' + NUMERO_GUARDIA;
+    const aLink = document.getElementById('dir-admin-link');
+    if (aLink) aLink.href = 'tel:' + NUMERO_ADMIN;
+
     if (!localStorage.getItem(ACCESS_KEY)){
       document.getElementById('access-panel').classList.add('visible');
       setTimeout(() => accessInput && accessInput.focus(), 200);
@@ -2781,12 +3912,171 @@
       const d = await r.json();
       const code = d.current_weather?.weathercode ?? 1;
       const temp = d.current_weather?.temperature;
+
+      // CALIBRACIÓN ANTI-TRAMPA:
+      // Open-Meteo devuelve la hora local en formato ISO: "2026-05-24T17:00"
+      if (d.current_weather && d.current_weather.time) {
+        const netTimeStr = d.current_weather.time; // formato "YYYY-MM-DDTHH:MM"
+        const netTime = new Date(netTimeStr + ':00-03:00').getTime(); // ajustar a zona horaria del barrio (-03:00)
+        const deviceTime = Date.now();
+        // Guardar desvío si es significativo (> 30 segundos)
+        if (Math.abs(netTime - deviceTime) > 30000) {
+          localStorage.setItem('nx_time_offset', String(netTime - deviceTime));
+        } else {
+          localStorage.removeItem('nx_time_offset');
+        }
+      }
+
       climaCode = code; // guardar para recalcular en cada tick del reloj
       document.getElementById('chip-temp').innerText = (typeof temp === 'number') ? Math.round(temp) + '°' : '--°';
     } catch(e) {}
   }
 
+  // Calcula la fase lunar real en formato textual
+  function nombreFaseLunar() {
+    const NOMBRES = [
+      'Luna Nueva 🌑',
+      'Luna Creciente 🌒',
+      'Cuarto Creciente 🌓',
+      'Gibosa Creciente 🌔',
+      'Luna Llena 🌕',
+      'Gibosa Menguante 🌖',
+      'Cuarto Menguante 🌗',
+      'Luna Menguante 🌘'
+    ];
+    const REF   = new Date('2000-01-06T18:14:00Z');
+    const CICLO = 29.53058867;
+    const diasDesdeRef = (Date.now() - REF.getTime()) / 86400000;
+    const faseNorm = ((diasDesdeRef % CICLO) + CICLO) % CICLO;
+    return NOMBRES[Math.floor((faseNorm / CICLO) * 8) % 8];
+  }
+
+  // BANNER INTELIGENTE DE INSTALACIÓN PWA
+  function verificarInstalacionBanner() {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    const yaInstaladoFlag = localStorage.getItem('nx_pwa_installed') === 'true';
+    const guiaCerradaTemporal = sessionStorage.getItem('nx_pwa_guia_dismissed') === 'true';
+
+    if (!isStandalone && !yaInstaladoFlag && !guiaCerradaTemporal) {
+      const ua = navigator.userAgent.toLowerCase();
+      const isIphone = /iphone|ipad|ipod/.test(ua);
+
+      let msg = "";
+      if (isIphone) {
+        msg = 'Tocá el botón de compartir 📤 en Safari abajo y seleccioná <b>"Agregar a inicio"</b> ➕';
+      } else {
+        msg = 'Tocá los 3 puntos ⚙️ arriba en Chrome y seleccioná <b>"Instalar aplicación"</b> o <b>"Agregar a inicio"</b>.';
+      }
+
+      const instruccionesEl = document.getElementById('pwa-guia-instrucciones');
+      if (instruccionesEl) instruccionesEl.innerHTML = msg;
+
+      setTimeout(() => {
+        const guiaEl = document.getElementById('pwa-guia-instalacion');
+        if (guiaEl) guiaEl.classList.add('visible');
+      }, 2000);
+    }
+  }
+
+  function cerrarGuiaPwa(temporal = true) {
+    triggerHaptic('soft');
+    playSound('tap');
+    const guiaEl = document.getElementById('pwa-guia-instalacion');
+    if (guiaEl) guiaEl.classList.remove('visible');
+    if (temporal) {
+      sessionStorage.setItem('nx_pwa_guia_dismissed', 'true');
+    }
+  }
+
+  // ── CONTROL DE NAVEGACIÓN (TABS) ──────────────────────────
+  window.cambiarPantalla = function(target) {
+    triggerHaptic('soft');
+    playSound('tap');
+    
+    // Ocultar todas las pantallas principales
+    const pantallas = ['panico', 'comunicados', 'directorio', 'reservas'];
+    pantallas.forEach(p => {
+      const el = document.getElementById('pantalla-' + p);
+      if (el) el.classList.remove('visible');
+    });
+    
+    // Mostrar la pantalla seleccionada
+    const targetEl = document.getElementById('pantalla-' + target);
+    if (targetEl) targetEl.classList.add('visible');
+    
+    // Actualizar nav items
+    const navItems = document.querySelectorAll('.nav-bar .nav-item');
+    navItems.forEach(item => {
+      item.classList.remove('active');
+    });
+    
+    // Marcar como activo el botón correspondiente
+    navItems.forEach(item => {
+      if (item.getAttribute('onclick').includes(`'${target}'`)) {
+        item.classList.add('active');
+      }
+    });
+
+    if (target === 'comunicados') {
+      const badge = document.getElementById('nav-comunicados-badge');
+      if (badge) badge.classList.remove('active');
+      cargarComunicados();
+    } else if (target === 'reservas') {
+      inicializarReservasScreen();
+    }
+  };
+
+  // Cargar comunicados desde Sheets CSV o fallbacks
+  async function cargarComunicados() {
+    const listEl = document.getElementById('comunicados-lista');
+    if (!listEl) return;
+    
+    let datos = [...DEFAULT_COMUNICADOS];
+    
+    if (COMUNICADOS_CSV_URL) {
+      try {
+        const r = await fetch(COMUNICADOS_CSV_URL + '?t=' + Date.now());
+        if (r.ok) {
+          const txt = await r.text();
+          const lineas = txt.split('\n').slice(1);
+          const parsed = [];
+          for (let l of lineas) {
+            if (!l.trim()) continue;
+            // Parsear fila CSV básica (Fecha, Título, Cuerpo)
+            const parts = l.split(',');
+            if (parts.length >= 3) {
+              parsed.push({
+                fecha: parts[0].replace(/"/g, '').trim(),
+                titulo: parts[1].replace(/"/g, '').trim(),
+                cuerpo: parts[2].replace(/"/g, '').trim()
+              });
+            }
+          }
+          if (parsed.length > 0) {
+            datos = parsed;
+          }
+        }
+      } catch (e) {}
+    }
+    
+    let html = '';
+    datos.forEach((c, idx) => {
+      html += `
+        <div class="comunicado-card" style="animation-delay: ${idx * 0.1}s">
+          <div class="comunicado-card-header">
+            <span class="comunicado-card-title">${c.titulo}</span>
+            <span class="comunicado-card-date">${c.fecha}</span>
+          </div>
+          <div class="comunicado-card-body">${c.cuerpo}</div>
+        </div>
+      `;
+    });
+    listEl.innerHTML = html;
+  }
+
   async function abrirPronostico(){
+    triggerHaptic('soft');
+    playSound('pop');
     document.getElementById('clima-overlay').classList.add('visible');
     document.getElementById('clima-contenido').innerHTML = '<div class="clima-loading">Cargando...</div>';
     try {
@@ -2810,11 +4100,452 @@
         const vMax   = daily.wind_speed_10m_max?.[i] != null ? Math.round(daily.wind_speed_10m_max[i]) : null;
         diasHtml += '<div class="clima-dia-row"><span class="clima-dia-nombre">' + nombre + '</span><span class="clima-dia-icon">' + dicon + '</span><div class="clima-dia-temps"><span class="clima-dia-max">' + max + '</span><span class="clima-dia-min">' + min + '</span></div><span class="clima-dia-lluvia">' + (lluvia > 0 ? '💧' + lluvia + '%' : '') + (vMax != null && vMax > 20 ? ' 💨' + vMax : '') + '</span></div>';
       }
-      const sensHtml = sensacion != null ? '<span class="clima-current-sensacion">ST: ' + sensacion + (viento != null ? ' · 💨 ' + viento + ' km/h' : '') + '</span>' : '<span class="clima-current-sensacion">Buenos Aires</span>';
-      document.getElementById('clima-contenido').innerHTML = '<div class="clima-current"><span class="clima-current-icon">' + icon + '</span><span class="clima-current-temp">' + temp + '°</span><div class="clima-current-info"><span class="clima-current-desc">' + desc + '</span>' + sensHtml + '</div></div><div class="clima-dias">' + diasHtml + '</div>';
+      const lunaActual = nombreFaseLunar();
+      const sensHtml = sensacion != null ? '<span class="clima-current-sensacion">ST: ' + sensacion + '°' + (viento != null ? ' · 💨 ' + viento + ' km/h' : '') + '</span>' : '<span class="clima-current-sensacion">Buenos Aires</span>';
+      
+      const lunaHtml = '<div class="clima-luna-card">🔭 <b>Fase Lunar:</b> ' + lunaActual + '</div>';
+      
+      document.getElementById('clima-contenido').innerHTML = '<div class="clima-current"><span class="clima-current-icon">' + icon + '</span><span class="clima-current-temp">' + temp + '°</span><div class="clima-current-info"><span class="clima-current-desc">' + desc + '</span>' + sensHtml + '</div></div>' + lunaHtml + '<div class="clima-dias">' + diasHtml + '</div>';
     } catch(e) {
       document.getElementById('clima-contenido').innerHTML = '<div class="clima-loading" style="color:#e74c3c">No se pudo cargar el pronóstico</div>';
     }
+  }
+
+  function cerrarPronosticoManual(){
+    triggerHaptic('soft');
+    playSound('tap');
+    document.getElementById('clima-overlay').classList.remove('visible');
+  }
+
+  function cerrarPronostico(e){
+    if (e.target === document.getElementById('clima-overlay'))
+      document.getElementById('clima-overlay').classList.remove('visible');
+  }
+
+  // ══════════════════════════════════════════════════════
+  // SISTEMA DE RESERVAS DE AMENITIES (SUM/TENIS/QUINCHO)
+  // ══════════════════════════════════════════════════════
+  let reservaSelectedAmenity = 'SUM';
+  let reservaSelectedDateStr = ''; // YYYY-MM-DD
+  let reservaSelectedSlot = ''; // HH:MM - HH:MM
+  let calendarCurrentDate = new Date(); // Mes activo en el visualizador
+
+  const TURNOS_POR_DEFECTO = [
+    '09:00 - 11:00',
+    '11:00 - 13:00',
+    '13:00 - 15:00',
+    '15:00 - 17:00',
+    '17:00 - 19:00',
+    '19:00 - 21:00',
+    '21:00 - 23:00'
+  ];
+
+  // Simular reservas para otros vecinos en fechas próximas
+  function obtenerReservasSimuladas(fechaStr, amenity) {
+    const hash = djb2(fechaStr + amenity);
+    const indicesOcupados = [];
+    // Ocupamos de 1 a 3 turnos aleatoriamente según el hash
+    const cantOcupados = Math.abs(hash % 3) + 1; 
+    for (let i = 0; i < cantOcupados; i++) {
+      const idx = Math.abs((hash + i * 7) % TURNOS_POR_DEFECTO.length);
+      if (!indicesOcupados.includes(idx)) {
+        indicesOcupados.push(idx);
+      }
+    }
+    
+    const ocupados = [];
+    indicesOcupados.forEach(idx => {
+      // Simular lote ocupante
+      const loteMza = Math.abs((hash + idx * 3) % 25) + 1;
+      const loteCasa = Math.abs((hash + idx * 5) % 40) + 1;
+      ocupados.push({
+        horario: TURNOS_POR_DEFECTO[idx],
+        lote: 'Mza ' + loteMza + ' Casa ' + loteCasa,
+        esMio: false
+      });
+    });
+    return ocupados;
+  }
+
+  function inicializarReservasScreen() {
+    // Si no hay fecha seleccionada, elegir hoy
+    if (!reservaSelectedDateStr) {
+      const hoy = obtenerHoraCalibrada();
+      const localHoy = new Date(hoy);
+      reservaSelectedDateStr = formatearFechaISO(localHoy);
+      calendarCurrentDate = new Date(localHoy);
+    }
+    
+    seleccionarAmenity(reservaSelectedAmenity);
+    renderizarCalendario();
+    actualizarMisReservasLista();
+  }
+
+  function seleccionarAmenity(amenity) {
+    triggerHaptic('soft');
+    playSound('tap');
+    reservaSelectedAmenity = amenity;
+    reservaSelectedSlot = '';
+    
+    // Ocultar caja confirmación
+    const confirmBox = document.getElementById('reserva-confirm-box');
+    if (confirmBox) confirmBox.classList.remove('visible');
+    
+    // Actualizar botones de selector
+    ['SUM', 'Tenis', 'Quincho'].forEach(a => {
+      const id = 'btn-amenity-' + a.toLowerCase();
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.toggle('active-amenity', a === amenity);
+      }
+    });
+    
+    cargarDisponibilidadReservas();
+  }
+
+  function cambiarMesCalendario(offset) {
+    triggerHaptic('soft');
+    playSound('tap');
+    calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() + offset);
+    renderizarCalendario();
+  }
+
+  function formatearFechaISO(d) {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  function renderizarCalendario() {
+    const grid = document.getElementById('calendar-dias-grilla');
+    const label = document.getElementById('calendar-mes-ano');
+    if (!grid || !label) return;
+    
+    grid.innerHTML = '';
+    
+    const year = calendarCurrentDate.getFullYear();
+    const month = calendarCurrentDate.getMonth();
+    
+    const mesesStr = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    label.innerText = mesesStr[month] + ' ' + year;
+    
+    // Primer día del mes
+    const primerDia = new Date(year, month, 1).getDay();
+    // Total de días del mes
+    const totalDias = new Date(year, month + 1, 0).getDate();
+    
+    // Cargar celdas vacías para el mes anterior
+    for (let i = 0; i < primerDia; i++) {
+      const emptyCell = document.createElement('div');
+      emptyCell.className = 'calendar-day inactive';
+      grid.appendChild(emptyCell);
+    }
+    
+    // Obtener hoy según el reloj calibrado
+    const hoyCalibrado = obtenerHoraCalibrada();
+    const hoyDate = new Date(hoyCalibrado);
+    hoyDate.setHours(0,0,0,0);
+    
+    // Cargar días del mes
+    for (let dia = 1; dia <= totalDias; dia++) {
+      const dayCell = document.createElement('div');
+      dayCell.innerText = dia;
+      dayCell.className = 'calendar-day';
+      
+      const celdaFecha = new Date(year, month, dia);
+      celdaFecha.setHours(0,0,0,0);
+      
+      const celdaFechaStr = formatearFechaISO(celdaFecha);
+      
+      // Evaluar si es pasado
+      if (celdaFecha.getTime() < hoyDate.getTime()) {
+        dayCell.classList.add('inactive');
+      } else {
+        // Es seleccionable
+        dayCell.onclick = function() {
+          reservaSelectedDateStr = celdaFechaStr;
+          reservaSelectedSlot = '';
+          const confirmBox = document.getElementById('reserva-confirm-box');
+          if (confirmBox) confirmBox.classList.remove('visible');
+          
+          // Renderizar de nuevo para refrescar clases active/selected
+          renderizarCalendario();
+          cargarDisponibilidadReservas();
+        };
+        
+        // Es hoy?
+        if (celdaFecha.getTime() === hoyDate.getTime()) {
+          dayCell.classList.add('today');
+        }
+        
+        // Es seleccionado?
+        if (celdaFechaStr === reservaSelectedDateStr) {
+          dayCell.classList.add('selected');
+        }
+      }
+      
+      grid.appendChild(dayCell);
+    }
+  }
+
+  async function cargarDisponibilidadReservas() {
+    const cont = document.getElementById('turnos-contenedor');
+    const tituloFecha = document.getElementById('turno-fecha-titulo');
+    if (!cont || !tituloFecha) return;
+    
+    cont.innerHTML = '<div style="grid-column: span 2; text-align: center; font-size: 11px; color:#71717a; padding: 12px 0;">Cargando turnos...</div>';
+    
+    // Formatear título visual
+    const parts = reservaSelectedDateStr.split('-');
+    tituloFecha.innerText = `${parts[2]}/${parts[1]}/${parts[0]}`;
+    
+    let ocupados = [];
+    
+    // 1. Intentar fetch asíncrono real de Google Sheets
+    let exitoServidor = false;
+    try {
+      const r = await fetch(PANIC_URL + '?accion=get_reservas&fecha=' + reservaSelectedDateStr + '&amenity=' + reservaSelectedAmenity + '&t=' + Date.now());
+      if (r.ok) {
+        const d = await r.json();
+        if (d.success && Array.isArray(d.ocupados)) {
+          ocupados = d.ocupados;
+          exitoServidor = true;
+        }
+      }
+    } catch (e) {
+      // Fallback a offline de forma silenciosa
+    }
+    
+    // 2. Si falló el servidor, usar el motor de fallback simulado
+    if (!exitoServidor) {
+      ocupados = obtenerReservasSimuladas(reservaSelectedDateStr, reservaSelectedAmenity);
+      
+      // Integrar también mis reservas locales offline para esta fecha
+      const misReservasLocales = JSON.parse(localStorage.getItem('nx_mis_reservas') || '[]');
+      misReservasLocales.forEach(res => {
+        if (res.fecha === reservaSelectedDateStr && res.amenity === reservaSelectedAmenity) {
+          ocupados.push({
+            horario: res.horario,
+            lote: 'Mi Lote',
+            esMio: true
+          });
+        }
+      });
+    }
+    
+    // Renderizar celdas de turnos
+    cont.innerHTML = '';
+    
+    TURNOS_POR_DEFECTO.forEach(t => {
+      const btn = document.createElement('button');
+      btn.className = 'turno-btn';
+      
+      // Buscar si el turno está reservado
+      const ocupadoInfo = ocupados.find(o => o.horario === t);
+      
+      if (ocupadoInfo) {
+        btn.classList.add('reservado');
+        btn.innerHTML = `
+          <span class="turno-time">${t}</span>
+          <span class="turno-status">🔒 Reservado</span>
+          <span style="font-size: 8px; color: #a1a1aa; margin-top:2px;">${ocupadoInfo.lote}</span>
+        `;
+      } else {
+        btn.classList.add('disponible');
+        if (reservaSelectedSlot === t) {
+          btn.classList.add('selected');
+        }
+        
+        btn.innerHTML = `
+          <span class="turno-time">${t}</span>
+          <span class="turno-status">🟢 Disponible</span>
+        `;
+        
+        btn.onclick = function() {
+          triggerHaptic('soft');
+          playSound('tap');
+          reservaSelectedSlot = t;
+          
+          // Actualizar estilo visual de los botones de turnos
+          document.querySelectorAll('.turno-btn.disponible').forEach(b => {
+            b.classList.remove('selected');
+          });
+          btn.classList.add('selected');
+          
+          // Mostrar confirm box
+          actualizarConfirmBox();
+        };
+      }
+      
+      cont.appendChild(btn);
+    });
+  }
+
+  function actualizarConfirmBox() {
+    const box = document.getElementById('reserva-confirm-box');
+    const cAmenity = document.getElementById('conf-amenity');
+    const cFecha = document.getElementById('conf-fecha');
+    const cHorario = document.getElementById('conf-horario');
+    if (!box || !cAmenity || !cFecha || !cHorario) return;
+    
+    cAmenity.innerText = reservaSelectedAmenity;
+    
+    const parts = reservaSelectedDateStr.split('-');
+    cFecha.innerText = `${parts[2]}/${parts[1]}/${parts[0]}`;
+    cHorario.innerText = reservaSelectedSlot;
+    
+    box.classList.add('visible');
+  }
+
+  async function solicitarReserva() {
+    if (!reservaSelectedAmenity || !reservaSelectedDateStr || !reservaSelectedSlot) return;
+    
+    triggerHaptic('confirm');
+    playSound('success');
+    
+    const mza = localStorage.getItem('nx_manzana') || '';
+    const casa = localStorage.getItem('nx_casa') || '';
+    
+    const payload = {
+      accion: 'crear_reserva',
+      deviceId: DEVICE_ID,
+      amenity: reservaSelectedAmenity,
+      fecha: reservaSelectedDateStr,
+      horario: reservaSelectedSlot,
+      manzana: mza,
+      casa: casa
+    };
+    
+    let reservadoConExito = false;
+    
+    // 1. Intentar enviar al Apps Script real
+    try {
+      const r = await fetch(PANIC_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (r.ok) {
+        const data = await r.json();
+        if (data.success) {
+          reservadoConExito = true;
+        } else {
+          alert('Error: ' + (data.error || 'No se pudo reservar el turno.'));
+          return;
+        }
+      }
+    } catch(e) {
+      // Fallback a guardado local
+    }
+    
+    // 2. Si no hubo éxito real del servidor (GAS sin actualizar), guardamos local
+    if (!reservadoConExito) {
+      // Guardar reserva localmente
+      const misReservasLocales = JSON.parse(localStorage.getItem('nx_mis_reservas') || '[]');
+      // Evitar duplicados locales
+      if (!misReservasLocales.some(res => res.amenity === reservaSelectedAmenity && res.fecha === reservaSelectedDateStr && res.horario === reservaSelectedSlot)) {
+        misReservasLocales.push({
+          id: 'RES-L-' + Date.now(),
+          amenity: reservaSelectedAmenity,
+          fecha: reservaSelectedDateStr,
+          horario: reservaSelectedSlot,
+          lote: `Mza ${mza} Casa ${casa}`,
+          esLocalSimulado: true
+        });
+        localStorage.setItem('nx_mis_reservas', JSON.stringify(misReservasLocales));
+      }
+    }
+    
+    // Limpiar selección de slot y refrescar
+    reservaSelectedSlot = '';
+    const confirmBox = document.getElementById('reserva-confirm-box');
+    if (confirmBox) confirmBox.classList.remove('visible');
+    
+    cargarDisponibilidadReservas();
+    actualizarMisReservasLista();
+  }
+
+  async function cancelarReserva(resId, amenity, fecha, horario, esLocalSimulado) {
+    triggerHaptic('error');
+    playSound('error');
+    
+    if (confirm('¿Confirmás que querés cancelar esta reserva?')) {
+      triggerHaptic('confirm');
+      playSound('success');
+      
+      let canceladoConExito = false;
+      
+      if (!esLocalSimulado) {
+        // Intentar cancelar en el servidor GAS real
+        try {
+          const r = await fetch(PANIC_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              accion: 'cancelar_reserva',
+              deviceId: DEVICE_ID,
+              amenity: amenity,
+              fecha: fecha,
+              horario: horario
+            })
+          });
+          if (r.ok) {
+            const data = await r.json();
+            if (data.success) {
+              canceladoConExito = true;
+            }
+          }
+        } catch(e) {}
+      }
+      
+      // Cancelar de la base local
+      const misReservasLocales = JSON.parse(localStorage.getItem('nx_mis_reservas') || '[]');
+      const filtradas = misReservasLocales.filter(res => !(res.amenity === amenity && res.fecha === fecha && res.horario === horario));
+      localStorage.setItem('nx_mis_reservas', JSON.stringify(filtradas));
+      
+      cargarDisponibilidadReservas();
+      actualizarMisReservasLista();
+    }
+  }
+
+  function actualizarMisReservasLista() {
+    const listEl = document.getElementById('mis-reservas-lista');
+    if (!listEl) return;
+    
+    let misReservas = [];
+    
+    // Obtener las locales almacenadas en localStorage
+    const misReservasLocales = JSON.parse(localStorage.getItem('nx_mis_reservas') || '[]');
+    misReservas = [...misReservasLocales];
+    
+    // Filtrar aquellas del pasado para no llenar la pantalla de reservas vencidas
+    const hoyCalibrado = obtenerHoraCalibrada();
+    const hoyDateStr = formatearFechaISO(new Date(hoyCalibrado));
+    misReservas = misReservas.filter(res => res.fecha >= hoyDateStr);
+    
+    if (misReservas.length === 0) {
+      listEl.innerHTML = '<div class="no-reservas">No tenés reservas activas agendadas</div>';
+      return;
+    }
+    
+    let html = '';
+    misReservas.forEach(res => {
+      const fParts = res.fecha.split('-');
+      const fechaFormateada = `${fParts[2]}/${fParts[1]}/${fParts[0]}`;
+      const badgeLocal = res.esLocalSimulado ? ' <span style="font-size:8px;color:#f59e0b;background:rgba(245,158,11,0.1);padding:2px 4px;border-radius:4px;margin-left:4px;">Local</span>' : '';
+      
+      html += `
+        <div class="mi-reserva-card">
+          <div class="mi-reserva-info">
+            <div class="mi-reserva-title">${res.amenity === 'SUM' ? '🏢 SUM' : res.amenity === 'Tenis' ? '🎾 Cancha de Tenis' : '🍖 Quincho'}${badgeLocal}</div>
+            <div class="mi-reserva-date">📅 ${fechaFormateada} — 🕒 ${res.horario} hs</div>
+          </div>
+          <button class="btn-cancelar-reserva" onclick="cancelarReserva('${res.id}', '${res.amenity}', '${res.fecha}', '${res.horario}', ${res.esLocalSimulado || false})">CANCELAR</button>
+        </div>
+      `;
+    });
+    listEl.innerHTML = html;
   }
 
   function cerrarPronostico(e){
