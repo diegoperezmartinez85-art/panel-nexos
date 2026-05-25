@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -13,6 +13,11 @@
   <link rel="apple-touch-icon" href="icon-192.png">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
+    :root {
+      --ac: #06b6d4;
+      --acr: 6, 182, 212;
+    }
 
     * {
       box-sizing: border-box;
@@ -203,7 +208,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 18px;
     }
     .pantalla-panico.visible {
       display: flex;
@@ -216,7 +221,7 @@
       font-weight: 500;
     }
     .info-config strong {
-      color: #06b6d4;
+      color: var(--ac);
       font-weight: 800;
     }
 
@@ -524,7 +529,34 @@
       font-family: monospace;
     }
 
-    .btn-cfg-main,
+    .btn-cfg-main {
+      background: rgba(30, 30, 32, 0.5);
+      color: #06b6d4;
+      border: 1.5px solid rgba(6, 182, 212, 0.35);
+      border-radius: 16px;
+      padding: 16px 24px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      width: 100%;
+      max-width: 350px;
+      box-sizing: border-box;
+    }
+    .btn-cfg-main:active {
+      transform: scale(0.96);
+      background: rgba(6, 182, 212, 0.15);
+      color: #06b6d4;
+      border-color: #06b6d4;
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
     .btn-volver {
       background: rgba(30, 30, 32, 0.5);
       color: #06b6d4;
@@ -546,7 +578,6 @@
       max-width: 320px;
       box-sizing: border-box;
     }
-    .btn-cfg-main:active,
     .btn-volver:active {
       transform: scale(0.96);
       background: rgba(6, 182, 212, 0.15);
@@ -557,10 +588,10 @@
     .btn-tipo-trigger {
       background: rgba(245, 158, 11, 0.05);
       color: #f59e0b;
-      border: 1.5px solid rgba(245, 158, 11, 0.3);
+      border: 1.5px solid rgba(245, 158, 11, 0.35);
       border-radius: 16px;
-      padding: 8px 22px;
-      font-size: 12.5px;
+      padding: 16px 24px;
+      font-size: 15px;
       font-weight: 800;
       letter-spacing: 0.8px;
       cursor: pointer;
@@ -575,7 +606,7 @@
       gap: 10px;
       animation: btnTriggerPulse 3s ease-in-out infinite;
       width: 100%;
-      max-width: 320px;
+      max-width: 350px;
       box-sizing: border-box;
     }
     .btn-tipo-trigger:active {
@@ -598,10 +629,10 @@
     .btn-visita-trigger {
       background: rgba(6, 182, 212, 0.05);
       color: #06b6d4;
-      border: 1.5px solid rgba(6, 182, 212, 0.3);
+      border: 1.5px solid rgba(6, 182, 212, 0.35);
       border-radius: 16px;
-      padding: 8px 22px;
-      font-size: 12.5px;
+      padding: 16px 24px;
+      font-size: 15px;
       font-weight: 800;
       cursor: pointer;
       backdrop-filter: blur(12px);
@@ -612,7 +643,7 @@
       gap: 10px;
       margin-top: 0px;
       width: 100%;
-      max-width: 320px;
+      max-width: 350px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       letter-spacing: 0.5px;
@@ -671,17 +702,29 @@
       text-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
     }
     .invitaciones-cerrar {
-      font-size: 16px;
-      color: #a1a1aa;
+      background: rgba(6, 182, 212, 0.08);
+      color: #06b6d4;
+      border: 1px solid rgba(6, 182, 212, 0.35);
+      border-radius: 12px;
+      padding: 6px 14px;
+      font-size: 12.5px;
+      font-weight: 800;
       cursor: pointer;
-      padding: 6px;
-      transition: color 0.2s;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 6px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
+      text-decoration: none;
     }
     .invitaciones-cerrar:active {
-      color: #06b6d4;
+      transform: scale(0.95);
+      background: rgba(6, 182, 212, 0.2);
+      border-color: #06b6d4;
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.35);
     }
     .invitaciones-body {
       flex: 1;
@@ -1404,21 +1447,25 @@
     .ig-link {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       text-decoration: none;
       color: #a1a1aa;
-      font-size: 12px;
-      font-weight: 700;
+      font-size: 15px;
+      font-weight: 800;
       letter-spacing: 0.5px;
-      padding: 8px 18px;
-      border-radius: 20px;
+      padding: 16px 24px;
+      border-radius: 16px;
       border: 1px solid transparent;
       background-image: linear-gradient(#09090b, #09090b), linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
       background-origin: border-box;
       background-clip: padding-box, border-box;
       box-shadow: 0 4px 15px rgba(220, 39, 67, 0.15);
       transition: all 0.3s ease;
-      margin-top: 8px;
+      margin-top: 0px;
+      width: 100%;
+      max-width: 350px;
+      box-sizing: border-box;
     }
     .ig-link:active {
       transform: scale(0.96);
@@ -1847,7 +1894,7 @@
       justify-content: center;
       gap: 10px;
       margin-bottom: 8px;
-      color: #06b6d4;
+      color: var(--ac);
     }
     .panel-header h2 {
       font-size: 15px;
@@ -1903,11 +1950,24 @@
       transform: scale(0.9);
     }
     .nav-item.active {
-      color: #06b6d4;
-      text-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+      color: var(--ac);
+      text-shadow: 0 0 10px rgba(var(--acr), 0.3);
     }
     .nav-item.active svg {
-      filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.5));
+      filter: drop-shadow(0 0 8px rgba(var(--acr), 0.5));
+    }
+    
+    .nav-indicator {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 25%;
+      height: 3px;
+      background: var(--ac);
+      box-shadow: 0 0 10px var(--ac), 0 0 5px var(--ac);
+      border-radius: 0 0 4px 4px;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 8600;
     }
     .nav-icon-badge-wrap {
       position: relative;
@@ -1969,12 +2029,19 @@
       font-weight: 800;
       color: #fff;
       line-height: 1.3;
+      flex: 1;
+      min-width: 0;
     }
     .comunicado-card-date {
       font-size: 10.5px;
       color: #a1a1aa;
       font-weight: 700;
       white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      max-width: 120px;
+      text-align: right;
+      flex-shrink: 0;
     }
     .comunicado-card-body {
       font-size: 12px;
@@ -2382,6 +2449,7 @@
       transform: scale(0.92);
       background: rgba(239, 68, 68, 0.2);
     }
+    }
     .no-reservas {
       font-size: 11px;
       color: #71717a;
@@ -2390,9 +2458,262 @@
       border: 1px dashed rgba(255, 255, 255, 0.05);
       border-radius: 12px;
     }
+
+    /* ── PANEL AJUSTES PREMIUM ── */
+    .settings-floating-btn {
+      position: fixed;
+      top: calc(env(safe-area-inset-top, 24px) - 6px);
+      right: 18px;
+      width: 38px;
+      height: 38px;
+      background: rgba(30, 30, 35, 0.45);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      color: var(--ac);
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 8000;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      outline: none;
+      display: none; /* Oculto hasta que cargue la app */
+    }
+    .settings-floating-btn:active {
+      transform: scale(0.9);
+      background: rgba(var(--acr), 0.15);
+      border-color: var(--ac);
+      box-shadow: 0 0 12px rgba(var(--acr), 0.35);
+    }
+    
+    .settings-panel {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 9000;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .settings-panel.visible {
+      display: flex;
+      animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .settings-sheet {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(20, 20, 25, 0.85);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border-radius: 28px 28px 0 0;
+      padding: 24px 20px 32px;
+      border-top: 1.5px solid rgba(var(--acr), 0.35);
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(var(--acr), 0.08);
+      transition: border-color 0.3s;
+    }
+    .settings-handle {
+      width: 40px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      margin: 0 auto 20px;
+    }
+    .settings-title {
+      font-size: 13px;
+      letter-spacing: 3px;
+      color: #fff;
+      text-shadow: 0 0 10px rgba(var(--acr), 0.3);
+      text-align: center;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      font-weight: 900;
+      transition: text-shadow 0.3s;
+    }
+    .settings-section {
+      width: 100%;
+      text-align: left;
+    }
+    .settings-section-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: #a1a1aa;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    .theme-selector-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .theme-btn {
+      background: rgba(39, 39, 42, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 14px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      color: #a1a1aa;
+      font-size: 12.5px;
+      font-weight: 700;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
+    }
+    .theme-btn:active {
+      transform: scale(0.96);
+    }
+    .theme-btn.active {
+      border-color: var(--t-color);
+      background: rgba(255, 255, 255, 0.03);
+      color: #fff;
+      box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.02);
+    }
+    .theme-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--t-color);
+      box-shadow: 0 0 6px var(--t-color);
+    }
+    .settings-cerrar-btn {
+      width: 100%;
+      background: var(--ac);
+      color: #09090b;
+      border: none;
+      border-radius: 16px;
+      padding: 16px;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      margin-top: 24px;
+      box-shadow: 0 4px 15px rgba(var(--acr), 0.25);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .settings-cerrar-btn:active {
+      transform: scale(0.97);
+    }
+    
+    /* Discreto Switch Styling */
+    .discreto-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(39, 39, 42, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      padding: 14px 16px;
+      width: 100%;
+    }
+    .discreto-info {
+      flex: 1;
+      padding-right: 12px;
+    }
+    .discreto-desc {
+      font-size: 11.5px;
+      color: #71717a;
+      line-height: 1.3;
+    }
+    .discreto-switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .discreto-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .discreto-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: .3s;
+      border-radius: 24px;
+    }
+    .discreto-slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #a1a1aa;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    .discreto-switch input:checked + .discreto-slider {
+      background-color: var(--ac);
+      border-color: var(--ac);
+    }
+    .discreto-switch input:checked + .discreto-slider:before {
+      transform: translateX(20px);
+      background-color: #09090b;
+    }
   </style>
 </head>
 <body>
+
+<button class="settings-floating-btn" id="settings-floating-btn" onclick="abrirAjustes(event)">🎨</button>
+
+<!-- PANEL DE AJUSTES PREMIUM -->
+<div class="settings-panel" id="settings-panel" onclick="cerrarAjustes(event)">
+  <div class="settings-sheet" onclick="event.stopPropagation()">
+    <div class="settings-handle"></div>
+    <div class="settings-title">⚙️ AJUSTES DE NEXOS</div>
+    
+    <!-- Tema de color -->
+    <div class="settings-section">
+      <div class="settings-section-title">Tema de Color Neón</div>
+      <div class="theme-selector-grid">
+        <button class="theme-btn active" data-theme="cyan" onclick="cambiarTema('cyan', '#06b6d4', '6, 182, 212')" style="--t-color: #06b6d4;">
+          <span class="theme-dot"></span> Classic Cyan
+        </button>
+        <button class="theme-btn" data-theme="violet" onclick="cambiarTema('violet', '#a855f7', '168, 85, 247')" style="--t-color: #a855f7;">
+          <span class="theme-dot"></span> Neon Violet
+        </button>
+        <button class="theme-btn" data-theme="green" onclick="cambiarTema('green', '#10b981', '16, 185, 129')" style="--t-color: #10b981;">
+          <span class="theme-dot"></span> Tactic Green
+        </button>
+        <button class="theme-btn" data-theme="orange" onclick="cambiarTema('orange', '#f59e0b', '245, 158, 11')" style="--t-color: #f59e0b;">
+          <span class="theme-dot"></span> Cyber Orange
+        </button>
+      </div>
+    </div>
+    
+    <!-- Modo discreto -->
+    <div class="settings-section" style="margin-top: 20px;">
+      <div class="discreto-row">
+        <div class="discreto-info">
+          <div class="settings-section-title" style="margin-bottom: 2px;">Modo Discreto</div>
+          <div class="discreto-desc">Silencia los sonidos y efectos de vibración en la app.</div>
+        </div>
+        <label class="discreto-switch">
+          <input type="checkbox" id="discreto-toggle" onchange="toggleModoDiscreto(this.checked)">
+          <span class="discreto-slider"></span>
+        </label>
+      </div>
+    </div>
+    
+    <button class="settings-cerrar-btn" onclick="cerrarAjustesManual()">Guardar Ajustes</button>
+  </div>
+</div>
 
 <!-- OVERLAY YA INSTALADO (PWA DEDUPLICATION) -->
 <div class="pwa-duplicado-overlay" id="pwa-duplicado-overlay">
@@ -2718,8 +3039,8 @@
 <div class="pin-panel" id="pin-panel">
   
   <div class="pin-content">
-    <div class="pin-title">🔑 PIN de administrador</div>
-    <div class="pin-sub">Para cambiar la ubicación necesitás el PIN.<br>Pedíselo a la administración del barrio.</div>
+    <div class="pin-title" id="pin-title-label">🔑 PIN de administrador</div>
+    <div class="pin-sub" id="pin-sub-label">Para cambiar la ubicación necesitás el PIN.<br>Pedíselo a la administración del barrio.</div>
     <input class="pin-campo" id="pin-input" type="password" inputmode="numeric" maxlength="6" placeholder="····">
     <div class="pin-intentos" id="pin-intentos"></div>
     <button class="pin-btn shimmer-effect" onclick="verificarPin()">CONFIRMAR</button>
@@ -2772,7 +3093,13 @@
   <div class="invitaciones-content">
     <div class="invitaciones-header">
       <div class="invitaciones-title">🎫 PRE-AUTORIZAR VISITA</div>
-      <div class="invitaciones-cerrar" onclick="cerrarInvitaciones()">✖️</div>
+      <button class="invitaciones-cerrar" onclick="cerrarInvitaciones()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Volver</span>
+      </button>
     </div>
     <div class="invitaciones-body">
       <div class="invitaciones-loader" id="invitaciones-loader">
@@ -2800,6 +3127,7 @@
 
 <!-- BOTTOM NAVIGATION BAR (Ultra-Premium Glassmorphic) -->
 <div class="nav-bar" id="app-nav-bar" style="display: none;">
+  <div class="nav-indicator" id="nav-indicator"></div>
   <button class="nav-item active" onclick="cambiarPantalla('panico')">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
@@ -2847,32 +3175,6 @@
     window.location.href = window.location.origin + window.location.pathname;
   }
 
-  // ── HOT-UPDATE COMPILATION INTERCEPTOR (GITHUB LIVE LOADER) ──
-  (function() {
-    try {
-      // Ignorar intercepción si estamos editando y probando localmente en PC (file:// o localhost)
-      const isLocal = window.location.protocol === 'file:' || 
-                      window.location.hostname === 'localhost' || 
-                      window.location.hostname === '127.0.0.1';
-      if (isLocal) return;
-
-      // Scoping dinámico por subcarpeta para que no se mezclen diferentes instalaciones del mismo dominio
-      const pathKey = 'nx_cached_html_' + window.location.pathname.replace(/\//g, '_');
-      const versionKey = pathKey + '_version';
-
-      const currentVersion = 'v4.5'; // Incrementar cuando el script cambia en disco local
-      const cachedHtml = localStorage.getItem(pathKey);
-      const cachedVersion = localStorage.getItem(versionKey);
-      
-      if (cachedHtml && cachedVersion && cachedVersion !== currentVersion) {
-        document.open();
-        document.write(cachedHtml);
-        document.close();
-      }
-    } catch (e) {
-      console.error("Hot-update failed:", e);
-    }
-  })();
 
   // ══════════════════════════════════════════════════════
   // CONFIGURACIÓN DE TERCEROS & CONTACTOS (Para clonado rápido)
@@ -3026,9 +3328,6 @@
 
   const PANIC_URL = 'https://script.google.com/macros/s/AKfycbwRNMfrj_t3IdhGFulnbFp6j06uB5XSb_uzA3au7jwKwcjdQ16KvBhahZdnfs9BrXZ8gQ/exec';
 
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(()=>{});
-  }
 
   function actualizarOffline(){
     document.getElementById('offline-badge').classList.toggle('visible',!navigator.onLine);
@@ -3138,6 +3437,8 @@
     document.getElementById('pantalla-baneado').classList.remove('visible');
     const navBar = document.getElementById('app-nav-bar');
     if (navBar) navBar.style.display = 'none';
+    const fBtn = document.getElementById('settings-floating-btn');
+    if (fBtn) fBtn.style.display = 'none';
   }
 
   function mostrarPantallaBaneado(ban) {
@@ -3147,6 +3448,8 @@
     document.getElementById('pantalla-baneado').classList.add('visible');
     const navBar = document.getElementById('app-nav-bar');
     if (navBar) navBar.style.display = 'none';
+    const fBtn = document.getElementById('settings-floating-btn');
+    if (fBtn) fBtn.style.display = 'none';
     const motivoEl = document.getElementById('ban-motivo-texto');
     if (ban && ban.motivo && ban.motivo.trim()) {
       motivoEl.innerText = ban.motivo;
@@ -3169,6 +3472,8 @@
     document.getElementById('pantalla-baneado').classList.remove('visible');
     const navBar = document.getElementById('app-nav-bar');
     if (navBar) navBar.style.display = 'flex';
+    const fBtn = document.getElementById('settings-floating-btn');
+    if (fBtn) fBtn.style.display = 'flex';
     verificarCooldown();
   }
 
@@ -3290,6 +3595,7 @@
   }
 
   function triggerHaptic(tipo) {
+    if (modoDiscreto) return;
     if (!navigator.vibrate) return;
     try {
       if (tipo === 'soft') {
@@ -3315,6 +3621,7 @@
     }
   }
   function playSound(type) {
+    if (modoDiscreto) return;
     try {
       initAudio();
       if (!audioCtx) return;
@@ -3741,74 +4048,6 @@
 
   function pinEsCorrecto(pin){ return hashPin(pin.trim()) === PIN_HASH; }
 
-  async function comprobarActualizacionVecino() {
-    triggerHaptic('soft');
-    playSound('tap');
-    
-    showToast('🔍 Conectando con GitHub...');
-    
-    let rawUrl = '';
-    const hostname = window.location.hostname;
-    const pathname = window.location.pathname;
-    
-    // Auto-detección dinámica de su propia ubicación en GitHub Pages
-    if (hostname.endsWith('.github.io')) {
-      const owner = hostname.split('.')[0];
-      const pathParts = pathname.split('/').filter(p => p.trim());
-      const repo = pathParts[0];
-      const filePath = pathParts.slice(1).join('/');
-      rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/${filePath}`;
-    } else {
-      // Fallback local/offline configurado en localStorage
-      rawUrl = localStorage.getItem('nx_github_raw_vecino') || 'https://raw.githubusercontent.com/Diego/nexos-maps/main/nexos_panicoing.html';
-    }
-    
-    try {
-      const res = await fetch(rawUrl + '?t=' + Date.now());
-      if (res.ok) {
-        const newHtml = await res.text();
-        
-        // Validación defensiva: verificar que el archivo recuperado contenga la firma de la PWA
-        if (newHtml.includes('id="pantalla-panico"') && newHtml.includes('const PANIC_URL')) {
-          showToast('🚀 ¡Nueva versión descargada! Recargando...');
-          
-          const pathKey = 'nx_cached_html_' + window.location.pathname.replace(/\//g, '_');
-          const versionKey = pathKey + '_version';
-          
-          localStorage.setItem(pathKey, newHtml);
-          localStorage.setItem(versionKey, 'GH-' + Date.now());
-          
-          // Purgar cachés del navegador
-          if ('caches' in window) {
-            caches.keys().then(names => {
-              names.forEach(name => caches.delete(name));
-            });
-          }
-          if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(registrations => {
-              registrations.forEach(r => r.update());
-            });
-          }
-          
-          triggerHaptic('confirm');
-          playSound('success');
-          
-          setTimeout(() => {
-            window.location.reload(true);
-          }, 1200);
-          return;
-        } else {
-          throw new Error('El archivo recuperado de GitHub no tiene el formato de la PWA.');
-        }
-      } else {
-        throw new Error('Fallo de red o URL incorrecta (HTTP ' + res.status + ').');
-      }
-    } catch (e) {
-      triggerHaptic('error');
-      playSound('error');
-      alert('❌ Error al actualizar desde GitHub:\n' + e.message + '\n\nSi está corriendo en producción, asegúrese de que el archivo exista en su repositorio de GitHub.');
-    }
-  }
 
   function pedirPinParaCambiar(){
     const block = parseInt(localStorage.getItem('nx_pin_block') || '0');
@@ -3911,8 +4150,80 @@
     }
   };
 
+  // ── AJUSTES PREMIUM SYSTEM ──
+  let modoDiscreto = localStorage.getItem('nx_modo_discreto') === 'true';
+  
+  window.abrirAjustes = function(e) {
+    if (e) e.stopPropagation();
+    triggerHaptic('soft');
+    playSound('pop');
+    const panel = document.getElementById('settings-panel');
+    if (panel) panel.classList.add('visible');
+  };
+  
+  window.cerrarAjustes = function(e) {
+    const panel = document.getElementById('settings-panel');
+    if (panel && e.target === panel) {
+      triggerHaptic('soft');
+      playSound('tap');
+      panel.classList.remove('visible');
+    }
+  };
+  
+  window.cerrarAjustesManual = function() {
+    triggerHaptic('soft');
+    playSound('tap');
+    const panel = document.getElementById('settings-panel');
+    if (panel) panel.classList.remove('visible');
+  };
+  
+  window.cambiarTema = function(name, color, rgb, clickPlay = true) {
+    if (clickPlay) {
+      triggerHaptic('soft');
+      playSound('tap');
+    }
+    
+    // Set variables on documentElement
+    document.documentElement.style.setProperty('--ac', color);
+    document.documentElement.style.setProperty('--acr', rgb);
+    
+    // Save to localStorage
+    localStorage.setItem('nx_theme_name', name);
+    localStorage.setItem('nx_theme_color', color);
+    localStorage.setItem('nx_theme_rgb', rgb);
+    
+    // Update theme-btn active class
+    const buttons = document.querySelectorAll('.theme-btn');
+    buttons.forEach(btn => {
+      if (btn.getAttribute('data-theme') === name) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  };
+  
+  window.toggleModoDiscreto = function(enabled) {
+    modoDiscreto = enabled;
+    localStorage.setItem('nx_modo_discreto', String(enabled));
+    if (!enabled) {
+      // Short buzz to confirm sound is active
+      triggerHaptic('soft');
+      playSound('tap');
+    }
+  };
+
   // ── DOMContentLoaded ──────────────────────────────────
   window.addEventListener('DOMContentLoaded', () => {
+    // Cargar ajustes guardados
+    const savedTheme = localStorage.getItem('nx_theme_name') || 'cyan';
+    const savedColor = localStorage.getItem('nx_theme_color') || '#06b6d4';
+    const savedRgb = localStorage.getItem('nx_theme_rgb') || '6, 182, 212';
+    cambiarTema(savedTheme, savedColor, savedRgb, false);
+    
+    const dToggle = document.getElementById('discreto-toggle');
+    if (dToggle) dToggle.checked = modoDiscreto;
+
     verificarStandalone();
     verificarInstalacionBanner();
 
@@ -4148,6 +4459,13 @@
       }
     });
 
+    // Mover barra indicadora de neón fluidamente
+    const idx = pantallas.indexOf(target);
+    const indicator = document.getElementById('nav-indicator');
+    if (indicator && idx !== -1) {
+      indicator.style.transform = `translateX(${idx * 100}%)`;
+    }
+
     if (target === 'comunicados') {
       const badge = document.getElementById('nav-comunicados-badge');
       if (badge) badge.classList.remove('active');
@@ -4161,6 +4479,88 @@
   async function cargarComunicados() {
     const listEl = document.getElementById('comunicados-lista');
     if (!listEl) return;
+    
+    function formatearFechaComunicado(fechaRaw) {
+      if (!fechaRaw) return '';
+      const rawStr = String(fechaRaw).trim();
+      
+      // 1. Try to match standard JS Date.toString() format: "Mon May 25 2026 00:00:00..."
+      const matchJS = rawStr.match(/^[A-Za-z]{3,4}\s+([A-Za-z]{3})\s+(\d{1,2})\s+(\d{4})/);
+      if (matchJS) {
+        const engMeses = {
+          'Jan': 'Ene', 'Feb': 'Feb', 'Mar': 'Mar', 'Apr': 'Abr', 'May': 'May', 'Jun': 'Jun',
+          'Jul': 'Jul', 'Aug': 'Ago', 'Sep': 'Sep', 'Oct': 'Oct', 'Nov': 'Nov', 'Dec': 'Dic'
+        };
+        const mesEng = matchJS[1];
+        const dia = parseInt(matchJS[2], 10);
+        const anio = parseInt(matchJS[3], 10);
+        const mesEsp = engMeses[mesEng] || mesEng;
+        
+        const hoy = new Date();
+        const ayer = new Date();
+        ayer.setDate(ayer.getDate() - 1);
+        
+        const getMonthNumber = (mStr) => {
+          const m = {
+            'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+            'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+          };
+          return m[mStr] !== undefined ? m[mStr] : -1;
+        };
+        
+        if (dia === hoy.getDate() && (hoy.getMonth() === getMonthNumber(mesEng)) && anio === hoy.getFullYear()) {
+          return 'Hoy';
+        }
+        if (dia === ayer.getDate() && (ayer.getMonth() === getMonthNumber(mesEng)) && anio === ayer.getFullYear()) {
+          return 'Ayer';
+        }
+        
+        if (anio === hoy.getFullYear()) {
+          return `${dia} ${mesEsp}`;
+        }
+        return `${dia} ${mesEsp} ${anio}`;
+      }
+      
+      if (rawStr.length < 15) return rawStr;
+      
+      try {
+        let cleanStr = rawStr;
+        if (cleanStr.includes('(')) {
+          cleanStr = cleanStr.split('(')[0].trim();
+        }
+        const date = new Date(cleanStr);
+        if (isNaN(date.getTime())) {
+          let fallback = rawStr;
+          if (fallback.includes('(')) fallback = fallback.split('(')[0].trim();
+          if (fallback.includes('GMT')) fallback = fallback.split('GMT')[0].trim();
+          return fallback;
+        }
+        const hoy = new Date();
+        const ayer = new Date();
+        ayer.setDate(ayer.getDate() - 1);
+        
+        if (date.toLocaleDateString('es-AR') === hoy.toLocaleDateString('es-AR')) {
+          return 'Hoy';
+        } else if (date.toLocaleDateString('es-AR') === ayer.toLocaleDateString('es-AR')) {
+          return 'Ayer';
+        }
+        
+        const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+        const dia = date.getDate();
+        const mes = meses[date.getMonth()];
+        const anio = date.getFullYear();
+        
+        if (anio === hoy.getFullYear()) {
+          return `${dia} ${mes}`;
+        }
+        return `${dia} ${mes} ${anio}`;
+      } catch (e) {
+        let fallback = rawStr;
+        if (fallback.includes('(')) fallback = fallback.split('(')[0].trim();
+        if (fallback.includes('GMT')) fallback = fallback.split('GMT')[0].trim();
+        return fallback;
+      }
+    }
     
     let datos = [...DEFAULT_COMUNICADOS];
     
@@ -4182,7 +4582,7 @@
         <div class="comunicado-card" style="animation-delay: ${idx * 0.1}s">
           <div class="comunicado-card-header">
             <span class="comunicado-card-title">${c.titulo}</span>
-            <span class="comunicado-card-date">${c.fecha}</span>
+            <span class="comunicado-card-date">${formatearFechaComunicado(c.fecha)}</span>
           </div>
           <div class="comunicado-card-body">${c.cuerpo}</div>
         </div>

@@ -3965,8 +3965,16 @@ async function sincronizar(manual=false){
   if(sincronizando)return;if(!manual&&(Date.now()-_lastSyncTs)<8000)return;
   triggerSysLedFlash('#0ea5e9');
   sincronizando=true;setSyncStatus('Sincronizando...','sync-loading');
+  
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => {
+    controller.abort();
+  }, 8000); // 8 segundos de tiempo de espera máximo
+  
   try{
-    const r=await fetch(url+'?t='+Date.now());if(!r.ok)throw new Error();
+    const r=await fetch(url+'?t='+Date.now(), { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if(!r.ok)throw new Error();
     const data=await r.json();
     const cloudData=Array.isArray(data)?data:(data.activos||[]);
     const panico=Array.isArray(data)?[]:(data.panico||[]);
@@ -3992,7 +4000,11 @@ async function sincronizar(manual=false){
     DB=[...cloudData,...pend,...salidosDedup];lsSet('nx_db',JSON.stringify(DB));render();
     setSyncStatus('✔ Sincronizado '+horaActual(),'sync-ok');
     if(panico.length>0){const ids=new Set(panicosPendientes.map(x=>String(x.panicoId)));const nuevas=panico.filter(a=>!ids.has(String(a.panicoId)));if(nuevas.length>0){panicosPendientes=panico;mostrarPanico(panico);}else panicosPendientes=panico;}
-  }catch(e){setSyncStatus('⚠ Sin conexión','sync-err');if(manual)showToast("⚠️ Error al sincronizar");}
+  }catch(e){
+    clearTimeout(timeoutId);
+    setSyncStatus('⚠ Sin conexión','sync-err');
+    if(manual)showToast("⚠️ Error al sincronizar");
+  }
   finally{sincronizando=false;_lastSyncTs=Date.now();}
 }
 // ── localStorage SEGURO ────────────────────────────────────
