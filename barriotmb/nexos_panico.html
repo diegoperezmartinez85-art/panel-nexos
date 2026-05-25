@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -221,8 +221,8 @@
     }
 
     .boton-redondo-container {
-      width: 200px;
-      height: 200px;
+      width: 210px;
+      height: 210px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -308,8 +308,8 @@
     }
 
     .boton-redondo {
-      width: 180px;
-      height: 180px;
+      width: 190px;
+      height: 190px;
       border-radius: 50%;
       background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%);
       border: 3px solid rgba(255, 255, 255, 0.15);
@@ -3162,23 +3162,7 @@
     displayEl.innerText = `Mz. ${mza} Casa ${casa}`;
     
     // Portal Secreto de Actualización (5 toques rápidos en el texto Mz/Casa)
-    let secretClicks = 0;
-    let secretTimer = null;
-    displayEl.style.cursor = 'pointer';
-    displayEl.onclick = () => {
-      secretClicks++;
-      clearTimeout(secretTimer);
-      if (secretClicks >= 5) {
-        localStorage.clear();
-        sessionStorage.clear();
-        if ('caches' in window) {
-          caches.keys().then(names => names.forEach(name => caches.delete(name)));
-        }
-        alert('🔄 ¡Memoria limpia! Recargando última versión de GitHub...');
-        window.location.reload(true);
-      }
-      secretTimer = setTimeout(() => { secretClicks = 0; }, 2000);
-    };
+    
     document.getElementById('pantalla-setup').classList.remove('visible');
     document.getElementById('pantalla-panico').classList.add('visible');
     document.getElementById('pantalla-enviado').classList.remove('visible');
