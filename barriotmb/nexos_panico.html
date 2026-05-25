@@ -199,7 +199,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 20px;
+      gap: 8px;
     }
     .pantalla-panico.visible {
       display: flex;
@@ -208,7 +208,7 @@
       text-align: center;
       color: #a1a1aa;
       font-size: 13px;
-      margin-bottom: 4px;
+      margin-bottom: 0px;
       font-weight: 500;
     }
     .info-config strong {
@@ -217,12 +217,12 @@
     }
 
     .boton-redondo-container {
-      width: 216px;
-      height: 216px;
+      width: 180px;
+      height: 180px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 6px 0;
+      margin: 0;
       position: relative;
       border-radius: 50%;
       background: radial-gradient(circle, rgba(239, 68, 68, 0.12) 0%, transparent 70%);
@@ -304,20 +304,20 @@
     }
 
     .boton-redondo {
-      width: 196px;
-      height: 196px;
+      width: 160px;
+      height: 160px;
       border-radius: 50%;
       background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%);
-      border: 3.5px solid rgba(255, 255, 255, 0.15);
+      border: 3px solid rgba(255, 255, 255, 0.15);
       color: white;
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.2);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.2);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 2px;
       position: relative;
       overflow: hidden;
       animation: neonRedPulse 2.5s ease-in-out infinite;
@@ -526,8 +526,8 @@
       color: #06b6d4;
       border: 1px solid rgba(6, 182, 212, 0.25);
       border-radius: 16px;
-      padding: 11px 24px;
-      font-size: 13.5px;
+      padding: 7px 20px;
+      font-size: 12.5px;
       font-weight: 800;
       cursor: pointer;
       backdrop-filter: blur(8px);
@@ -555,8 +555,8 @@
       color: #f59e0b;
       border: 1.5px solid rgba(245, 158, 11, 0.3);
       border-radius: 16px;
-      padding: 11px 24px;
-      font-size: 13.5px;
+      padding: 8px 22px;
+      font-size: 12.5px;
       font-weight: 800;
       letter-spacing: 0.8px;
       cursor: pointer;
@@ -564,7 +564,7 @@
       -webkit-backdrop-filter: blur(12px);
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      margin-top: 6px;
+      margin-top: 0px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -596,8 +596,8 @@
       color: #06b6d4;
       border: 1.5px solid rgba(6, 182, 212, 0.3);
       border-radius: 16px;
-      padding: 11px 24px;
-      font-size: 13.5px;
+      padding: 8px 22px;
+      font-size: 12.5px;
       font-weight: 800;
       cursor: pointer;
       backdrop-filter: blur(12px);
@@ -606,7 +606,7 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
-      margin-top: 6px;
+      margin-top: 0px;
       width: 100%;
       max-width: 320px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
@@ -2530,12 +2530,6 @@
     </svg>
     Cambiar ubicación
   </button>
-  <button class="btn-cfg-main shimmer-effect" style="margin-top: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);" onclick="comprobarActualizacionVecino()">
-    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
-    </svg>
-    Comprobar actualización
-  </button>
   <a class="ig-link" href="https://www.instagram.com/nexosmaps?igsh=MThvc241Y2JhNmhvcQ%3D%3D&utm_source=qr" target="_blank" rel="noopener">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
     @nexosmaps
@@ -2838,6 +2832,44 @@
 </div>
 
 <script>
+  // ── CACHE BUSTER QUERY PROCESSOR (DEVELOPER TOOL) ──
+  if (window.location.search.includes('clear') || window.location.search.includes('clean') || window.location.search.includes('update')) {
+    localStorage.clear();
+    sessionStorage.clear();
+    if ('caches' in window) {
+      caches.keys().then(names => names.forEach(name => caches.delete(name)));
+    }
+    // Redirigir a la URL limpia sin parámetros para evitar bucles de recarga
+    window.location.href = window.location.origin + window.location.pathname;
+  }
+
+  // ── HOT-UPDATE COMPILATION INTERCEPTOR (GITHUB LIVE LOADER) ──
+  (function() {
+    try {
+      // Ignorar intercepción si estamos editando y probando localmente en PC (file:// o localhost)
+      const isLocal = window.location.protocol === 'file:' || 
+                      window.location.hostname === 'localhost' || 
+                      window.location.hostname === '127.0.0.1';
+      if (isLocal) return;
+
+      // Scoping dinámico por subcarpeta para que no se mezclen diferentes instalaciones del mismo dominio
+      const pathKey = 'nx_cached_html_' + window.location.pathname.replace(/\//g, '_');
+      const versionKey = pathKey + '_version';
+
+      const currentVersion = 'v4.5'; // Incrementar cuando el script cambia en disco local
+      const cachedHtml = localStorage.getItem(pathKey);
+      const cachedVersion = localStorage.getItem(versionKey);
+      
+      if (cachedHtml && cachedVersion && cachedVersion !== currentVersion) {
+        document.open();
+        document.write(cachedHtml);
+        document.close();
+      }
+    } catch (e) {
+      console.error("Hot-update failed:", e);
+    }
+  })();
+
   // ══════════════════════════════════════════════════════
   // CONFIGURACIÓN DE TERCEROS & CONTACTOS (Para clonado rápido)
   // ══════════════════════════════════════════════════════
@@ -2988,7 +3020,7 @@
     try { sessionStorage.setItem('nx_lp_s', tsStr); } catch(e) {}
   }
 
-  const PANIC_URL = 'https://script.google.com/macros/s/AKfycbwwm91ylpaaEL8cNwFtzymdj57WlsZG8xNPXi3ydV9SaTaupjBD2xtWJVO00T9aLisEoA/exec';
+  const PANIC_URL = 'https://script.google.com/macros/s/AKfycbwRNMfrj_t3IdhGFulnbFp6j06uB5XSb_uzA3au7jwKwcjdQ16KvBhahZdnfs9BrXZ8gQ/exec';
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(()=>{});
@@ -3144,15 +3176,13 @@
   }
 
   function verificarCooldown(){
-    if (cooldownManipulado()) {
-      guardarTimestampCooldown(obtenerHoraCalibrada());
-      activarUI_Cooldown(COOLDOWN_MS);
-      return;
-    }
     const ts   = parseInt(localStorage.getItem('nx_last_panico') || '0');
     const diff = obtenerHoraCalibrada() - ts;
-    if (ts && diff < COOLDOWN_MS){ activarUI_Cooldown(COOLDOWN_MS - diff); }
-    else { desactivarUI_Cooldown(); }
+    if (ts && diff < COOLDOWN_MS && diff >= 0){ 
+      activarUI_Cooldown(COOLDOWN_MS - diff); 
+    } else { 
+      desactivarUI_Cooldown(); 
+    }
   }
 
   function activarUI_Cooldown(msRestantes){
@@ -3235,10 +3265,9 @@
     if (visitaBtn) { visitaBtn.style.display = 'inline-flex'; }
   }
 
-  // ── OBTENER HORA CALIBRADA (ANTI-TRAMPAS RELOJ) ──────────
+  // ── OBTENER HORA REAL (ESTABILIDAD ABSOLUTA DEL COOLDOWN) ──────────
   function obtenerHoraCalibrada() {
-    const offset = parseInt(localStorage.getItem('nx_time_offset') || '0');
-    return Date.now() + offset;
+    return Date.now();
   }
 
   function obtenerUbicacion(){
@@ -3704,36 +3733,73 @@
 
   function pinEsCorrecto(pin){ return hashPin(pin.trim()) === PIN_HASH; }
 
-  function comprobarActualizacionVecino() {
+  async function comprobarActualizacionVecino() {
     triggerHaptic('soft');
     playSound('tap');
     
-    showToast('🔄 Buscando actualizaciones...');
+    showToast('🔍 Conectando con GitHub...');
     
-    setTimeout(() => {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(registrations => {
-          if (registrations.length > 0) {
-            registrations.forEach(r => r.update());
+    let rawUrl = '';
+    const hostname = window.location.hostname;
+    const pathname = window.location.pathname;
+    
+    // Auto-detección dinámica de su propia ubicación en GitHub Pages
+    if (hostname.endsWith('.github.io')) {
+      const owner = hostname.split('.')[0];
+      const pathParts = pathname.split('/').filter(p => p.trim());
+      const repo = pathParts[0];
+      const filePath = pathParts.slice(1).join('/');
+      rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/${filePath}`;
+    } else {
+      // Fallback local/offline configurado en localStorage
+      rawUrl = localStorage.getItem('nx_github_raw_vecino') || 'https://raw.githubusercontent.com/Diego/nexos-maps/main/nexos_panicoing.html';
+    }
+    
+    try {
+      const res = await fetch(rawUrl + '?t=' + Date.now());
+      if (res.ok) {
+        const newHtml = await res.text();
+        
+        // Validación defensiva: verificar que el archivo recuperado contenga la firma de la PWA
+        if (newHtml.includes('id="pantalla-panico"') && newHtml.includes('const PANIC_URL')) {
+          showToast('🚀 ¡Nueva versión descargada! Recargando...');
+          
+          const pathKey = 'nx_cached_html_' + window.location.pathname.replace(/\//g, '_');
+          const versionKey = pathKey + '_version';
+          
+          localStorage.setItem(pathKey, newHtml);
+          localStorage.setItem(versionKey, 'GH-' + Date.now());
+          
+          // Purgar cachés del navegador
+          if ('caches' in window) {
+            caches.keys().then(names => {
+              names.forEach(name => caches.delete(name));
+            });
           }
-        });
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+              registrations.forEach(r => r.update());
+            });
+          }
+          
+          triggerHaptic('confirm');
+          playSound('success');
+          
+          setTimeout(() => {
+            window.location.reload(true);
+          }, 1200);
+          return;
+        } else {
+          throw new Error('El archivo recuperado de GitHub no tiene el formato de la PWA.');
+        }
+      } else {
+        throw new Error('Fallo de red o URL incorrecta (HTTP ' + res.status + ').');
       }
-      
-      // Limpiar caches
-      if ('caches' in window) {
-        caches.keys().then(names => {
-          names.forEach(name => caches.delete(name));
-        });
-      }
-      
-      triggerHaptic('confirm');
-      playSound('success');
-      showToast('⚡ ¡Caché limpia! Recargando...');
-      
-      setTimeout(() => {
-        window.location.reload(true);
-      }, 1000);
-    }, 1500);
+    } catch (e) {
+      triggerHaptic('error');
+      playSound('error');
+      alert('❌ Error al actualizar desde GitHub:\n' + e.message + '\n\nSi está corriendo en producción, asegúrese de que el archivo exista en su repositorio de GitHub.');
+    }
   }
 
   function pedirPinParaCambiar(){
@@ -3924,7 +3990,17 @@
   function iconoClima(code, soloActual = true) {
     if (soloActual && esNoche()) {
       const mapa = iconosNoche();
-      return mapa[code] ?? CLIMA_ICONS[code] ?? '🌙';
+      let icon = mapa[code] ?? CLIMA_ICONS[code] ?? '🌙';
+      
+      // Lista de emojis de fases lunares para chequear si el ícono ya tiene uno
+      const lunas = ['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘','🌙'];
+      const tieneLuna = lunas.some(l => icon.includes(l));
+      
+      // Si es de noche y el ícono climático (ej: niebla, cubierto) no tiene luna, se la agregamos al principio
+      if (!tieneLuna) {
+        icon = faselunar() + ' ' + icon;
+      }
+      return icon;
     }
     return CLIMA_ICONS[code] || '🌤️';
   }
@@ -3973,20 +4049,6 @@
       const d = await r.json();
       const code = d.current_weather?.weathercode ?? 1;
       const temp = d.current_weather?.temperature;
-
-      // CALIBRACIÓN ANTI-TRAMPA:
-      // Open-Meteo devuelve la hora local en formato ISO: "2026-05-24T17:00"
-      if (d.current_weather && d.current_weather.time) {
-        const netTimeStr = d.current_weather.time; // formato "YYYY-MM-DDTHH:MM"
-        const netTime = new Date(netTimeStr + ':00-03:00').getTime(); // ajustar a zona horaria del barrio (-03:00)
-        const deviceTime = Date.now();
-        // Guardar desvío si es significativo (> 30 segundos)
-        if (Math.abs(netTime - deviceTime) > 30000) {
-          localStorage.setItem('nx_time_offset', String(netTime - deviceTime));
-        } else {
-          localStorage.removeItem('nx_time_offset');
-        }
-      }
 
       climaCode = code; // guardar para recalcular en cada tick del reloj
       document.getElementById('chip-temp').innerText = (typeof temp === 'number') ? Math.round(temp) + '°' : '--°';
@@ -4087,37 +4149,23 @@
     }
   };
 
-  // Cargar comunicados desde Sheets CSV o fallbacks
+  // Cargar comunicados desde Sheets de forma asíncrona y segura
   async function cargarComunicados() {
     const listEl = document.getElementById('comunicados-lista');
     if (!listEl) return;
     
     let datos = [...DEFAULT_COMUNICADOS];
     
-    if (COMUNICADOS_CSV_URL) {
-      try {
-        const r = await fetch(COMUNICADOS_CSV_URL + '?t=' + Date.now());
-        if (r.ok) {
-          const txt = await r.text();
-          const lineas = txt.split('\n').slice(1);
-          const parsed = [];
-          for (let l of lineas) {
-            if (!l.trim()) continue;
-            // Parsear fila CSV básica (Fecha, Título, Cuerpo)
-            const parts = l.split(',');
-            if (parts.length >= 3) {
-              parsed.push({
-                fecha: parts[0].replace(/"/g, '').trim(),
-                titulo: parts[1].replace(/"/g, '').trim(),
-                cuerpo: parts[2].replace(/"/g, '').trim()
-              });
-            }
-          }
-          if (parsed.length > 0) {
-            datos = parsed;
-          }
+    try {
+      const r = await fetch(PANIC_URL + '?accion=get_comunicados&t=' + Date.now());
+      if (r.ok) {
+        const d = await r.json();
+        if (d.ok && Array.isArray(d.comunicados) && d.comunicados.length > 0) {
+          datos = d.comunicados;
         }
-      } catch (e) {}
+      }
+    } catch (e) {
+      console.warn("Fallo al conectar con el servidor de comunicados, usando fallbacks locale.");
     }
     
     let html = '';
@@ -4191,24 +4239,48 @@
   let reservaSelectedSlot = ''; // HH:MM - HH:MM
   let calendarCurrentDate = new Date(); // Mes activo en el visualizador
 
-  const TURNOS_POR_DEFECTO = [
-    '09:00 - 11:00',
-    '11:00 - 13:00',
-    '13:00 - 15:00',
-    '15:00 - 17:00',
-    '17:00 - 19:00',
-    '19:00 - 21:00',
-    '21:00 - 23:00'
-  ];
+  // Devuelve la lista de turnos según el amenity seleccionado (1 hora para deportes, 2 horas para salones)
+  function obtenerTurnosParaAmenity(amenity) {
+    const am = String(amenity).toLowerCase();
+    if (am === 'tenis' || am === 'paddle' || am === 'futbol') {
+      return [
+        '08:00 - 09:00',
+        '09:00 - 10:00',
+        '10:00 - 11:00',
+        '11:00 - 12:00',
+        '12:00 - 13:00',
+        '13:00 - 14:00',
+        '14:00 - 15:00',
+        '15:00 - 16:00',
+        '16:00 - 17:00',
+        '17:00 - 18:00',
+        '18:00 - 19:00',
+        '19:00 - 20:00',
+        '20:00 - 21:00',
+        '21:00 - 22:00',
+        '22:00 - 23:00'
+      ];
+    }
+    return [
+      '09:00 - 11:00',
+      '11:00 - 13:00',
+      '13:00 - 15:00',
+      '15:00 - 17:00',
+      '17:00 - 19:00',
+      '19:00 - 21:00',
+      '21:00 - 23:00'
+    ];
+  }
 
   // Simular reservas para otros vecinos en fechas próximas
   function obtenerReservasSimuladas(fechaStr, amenity) {
+    const turnos = obtenerTurnosParaAmenity(amenity);
     const hash = djb2(fechaStr + amenity);
     const indicesOcupados = [];
     // Ocupamos de 1 a 3 turnos aleatoriamente según el hash
     const cantOcupados = Math.abs(hash % 3) + 1; 
     for (let i = 0; i < cantOcupados; i++) {
-      const idx = Math.abs((hash + i * 7) % TURNOS_POR_DEFECTO.length);
+      const idx = Math.abs((hash + i * 7) % turnos.length);
       if (!indicesOcupados.includes(idx)) {
         indicesOcupados.push(idx);
       }
@@ -4220,7 +4292,7 @@
       const loteMza = Math.abs((hash + idx * 3) % 25) + 1;
       const loteCasa = Math.abs((hash + idx * 5) % 40) + 1;
       ocupados.push({
-        horario: TURNOS_POR_DEFECTO[idx],
+        horario: turnos[idx],
         lote: 'Mza ' + loteMza + ' Casa ' + loteCasa,
         esMio: false
       });
@@ -4398,7 +4470,8 @@
     // Renderizar celdas de turnos
     cont.innerHTML = '';
     
-    TURNOS_POR_DEFECTO.forEach(t => {
+    const turnos = obtenerTurnosParaAmenity(reservaSelectedAmenity);
+    turnos.forEach(t => {
       const btn = document.createElement('button');
       btn.className = 'turno-btn';
       
