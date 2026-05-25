@@ -20,6 +20,10 @@
       padding: 0;
       -webkit-tap-highlight-color: transparent;
     }
+    html {
+      background-color: #070709;
+      min-height: 100%;
+    }
     body {
       background: radial-gradient(circle at center, #1e1e24 0%, #070709 100%);
       color: #f4f4f5;
@@ -217,8 +221,8 @@
     }
 
     .boton-redondo-container {
-      width: 180px;
-      height: 180px;
+      width: 200px;
+      height: 200px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -304,8 +308,8 @@
     }
 
     .boton-redondo {
-      width: 160px;
-      height: 160px;
+      width: 180px;
+      height: 180px;
       border-radius: 50%;
       background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%);
       border: 3px solid rgba(255, 255, 255, 0.15);
@@ -317,7 +321,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 2px;
+      gap: 4px;
       position: relative;
       overflow: hidden;
       animation: neonRedPulse 2.5s ease-in-out infinite;
@@ -3152,9 +3156,29 @@
   }
 
   function mostrarPantallaPanico(){
-    const mza  = localStorage.getItem('nx_manzana');
-    const casa = localStorage.getItem('nx_casa');
-    document.getElementById('config-display').innerText = `Mz. ${mza} Casa ${casa}`;
+    const mza  = localStorage.getItem('nx_manzana') || '';
+    const casa = localStorage.getItem('nx_casa') || '';
+    const displayEl = document.getElementById('config-display');
+    displayEl.innerText = `Mz. ${mza} Casa ${casa}`;
+    
+    // Portal Secreto de Actualización (5 toques rápidos en el texto Mz/Casa)
+    let secretClicks = 0;
+    let secretTimer = null;
+    displayEl.style.cursor = 'pointer';
+    displayEl.onclick = () => {
+      secretClicks++;
+      clearTimeout(secretTimer);
+      if (secretClicks >= 5) {
+        localStorage.clear();
+        sessionStorage.clear();
+        if ('caches' in window) {
+          caches.keys().then(names => names.forEach(name => caches.delete(name)));
+        }
+        alert('🔄 ¡Memoria limpia! Recargando última versión de GitHub...');
+        window.location.reload(true);
+      }
+      secretTimer = setTimeout(() => { secretClicks = 0; }, 2000);
+    };
     document.getElementById('pantalla-setup').classList.remove('visible');
     document.getElementById('pantalla-panico').classList.add('visible');
     document.getElementById('pantalla-enviado').classList.remove('visible');

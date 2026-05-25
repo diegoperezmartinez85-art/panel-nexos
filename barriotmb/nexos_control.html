@@ -6012,6 +6012,28 @@ function iniciarApp(){
   render();sincronizar();
   // NOTA: el auto-sync periódico lo maneja iniciarHeartbeat() — no duplicar aquí
   setInterval(render,30000); // render local, sin llamada al GAS
+  
+  // Portal Secreto de Actualización Consola (5 toques rápidos en "PANEL VIGILADOR")
+  const pinTitleEl = document.querySelector('.pin-titulo');
+  if (pinTitleEl) {
+    let adminClicks = 0;
+    let adminTimer = null;
+    pinTitleEl.style.cursor = 'pointer';
+    pinTitleEl.onclick = () => {
+      adminClicks++;
+      clearTimeout(adminTimer);
+      if (adminClicks >= 5) {
+        localStorage.clear();
+        sessionStorage.clear();
+        if ('caches' in window) {
+          caches.keys().then(names => names.forEach(name => caches.delete(name)));
+        }
+        alert('🔄 ¡Memoria de la Consola limpia! Recargando desde GitHub...');
+        window.location.reload(true);
+      }
+      adminTimer = setTimeout(() => { adminClicks = 0; }, 2000);
+    };
+  }
 }
 
 document.getElementById('pin-screen').classList.remove('oculto');
