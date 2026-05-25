@@ -4366,6 +4366,23 @@
         let fecha = hoy.getFullYear() + '-' + String(hoy.getMonth() + 1).padStart(2, '0') + '-' + String(hoy.getDate()).padStart(2, '0');
         let id = payload?.respondentId || payload?.id || payload?.submissionId || ('PWA-' + Date.now());
         
+        // Helper recursivo para extraer valores primitivos de estructuras de Tally (por si vienen objetos/arrays)
+        const getPrimitiveValue = (v) => {
+          if (v === undefined || v === null) return '';
+          if (typeof v !== 'object') return String(v).trim();
+          if (Array.isArray(v)) {
+            if (v.length === 0) return '';
+            return getPrimitiveValue(v[0]);
+          }
+          if (v.value !== undefined && v.value !== null) return getPrimitiveValue(v.value);
+          if (v.answer !== undefined && v.answer !== null) return getPrimitiveValue(v.answer);
+          if (v.text !== undefined && v.text !== null) return getPrimitiveValue(v.text);
+          if (v.name !== undefined && v.name !== null) return getPrimitiveValue(v.name);
+          const keys = Object.keys(v);
+          if (keys.length > 0) return getPrimitiveValue(v[keys[0]]);
+          return '';
+        };
+
         // Manejar estructura de Tally extremadamente flexible (campos como array o como diccionario)
         let fields = [];
         if (payload) {
@@ -4380,12 +4397,14 @@
           }
         }
         
+        // 1. Escaneo por iteración de array estándar
         fields.forEach(f => {
-          const key = (f.key || f.id || '').toLowerCase();
+          const key = (f.key || f.id || f.fieldId || '').toLowerCase();
           const lbl = (f.label || f.name || f.title || '').toLowerCase();
-          const val = f.value;
+          const val = f.value !== undefined && f.value !== null ? f.value : f.answer;
           if (val !== undefined && val !== null && val !== '') {
-            const valStr = String(val).trim();
+            const valStr = getPrimitiveValue(val);
+            if (!valStr || valStr === '[object Object]') return;
             
             // Mapeo robusto: 1) por ID/UUID exacto de Tally (yPelod), 2) por etiqueta de texto (fallback)
             if (key.includes('dd78585b-f4b4-4445-bd87-bdbaceaadb2f') || lbl.includes('nombre') || lbl.includes('visitante') || lbl.includes('invitado')) {
@@ -4430,19 +4449,89 @@
             }
           }
         });
-        
-        // Reconstrucción del mensaje y de la URL del código QR respetando la codificación exacta y el formato esperado
-        const textValue = `INGRESO NEXOS
-Visita: ${nombre}
-Patente: ${patente}
-DNI: ${dni}
-Mza:${mza} Casa:${casa}
-Prop:${celularPropietario}
-Fecha: ${fecha}
-ID:${id}`;
 
-        const whatsappUrl = `https://api.whatsapp.com/send?phone=5491151037761&text=${encodeURIComponent(textValue)}`;
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&margin=20&data=${encodeURIComponent(whatsappUrl)}`;
+        // 2. Escáner plano directo de claves en el payload/answers (fallback extremo por si vienen como objeto plano)
+        const scanObjRecursive = (obj) => {
+          if (!obj || typeof obj !== 'object') return;
+          for (const k in obj) {
+            const val = obj[k];
+            if (val === undefined || val === null || val === '') continue;
+            
+            const keyLower = k.toLowerCase();
+            if (typeof val === 'object') {
+              const prim = getPrimitiveValue(val);
+              if (prim && typeof prim === 'string' && prim !== '[object Object]') {
+                if (keyLower.includes('dd78585b-f4b4-4445-bd87-bdbaceaadb2f')) {
+                  nombre = prim;
+                } else if (keyLower.includes('711af457-7d0f-4e9f-926b-7bba9047589f')) {
+                  dni = prim.replace(/\D/g, '');
+                } else if (keyLower.includes('39034c66-8855-45d0-9b12-0e7729b2b248')) {
+                  patente = prim.toUpperCase();
+                } else if (keyLower.includes('00e13c41-6fe5-40c6-ae16-502eb84dd3a7')) {
+                  mza = prim;
+                } else if (keyLower.includes('5251118d-6320-4022-89df-1a2dc1d9ab00')) {
+                  casa = prim;
+                } else if (keyLower.includes('5a3dd8de-e446-44fe-87d6-0957a3c6b330')) {
+                  celularPropietario = prim.replace(/\D/g, '');
+                } else if (keyLower.includes('1f696dd1-1f88-4e7a-b0f3-a52471a16424')) {
+                  if (prim.includes('-')) {
+                    const parts = prim.split('-');
+                    if (parts.length === 3) {
+                      if (parts[0].length === 4) fecha = prim;
+                      else fecha = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+                    }
+                  } else if (prim.includes('/')) {
+                    const parts = prim.split('/');
+                    if (parts.length === 3) {
+                      if (parts[2].length === 4) fecha = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+                      else if (parts[0].length === 4) fecha = `${parts[0]}-${parts[1].padStart(2,'0')}-${parts[2].padStart(2,'0')}`;
+                    }
+                  }
+                }
+              }
+              scanObjRecursive(val);
+              continue;
+            }
+            
+            const valStr = String(val).trim();
+            if (valStr === '[object Object]') continue;
+            
+            if (keyLower.includes('dd78585b-f4b4-4445-bd87-bdbaceaadb2f')) {
+              nombre = valStr;
+            } else if (keyLower.includes('711af457-7d0f-4e9f-926b-7bba9047589f')) {
+              dni = valStr.replace(/\D/g, '');
+            } else if (keyLower.includes('39034c66-8855-45d0-9b12-0e7729b2b248')) {
+              patente = valStr.toUpperCase();
+            } else if (keyLower.includes('00e13c41-6fe5-40c6-ae16-502eb84dd3a7')) {
+              mza = valStr;
+            } else if (keyLower.includes('5251118d-6320-4022-89df-1a2dc1d9ab00')) {
+              casa = valStr;
+            } else if (keyLower.includes('5a3dd8de-e446-44fe-87d6-0957a3c6b330')) {
+              celularPropietario = valStr.replace(/\D/g, '');
+            } else if (keyLower.includes('1f696dd1-1f88-4e7a-b0f3-a52471a16424')) {
+              if (valStr.includes('-')) {
+                const parts = valStr.split('-');
+                if (parts.length === 3) {
+                  if (parts[0].length === 4) fecha = valStr;
+                  else fecha = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+                }
+              } else if (valStr.includes('/')) {
+                const parts = valStr.split('/');
+                if (parts.length === 3) {
+                  if (parts[2].length === 4) fecha = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+                  else if (parts[0].length === 4) fecha = `${parts[0]}-${parts[1].padStart(2,'0')}-${parts[2].padStart(2,'0')}`;
+                }
+              }
+            }
+          }
+        };
+        
+        if (payload) {
+          scanObjRecursive(payload);
+        }
+        
+        // Reconstrucción del mensaje y de la URL del código QR respetando el formato literal de Tally carácter por carácter
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&margin=20&data=https://api.whatsapp.com/send?phone=5491151037761%26text=INGRESO%20NEXOS%0AVisita:%20${encodeURIComponent(nombre)}%0APatente:%20${encodeURIComponent(patente)}%0ADNI:%20${encodeURIComponent(dni)}%0AMza:${encodeURIComponent(mza)}%20Casa:${encodeURIComponent(casa)}%0AProp:${encodeURIComponent(celularPropietario)}%0AFecha:%20${encodeURIComponent(fecha)}%0AID:${encodeURIComponent(id)}`;
         
         _currentShare = { nombre, mza, casa, qrUrl };
         
