@@ -739,6 +739,142 @@
       background: transparent;
       display: block;
     }
+
+    /* ── MODAL COMPARTIR QR ── */
+    .qr-share-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(9, 9, 11, 0.96);
+      z-index: 200000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      padding: 24px;
+      box-sizing: border-box;
+    }
+    .qr-share-overlay.visible {
+      display: flex;
+      animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .qr-share-card {
+      width: 100%;
+      max-width: 360px;
+      background: rgba(20, 20, 25, 0.85);
+      border: 1px solid rgba(var(--acr), 0.3);
+      border-radius: 28px;
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(var(--acr), 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      box-sizing: border-box;
+      position: relative;
+      overflow: hidden;
+      animation: scaleUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes scaleUp {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .qr-share-logo {
+      font-size: 11px;
+      font-weight: 900;
+      color: #71717a;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .qr-share-badge {
+      display: inline-flex;
+      padding: 6px 14px;
+      background: rgba(var(--acr), 0.1);
+      color: var(--ac);
+      border: 1.5px solid rgba(var(--acr), 0.35);
+      border-radius: 12px;
+      font-size: 11.5px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+    .qr-share-frame {
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 15px rgba(var(--acr), 0.1);
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .qr-share-img {
+      width: 200px;
+      height: 200px;
+      display: block;
+    }
+    .qr-share-info {
+      margin-bottom: 24px;
+    }
+    .qr-share-name {
+      font-size: 20px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+    .qr-share-meta {
+      font-size: 13.5px;
+      color: #a1a1aa;
+      font-weight: 500;
+    }
+    .qr-share-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+    .qr-btn-primary {
+      background: linear-gradient(135deg, var(--ac) 0%, rgba(var(--acr), 0.7) 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 16px;
+      padding: 16px 20px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 8px 20px rgba(var(--acr), 0.35);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .qr-btn-primary:active {
+      transform: scale(0.96);
+      box-shadow: 0 4px 10px rgba(var(--acr), 0.2);
+      filter: brightness(0.9);
+    }
+    .qr-btn-secondary {
+      background: rgba(30, 30, 35, 0.6);
+      color: #a1a1aa;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 14px 20px;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .qr-btn-secondary:active {
+      transform: scale(0.97);
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+    }
     .invitaciones-loader {
       position: absolute;
       top: 0;
@@ -3111,6 +3247,39 @@
   </div>
 </div>
 
+<!-- OVERLAY DE COMPARTIR QR GENERADO -->
+<div class="qr-share-overlay" id="qr-share-overlay">
+  <div class="qr-share-card">
+    <div class="qr-share-logo">NEXOS</div>
+    <div class="qr-share-badge">Pase de Acceso</div>
+    
+    <div class="qr-share-frame">
+      <img class="qr-share-img" id="qr-share-img" src="" alt="Código QR">
+    </div>
+    
+    <div class="qr-share-info">
+      <div class="qr-share-name" id="qr-share-name">Invitado</div>
+      <div class="qr-share-meta" id="qr-share-meta">Mza -- Casa --</div>
+    </div>
+    
+    <div class="qr-share-btn-group">
+      <button class="qr-btn-primary" id="qr-btn-compartir" onclick="compartirPaseActual()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"></circle>
+          <circle cx="6" cy="12" r="3"></circle>
+          <circle cx="18" cy="19" r="3"></circle>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+        </svg>
+        <span>Compartir Pase</span>
+      </button>
+      <button class="qr-btn-secondary" onclick="cerrarQrCompartir()">
+        Volver al Inicio
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- GUIA DE INSTALACION PWA (Premium OS Smart Assist) -->
 <div class="pwa-guia" id="pwa-guia-instalacion">
   <div class="pwa-guia-content">
@@ -4122,14 +4291,28 @@
     triggerHaptic('soft');
     playSound('pop');
     const panel = document.getElementById('invitaciones-panel');
-    const iframe = document.getElementById('tally-iframe');
+    const body = document.querySelector('.invitaciones-body');
     const loader = document.getElementById('invitaciones-loader');
     
-    if (panel && iframe) {
+    if (panel && body) {
       loader.style.opacity = '1';
       loader.style.display = 'flex';
       
+      // Eliminar cualquier instancia previa del iframe
+      const viejo = document.getElementById('tally-iframe');
+      if (viejo) viejo.remove();
+      
+      // Crear dinámicamente el iframe.
+      // Omitir allow-top-navigation es CRÍTICO para que Safari e iOS bloqueen
+      // cualquier intento de Tally de redireccionar/secuestrar la ventana principal (breakout).
+      const iframe = document.createElement('iframe');
+      iframe.className = 'tally-iframe';
+      iframe.id = 'tally-iframe';
+      iframe.title = 'Pre-autorizar Visita';
+      iframe.sandbox = 'allow-forms allow-scripts allow-same-origin';
       iframe.src = TALLY_URL;
+      
+      body.appendChild(iframe);
       panel.classList.add('visible');
       
       iframe.onload = function() {
@@ -4146,8 +4329,201 @@
     const iframe = document.getElementById('tally-iframe');
     if (panel) {
       panel.classList.remove('visible');
-      if (iframe) iframe.src = '';
+      if (iframe) iframe.remove();
     }
+  };
+
+  // ── INTEGRACIÓN DE CONTROL DE TALLY & COMPARTIR QR ──
+  let _currentShare = { nombre: '', mza: '', casa: '', qrUrl: '' };
+
+  window.addEventListener('message', function(e) {
+    let data = null;
+    
+    // Tally puede enviar e.data como un objeto JSON crudo o un string JSON
+    if (typeof e?.data === 'string') {
+      if (e.data.includes('Tally.FormSubmitted')) {
+        try { data = JSON.parse(e.data); } catch(err) {}
+      }
+    } else if (e?.data && typeof e.data === 'object') {
+      if (e.data.event === 'Tally.FormSubmitted' || e.data.type === 'Tally.FormSubmitted') {
+        data = e.data;
+      }
+    }
+    
+    if (data && (data.event === 'Tally.FormSubmitted' || data.type === 'Tally.FormSubmitted')) {
+      try {
+        const payload = data.payload;
+        
+        let nombre = 'Invitado';
+        let dni = '';
+        let patente = '';
+        let mza = localStorage.getItem('nx_manzana') || '';
+        let casa = localStorage.getItem('nx_casa') || '';
+        let celularPropietario = '';
+        
+        // La guardia (nexos_control.html) valida la fecha con el formato estándar YYYY-MM-DD
+        const hoy = new Date();
+        let fecha = hoy.getFullYear() + '-' + String(hoy.getMonth() + 1).padStart(2, '0') + '-' + String(hoy.getDate()).padStart(2, '0');
+        let id = payload?.respondentId || payload?.id || payload?.submissionId || ('PWA-' + Date.now());
+        
+        // Manejar estructura de Tally extremadamente flexible (campos como array o como diccionario)
+        let fields = [];
+        if (payload) {
+          if (Array.isArray(payload.fields)) {
+            fields = payload.fields;
+          } else if (payload.fields && typeof payload.fields === 'object') {
+            fields = Object.values(payload.fields);
+          } else if (Array.isArray(payload.answers)) {
+            fields = payload.answers;
+          } else if (payload.answers && typeof payload.answers === 'object') {
+            fields = Object.values(payload.answers);
+          }
+        }
+        
+        fields.forEach(f => {
+          const key = (f.key || f.id || '').toLowerCase();
+          const lbl = (f.label || f.name || f.title || '').toLowerCase();
+          const val = f.value;
+          if (val !== undefined && val !== null && val !== '') {
+            const valStr = String(val).trim();
+            
+            // Mapeo robusto: 1) por ID/UUID exacto de Tally (yPelod), 2) por etiqueta de texto (fallback)
+            if (key.includes('dd78585b-f4b4-4445-bd87-bdbaceaadb2f') || lbl.includes('nombre') || lbl.includes('visitante') || lbl.includes('invitado')) {
+              nombre = valStr;
+            } else if (key.includes('711af457-7d0f-4e9f-926b-7bba9047589f') || lbl.includes('dni') || lbl.includes('documento') || lbl.includes('conductor')) {
+              dni = valStr.replace(/\D/g, ''); // Solo números para DNI
+            } else if (key.includes('39034c66-8855-45d0-9b12-0e7729b2b248') || lbl.includes('patente') || lbl.includes('dominio') || lbl.includes('pat')) {
+              patente = valStr.toUpperCase();
+            } else if (key.includes('00e13c41-6fe5-40c6-ae16-502eb84dd3a7') || lbl.includes('manzana') || lbl.includes('mza') || lbl.includes('lote')) {
+              mza = valStr;
+            } else if (key.includes('5251118d-6320-4022-89df-1a2dc1d9ab00') || lbl.includes('casa')) {
+              casa = valStr;
+            } else if (key.includes('5a3dd8de-e446-44fe-87d6-0957a3c6b330') || lbl.includes('celular') || lbl.includes('teléfono') || lbl.includes('prop')) {
+              celularPropietario = valStr.replace(/\D/g, ''); // Solo números para teléfono
+            } else if (key.includes('1f696dd1-1f88-4e7a-b0f3-a52471a16424') || lbl.includes('fecha') || lbl.includes('date')) {
+              // Convertir fecha a formato estándar YYYY-MM-DD para compatibilidad absoluta con el escáner de la guardia
+              if (valStr.includes('-')) {
+                const parts = valStr.split('-');
+                if (parts.length === 3) {
+                  if (parts[0].length === 4) {
+                    fecha = valStr; // YYYY-MM-DD
+                  } else {
+                    fecha = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`; // DD-MM-YYYY
+                  }
+                } else {
+                  fecha = valStr;
+                }
+              } else if (valStr.includes('/')) {
+                const parts = valStr.split('/');
+                if (parts.length === 3) {
+                  if (parts[2].length === 4) {
+                    fecha = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`; // DD/MM/YYYY
+                  } else if (parts[0].length === 4) {
+                    fecha = `${parts[0]}-${parts[1].padStart(2,'0')}-${parts[2].padStart(2,'0')}`; // YYYY/MM/DD
+                  }
+                } else {
+                  fecha = valStr;
+                }
+              } else {
+                fecha = valStr;
+              }
+            }
+          }
+        });
+        
+        // Reconstrucción del mensaje y de la URL del código QR respetando la codificación exacta y el formato esperado
+        const textValue = `INGRESO NEXOS
+Visita: ${nombre}
+Patente: ${patente}
+DNI: ${dni}
+Mza:${mza} Casa:${casa}
+Prop:${celularPropietario}
+Fecha: ${fecha}
+ID:${id}`;
+
+        const whatsappUrl = `https://api.whatsapp.com/send?phone=5491151037761&text=${encodeURIComponent(textValue)}`;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&margin=20&data=${encodeURIComponent(whatsappUrl)}`;
+        
+        _currentShare = { nombre, mza, casa, qrUrl };
+        
+        // Hijack inmediato y destructivo: Destruimos físicamente el iframe del DOM
+        // para frenar instantáneamente cualquier hilo de redirección de Tally.
+        const iframe = document.getElementById('tally-iframe');
+        if (iframe) {
+          iframe.src = 'about:blank';
+          iframe.remove();
+        }
+        
+        const panelInvitaciones = document.getElementById('invitaciones-panel');
+        if (panelInvitaciones) panelInvitaciones.classList.remove('visible');
+        
+        // Cargar datos en el modal PWA
+        document.getElementById('qr-share-img').src = qrUrl;
+        document.getElementById('qr-share-name').innerText = nombre;
+        document.getElementById('qr-share-meta').innerText = `Manzana ${mza} · Casa ${casa}`;
+        
+        // Abrir modal de compartir
+        const shareOverlay = document.getElementById('qr-share-overlay');
+        if (shareOverlay) {
+          shareOverlay.classList.add('visible');
+          triggerHaptic('confirm');
+          playSound('success');
+        }
+      } catch (err) {
+        console.error("Error parsing Tally submit:", err);
+      }
+    }
+  });
+
+  window.cerrarQrCompartir = function() {
+    triggerHaptic('soft');
+    playSound('tap');
+    const shareOverlay = document.getElementById('qr-share-overlay');
+    if (shareOverlay) shareOverlay.classList.remove('visible');
+  };
+
+  window.compartirPaseActual = async function() {
+    triggerHaptic('soft');
+    playSound('tap');
+    
+    const { nombre, mza, casa, qrUrl } = _currentShare;
+    if (!qrUrl) return;
+    
+    // Intentar compartir como archivo de imagen nativo en iOS/Android
+    if (navigator.share) {
+      try {
+        const response = await fetch(qrUrl);
+        const blob = await response.blob();
+        const file = new File([blob], 'pase_nexos.png', { type: 'image/png' });
+        
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: 'Pase de Acceso - Nexos',
+            text: `Pase de ingreso para ${nombre}. Mza ${mza} Casa ${casa}.`
+          });
+          return;
+        }
+      } catch (err) {
+        console.warn("Fallo compartiendo archivo, intentando enlace:", err);
+      }
+      
+      // Fallback a enlace nativo
+      try {
+        await navigator.share({
+          title: 'Pase de Acceso - Nexos',
+          text: `Pase de ingreso para ${nombre}. Mza ${mza} Casa ${casa}.\nCódigo QR de acceso:`,
+          url: qrUrl
+        });
+        return;
+      } catch (err) {
+        console.warn("Fallo Web Share:", err);
+      }
+    }
+    
+    // Fallback definitivo: Abrir WhatsApp con el link del QR formateado
+    const textoWa = encodeURIComponent(`*🎫 PASE DE INGRESO — NEXOS*\n\nHola *${nombre}*, te comparto tu pase de ingreso para el barrio.\n\n📍 *Destino:* Manzana ${mza}, Casa ${casa}\n\n📲 *Código QR de Acceso:* ${qrUrl}`);
+    window.open(`https://wa.me/?text=${textoWa}`, '_blank');
   };
 
   // ── AJUSTES PREMIUM SYSTEM ──
