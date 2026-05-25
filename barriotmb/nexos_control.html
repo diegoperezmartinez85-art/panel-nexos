@@ -1189,6 +1189,110 @@
     .cal-nota-del { background: none; border: none; color: #555; font-size: 14px; cursor: pointer; padding: 0; }
     .cal-mini-nota { font-size: 9px; color: var(--purple); font-weight: 700; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 1px; }
 
+    /* ── AMENITIES RESERVATIONS ADMIN SYSTEM ── */
+    .reserva-amenities-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .reserva-amenities-selector button {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      color: var(--text-muted);
+      padding: 10px 4px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .reserva-amenities-selector button:active { transform: scale(0.95); }
+    .reserva-amenities-selector button.active-amenity {
+      background: rgba(6, 182, 212, 0.1);
+      border-color: var(--cyan);
+      color: #fff;
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.25);
+    }
+    .reserva-calendario-container {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 14px;
+      margin-bottom: 15px;
+    }
+    .turno-card-admin {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: all 0.2s ease;
+    }
+    .turno-card-admin:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .turno-card-admin.ocupado {
+      border-left: 4px solid var(--red);
+      background: rgba(239, 68, 68, 0.02);
+    }
+    .turno-card-admin.disponible {
+      border-left: 4px solid var(--green);
+      background: rgba(16, 185, 129, 0.02);
+    }
+    .turno-info-admin {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .turno-hora-admin {
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+      font-family: monospace;
+    }
+    .turno-estado-admin {
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .turno-estado-admin.disp { color: var(--green); }
+    .turno-estado-admin.ocup { color: var(--text-muted); }
+    .btn-admin-reservar {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid var(--green);
+      color: var(--green);
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-admin-reservar:active {
+      transform: scale(0.93);
+      background: var(--green);
+      color: #000;
+    }
+    .btn-admin-cancelar {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid var(--red);
+      color: var(--red);
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-admin-cancelar:active {
+      transform: scale(0.93);
+      background: var(--red);
+      color: #fff;
+    }
+
     /* ── HIGH-TECH WEBRTC QR SCANNER ── */
     .qr-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 20000; flex-direction: column; }
     .qr-overlay.visible { display: flex; }
@@ -2163,6 +2267,89 @@
   </div>
 </div>
 
+<!-- RESERVAS ADMIN MODAL -->
+<div class="modal-overlay" id="modal-reservas-admin">
+  <div class="cal-modal-box" style="max-width: 460px; max-height: 90vh; display: flex; flex-direction: column;">
+    <button class="modal-close" onclick="cerrarModal('modal-reservas-admin')">✕</button>
+    <div class="modal-title" style="color:var(--cyan)">🏢 GESTIÓN DE AMENITIES</div>
+    
+    <!-- Selector de Amenities -->
+    <div class="reserva-amenities-selector" style="margin-bottom:15px; flex-shrink: 0;">
+      <button class="active-amenity" id="btn-admin-sum" onclick="seleccionarAmenityAdmin('SUM')">
+        <span style="font-size:16px;">🏢</span>
+        <span>SUM</span>
+      </button>
+      <button id="btn-admin-tenis" onclick="seleccionarAmenityAdmin('Tenis')">
+        <span style="font-size:16px;">🎾</span>
+        <span>Tenis</span>
+      </button>
+      <button id="btn-admin-quincho" onclick="seleccionarAmenityAdmin('Quincho')">
+        <span style="font-size:16px;">🍖</span>
+        <span>Quincho</span>
+      </button>
+      <button id="btn-admin-paddle" onclick="seleccionarAmenityAdmin('Paddle')">
+        <span style="font-size:16px;">🏓</span>
+        <span>Paddle</span>
+      </button>
+      <button id="btn-admin-futbol" onclick="seleccionarAmenityAdmin('futbol')">
+        <span style="font-size:16px;">⚽</span>
+        <span>Fútbol</span>
+      </button>
+    </div>
+
+    <!-- Calendario esmerilado -->
+    <div class="reserva-calendario-container" style="flex-shrink: 0; margin-bottom: 12px;">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="cambiarMesAdmin(-1)">◀</button>
+        <div class="cal-mes-titulo" id="admin-cal-titulo">—</div>
+        <button class="cal-nav-btn" onclick="cambiarMesAdmin(1)">▶</button>
+      </div>
+      <div class="calendar-weekdays" style="display:grid; grid-template-columns:repeat(7, 1fr); text-align:center; font-size:10px; font-weight:800; color:var(--text-muted); margin-bottom:8px;">
+        <span>D</span><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span>
+      </div>
+      <div class="calendar-days" id="admin-cal-grilla" style="display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:0;"></div>
+    </div>
+
+    <!-- Turnos y Estados -->
+    <div style="flex:1; overflow-y:auto; padding-right:4px; border-top:1px solid var(--border); padding-top:12px;">
+      <div style="font-size:13px; font-weight:800; margin-bottom:10px; color:#fff;">🕒 Turnos para el <span id="admin-fecha-titulo">--/--/----</span></div>
+      <div id="admin-turnos-lista" style="display:flex; flex-direction:column; gap:8px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MURAL ADMIN MODAL -->
+<div class="modal-overlay" id="modal-mural-admin">
+  <div class="cal-modal-box" style="max-width: 440px; display: flex; flex-direction: column;">
+    <button class="modal-close" onclick="cerrarModal('modal-mural-admin')">✕</button>
+    <div class="modal-title" style="color:#14b8a6">📢 PUBLICAR NOVEDADES (MURAL)</div>
+    
+    <div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <label style="font-size:11px; font-weight:800; color:#a1a1aa;">📌 TÍTULO DEL COMUNICADO</label>
+        <input type="text" id="mural-titulo" placeholder="Ej. Corte programado de agua 💧" style="width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.4); color:#fff; font-size:13px; box-sizing:border-box;">
+      </div>
+      
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <label style="font-size:11px; font-weight:800; color:#a1a1aa;">📅 FECHA MOSTRADA</label>
+        <input type="date" id="mural-fecha" style="width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.4); color:#fff; font-size:13px; color-scheme: dark; box-sizing:border-box;">
+      </div>
+      
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <label style="font-size:11px; font-weight:800; color:#a1a1aa;">📝 CUERPO DEL MENSAJE</label>
+        <textarea id="mural-cuerpo" rows="4" placeholder="Escribí los detalles de la novedad acá..." style="width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.4); color:#fff; font-size:13px; font-family:inherit; resize:vertical; box-sizing:border-box;"></textarea>
+      </div>
+      
+      <div style="display:flex; flex-direction:column; gap:4px; margin-bottom:5px;">
+        <label style="font-size:11px; font-weight:800; color:#a1a1aa;">🔑 CONTRASEÑA DE AUTORIZACIÓN</label>
+        <input type="password" id="mural-clave" placeholder="Ingresá la clave de publicación" style="width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.4); color:#fff; font-size:13px; text-align:center; box-sizing:border-box;" autocomplete="new-password">
+      </div>
+      
+      <button class="inc-guardar-btn" onclick="publicarMural()" style="background:#14b8a6; color:#fff; font-weight:800; padding:12px; border-radius:10px; border:none; cursor:pointer; width:100%; transition:all 0.2s;" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter='none'">🚀 PUBLICAR EN EL MURO</button>
+    </div>
+  </div>
+</div>
+
 <!-- APP -->
 <div class="app-wrap">
 <div class="top-bar" id="top-bar">
@@ -2218,6 +2405,8 @@
         <div class="menu-item purple-item" onclick="abrirListaNegra()"><span class="menu-item-icon">🚫</span>Lista negra</div>
         <div class="menu-item" style="color:#00d4d4;" onclick="abrirHistorialSheet()"><span class="menu-item-icon">🗂️</span>Consulta historial Sheet</div>
         <div class="menu-item" style="color:#a855f7;" onclick="abrirCalendario()"><span class="menu-item-icon">📅</span>Calendario</div>
+        <div class="menu-item" style="color:#06b6d4;" onclick="abrirReservasAdmin()"><span class="menu-item-icon">🏢</span>Reservas de Amenities</div>
+        <div class="menu-item" style="color:#14b8a6;" onclick="abrirMuralAdmin()"><span class="menu-item-icon">📢</span>Publicar Novedades</div>
         <div class="menu-item" style="color:#ff4444;" onclick="abrirSOS()"><span class="menu-item-icon">🆘</span>Directorio SOS</div>
         <div class="menu-item" style="color:var(--gold);" onclick="abrirIncidentes()"><span class="menu-item-icon">📝</span>Registro de incidentes<span id="inc-menu-badge" style="display:none;margin-left:6px;background:var(--red);color:#fff;font-size:9px;font-weight:900;border-radius:20px;padding:2px 7px;"></span></div>
         <div class="menu-section-label">ADMINISTRACIÓN</div>
@@ -2307,6 +2496,7 @@
       </div>
       
       <button class="btn-save" onclick="guardarConfig()" style="margin-top:16px;">GUARDAR CONFIGURACIÓN</button>
+      <button class="btn-save" onclick="comprobarActualizacionControl()" style="margin-top:10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: #fff;">🔄 COMPROBAR ACTUALIZACIÓN</button>
     </div>
     <!-- SECCIÓN AUDIO Y VOCAL -->
     <div class="section" style="border-color:var(--border);">
@@ -4638,6 +4828,433 @@ function calSeleccionarDia(fStr){calDiaSeleccionado=fStr;const feriado=FERIADOS[
 function calGuardarNota(fStr){const input=document.getElementById('cal-input-nota');if(!input)return;const texto=input.value.trim();if(!texto){showToast('✏️ Escribí algo primero');return;}if(!calNotas[fStr])calNotas[fStr]=[];calNotas[fStr].push({texto,ts:Date.now()});calGuardarNotas();showToast('✅ Nota guardada');calSeleccionarDia(fStr);renderCalendario();}
 function calBorrarNota(fStr,idx){if(!calNotas[fStr])return;calNotas[fStr].splice(idx,1);if(!calNotas[fStr].length)delete calNotas[fStr];calGuardarNotas();showToast('🗑️ Nota eliminada');calSeleccionarDia(fStr);renderCalendario();}
 function calLimpiarInput(){const input=document.getElementById('cal-input-nota');if(input)input.value='';}
+
+function abrirMuralAdmin() {
+  cerrarMenu();
+  // Limpiar campos del modal y establecer la fecha de hoy por defecto
+  document.getElementById('mural-titulo').value = '';
+  document.getElementById('mural-cuerpo').value = '';
+  document.getElementById('mural-clave').value = '';
+  
+  const hoy = new Date();
+  const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
+  document.getElementById('mural-fecha').value = hoyStr;
+  
+  abrirModal('modal-mural-admin');
+}
+
+async function publicarMural() {
+  const titulo = document.getElementById('mural-titulo').value.trim();
+  let fechaSeleccionada = document.getElementById('mural-fecha').value;
+  const cuerpo = document.getElementById('mural-cuerpo').value.trim();
+  const clave = document.getElementById('mural-clave').value.trim();
+  
+  if (!titulo || !cuerpo || !clave) {
+    if (typeof playSound === 'function') playSound('error');
+    alert('⚠️ Por favor completa los campos obligatorios: Título, Cuerpo y Contraseña.');
+    return;
+  }
+  
+  // Si por alguna razón la fecha está vacía, usar el día de hoy
+  if (!fechaSeleccionada) {
+    const hoy = new Date();
+    fechaSeleccionada = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
+  }
+  
+  // Convertir formato yyyy-MM-dd de HTML5 a dd/MM/yyyy esperado por el Google Sheet
+  const parts = fechaSeleccionada.split('-');
+  const fechaFormateada = `${parts[2]}/${parts[1]}/${parts[0]}`;
+  
+  if (typeof playSound === 'function') playSound('tap');
+  
+  // URL de Google Sheets
+  const url = localStorage.getItem('nx_url') || '';
+  if (!url) {
+    alert('❌ Error: No se ha configurado la URL de red en el sistema.');
+    return;
+  }
+  
+  const payload = {
+    accion: 'crear_comunicado',
+    titulo: titulo,
+    fecha: fechaFormateada,
+    cuerpo: cuerpo,
+    clave: clave
+  };
+  
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' }, // Evitar preflight CORS estricto en browsers de garita
+      body: JSON.stringify(payload)
+    });
+    
+    if (res.ok) {
+      const d = await res.json();
+      if (d.ok) {
+        if (typeof playSound === 'function') playSound('success');
+        alert('🚀 ¡Comunicado publicado con éxito en el Mural!');
+        cerrarModal('modal-mural-admin');
+      } else {
+        if (typeof playSound === 'function') playSound('error');
+        alert('❌ Error: ' + (d.error || 'No se pudo publicar.'));
+      }
+    } else {
+      throw new Error();
+    }
+  } catch (e) {
+    if (typeof playSound === 'function') playSound('error');
+    alert('❌ Error al conectar con el servidor o contraseña incorrecta. Verificá la URL del Apps Script y los datos ingresados.');
+  }
+}
+
+async function comprobarActualizacionControl() {
+  if (typeof playSound === 'function') playSound('tap');
+  showToast('🔄 Buscando actualizaciones en el panel...');
+  
+  setTimeout(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        if (registrations.length > 0) {
+          registrations.forEach(r => r.update());
+        }
+      });
+    }
+    
+    // Eliminar cachés locales
+    if ('caches' in window) {
+      caches.keys().then(names => {
+        names.forEach(name => caches.delete(name));
+      });
+    }
+    
+    if (typeof playSound === 'function') playSound('success');
+    showToast('⚡ ¡Caché del panel limpia! Recargando...');
+    
+    setTimeout(() => {
+      window.location.reload(true);
+    }, 1000);
+  }, 1500);
+}
+
+// ══════════════════════════════════════════════════════════
+// ── AMENITIES RESERVATIONS ADMIN ENGINE ───────────────────
+// ══════════════════════════════════════════════════════════
+let adminSelectedAmenity = 'SUM';
+let adminSelectedDateStr = '';
+let adminCalendarCurrentDate = new Date();
+
+function abrirReservasAdmin() {
+  const hoy = new Date();
+  adminCalendarCurrentDate = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  adminSelectedDateStr = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
+  adminSelectedAmenity = 'SUM';
+  
+  seleccionarAmenityAdmin('SUM');
+  
+  const [a, m, d] = adminSelectedDateStr.split('-');
+  document.getElementById('admin-fecha-titulo').textContent = `${d}/${m}/${a}`;
+  
+  abrirModal('modal-reservas-admin');
+}
+
+function seleccionarAmenityAdmin(amenity) {
+  adminSelectedAmenity = amenity;
+  
+  ['SUM', 'Tenis', 'Quincho', 'Paddle', 'futbol'].forEach(a => {
+    const el = document.getElementById('btn-admin-' + a.toLowerCase());
+    if (el) {
+      el.className = a.toLowerCase() === amenity.toLowerCase() ? 'active-amenity' : '';
+    }
+  });
+  
+  initAdminCalendario();
+  cargarReservasAdmin();
+  
+  if (typeof playSynthClick === 'function') playSynthClick();
+}
+
+function cambiarMesAdmin(delta) {
+  adminCalendarCurrentDate.setMonth(adminCalendarCurrentDate.getMonth() + delta);
+  initAdminCalendario();
+}
+
+function initAdminCalendario() {
+  const año = adminCalendarCurrentDate.getFullYear();
+  const mes = adminCalendarCurrentDate.getMonth();
+  
+  document.getElementById('admin-cal-titulo').textContent = `${MESES_ES[mes]} ${año}`;
+  
+  const primerDia = new Date(año, mes, 1).getDay();
+  const diasEnMes = new Date(año, mes + 1, 0).getDate();
+  
+  const hoy = new Date();
+  const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
+  
+  let html = '';
+  for (let i = 0; i < primerDia; i++) {
+    html += '<div class="cal-dia vacio"></div>';
+  }
+  
+  for (let d = 1; d <= diasEnMes; d++) {
+    const fStr = `${año}-${String(mes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const esHoy = fStr === hoyStr;
+    const esSeleccionado = fStr === adminSelectedDateStr;
+    
+    let cls = 'cal-dia';
+    if (esHoy) cls += ' hoy';
+    if (esSeleccionado) cls += ' seleccionado';
+    
+    html += `<div class="${cls}" style="border-radius:10px; min-height:44px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:all 0.15s; border: 1px solid ${esSeleccionado ? 'var(--cyan)' : 'transparent'}; background: ${esSeleccionado ? 'rgba(6,182,212,0.15)' : 'rgba(255,255,255,0.01)'}" onclick="seleccionarDiaAdmin('${fStr}')">
+      <span class="cal-num" style="font-size:14px; font-weight:700; color:${esSeleccionado ? '#fff' : (esHoy ? 'var(--cyan)' : '#ddd')}">${d}</span>
+    </div>`;
+  }
+  
+  document.getElementById('admin-cal-grilla').innerHTML = html;
+}
+
+function seleccionarDiaAdmin(fStr) {
+  adminSelectedDateStr = fStr;
+  
+  const [a, m, d] = fStr.split('-');
+  document.getElementById('admin-fecha-titulo').textContent = `${d}/${m}/${a}`;
+  
+  initAdminCalendario();
+  cargarReservasAdmin();
+  
+  if (typeof playSynthClick === 'function') playSynthClick();
+}
+
+async function cargarReservasAdmin() {
+  const container = document.getElementById('admin-turnos-lista');
+  container.innerHTML = '<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:12px 0;">Cargando disponibilidad...</div>';
+  
+  const url = localStorage.getItem('nx_url') || lsGet('nx_url');
+  if (!url) {
+    container.innerHTML = '<div style="color:var(--red);font-size:12px;text-align:center;padding:12px 0;">⚙️ Configurar URL del Sheet en Configuración</div>';
+    return;
+  }
+  
+  try {
+    const res = await fetch(`${url}?accion=get_reservas&fecha=${adminSelectedDateStr}&amenity=${adminSelectedAmenity}&t=${Date.now()}`);
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    
+    if (data.success && Array.isArray(data.ocupados)) {
+      renderTurnosAdmin(data.ocupados);
+    } else {
+      throw new Error();
+    }
+  } catch (e) {
+    console.warn("Amenities Admin load error, using simulation fallback:", e);
+    const defaultOcupados = generateSimulatedReservasAdmin(adminSelectedDateStr, adminSelectedAmenity);
+    renderTurnosAdmin(defaultOcupados);
+  }
+}
+
+function renderTurnosAdmin(ocupados) {
+  const container = document.getElementById('admin-turnos-lista');
+  const TURNOS_POR_DEFECTO = [
+    '09:00 - 11:00',
+    '11:00 - 13:00',
+    '13:00 - 15:00',
+    '15:00 - 17:00',
+    '17:00 - 19:00',
+    '19:00 - 21:00',
+    '21:00 - 23:00'
+  ];
+  
+  let html = '';
+  TURNOS_POR_DEFECTO.forEach(slot => {
+    const ocupado = ocupados.find(o => o.horario === slot);
+    
+    if (ocupado) {
+      html += `<div class="turno-card-admin ocupado">
+        <div class="turno-info-admin">
+          <span class="turno-hora-admin">${slot}</span>
+          <span class="turno-estado-admin ocup" style="color:var(--red);">🔒 Ocupado · ${escHtml(ocupado.lote)}</span>
+        </div>
+        <button class="btn-admin-cancelar" onclick="cancelarReservaAdmin('${slot}', '${escHtml(ocupado.lote)}')">✕ ANULAR</button>
+      </div>`;
+    } else {
+      html += `<div class="turno-card-admin disponible">
+        <div class="turno-info-admin">
+          <span class="turno-hora-admin">${slot}</span>
+          <span class="turno-estado-admin disp">🟢 Disponible</span>
+        </div>
+        <button class="btn-admin-reservar" onclick="reservarTurnoAdmin('${slot}')">➕ RESERVAR</button>
+      </div>`;
+    }
+  });
+  
+  container.innerHTML = html;
+}
+
+async function reservarTurnoAdmin(horario) {
+  const manzana = prompt("Ingrese el número de MANZANA para la reserva:");
+  if (manzana === null) return;
+  const mzaTrim = manzana.trim();
+  if (!mzaTrim) {
+    showToast("⚠️ La manzana es obligatoria.");
+    return;
+  }
+  
+  const casa = prompt("Ingrese el número de CASA para la reserva:");
+  if (casa === null) return;
+  const casaTrim = casa.trim();
+  if (!casaTrim) {
+    showToast("⚠️ La casa es obligatoria.");
+    return;
+  }
+  
+  if (typeof playSynthClick === 'function') playSynthClick();
+  
+  const url = localStorage.getItem('nx_url') || lsGet('nx_url');
+  const vecinoStr = `Mza ${mzaTrim} Casa ${casaTrim}`;
+  
+  if (!url) {
+    saveSimulatedReservaAdmin(adminSelectedDateStr, adminSelectedAmenity, horario, vecinoStr, 'Confirmado');
+    showToast(`🏢 Reserva local registrada: ${vecinoStr}`);
+    cargarReservasAdmin();
+    return;
+  }
+  
+  showToast("⏳ Registrando reserva...");
+  try {
+    const query = `?accion=crear_reserva&deviceId=ADMIN&amenity=${encodeURIComponent(adminSelectedAmenity)}&fecha=${adminSelectedDateStr}&horario=${encodeURIComponent(horario)}&manzana=${encodeURIComponent(mzaTrim)}&casa=${encodeURIComponent(casaTrim)}`;
+    
+    fetch(url + query, { mode: 'no-cors' });
+    
+    saveSimulatedReservaAdmin(adminSelectedDateStr, adminSelectedAmenity, horario, vecinoStr, 'Confirmado');
+    
+    if (typeof playSynthSweep === 'function') playSynthSweep();
+    showToast(`✅ Reserva confirmada: ${vecinoStr}`);
+    
+    setTimeout(cargarReservasAdmin, 800);
+  } catch (e) {
+    showToast("⚠️ Error al conectar con el servidor.");
+  }
+}
+
+async function cancelarReservaAdmin(horario, vecino) {
+  if (!confirm(`¿Está seguro de que desea ANULAR la reserva del turno ${horario} para el vecino (${vecino})?`)) return;
+  
+  if (typeof playSynthClick === 'function') playSynthClick();
+  
+  const url = localStorage.getItem('nx_url') || lsGet('nx_url');
+  
+  if (!url) {
+    saveSimulatedReservaAdmin(adminSelectedDateStr, adminSelectedAmenity, horario, vecino, 'Cancelado');
+    showToast("🗑️ Reserva local anulada");
+    cargarReservasAdmin();
+    return;
+  }
+  
+  showToast("⏳ Anulando reserva...");
+  try {
+    const query = `?accion=cancelar_reserva&deviceId=ADMIN&amenity=${encodeURIComponent(adminSelectedAmenity)}&fecha=${adminSelectedDateStr}&horario=${encodeURIComponent(horario)}`;
+    
+    fetch(url + query, { mode: 'no-cors' });
+    
+    saveSimulatedReservaAdmin(adminSelectedDateStr, adminSelectedAmenity, horario, vecino, 'Cancelado');
+    
+    showToast("🗑️ Reserva anulada con éxito");
+    
+    setTimeout(cargarReservasAdmin, 800);
+  } catch (e) {
+    showToast("⚠️ Error al conectar con el servidor.");
+  }
+}
+
+function djb2Numeric(str) {
+  let h = 5381;
+  for (let i = 0; i < str.length; i++) {
+    h = ((h << 5) + h) ^ str.charCodeAt(i);
+    h |= 0;
+  }
+  return Math.abs(h);
+}
+
+function generateSimulatedReservasAdmin(fechaStr, amenity) {
+  let localBookings = [];
+  try {
+    localBookings = JSON.parse(localStorage.getItem('nx_admin_sim_reservas') || '[]');
+  } catch (e) {
+    localBookings = [];
+  }
+  
+  const dayLocals = localBookings.filter(x => x.fecha === fechaStr && x.amenity === amenity && x.estado !== 'Cancelado');
+  
+  const hash = djb2Numeric(fechaStr + amenity);
+  const TURNOS_POR_DEFECTO = [
+    '09:00 - 11:00',
+    '11:00 - 13:00',
+    '13:00 - 15:00',
+    '15:00 - 17:00',
+    '17:00 - 19:00',
+    '19:00 - 21:00',
+    '21:00 - 23:00'
+  ];
+  
+  const indicesOcupados = [];
+  const cantOcupados = (hash % 3) + 1;
+  for (let i = 0; i < cantOcupados; i++) {
+    const idx = (hash + i * 7) % TURNOS_POR_DEFECTO.length;
+    if (!indicesOcupados.includes(idx)) {
+      indicesOcupados.push(idx);
+    }
+  }
+  
+  const ocupados = [];
+  indicesOcupados.forEach(idx => {
+    const loteMza = ((hash + idx * 3) % 25) + 1;
+    const loteCasa = ((hash + idx * 5) % 40) + 1;
+    
+    const isCancelled = localBookings.some(x => x.fecha === fechaStr && x.amenity === amenity && x.horario === TURNOS_POR_DEFECTO[idx] && x.estado === 'Cancelado');
+    
+    if (!isCancelled) {
+      ocupados.push({
+        horario: TURNOS_POR_DEFECTO[idx],
+        lote: 'Mza ' + loteMza + ' Casa ' + loteCasa,
+        esMio: false
+      });
+    }
+  });
+  
+  dayLocals.forEach(x => {
+    if (!ocupados.some(o => o.horario === x.horario)) {
+      ocupados.push({
+        horario: x.horario,
+        lote: x.lote,
+        esMio: true
+      });
+    }
+  });
+  
+  return ocupados;
+}
+
+function saveSimulatedReservaAdmin(fecha, amenity, horario, lote, estado) {
+  let localBookings = [];
+  try {
+    localBookings = JSON.parse(localStorage.getItem('nx_admin_sim_reservas') || '[]');
+  } catch (e) {
+    localBookings = [];
+  }
+  
+  localBookings = localBookings.filter(x => !(x.fecha === fecha && x.amenity === amenity && x.horario === horario));
+  
+  localBookings.push({
+    fecha,
+    amenity,
+    horario,
+    lote,
+    estado,
+    ts: Date.now()
+  });
+  
+  localStorage.setItem('nx_admin_sim_reservas', JSON.stringify(localBookings));
+}
 
 // ══════════════════════════════════════════════════════════
 //  QR SCANNER

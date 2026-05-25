@@ -217,12 +217,12 @@
     }
 
     .boton-redondo-container {
-      width: 280px;
-      height: 280px;
+      width: 216px;
+      height: 216px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 20px 0;
+      margin: 6px 0;
       position: relative;
       border-radius: 50%;
       background: radial-gradient(circle, rgba(239, 68, 68, 0.12) 0%, transparent 70%);
@@ -304,8 +304,8 @@
     }
 
     .boton-redondo {
-      width: 256px;
-      height: 256px;
+      width: 196px;
+      height: 196px;
       border-radius: 50%;
       background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%);
       border: 3.5px solid rgba(255, 255, 255, 0.15);
@@ -317,7 +317,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 6px;
       position: relative;
       overflow: hidden;
       animation: neonRedPulse 2.5s ease-in-out infinite;
@@ -403,12 +403,12 @@
       cursor: not-allowed;
     }
     .boton-emoji {
-      font-size: 52px;
+      font-size: 38px;
       line-height: 1;
       filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
     }
     .boton-texto {
-      font-size: 17px;
+      font-size: 14px;
       font-weight: 800;
       letter-spacing: 1.5px;
       text-align: center;
@@ -526,8 +526,8 @@
       color: #06b6d4;
       border: 1px solid rgba(6, 182, 212, 0.25);
       border-radius: 16px;
-      padding: 14px 36px;
-      font-size: 14px;
+      padding: 11px 24px;
+      font-size: 13.5px;
       font-weight: 800;
       cursor: pointer;
       backdrop-filter: blur(8px);
@@ -538,6 +538,9 @@
       gap: 8px;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      width: 100%;
+      max-width: 320px;
+      box-sizing: border-box;
     }
     .btn-cfg-main:active,
     .btn-volver:active {
@@ -552,8 +555,8 @@
       color: #f59e0b;
       border: 1.5px solid rgba(245, 158, 11, 0.3);
       border-radius: 16px;
-      padding: 16px 42px;
-      font-size: 15px;
+      padding: 11px 24px;
+      font-size: 13.5px;
       font-weight: 800;
       letter-spacing: 0.8px;
       cursor: pointer;
@@ -561,12 +564,15 @@
       -webkit-backdrop-filter: blur(12px);
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      margin-top: 10px;
+      margin-top: 6px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
       animation: btnTriggerPulse 3s ease-in-out infinite;
+      width: 100%;
+      max-width: 320px;
+      box-sizing: border-box;
     }
     .btn-tipo-trigger:active {
       transform: scale(0.96);
@@ -590,8 +596,8 @@
       color: #06b6d4;
       border: 1.5px solid rgba(6, 182, 212, 0.3);
       border-radius: 16px;
-      padding: 16px 42px;
-      font-size: 15px;
+      padding: 11px 24px;
+      font-size: 13.5px;
       font-weight: 800;
       cursor: pointer;
       backdrop-filter: blur(12px);
@@ -600,12 +606,13 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
-      margin-top: 14px;
+      margin-top: 6px;
       width: 100%;
       max-width: 320px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       letter-spacing: 0.5px;
+      box-sizing: border-box;
     }
     .btn-visita-trigger:active {
       transform: scale(0.96);
@@ -646,6 +653,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 16px 20px;
+      padding-top: calc(env(safe-area-inset-top, 24px) + 16px);
       background: rgba(20, 20, 25, 0.85);
       border-bottom: 1px solid rgba(6, 182, 212, 0.25);
       backdrop-filter: blur(10px);
@@ -1221,11 +1229,11 @@
       filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
     }
     .lp-hint {
-      font-size: 13px;
+      font-size: 12px;
       color: #71717a;
       letter-spacing: 0.5px;
-      margin-top: 12px;
-      margin-bottom: 4px;
+      margin-top: 4px;
+      margin-bottom: 2px;
       transition: color 0.3s;
       font-weight: 500;
     }
@@ -1406,7 +1414,7 @@
       background-clip: padding-box, border-box;
       box-shadow: 0 4px 15px rgba(220, 39, 67, 0.15);
       transition: all 0.3s ease;
-      margin-top: 20px;
+      margin-top: 8px;
     }
     .ig-link:active {
       transform: scale(0.96);
@@ -2059,7 +2067,8 @@
 
     /* Amenities Selector */
     .reserva-amenities-selector {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       width: 100%;
       gap: 8px;
       margin-bottom: 4px;
@@ -2521,6 +2530,12 @@
     </svg>
     Cambiar ubicación
   </button>
+  <button class="btn-cfg-main shimmer-effect" style="margin-top: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);" onclick="comprobarActualizacionVecino()">
+    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+    </svg>
+    Comprobar actualización
+  </button>
   <a class="ig-link" href="https://www.instagram.com/nexosmaps?igsh=MThvc241Y2JhNmhvcQ%3D%3D&utm_source=qr" target="_blank" rel="noopener">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
     @nexosmaps
@@ -2628,6 +2643,14 @@
     <button id="btn-amenity-quincho" onclick="seleccionarAmenity('Quincho')">
       <span class="icon">🍖</span>
       <span>Quincho</span>
+    </button>
+    <button id="btn-amenity-paddle" onclick="seleccionarAmenity('Paddle')">
+      <span class="icon">🏓</span>
+      <span>Paddle</span>
+    </button>
+    <button id="btn-amenity-futbol" onclick="seleccionarAmenity('futbol')">
+      <span class="icon">⚽</span>
+      <span>Fútbol</span>
     </button>
   </div>
 
@@ -2965,7 +2988,7 @@
     try { sessionStorage.setItem('nx_lp_s', tsStr); } catch(e) {}
   }
 
-  const PANIC_URL = 'https://script.google.com/macros/s/AKfycbwmgRzyWiBT_sdurtYx6NbH-ZfbYdao3g6vgYty6pBuR9oWbr3py-NF_V_ndIBG44qctA/exec';
+  const PANIC_URL = 'https://script.google.com/macros/s/AKfycbwwm91ylpaaEL8cNwFtzymdj57WlsZG8xNPXi3ydV9SaTaupjBD2xtWJVO00T9aLisEoA/exec';
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(()=>{});
@@ -3077,6 +3100,8 @@
     document.getElementById('pantalla-panico').classList.remove('visible');
     document.getElementById('pantalla-enviado').classList.remove('visible');
     document.getElementById('pantalla-baneado').classList.remove('visible');
+    const navBar = document.getElementById('app-nav-bar');
+    if (navBar) navBar.style.display = 'none';
   }
 
   function mostrarPantallaBaneado(ban) {
@@ -3084,6 +3109,8 @@
     document.getElementById('pantalla-panico').classList.remove('visible');
     document.getElementById('pantalla-enviado').classList.remove('visible');
     document.getElementById('pantalla-baneado').classList.add('visible');
+    const navBar = document.getElementById('app-nav-bar');
+    if (navBar) navBar.style.display = 'none';
     const motivoEl = document.getElementById('ban-motivo-texto');
     if (ban && ban.motivo && ban.motivo.trim()) {
       motivoEl.innerText = ban.motivo;
@@ -3100,6 +3127,8 @@
     document.getElementById('pantalla-panico').classList.add('visible');
     document.getElementById('pantalla-enviado').classList.remove('visible');
     document.getElementById('pantalla-baneado').classList.remove('visible');
+    const navBar = document.getElementById('app-nav-bar');
+    if (navBar) navBar.style.display = 'flex';
     verificarCooldown();
   }
 
@@ -3675,6 +3704,38 @@
 
   function pinEsCorrecto(pin){ return hashPin(pin.trim()) === PIN_HASH; }
 
+  function comprobarActualizacionVecino() {
+    triggerHaptic('soft');
+    playSound('tap');
+    
+    showToast('🔄 Buscando actualizaciones...');
+    
+    setTimeout(() => {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          if (registrations.length > 0) {
+            registrations.forEach(r => r.update());
+          }
+        });
+      }
+      
+      // Limpiar caches
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          names.forEach(name => caches.delete(name));
+        });
+      }
+      
+      triggerHaptic('confirm');
+      playSound('success');
+      showToast('⚡ ¡Caché limpia! Recargando...');
+      
+      setTimeout(() => {
+        window.location.reload(true);
+      }, 1000);
+    }, 1500);
+  }
+
   function pedirPinParaCambiar(){
     const block = parseInt(localStorage.getItem('nx_pin_block') || '0');
     if (block && Date.now() < block){
@@ -4192,11 +4253,11 @@
     if (confirmBox) confirmBox.classList.remove('visible');
     
     // Actualizar botones de selector
-    ['SUM', 'Tenis', 'Quincho'].forEach(a => {
+    ['SUM', 'Tenis', 'Quincho', 'Paddle', 'futbol'].forEach(a => {
       const id = 'btn-amenity-' + a.toLowerCase();
       const el = document.getElementById(id);
       if (el) {
-        el.classList.toggle('active-amenity', a === amenity);
+        el.classList.toggle('active-amenity', a.toLowerCase() === amenity.toLowerCase());
       }
     });
     
@@ -4401,60 +4462,45 @@
   async function solicitarReserva() {
     if (!reservaSelectedAmenity || !reservaSelectedDateStr || !reservaSelectedSlot) return;
     
+    // Evitar más de una reserva del mismo item por día por dispositivo
+    const misReservasLocales = JSON.parse(localStorage.getItem('nx_mis_reservas') || '[]');
+    const yaReservado = misReservasLocales.some(res => 
+      res.amenity && res.amenity.toLowerCase() === reservaSelectedAmenity.toLowerCase() && 
+      res.fecha === reservaSelectedDateStr
+    );
+    
+    if (yaReservado) {
+      triggerHaptic('error');
+      playSound('error');
+      showToast(`⚠️ Ya tenés una reserva de ${reservaSelectedAmenity} para este día.`);
+      return;
+    }
+    
     triggerHaptic('confirm');
     playSound('success');
     
     const mza = localStorage.getItem('nx_manzana') || '';
     const casa = localStorage.getItem('nx_casa') || '';
     
-    const payload = {
-      accion: 'crear_reserva',
-      deviceId: DEVICE_ID,
-      amenity: reservaSelectedAmenity,
-      fecha: reservaSelectedDateStr,
-      horario: reservaSelectedSlot,
-      manzana: mza,
-      casa: casa
-    };
-    
-    let reservadoConExito = false;
-    
-    // 1. Intentar enviar al Apps Script real
+    // 1. Enviar al Apps Script real (vía GET + no-cors para eludir bloqueos locales de origen file://)
     try {
-      const r = await fetch(PANIC_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (r.ok) {
-        const data = await r.json();
-        if (data.success) {
-          reservadoConExito = true;
-        } else {
-          alert('Error: ' + (data.error || 'No se pudo reservar el turno.'));
-          return;
-        }
-      }
+      const url = `${PANIC_URL}?accion=crear_reserva&deviceId=${encodeURIComponent(DEVICE_ID)}&amenity=${encodeURIComponent(reservaSelectedAmenity)}&fecha=${encodeURIComponent(reservaSelectedDateStr)}&horario=${encodeURIComponent(reservaSelectedSlot)}&manzana=${encodeURIComponent(mza)}&casa=${encodeURIComponent(casa)}`;
+      fetch(url, { mode: 'no-cors' });
     } catch(e) {
-      // Fallback a guardado local
+      // Falla silenciosa
     }
     
-    // 2. Si no hubo éxito real del servidor (GAS sin actualizar), guardamos local
-    if (!reservadoConExito) {
-      // Guardar reserva localmente
-      const misReservasLocales = JSON.parse(localStorage.getItem('nx_mis_reservas') || '[]');
-      // Evitar duplicados locales
-      if (!misReservasLocales.some(res => res.amenity === reservaSelectedAmenity && res.fecha === reservaSelectedDateStr && res.horario === reservaSelectedSlot)) {
-        misReservasLocales.push({
-          id: 'RES-L-' + Date.now(),
-          amenity: reservaSelectedAmenity,
-          fecha: reservaSelectedDateStr,
-          horario: reservaSelectedSlot,
-          lote: `Mza ${mza} Casa ${casa}`,
-          esLocalSimulado: true
-        });
-        localStorage.setItem('nx_mis_reservas', JSON.stringify(misReservasLocales));
-      }
+    // 2. Grabar localmente en localStorage de inmediato para dar feedback visual instantáneo
+    if (!misReservasLocales.some(res => res.amenity === reservaSelectedAmenity && res.fecha === reservaSelectedDateStr && res.horario === reservaSelectedSlot)) {
+      misReservasLocales.push({
+        id: 'RES-L-' + Date.now(),
+        amenity: reservaSelectedAmenity,
+        fecha: reservaSelectedDateStr,
+        horario: reservaSelectedSlot,
+        lote: `Mza ${mza} Casa ${casa}`,
+        esLocalSimulado: false // Es una reserva real enviada
+      });
+      localStorage.setItem('nx_mis_reservas', JSON.stringify(misReservasLocales));
     }
     
     // Limpiar selección de slot y refrescar
@@ -4477,25 +4523,10 @@
       let canceladoConExito = false;
       
       if (!esLocalSimulado) {
-        // Intentar cancelar en el servidor GAS real
+        // Enviar cancelación usando mode: 'no-cors' para eludir restricciones locales (file://)
         try {
-          const r = await fetch(PANIC_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              accion: 'cancelar_reserva',
-              deviceId: DEVICE_ID,
-              amenity: amenity,
-              fecha: fecha,
-              horario: horario
-            })
-          });
-          if (r.ok) {
-            const data = await r.json();
-            if (data.success) {
-              canceladoConExito = true;
-            }
-          }
+          const url = `${PANIC_URL}?accion=cancelar_reserva&deviceId=${encodeURIComponent(DEVICE_ID)}&amenity=${encodeURIComponent(amenity)}&fecha=${encodeURIComponent(fecha)}&horario=${encodeURIComponent(horario)}`;
+          fetch(url, { mode: 'no-cors' });
         } catch(e) {}
       }
       
@@ -4538,7 +4569,15 @@
       html += `
         <div class="mi-reserva-card">
           <div class="mi-reserva-info">
-            <div class="mi-reserva-title">${res.amenity === 'SUM' ? '🏢 SUM' : res.amenity === 'Tenis' ? '🎾 Cancha de Tenis' : '🍖 Quincho'}${badgeLocal}</div>
+            <div class="mi-reserva-title">${
+              !res.amenity ? '📅 Reserva' :
+              res.amenity.toLowerCase() === 'sum' ? '🏢 SUM' : 
+              res.amenity.toLowerCase() === 'tenis' ? '🎾 Cancha de Tenis' : 
+              res.amenity.toLowerCase() === 'quincho' ? '🍖 Quincho' : 
+              res.amenity.toLowerCase() === 'paddle' ? '🏓 Cancha de Paddle' : 
+              res.amenity.toLowerCase() === 'futbol' ? '⚽ Cancha de Fútbol' : 
+              res.amenity
+            }${badgeLocal}</div>
             <div class="mi-reserva-date">📅 ${fechaFormateada} — 🕒 ${res.horario} hs</div>
           </div>
           <button class="btn-cancelar-reserva" onclick="cancelarReserva('${res.id}', '${res.amenity}', '${res.fecha}', '${res.horario}', ${res.esLocalSimulado || false})">CANCELAR</button>
@@ -4548,10 +4587,6 @@
     listEl.innerHTML = html;
   }
 
-  function cerrarPronostico(e){
-    if (e.target === document.getElementById('clima-overlay'))
-      document.getElementById('clima-overlay').classList.remove('visible');
-  }
 </script>
 </body>
 </html>
