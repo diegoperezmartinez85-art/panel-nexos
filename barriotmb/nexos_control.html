@@ -2495,6 +2495,12 @@
         Para habilitar la lectura de patentes por cámara. Creá una cuenta en <a href="https://app.platerecognizer.com/" target="_blank" style="color:var(--cyan); text-decoration:underline;">platerecognizer.com</a> y pegá el API Token acá. Si se deja vacío, la app usará un simulador inteligente local de prueba.
       </div>
       
+      <div class="campo-label" style="margin-top:16px;">URL RAW GITHUB (PANICOING VECINO)</div>
+      <input id="cfg-github-vecino" class="giant" placeholder="Ej. https://raw.githubusercontent.com/.../nexos_panicoing.html">
+      
+      <div class="campo-label" style="margin-top:16px;">URL RAW GITHUB (CONTROL GUARDIA)</div>
+      <input id="cfg-github-control" class="giant" placeholder="Ej. https://raw.githubusercontent.com/.../nexos_control (2).html">
+      
       <button class="btn-save" onclick="guardarConfig()" style="margin-top:16px;">GUARDAR CONFIGURACIÓN</button>
       <button class="btn-save" onclick="comprobarActualizacionControl()" style="margin-top:10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: #fff;">🔄 COMPROBAR ACTUALIZACIÓN</button>
     </div>
@@ -2627,6 +2633,33 @@
 </nav>
 
 <script>
+// ── HOT-UPDATE COMPILATION INTERCEPTOR (GITHUB LIVE LOADER) ──
+(function() {
+  try {
+    // Ignorar intercepción si estamos editando y probando localmente en PC (file:// o localhost)
+    const isLocal = window.location.protocol === 'file:' || 
+                    window.location.hostname === 'localhost' || 
+                    window.location.hostname === '127.0.0.1';
+    if (isLocal) return;
+
+    // Scoping dinámico por subcarpeta para que no se mezclen diferentes instalaciones del mismo dominio
+    const pathKey = 'nx_cached_html_' + window.location.pathname.replace(/\//g, '_');
+    const versionKey = pathKey + '_version';
+
+    const currentVersion = 'v4.5'; // Incrementar cuando el script cambia en disco local
+    const cachedHtml = localStorage.getItem(pathKey);
+    const cachedVersion = localStorage.getItem(versionKey);
+    
+    if (cachedHtml && cachedVersion && cachedVersion !== currentVersion) {
+      document.open();
+      document.write(cachedHtml);
+      document.close();
+    }
+  } catch (e) {
+    console.error("Hot-update failed:", e);
+  }
+})();
+
 // ── CONSTANTES ─────────────────────────────────────────────
 /* --- SYNTHESIZED AUDIO CLICK FEEDBACK (Web Audio API - Offline & GPU safe) --- */
 function playSynthClick() {
@@ -2795,7 +2828,17 @@ function iconosNoche() {
 function iconoClima(code, soloActual = true) {
   if (soloActual && esNoche()) {
     const mapa = iconosNoche();
-    return mapa[code] ?? CLIMA_ICONS[code] ?? '🌙';
+    let icon = mapa[code] ?? CLIMA_ICONS[code] ?? '🌙';
+    
+    // Lista de emojis de fases lunares para chequear si el ícono ya tiene uno
+    const lunas = ['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘','🌙'];
+    const tieneLuna = lunas.some(l => icon.includes(l));
+    
+    // Si es de noche y el ícono climático (ej: niebla, cubierto) no tiene luna, se la agregamos al principio
+    if (!tieneLuna) {
+      icon = faselunar() + ' ' + icon;
+    }
+    return icon;
   }
   return CLIMA_ICONS[code] || '🌤️';
 }
@@ -4336,6 +4379,8 @@ function _ejecutarSalidaRapida(){
 function guardarConfig(){
   lsSet('nx_url',document.getElementById('cfg-url').value.trim());
   lsSet('nx_lpr_token',document.getElementById('cfg-lpr-token').value.trim());
+  lsSet('nx_github_raw_vecino',document.getElementById('cfg-github-vecino').value.trim());
+  lsSet('nx_github_raw_control',document.getElementById('cfg-github-control').value.trim());
   const checked = document.getElementById('cfg-voz-alertas').checked;
   lsSet('nx_voz_alertas', checked ? 'true' : 'false');
   showToast("⚙️ GUARDADO");
@@ -4910,31 +4955,67 @@ async function publicarMural() {
 
 async function comprobarActualizacionControl() {
   if (typeof playSound === 'function') playSound('tap');
-  showToast('🔄 Buscando actualizaciones en el panel...');
+  showToast('🔍 Conectando con GitHub...');
   
-  setTimeout(() => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(registrations => {
-        if (registrations.length > 0) {
-          registrations.forEach(r => r.update());
+  let rawUrl = '';
+  const hostname = window.location.hostname;
+  const pathname = window.location.pathname;
+  
+  // Auto-detección dinámica de su propia ubicación en GitHub Pages
+  if (hostname.endsWith('.github.io')) {
+    const owner = hostname.split('.')[0];
+    const pathParts = pathname.split('/').filter(p => p.trim());
+    const repo = pathParts[0];
+    const filePath = pathParts.slice(1).join('/');
+    rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/${filePath}`;
+  } else {
+    // Fallback local/offline configurado en localStorage
+    rawUrl = localStorage.getItem('nx_github_raw_control') || 'https://raw.githubusercontent.com/Diego/nexos-maps/main/nexos_control%20(2).html';
+  }
+  
+  try {
+    const res = await fetch(rawUrl + '?t=' + Date.now());
+    if (res.ok) {
+      const newHtml = await res.text();
+      
+      // Validación defensiva: verificar que el archivo recuperado contenga la firma del Panel de Control
+      if (newHtml.includes('id="p-config"') && newHtml.includes('iniciarApp')) {
+        showToast('🚀 ¡Nueva versión descargada! Recargando panel...');
+        
+        const pathKey = 'nx_cached_html_' + window.location.pathname.replace(/\//g, '_');
+        const versionKey = pathKey + '_version';
+        
+        localStorage.setItem(pathKey, newHtml);
+        localStorage.setItem(versionKey, 'GH-' + Date.now());
+        
+        // Purgar cachés del navegador
+        if ('caches' in window) {
+          caches.keys().then(names => {
+            names.forEach(name => caches.delete(name));
+          });
         }
-      });
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(registrations => {
+            registrations.forEach(r => r.update());
+          });
+        }
+        
+        if (typeof playSound === 'function') playSound('success');
+        
+        setTimeout(() => {
+          window.location.reload(true);
+        }, 1200);
+        return;
+      } else {
+        throw new Error('El archivo recuperado de GitHub no tiene el formato del Panel.');
+      }
+    } else {
+      throw new Error('Fallo de red o URL incorrecta (HTTP ' + res.status + ').');
     }
-    
-    // Eliminar cachés locales
-    if ('caches' in window) {
-      caches.keys().then(names => {
-        names.forEach(name => caches.delete(name));
-      });
-    }
-    
-    if (typeof playSound === 'function') playSound('success');
-    showToast('⚡ ¡Caché del panel limpia! Recargando...');
-    
-    setTimeout(() => {
-      window.location.reload(true);
-    }, 1000);
-  }, 1500);
+  } catch (e) {
+    if (typeof playSound === 'function') playSound('error');
+    alert('❌ Error al actualizar desde GitHub:\n' + e.message + '\n\nSi está corriendo en producción, asegúrese de que el archivo exista en su repositorio de GitHub.');
+  }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -5792,6 +5873,8 @@ window.addEventListener('resize',ajustarScrollTop);
 function iniciarApp(){
   document.getElementById('cfg-url').value=localStorage.getItem('nx_url')||'';
   document.getElementById('cfg-lpr-token').value=localStorage.getItem('nx_lpr_token')||'';
+  document.getElementById('cfg-github-vecino').value=localStorage.getItem('nx_github_raw_vecino')||'';
+  document.getElementById('cfg-github-control').value=localStorage.getItem('nx_github_raw_control')||'';
   const vozHabilitada = localStorage.getItem('nx_voz_alertas') !== 'false';
   const inputVoz = document.getElementById('cfg-voz-alertas');
   if (inputVoz) inputVoz.checked = vozHabilitada;
