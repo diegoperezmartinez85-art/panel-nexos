@@ -2429,14 +2429,14 @@
         </div>
         <div class="menu-item" onclick="abrirBusqueda()"><span class="menu-item-icon">📋</span>Historial del día</div>
         <div class="menu-item gold-item" onclick="abrirTurno()"><span class="menu-item-icon">🖨️</span>Cierre de turno / PDF</div>
-        <div class="menu-item purple-item" onclick="abrirListaNegra()"><span class="menu-item-icon">🚫</span>Lista negra</div>
-        <div class="menu-item" style="color:#00d4d4;" onclick="abrirHistorialSheet()"><span class="menu-item-icon">🗂️</span>Consulta historial Sheet</div>
         <div class="menu-item" style="color:#a855f7;" onclick="abrirCalendario()"><span class="menu-item-icon">📅</span>Calendario</div>
-        <div class="menu-item" style="color:#06b6d4;" onclick="abrirReservasAdmin()"><span class="menu-item-icon">🏢</span>Reservas de Amenities</div>
-        <div class="menu-item" style="color:#14b8a6;" onclick="abrirMuralAdmin()"><span class="menu-item-icon">📢</span>Publicar Novedades</div>
         <div class="menu-item" style="color:#ff4444;" onclick="abrirSOS()"><span class="menu-item-icon">🆘</span>Directorio SOS</div>
         <div class="menu-item" style="color:var(--gold);" onclick="abrirIncidentes()"><span class="menu-item-icon">📝</span>Registro de incidentes<span id="inc-menu-badge" style="display:none;margin-left:6px;background:var(--red);color:#fff;font-size:9px;font-weight:900;border-radius:20px;padding:2px 7px;"></span></div>
         <div class="menu-section-label">ADMINISTRACIÓN</div>
+        <div class="menu-item" style="color:#14b8a6;" onclick="abrirMuralAdmin()"><span class="menu-item-icon">📢</span>Publicar Novedades</div>
+        <div class="menu-item" style="color:#06b6d4;" onclick="abrirReservasAdmin()"><span class="menu-item-icon">🏢</span>Reservas de Amenities</div>
+        <div class="menu-item purple-item" onclick="abrirListaNegra()"><span class="menu-item-icon">🚫</span>Lista negra</div>
+        <div class="menu-item" style="color:#00d4d4;" onclick="abrirHistorialSheet()"><span class="menu-item-icon">🗂️</span>Consulta historial Sheet</div>
         <div class="menu-item" style="color:var(--purple);" onclick="abrirBaneo()"><span class="menu-item-icon">🚷</span>Baneo de vecinos</div>
         <div class="menu-item" style="color:var(--green);" onclick="abrirPropietarios()"><span class="menu-item-icon">👥</span>Propietarios</div>
         <div class="menu-section-label">SISTEMA</div>
@@ -3033,7 +3033,15 @@ function triggerHaptic(tipo) {
   }
 }
 let pinActual='';
-function pinTecla(d){document.getElementById('pin-nombre').blur();if(pinActual.length>=4)return;triggerHaptic('click');pinActual+=d;actualizarPuntos();if(pinActual.length===4)setTimeout(verificarPin,120);}
+function pinTecla(d){
+  const el = document.getElementById('pin-nombre');
+  if(el && document.activeElement === el) el.blur();
+  if(pinActual.length>=4)return;
+  triggerHaptic('click');
+  pinActual+=d;
+  actualizarPuntos();
+  if(pinActual.length===4)setTimeout(verificarPin,120);
+}
 function pinBorrar(){triggerHaptic('delete');pinActual=pinActual.slice(0,-1);actualizarPuntos();document.getElementById('pin-error').innerText='';}
 function actualizarPuntos(){for(let i=0;i<4;i++)document.getElementById('p'+i).classList.toggle('lleno',i<pinActual.length);}
 function verificarPin(){
@@ -5505,10 +5513,18 @@ function renderTurnosAdmin(ocupados) {
     const ocupado = ocupados.find(o => o.horario === slot);
     
     if (ocupado) {
+      let detStr = `🔒 Ocupado · ${escHtml(ocupado.lote)}`;
+      if (ocupado.nombre) {
+        detStr += ` · 👤 ${escHtml(ocupado.nombre)}`;
+      }
+      if (ocupado.contacto) {
+        detStr += ` (📞 ${escHtml(ocupado.contacto)})`;
+      }
+      
       html += `<div class="turno-card-admin ocupado">
         <div class="turno-info-admin">
           <span class="turno-hora-admin">${slot}</span>
-          <span class="turno-estado-admin ocup" style="color:var(--red);">🔒 Ocupado · ${escHtml(ocupado.lote)}</span>
+          <span class="turno-estado-admin ocup" style="color:var(--red); font-size:11px; line-height: 1.4;">${detStr}</span>
         </div>
         <button class="btn-admin-cancelar" onclick="cancelarReservaAdmin('${slot}', '${escHtml(ocupado.lote)}')">✕ ANULAR</button>
       </div>`;
@@ -5543,13 +5559,16 @@ async function reservarTurnoAdmin(horario) {
     return;
   }
   
+  const nombre = prompt("Ingrese el NOMBRE completo del vecino (Opcional):") || "";
+  const contacto = prompt("Ingrese el TELÉFONO de contacto (Opcional):") || "";
+  
   if (typeof playSynthClick === 'function') playSynthClick();
   
   const url = localStorage.getItem('nx_url') || lsGet('nx_url');
   const vecinoStr = `Mza ${mzaTrim} Casa ${casaTrim}`;
   
   if (!url) {
-    saveSimulatedReservaAdmin(adminSelectedDateStr, adminSelectedAmenity, horario, vecinoStr, 'Confirmado');
+    saveSimulatedReservaAdmin(adminSelectedDateStr, adminSelectedAmenity, horario, vecinoStr, 'Confirmado', nombre, contacto);
     showToast(`🏢 Reserva local registrada: ${vecinoStr}`);
     cargarReservasAdmin();
     return;
@@ -5557,11 +5576,11 @@ async function reservarTurnoAdmin(horario) {
   
   showToast("⏳ Registrando reserva...");
   try {
-    const query = `?accion=crear_reserva&deviceId=ADMIN&amenity=${encodeURIComponent(adminSelectedAmenity)}&fecha=${adminSelectedDateStr}&horario=${encodeURIComponent(horario)}&manzana=${encodeURIComponent(mzaTrim)}&casa=${encodeURIComponent(casaTrim)}`;
+    const query = `?accion=crear_reserva&deviceId=ADMIN&amenity=${encodeURIComponent(adminSelectedAmenity)}&fecha=${adminSelectedDateStr}&horario=${encodeURIComponent(horario)}&manzana=${encodeURIComponent(mzaTrim)}&casa=${encodeURIComponent(casaTrim)}&nombre=${encodeURIComponent(nombre.trim())}&contacto=${encodeURIComponent(contacto.trim())}`;
     
     fetch(url + query, { mode: 'no-cors' });
     
-    saveSimulatedReservaAdmin(adminSelectedDateStr, adminSelectedAmenity, horario, vecinoStr, 'Confirmado');
+    saveSimulatedReservaAdmin(adminSelectedDateStr, adminSelectedAmenity, horario, vecinoStr, 'Confirmado', nombre, contacto);
     
     if (typeof playSynthSweep === 'function') playSynthSweep();
     showToast(`✅ Reserva confirmada: ${vecinoStr}`);
@@ -5654,6 +5673,8 @@ function generateSimulatedReservasAdmin(fechaStr, amenity) {
       ocupados.push({
         horario: x.horario,
         lote: x.lote,
+        nombre: x.nombre || '',
+        contacto: x.contacto || '',
         esMio: true
       });
     }
@@ -5662,7 +5683,7 @@ function generateSimulatedReservasAdmin(fechaStr, amenity) {
   return ocupados;
 }
 
-function saveSimulatedReservaAdmin(fecha, amenity, horario, lote, estado) {
+function saveSimulatedReservaAdmin(fecha, amenity, horario, lote, estado, nombre, contacto) {
   let localBookings = [];
   try {
     localBookings = JSON.parse(localStorage.getItem('nx_admin_sim_reservas') || '[]');
@@ -5678,6 +5699,8 @@ function saveSimulatedReservaAdmin(fecha, amenity, horario, lote, estado) {
     horario,
     lote,
     estado,
+    nombre: nombre || '',
+    contacto: contacto || '',
     ts: Date.now()
   });
   
