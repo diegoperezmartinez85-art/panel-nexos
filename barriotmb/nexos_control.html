@@ -5504,6 +5504,27 @@ function obtenerTurnosParaAmenity(amenity) {
   ];
 }
 
+function cleanPhoneForWhatsApp(phone) {
+  let num = String(phone).replace(/\D/g, '');
+  if (!num) return '';
+  if (num.startsWith('0')) num = num.substring(1);
+  if (!num.startsWith('54')) {
+    if (num.startsWith('15')) {
+      num = '11' + num.substring(2);
+    }
+    if (num.length === 10) {
+      num = '549' + num;
+    } else {
+      num = '54' + num;
+    }
+  }
+  return num;
+}
+
+function cleanPhoneForCalling(phone) {
+  return String(phone).replace(/\D/g, '');
+}
+
 function renderTurnosAdmin(ocupados) {
   const container = document.getElementById('admin-turnos-lista');
   const turnos = obtenerTurnosParaAmenity(adminSelectedAmenity);
@@ -5513,20 +5534,32 @@ function renderTurnosAdmin(ocupados) {
     const ocupado = ocupados.find(o => o.horario === slot);
     
     if (ocupado) {
-      let detStr = `🔒 Ocupado · ${escHtml(ocupado.lote)}`;
-      if (ocupado.nombre) {
-        detStr += ` · 👤 ${escHtml(ocupado.nombre)}`;
-      }
-      if (ocupado.contacto) {
-        detStr += ` (📞 ${escHtml(ocupado.contacto)})`;
-      }
-      
-      html += `<div class="turno-card-admin ocupado">
-        <div class="turno-info-admin">
-          <span class="turno-hora-admin">${slot}</span>
-          <span class="turno-estado-admin ocup" style="color:var(--red); font-size:11px; line-height: 1.4;">${detStr}</span>
+      html += `<div class="turno-card-admin ocupado" style="height: auto; min-height: 62px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-sizing: border-box;">
+        <div class="turno-info-admin" style="display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span class="turno-hora-admin" style="font-weight: 800; font-size: 14px; color: #fff; font-family: monospace;">${slot}</span>
+            <span class="turno-estado-admin ocup" style="color: var(--red); font-size: 11px; font-weight: 700; background: rgba(239, 68, 68, 0.1); padding: 2px 8px; border-radius: 20px; white-space: nowrap;">🔒 ${escHtml(ocupado.lote)}</span>
+          </div>
+          
+          ${(ocupado.nombre || ocupado.contacto) ? `
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 2px;">
+              ${ocupado.nombre ? `<span style="font-size: 11px; color: #e4e4e7; font-weight: 500; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">👤 ${escHtml(ocupado.nombre)}</span>` : ''}
+              ${ocupado.contacto ? `
+                <div style="display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                  <span style="font-size: 11px; color: #a1a1aa; white-space: nowrap;">📞 ${escHtml(ocupado.contacto)}</span>
+                  <!-- Botones de Acción Whatsapp y Llamada -->
+                  <a href="https://api.whatsapp.com/send?phone=${cleanPhoneForWhatsApp(ocupado.contacto)}" target="_blank" style="background: rgba(37, 211, 102, 0.12); color: #25d366; border: 1px solid rgba(37, 211, 102, 0.25); border-radius: 6px; padding: 2px 6px; font-size: 9px; text-decoration: none; display: inline-flex; align-items: center; gap: 3px; font-weight: 700; transition: all 0.2s;-webkit-tap-highlight-color:transparent;" onmouseover="this.style.background='rgba(37,211,102,0.25)'" onmouseout="this.style.background='rgba(37,211,102,0.12)'">
+                    💬 WhatsApp
+                  </a>
+                  <a href="tel:${cleanPhoneForCalling(ocupado.contacto)}" style="background: rgba(6, 182, 212, 0.12); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.25); border-radius: 6px; padding: 2px 6px; font-size: 9px; text-decoration: none; display: inline-flex; align-items: center; gap: 3px; font-weight: 700; transition: all 0.2s;-webkit-tap-highlight-color:transparent;" onmouseover="this.style.background='rgba(6,182,212,0.25)'" onmouseout="this.style.background='rgba(6,182,212,0.12)'">
+                    📞 Llamar
+                  </a>
+                </div>
+              ` : ''}
+            </div>
+          ` : ''}
         </div>
-        <button class="btn-admin-cancelar" onclick="cancelarReservaAdmin('${slot}', '${escHtml(ocupado.lote)}')">✕ ANULAR</button>
+        <button class="btn-admin-cancelar" onclick="cancelarReservaAdmin('${slot}', '${escHtml(ocupado.lote)}')" style="flex-shrink: 0; margin-left: auto;">✕ ANULAR</button>
       </div>`;
     } else {
       html += `<div class="turno-card-admin disponible">
