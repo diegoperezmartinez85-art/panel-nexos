@@ -5347,19 +5347,21 @@
     // 2. Si falló el servidor, usar el motor de fallback simulado
     if (!exitoServidor) {
       ocupados = obtenerReservasSimuladas(reservaSelectedDateStr, reservaSelectedAmenity);
-      
-      // Integrar también mis reservas locales offline para esta fecha
-      const misReservasLocales = JSON.parse(localStorage.getItem('nx_mis_reservas') || '[]');
-      misReservasLocales.forEach(res => {
-        if (res.fecha === reservaSelectedDateStr && res.amenity === reservaSelectedAmenity) {
+    }
+    
+    // 3. Integrar siempre mis reservas locales para esta fecha (garantiza feedback inmediato sin delay del servidor)
+    const misReservasLocales = JSON.parse(localStorage.getItem('nx_mis_reservas') || '[]');
+    misReservasLocales.forEach(res => {
+      if (res.fecha === reservaSelectedDateStr && res.amenity && res.amenity.toLowerCase() === reservaSelectedAmenity.toLowerCase()) {
+        if (!ocupados.some(o => o.horario === res.horario)) {
           ocupados.push({
             horario: res.horario,
-            lote: 'Mi Lote',
+            lote: res.lote || 'Mi Lote',
             esMio: true
           });
         }
-      });
-    }
+      }
+    });
     
     // Renderizar celdas de turnos
     cont.innerHTML = '';
