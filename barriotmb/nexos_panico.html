@@ -3495,7 +3495,7 @@
     try { sessionStorage.setItem('nx_lp_s', tsStr); } catch(e) {}
   }
 
-  const PANIC_URL = 'https://script.google.com/macros/s/AKfycbwRNMfrj_t3IdhGFulnbFp6j06uB5XSb_uzA3au7jwKwcjdQ16KvBhahZdnfs9BrXZ8gQ/exec';
+  const PANIC_URL = 'https://script.google.com/macros/s/AKfycbwxwRkYPyYvQEhKqjaIVmKYXlxjgVw42BFnueSsaIzEXK4_tRgJ5_T2c-zW4ZggNvTyEw/exec';
 
 
   function actualizarOffline(){
@@ -3652,6 +3652,17 @@
     const err  = document.getElementById('setup-error');
     err.innerText = '';
     if (!mza || !casa){ err.innerText='Completá manzana y casa'; return; }
+    
+    // Registrar vinculación en el servidor de inmediato durante la configuración
+    fetch(`${PANIC_URL}?accion=vincular&deviceId=${encodeURIComponent(DEVICE_ID)}&mza=${encodeURIComponent(mza)}&casa=${encodeURIComponent(casa)}&t=${Date.now()}`)
+      .then(r => r.json())
+      .then(d => {
+        console.log('Vinculación registrada:', d);
+      })
+      .catch(e => {
+        console.error('Error al registrar vinculación:', e);
+      });
+
     localStorage.setItem('nx_manzana', mza);
     localStorage.setItem('nx_casa', casa);
     inicializar();

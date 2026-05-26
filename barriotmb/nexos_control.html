@@ -2008,11 +2008,29 @@
       <button class="btn-modal-action" style="background:var(--border);color:#888;margin-top:10px;" onclick="ocultarPinBaneo()">Cancelar</button>
     </div>
     <div id="ban-vista-form" style="display:none;">
-      <div class="campo-label">MANZANA *</div><input class="modal-search" id="ban-mza" placeholder="Ej: 5" inputmode="numeric">
-      <div class="campo-label">CASA *</div><input class="modal-search" id="ban-casa" placeholder="Ej: 12" inputmode="numeric">
-      <div class="campo-label">ID RESIDENTE (opcional)</div><input class="modal-search" id="ban-id" placeholder="DNI, nombre u otro ID">
+      <!-- Selector de Tipo de Baneo -->
+      <div class="campo-label" style="text-align:center;font-weight:bold;margin-bottom:6px;">TIPO DE BANEO</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button id="btn-ban-tipo-casa" class="btn-modal-action" style="margin:0;background:var(--purple);color:#fff;flex:1;font-size:12px;padding:8px 0;height:auto;" onclick="setBanTipoForm('casa')">Por Lote</button>
+        <button id="btn-ban-tipo-device" class="btn-modal-action" style="margin:0;background:var(--border);color:#888;flex:1;font-size:12px;padding:8px 0;height:auto;" onclick="setBanTipoForm('device')">Por Dispositivo</button>
+      </div>
+
+      <!-- Campos para Baneo por Casa -->
+      <div id="form-ban-casa-fields">
+        <div class="campo-label">MANZANA *</div><input class="modal-search" id="ban-mza" placeholder="Ej: 5" inputmode="numeric">
+        <div class="campo-label">CASA *</div><input class="modal-search" id="ban-casa" placeholder="Ej: 12" inputmode="numeric">
+        <div class="campo-label">ID RESIDENTE (opcional)</div><input class="modal-search" id="ban-id" placeholder="DNI, nombre u otro ID">
+      </div>
+
+      <!-- Campos para Baneo por Dispositivo -->
+      <div id="form-ban-device-fields" style="display:none;">
+        <div class="campo-label">DEVICE ID *</div><input class="modal-search" id="ban-device-id-input" placeholder="Ej: nx-6a8b2c1d">
+      </div>
+
+      <!-- Campos Comunes -->
       <div class="campo-label">MOTIVO</div><input class="modal-search" id="ban-motivo" placeholder="Motivo del baneo">
       <div class="gpin-error" id="ban-form-error"></div>
+      
       <button class="btn-modal-action" style="background:var(--purple);color:#fff;" onclick="confirmarBaneo()">🚷 BANEAR</button>
       <button class="btn-modal-action" style="background:var(--border);color:#888;" onclick="ocultarFormBaneo()">Cancelar</button>
     </div>
@@ -3160,10 +3178,12 @@ let DB=(()=>{const hoyStr=new Date().toLocaleDateString('es-AR');const raw=JSON.
 return raw.filter(r=>!r.hS||new Date(r.tsE||0).toLocaleDateString('es-AR')===hoyStr);})();
 let LISTA_NEGRA=JSON.parse(localStorage.getItem('nx_lista_negra')||'[]');
 let BANEADOS=JSON.parse(localStorage.getItem('nx_baneados')||'[]');
+let DEVICES_BANEADOS=JSON.parse(localStorage.getItem('nx_devices_baneados')||'[]');
 let sincronizando=false,panicosPendientes=[],_lastSyncTs=0;
 let audioCtx=null,sirenInterval=null;
 
 function guardarBaneados(){lsSet('nx_baneados',JSON.stringify(BANEADOS));}
+function guardarDevicesBaneados(){lsSet('nx_devices_baneados',JSON.stringify(DEVICES_BANEADOS));}
 function esBaneado(mza,casa){const mN=String(mza||'').trim(),cN=String(casa||'').trim();if(!mN||!cN)return false;return BANEADOS.some(b=>String(b.mza).trim()===mN&&String(b.casa).trim()===cN);}
 function verificarListaNegra(pat,dni){const match=LISTA_NEGRA.find(r=>(r.pat&&r.pat===pat)||(r.dni&&r.dni===dni&&dni));if(match)showToast('🚫 LISTA NEGRA: '+(match.pat||match.dni)+(match.motivo?' — '+match.motivo:''));}
 
@@ -3979,6 +3999,7 @@ async function sincronizar(manual=false){
     const cloudData=Array.isArray(data)?data:(data.activos||[]);
     const panico=Array.isArray(data)?[]:(data.panico||[]);
     if(data.baneados)cargarBaneadosDesdeCloud(data.baneados);
+    if(data.devicesBaneados)cargarDevicesBaneadosDesdeCloud(data.devicesBaneados);
     if(Array.isArray(data.listaNegra)&&data.listaNegra.length>0){LISTA_NEGRA=data.listaNegra;localStorage.setItem('nx_lista_negra',JSON.stringify(LISTA_NEGRA));}
     if(Array.isArray(data.vigiladores)&&data.vigiladores.length>0){VIGILADORES=data.vigiladores;localStorage.setItem('nx_vigiladores',JSON.stringify(VIGILADORES));}
     if(Array.isArray(data.propietarios)){PROPIETARIOS=data.propietarios;localStorage.setItem('nx_propietarios',JSON.stringify(PROPIETARIOS));if(typeof renderPropietarios==='function')renderPropietarios();}
@@ -4051,6 +4072,7 @@ function enviar(datos){
     .catch(()=>{_colaOffline.push(datos);_guardarCola();showToast('⚠️ Sin red — guardado en cola');registrarBackgroundSync();});
 }
 function cargarBaneadosDesdeCloud(bC){if(!Array.isArray(bC))return;BANEADOS=bC.map(b=>({mza:String(b.mza||''),casa:String(b.casa||''),id:b.id||'',motivo:b.motivo||'',ts:b.ts||Date.now()}));guardarBaneados();}
+function cargarDevicesBaneadosDesdeCloud(dC){if(!Array.isArray(dC))return;DEVICES_BANEADOS=dC.map(d=>({deviceId:String(d.deviceId||''),motivo:d.motivo||'',ts:d.ts||Date.now()}));guardarDevicesBaneados();}
 
 // ── VIGILADORES ONLINE ─────────────────────────────────────
 let _vigsOnline = [];
@@ -4662,23 +4684,206 @@ function verificarReset(){if(resetPin===PIN_CORRECTO){const activos=DB.filter(x=
 
 // ── BANEO ──────────────────────────────────────────────────
 let banPinActual='';
-function renderBaneados(){const cont=document.getElementById('ban-lista-contenido');if(!BANEADOS.length){cont.innerHTML='<div class="empty-msg">Sin vecinos baneados 🟢</div>';return;}cont.innerHTML=BANEADOS.slice().sort((a,b)=>b.ts-a.ts).map((b,idx)=>`<div class="ban-item"><div class="ban-item-info"><span class="ban-badge">🚷 BANEADO</span><div class="ban-item-id">Mza ${escHtml(String(b.mza))} — Casa ${escHtml(String(b.casa))}</div>${b.id?`<div class="ban-item-det">ID: ${escHtml(b.id)}</div>`:''} ${b.motivo?`<div class="ban-item-det" style="color:#e74c3c">⚠️ ${escHtml(b.motivo)}</div>`:''}</div><button class="ban-unban-btn" onclick="pedirPinDesbanear(${idx})">DESBANEAR</button></div>`).join('');}
-function desbanear(idx){const b=BANEADOS[idx];if(!b)return;BANEADOS.splice(idx,1);guardarBaneados();enviarBaneo({accion:'desbanear',mza:b.mza,casa:b.casa});renderBaneados();showToast(`✅ Mza ${b.mza} Casa ${b.casa} desbaneada`);}
-let desbanearIdx=-1,desPinActual='';
-function pedirPinDesbanear(idx){desbanearIdx=idx;desPinActual='';actualizarDesPuntos();document.getElementById('des-pin-error').innerText='';document.getElementById('modal-desbanear').classList.add('visible');}
-function actualizarDesPuntos(){for(let i=0;i<4;i++)document.getElementById('dp'+i).classList.toggle('lleno',i<desPinActual.length);}
+let currentBanTipo = 'casa';
+
+function setBanTipoForm(tipo) {
+  currentBanTipo = tipo;
+  const btnCasa = document.getElementById('btn-ban-tipo-casa');
+  const btnDev = document.getElementById('btn-ban-tipo-device');
+  const divCasa = document.getElementById('form-ban-casa-fields');
+  const divDev = document.getElementById('form-ban-device-fields');
+  
+  if (tipo === 'casa') {
+    if (btnCasa) { btnCasa.style.background = 'var(--purple)'; btnCasa.style.color = '#fff'; }
+    if (btnDev) { btnDev.style.background = 'var(--border)'; btnDev.style.color = '#888'; }
+    if (divCasa) divCasa.style.display = 'block';
+    if (divDev) divDev.style.display = 'none';
+  } else {
+    if (btnCasa) { btnCasa.style.background = 'var(--border)'; btnCasa.style.color = '#888'; }
+    if (btnDev) { btnDev.style.background = 'var(--purple)'; btnDev.style.color = '#fff'; }
+    if (divCasa) divCasa.style.display = 'none';
+    if (divDev) divDev.style.display = 'block';
+  }
+  const errEl = document.getElementById('ban-form-error');
+  if (errEl) errEl.innerText = '';
+}
+
+function renderBaneados(){
+  const cont = document.getElementById('ban-lista-contenido');
+  if (!cont) return;
+  const items = [];
+  
+  BANEADOS.forEach((b, idx) => {
+    items.push({
+      tipo: 'casa',
+      key: `casa-${idx}`,
+      title: `Mza ${escHtml(String(b.mza))} — Casa ${escHtml(String(b.casa))}`,
+      subtitle: b.id ? `ID: ${escHtml(b.id)}` : '',
+      motivo: b.motivo || '',
+      ts: b.ts || 0,
+      idx: idx
+    });
+  });
+  
+  DEVICES_BANEADOS.forEach((d, idx) => {
+    items.push({
+      tipo: 'device',
+      key: `device-${idx}`,
+      title: `Dispositivo: ${escHtml(d.deviceId)}`,
+      subtitle: `Baneo por ID`,
+      motivo: d.motivo || '',
+      ts: d.ts || 0,
+      idx: idx
+    });
+  });
+  
+  if (!items.length) {
+    cont.innerHTML = '<div class="empty-msg">Sin vecinos ni dispositivos baneados 🟢</div>';
+    return;
+  }
+  
+  cont.innerHTML = items.sort((a,b)=>b.ts-a.ts).map(item => `
+    <div class="ban-item">
+      <div class="ban-item-info">
+        <span class="ban-badge" style="background:${item.tipo === 'device' ? '#9b59b6' : '#e74c3c'}">
+          ${item.tipo === 'device' ? '📱 DISPOSITIVO' : '🚷 VECINO'}
+        </span>
+        <div class="ban-item-id">${item.title}</div>
+        ${item.subtitle ? `<div class="ban-item-det">${item.subtitle}</div>` : ''}
+        ${item.motivo ? `<div class="ban-item-det" style="color:#e74c3c">⚠️ ${escHtml(item.motivo)}</div>` : ''}
+      </div>
+      <button class="ban-unban-btn" onclick="pedirPinDesbanear('${item.tipo}', ${item.idx})">DESBANEAR</button>
+    </div>
+  `).join('');
+}
+
+function desbanear(tipo, idx){
+  if(tipo === 'casa') {
+    const b=BANEADOS[idx];
+    if(!b)return;
+    BANEADOS.splice(idx,1);
+    guardarBaneados();
+    enviarBaneo({accion:'desbanear',mza:b.mza,casa:b.casa});
+    renderBaneados();
+    showToast(`✅ Mza ${b.mza} Casa ${b.casa} desbaneada`);
+  } else if(tipo === 'device') {
+    const d=DEVICES_BANEADOS[idx];
+    if(!d)return;
+    DEVICES_BANEADOS.splice(idx,1);
+    guardarDevicesBaneados();
+    enviarBaneo({accion:'desbanear_device',deviceId:d.deviceId});
+    renderBaneados();
+    showToast(`✅ Dispositivo ${d.deviceId} desbaneado`);
+  }
+}
+
+let desbanearTipo='', desbanearIdx=-1, desPinActual='';
+
+function pedirPinDesbanear(tipo, idx){
+  desbanearTipo=tipo;
+  desbanearIdx=idx;
+  desPinActual='';
+  actualizarDesPuntos();
+  const err = document.getElementById('des-pin-error');
+  if (err) err.innerText='';
+  const m = document.getElementById('modal-desbanear');
+  if (m) m.classList.add('visible');
+}
+
+function actualizarDesPuntos(){
+  for(let i=0;i<4;i++) {
+    const el = document.getElementById('dp'+i);
+    if (el) el.classList.toggle('lleno',i<desPinActual.length);
+  }
+}
 function desPinTecla(d){if(desPinActual.length>=4)return;desPinActual+=d;actualizarDesPuntos();if(desPinActual.length===4)setTimeout(verificarDesPin,120);}
-function desPinBorrar(){desPinActual=desPinActual.slice(0,-1);actualizarDesPuntos();document.getElementById('des-pin-error').innerText='';}
-function verificarDesPin(){if(desPinActual===PIN_CORRECTO){cerrarModal('modal-desbanear');desbanear(desbanearIdx);desbanearIdx=-1;}else{document.getElementById('des-pin-error').innerText='CLAVE INCORRECTA';desPinActual='';actualizarDesPuntos();}}
+function desPinBorrar(){desPinActual=desPinActual.slice(0,-1);actualizarDesPuntos();const err = document.getElementById('des-pin-error');if (err) err.innerText='';}
+
+function verificarDesPin(){
+  if(desPinActual===PIN_CORRECTO){
+    cerrarModal('modal-desbanear');
+    desbanear(desbanearTipo, desbanearIdx);
+    desbanearTipo='';
+    desbanearIdx=-1;
+  }else{
+    const err = document.getElementById('des-pin-error');
+    if (err) err.innerText='CLAVE INCORRECTA';
+    desPinActual='';
+    actualizarDesPuntos();
+  }
+}
+
 function abrirBaneo(){renderBaneados();document.getElementById('ban-vista-consulta').style.display='block';document.getElementById('ban-vista-pin').style.display='none';document.getElementById('ban-vista-form').style.display='none';abrirModal('modal-baneo');}
 function mostrarPinBaneo(){banPinActual='';actualizarBanPuntos();document.getElementById('ban-pin-error').innerText='';document.getElementById('ban-vista-consulta').style.display='none';document.getElementById('ban-vista-pin').style.display='block';document.getElementById('ban-vista-form').style.display='none';}
 function ocultarPinBaneo(){document.getElementById('ban-vista-consulta').style.display='block';document.getElementById('ban-vista-pin').style.display='none';document.getElementById('ban-vista-form').style.display='none';}
-function actualizarBanPuntos(){for(let i=0;i<4;i++)document.getElementById('bp'+i).classList.toggle('lleno',i<banPinActual.length);}
+function actualizarBanPuntos(){for(let i=0;i<4;i++){const el=document.getElementById('bp'+i);if(el)el.classList.toggle('lleno',i<banPinActual.length);}}
 function banPinTecla(d){if(banPinActual.length>=4)return;banPinActual+=d;actualizarBanPuntos();if(banPinActual.length===4)setTimeout(verificarBanPin,120);}
-function banPinBorrar(){banPinActual=banPinActual.slice(0,-1);actualizarBanPuntos();document.getElementById('ban-pin-error').innerText='';}
-function verificarBanPin(){if(banPinActual===PIN_CORRECTO){document.getElementById('ban-vista-pin').style.display='none';document.getElementById('ban-vista-form').style.display='block';['ban-mza','ban-casa','ban-id','ban-motivo'].forEach(id=>document.getElementById(id).value='');document.getElementById('ban-form-error').innerText='';}else{document.getElementById('ban-pin-error').innerText='CLAVE INCORRECTA';banPinActual='';actualizarBanPuntos();}}
+function banPinBorrar(){banPinActual=banPinActual.slice(0,-1);actualizarBanPuntos();const err=document.getElementById('ban-pin-error');if(err)err.innerText='';}
+
+function verificarBanPin(){
+  if(banPinActual===PIN_CORRECTO){
+    document.getElementById('ban-vista-pin').style.display='none';
+    document.getElementById('ban-vista-form').style.display='block';
+    setBanTipoForm('casa');
+    ['ban-mza','ban-casa','ban-id','ban-motivo','ban-device-id-input'].forEach(id=>{
+      const el = document.getElementById(id);
+      if (el) el.value='';
+    });
+    const err = document.getElementById('ban-form-error');
+    if(err)err.innerText='';
+  }else{
+    const err = document.getElementById('ban-pin-error');
+    if(err)err.innerText='CLAVE INCORRECTA';
+    banPinActual='';
+    actualizarBanPuntos();
+  }
+}
+
 function ocultarFormBaneo(){document.getElementById('ban-vista-consulta').style.display='block';document.getElementById('ban-vista-form').style.display='none';}
-function confirmarBaneo(){const mza=document.getElementById('ban-mza').value.trim(),casa=document.getElementById('ban-casa').value.trim(),id=document.getElementById('ban-id').value.trim(),motivo=document.getElementById('ban-motivo').value.trim();const errEl=document.getElementById('ban-form-error');if(!mza||!casa){errEl.innerText='Manzana y Casa son obligatorios';return;}if(esBaneado(mza,casa)){errEl.innerText='Esta casa ya está baneada';return;}BANEADOS.push({mza,casa,id,motivo,ts:Date.now()});guardarBaneados();enviarBaneo({accion:'banear',mza,casa,id,motivo});showToast(`🚷 Mza ${mza} Casa ${casa} baneada`);ocultarFormBaneo();renderBaneados();}
+
+function confirmarBaneo(){
+  const errEl = document.getElementById('ban-form-error');
+  const motivo = document.getElementById('ban-motivo').value.trim();
+  
+  if (currentBanTipo === 'casa') {
+    const mza = document.getElementById('ban-mza').value.trim();
+    const casa = document.getElementById('ban-casa').value.trim();
+    const id = document.getElementById('ban-id').value.trim();
+    
+    if(!mza || !casa){
+      if(errEl)errEl.innerText = 'Manzana y Casa son obligatorios';
+      return;
+    }
+    if(esBaneado(mza,casa)){
+      if(errEl)errEl.innerText = 'Esta casa ya está baneada';
+      return;
+    }
+    
+    BANEADOS.push({mza,casa,id,motivo,ts:Date.now()});
+    guardarBaneados();
+    enviarBaneo({accion:'banear',mza,casa,id,motivo});
+    showToast(`🚷 Mza ${mza} Casa ${casa} baneada`);
+  } else {
+    const devId = document.getElementById('ban-device-id-input').value.trim();
+    if(!devId){
+      if(errEl)errEl.innerText = 'El Device ID es obligatorio';
+      return;
+    }
+    if(DEVICES_BANEADOS.some(d => d.deviceId === devId)){
+      if(errEl)errEl.innerText = 'Este dispositivo ya está baneado';
+      return;
+    }
+    
+    DEVICES_BANEADOS.push({deviceId: devId, motivo, ts:Date.now()});
+    guardarDevicesBaneados();
+    enviarBaneo({accion:'banear_device',deviceId: devId, motivo});
+    showToast(`📱 Dispositivo ${devId} baneado`);
+  }
+  
+  ocultarFormBaneo();
+  renderBaneados();
+}
+
 function enviarBaneo(datos){const url=localStorage.getItem('nx_url');if(!url)return;fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)}).catch(()=>{});}
 
 // ── PROPIETARIOS ───────────────────────────────────────────
