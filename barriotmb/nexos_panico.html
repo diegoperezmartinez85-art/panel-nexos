@@ -208,7 +208,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 18px;
+      gap: 12px;
     }
     .pantalla-panico.visible {
       display: flex;
@@ -1749,13 +1749,22 @@
       height: 5px;
       border-radius: 50%;
       background: currentColor;
-      animation: livePulse 1.8s ease-in-out infinite;
+      animation: livePulse 1.6s ease-in-out infinite;
       flex-shrink: 0;
       margin-left: 2px;
     }
+    .marquesina-badge.modo-mural::after {
+      box-shadow: 0 0 6px 2px rgba(6, 182, 212, 0.7);
+    }
+    .marquesina-badge.modo-dolar::after {
+      box-shadow: 0 0 6px 2px rgba(34, 197, 94, 0.7);
+    }
+    .marquesina-badge.modo-mundo::after {
+      box-shadow: 0 0 6px 2px rgba(168, 85, 247, 0.7);
+    }
     @keyframes livePulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.3; transform: scale(0.7); }
+      0%, 100% { opacity: 1; transform: scale(1); box-shadow: inherit; }
+      50% { opacity: 0.25; transform: scale(0.65); box-shadow: none; }
     }
     .marquesina-track {
       flex: 1;
@@ -1771,10 +1780,7 @@
       height: 100%;
       white-space: nowrap;
       will-change: transform;
-      animation: marquee-scroll 7s linear infinite;
-    }
-    .marquesina-ticker.fast {
-      animation-duration: 4s;
+      animation: marquee-scroll 30s linear infinite;
     }
     .marquesina-ticker.paused {
       animation-play-state: paused;
@@ -1810,7 +1816,7 @@
     }
     @keyframes marquee-scroll {
       0%   { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
+      100% { transform: translateX(var(--ticker-dist, -50%)); }
     }
     .marquesina-dot {
       width: 3px;
@@ -2948,6 +2954,25 @@
       transform: scale(0.97);
     }
     
+    /* ── BUTTON GROUPS (jerarquía visual) ── */
+    .btn-group-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 350px;
+    }
+    .btn-group-secondary {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 350px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      margin-top: 2px;
+    }
+
     /* Discreto Switch Styling */
     .discreto-row {
       display: flex;
@@ -3188,33 +3213,39 @@
     </button>
   </div>
   <div class="lp-hint" id="lp-hint">Mantené presionado para activar</div>
-  <button class="btn-tipo-trigger shimmer-effect" id="btn-tipo-trigger" onclick="abrirTipo(event)">
-    <svg class="btn-icon-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-    </svg>
-    Reportar Tipo de Alerta
-  </button>
-  <button class="btn-visita-trigger shimmer-effect" id="btn-visita-trigger" onclick="abrirInvitaciones()">
-    <svg class="btn-icon-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="3" y="3" width="7" height="7" rx="1"/>
-      <rect x="14" y="3" width="7" height="7" rx="1"/>
-      <rect x="3" y="14" width="7" height="7" rx="1"/>
-      <path d="M14 14h1M18 14h3M14 18h3M18 18h3M14 21h7"/>
-    </svg>
-    Pre-autorizar Visita (QR)
-  </button>
-  <div class="aviso-cooldown" id="aviso-cooldown">
-    ✅ Alerta recibida por el vigilador.<br>
-    Podés volver a enviar en <span id="cooldown-restante">15:00</span>
+  <!-- Grupo principal: acciones de alerta y visita -->
+  <div class="btn-group-actions">
+    <button class="btn-tipo-trigger shimmer-effect" id="btn-tipo-trigger" onclick="abrirTipo(event)">
+      <svg class="btn-icon-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      Reportar Tipo de Alerta
+    </button>
+    <button class="btn-visita-trigger shimmer-effect" id="btn-visita-trigger" onclick="abrirInvitaciones()">
+      <svg class="btn-icon-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1"/>
+        <rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/>
+        <path d="M14 14h1M18 14h3M14 18h3M18 18h3M14 21h7"/>
+      </svg>
+      Pre-autorizar Visita (QR)
+    </button>
+    <div class="aviso-cooldown" id="aviso-cooldown">
+      ✅ Alerta recibida por el vigilador.<br>
+      Podés volver a enviar en <span id="cooldown-restante">15:00</span>
+    </div>
   </div>
-  <button class="btn-cfg-main shimmer-effect" onclick="pedirPinParaCambiar()">
-    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-      <circle cx="12" cy="10" r="3"/>
-    </svg>
-    Cambiar ubicación
-  </button>
+  <!-- Grupo secundario: configuración y social -->
+  <div class="btn-group-secondary">
+    <button class="btn-cfg-main shimmer-effect" onclick="pedirPinParaCambiar()">
+      <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+        <circle cx="12" cy="10" r="3"/>
+      </svg>
+      Cambiar ubicación
+    </button>
+  </div>
   <a class="ig-link" href="https://www.instagram.com/nexosmaps?igsh=MThvc241Y2JhNmhvcQ%3D%3D&utm_source=qr" target="_blank" rel="noopener">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
     @nexosmaps
@@ -6008,12 +6039,18 @@
       const r = await fetch('https://dolarapi.com/v1/dolares', { signal: AbortSignal.timeout(5000) });
       if (r.ok) {
         const data = await r.json();
-        _marquesinaData.dolar = data.map(d => {
+        const items = [];
+        data.forEach(d => {
           const nombre = d.nombre || d.casa || '—';
-          const compra = d.compra ? '💵 Compra: $' + d.compra.toLocaleString('es-AR') : '';
-          const venta  = d.venta  ? '  Venta: $' + d.venta.toLocaleString('es-AR')  : '';
-          return `💱 ${nombre}${compra}${venta}`;
+          if (d.compra && d.venta) {
+            items.push(`💱 ${nombre} · Comprá $${d.compra.toLocaleString('es-AR')} · Vendé $${d.venta.toLocaleString('es-AR')}`);
+          } else if (d.compra) {
+            items.push(`💱 ${nombre} · Comprá $${d.compra.toLocaleString('es-AR')}`);
+          } else if (d.venta) {
+            items.push(`💱 ${nombre} · Vendé $${d.venta.toLocaleString('es-AR')}`);
+          }
         });
+        _marquesinaData.dolar = items;
         return;
       }
     } catch(e) {}
@@ -6145,12 +6182,24 @@
     else if (_marquesinaMode === 2) cls = 'mundo-item';
 
     ticker.innerHTML = makeItems(cls) + makeItems(cls);
-    ticker.classList.toggle('fast', _marquesinaMode === 2);
 
-    // Reset animation
+    // Detener animacion antes de medir
     ticker.style.animation = 'none';
-    ticker.offsetHeight; // reflow
-    ticker.style.animation = '';
+    ticker.style.transform = 'translateX(0)';
+
+    // Velocidad en px/s
+    const pxPerSecond = _marquesinaMode === 1 ? 65 : (_marquesinaMode === 2 ? 65 : 38);
+
+    // Doble rAF: primer frame pinta el DOM, segundo frame ya tiene dimensiones reales
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const halfWidth = ticker.scrollWidth / 2; // mitad porque el contenido esta duplicado
+        const duration = Math.max(5, halfWidth / pxPerSecond);
+        // Usar variable CSS para que el keyframe conozca la distancia exacta
+        ticker.style.setProperty('--ticker-dist', `-${halfWidth}px`);
+        ticker.style.animation = `marquee-scroll ${duration.toFixed(1)}s linear infinite`;
+      });
+    });
   }
 
   // Inicializar marquesina cuando se cargue la pantalla principal
