@@ -1461,6 +1461,7 @@
       padding: 24px 20px 32px;
       border-top: 1.5px solid rgba(245, 158, 11, 0.35);
       box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(245, 158, 11, 0.08);
+      position: relative;
     }
     .tipo-handle {
       width: 40px;
@@ -1637,6 +1638,9 @@
       transform: scale(0.96);
       background: rgba(39, 39, 42, 0.7);
     }
+
+
+
     .clima-chip-icon {
       font-size: 16px;
       line-height: 1;
@@ -1667,33 +1671,217 @@
       margin-left: 2px;
     }
 
+    /* ── MARQUESINA NEXOS ── */
+    .marquesina-wrap {
+      width: 100%;
+      max-width: 380px;
+      margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 14px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: opacity 0.2s, transform 0.2s;
+      filter: drop-shadow(0 2px 10px rgba(0,0,0,0.4));
+    }
+    .marquesina-wrap:active {
+      opacity: 0.8;
+      transform: scale(0.99);
+    }
+    .marquesina-inner {
+      display: flex;
+      align-items: center;
+      height: 36px;
+      background: linear-gradient(135deg, rgba(15, 15, 20, 0.92) 0%, rgba(22, 22, 30, 0.88) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    /* Línea superior brillante (premium) */
+    .marquesina-inner::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(to right, transparent 0%, rgba(255,255,255,0.18) 40%, rgba(255,255,255,0.18) 60%, transparent 100%);
+      z-index: 3;
+    }
+    .marquesina-badge {
+      flex-shrink: 0;
+      padding: 0 12px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      font-size: 8.5px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border-right: 1px solid rgba(255,255,255,0.08);
+      white-space: nowrap;
+      transition: background 0.4s, color 0.4s;
+      z-index: 2;
+      gap: 5px;
+    }
+    .marquesina-badge.modo-mural {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.18) 0%, rgba(6, 182, 212, 0.08) 100%);
+      color: #22d3ee;
+      text-shadow: 0 0 8px rgba(6,182,212,0.5);
+    }
+    .marquesina-badge.modo-dolar {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.18) 0%, rgba(34, 197, 94, 0.08) 100%);
+      color: #4ade80;
+      text-shadow: 0 0 8px rgba(34,197,94,0.5);
+    }
+    .marquesina-badge.modo-mundo {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.18) 0%, rgba(168, 85, 247, 0.08) 100%);
+      color: #c084fc;
+      text-shadow: 0 0 8px rgba(168,85,247,0.5);
+    }
+    /* Indicador live parpadeante */
+    .marquesina-badge::after {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: livePulse 1.8s ease-in-out infinite;
+      flex-shrink: 0;
+      margin-left: 2px;
+    }
+    @keyframes livePulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.7); }
+    }
+    .marquesina-track {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      height: 100%;
+      mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+    }
+    .marquesina-ticker {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      white-space: nowrap;
+      will-change: transform;
+      animation: marquee-scroll 7s linear infinite;
+    }
+    .marquesina-ticker.fast {
+      animation-duration: 4s;
+    }
+    .marquesina-ticker.paused {
+      animation-play-state: paused;
+    }
+    .marquesina-item {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #e4e4e7;
+      padding: 0 20px;
+      gap: 6px;
+      letter-spacing: 0.25px;
+    }
+    .marquesina-item .m-sep {
+      color: rgba(255,255,255,0.2);
+      margin: 0 4px;
+    }
+    .marquesina-item.dolar-item {
+      color: #86efac;
+      font-weight: 700;
+    }
+    .marquesina-item.dolar-item .dolar-label {
+      color: #6ee7b7;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .marquesina-item.mundo-item {
+      color: #d8b4fe;
+      font-weight: 600;
+    }
+    @keyframes marquee-scroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .marquesina-dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.35;
+      display: inline-block;
+      margin: 0 12px;
+      flex-shrink: 0;
+    }
+
     /* ── MODAL PRONÓSTICO ── */
     .clima-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(9, 9, 11, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(9, 9, 12, 0.82);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
       z-index: 8000;
       align-items: flex-end;
       justify-content: center;
       padding: 0;
+      cursor: pointer; /* Prevenir bugs de clicks/taps en Safari móvil */
     }
     .clima-overlay.visible {
       display: flex;
-      animation: fadeIn 0.2s ease;
+      animation: fadeIn 0.25s ease;
     }
     .clima-sheet {
+      position: relative;
       width: 100%;
       max-width: 420px;
-      background: rgba(24, 24, 27, 0.85);
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
-      border-radius: 26px 26px 0 0;
-      padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
-      border-top: 1px solid rgba(6, 182, 212, 0.25);
-      box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.6);
+      background: rgba(14, 14, 18, 0.82);
+      backdrop-filter: blur(32px);
+      -webkit-backdrop-filter: blur(32px);
+      border-radius: 32px 32px 0 0;
+      padding: 22px 20px calc(20px + env(safe-area-inset-bottom, 12px));
+      border-top: 1.5px solid rgba(6, 182, 212, 0.35);
+      box-shadow: 0 -8px 42px rgba(0, 0, 0, 0.72);
+      overflow: hidden;
+    }
+    /* Partículas atmosféricas de fondo dinámicas */
+    .clima-sheet::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      left: -40px;
+      width: 140px;
+      height: 140px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.22) 0%, transparent 70%);
+      filter: blur(20px);
+      pointer-events: none;
+      animation: atmosphericDrift 10s ease-in-out infinite alternate;
+    }
+    .clima-sheet::after {
+      content: '';
+      position: absolute;
+      bottom: -40px;
+      right: -40px;
+      width: 160px;
+      height: 160px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.16) 0%, transparent 70%);
+      filter: blur(25px);
+      pointer-events: none;
+      animation: atmosphericDrift 12s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes atmosphericDrift {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(30px, 20px) scale(1.15); }
     }
     .clima-handle {
       width: 36px;
@@ -1790,16 +1978,27 @@
       font-size: 13px;
     }
     .clima-cerrar {
+      display: block;
+      width: 100%;
       text-align: center;
-      color: #71717a;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
       font-size: 13px;
+      font-weight: 800;
+      padding: 12px;
+      border-radius: 16px;
       cursor: pointer;
-      margin-top: 16px;
-      padding: 6px;
-      transition: color 0.2s;
+      margin-top: 18px;
+      box-sizing: border-box;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
     }
     .clima-cerrar:active {
-      color: white;
+      transform: scale(0.97);
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.25);
     }
 
     /* ── CUSTOM PREMIUM SCROLLBARS ── */
@@ -2050,59 +2249,63 @@
       transform: translateX(-50%);
       width: 100%;
       max-width: 420px;
-      height: 70px;
-      background: rgba(18, 18, 20, 0.85);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      height: 76px; /* Aumentado para respiración premium y iPhone home indicator */
+      background: rgba(12, 12, 16, 0.82);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border-top: 1px solid rgba(255, 255, 255, 0.09);
       display: flex;
       align-items: center;
       justify-content: space-around;
       z-index: 8500;
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-      box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.5);
+      padding-bottom: env(safe-area-inset-bottom, 12px);
+      box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.03);
     }
     .nav-item {
       background: none;
       border: none;
-      color: #71717a;
+      color: rgba(255, 255, 255, 0.45); /* Aumentado el contraste de inactivos para que no pasen desapercibidos */
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      font-size: 11px;
+      gap: 5px;
+      font-size: 11.5px;
       font-weight: 700;
       cursor: pointer;
       flex: 1;
       height: 100%;
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       -webkit-tap-highlight-color: transparent;
+      padding-top: 6px;
     }
     .nav-item svg {
-      transition: transform 0.2s ease;
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .nav-item:active svg {
-      transform: scale(0.9);
+      transform: scale(0.85);
     }
     .nav-item.active {
       color: var(--ac);
-      text-shadow: 0 0 10px rgba(var(--acr), 0.3);
+      text-shadow: 0 0 12px rgba(var(--acr), 0.4);
+      transform: translateY(-1px);
     }
     .nav-item.active svg {
-      filter: drop-shadow(0 0 8px rgba(var(--acr), 0.5));
+      filter: drop-shadow(0 0 8px rgba(var(--acr), 0.55));
+      transform: scale(1.05);
     }
     
     .nav-indicator {
       position: absolute;
-      top: 0;
+      top: 6px; /* Decoplada: bajada 6px desde el borde superior */
       left: 0;
       width: 25%;
-      height: 3px;
-      background: var(--ac);
-      box-shadow: 0 0 10px var(--ac), 0 0 5px var(--ac);
-      border-radius: 0 0 4px 4px;
-      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      height: 4px; /* Grosor premium */
+      /* Cápsula de neón flotante centrada ocupando el 50% central del botón */
+      background: linear-gradient(90deg, transparent 25%, var(--ac) 25%, var(--ac) 75%, transparent 75%);
+      box-shadow: 0 2px 10px var(--ac), 0 0 5px var(--ac);
+      border-radius: 99px;
+      transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
       z-index: 8600;
     }
     .nav-icon-badge-wrap {
@@ -2141,18 +2344,19 @@
       border-radius: 4px;
     }
     .comunicado-card {
-      background: rgba(28, 28, 30, 0.45);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 18px;
-      padding: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px; /* Esquinas un toque más modernas y redondeadas */
+      padding: 18px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
       text-align: left;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
       animation: slideInUp 0.4s ease both;
+      transition: all 0.25s ease;
     }
     .comunicado-card-header {
       display: flex;
@@ -2199,16 +2403,18 @@
       -webkit-tap-highlight-color: transparent;
     }
     .dir-card {
-      background: rgba(28, 28, 30, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px; /* Redondeado premium uniforme */
       padding: 14px 16px;
       display: flex;
       align-items: center;
       gap: 14px;
       text-align: left;
-      transition: all 0.2s;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
     .dir-card:active {
       transform: scale(0.97);
@@ -2317,13 +2523,13 @@
     /* Calendario */
     .reserva-calendario-container {
       width: 100%;
-      background: rgba(24, 24, 27, 0.55);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 20px;
       padding: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
     .calendar-header {
       display: flex;
@@ -2941,12 +3147,30 @@
   <div class="nexos-logo-top">
     <img id="panico-logo-img" src="" alt="NEXOS">
   </div>
-  <div class="info-config">Configurado: <strong id="config-display"></strong></div>
+  <div class="info-config" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+    <span>Configurado: <strong id="config-display"></strong></span>
+    <span onclick="abrirModal('modal-novedades-sistema-panico')" style="cursor: pointer; background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.3); color: var(--ac); font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 20px;" title="Ver Novedades v.1.2">v.1.2 ℹ️</span>
+  </div>
   <div class="clima-chip" id="clima-chip" onclick="abrirPronostico()">
     <span class="clima-chip-icon" id="chip-icon">🌤️</span>
     <span class="clima-chip-temp" id="chip-temp">17°</span>
     <span class="clima-chip-hora" id="chip-hora">--:--</span>
   </div>
+
+  <!-- ── MARQUESINA ── -->
+  <div class="marquesina-wrap" id="marquesina-wrap" onclick="marquesinaToggleModo()">
+    <div class="marquesina-inner">
+      <div class="marquesina-badge modo-mural" id="marquesina-badge">📋 MURAL</div>
+      <div class="marquesina-track">
+        <div class="marquesina-ticker" id="marquesina-ticker">
+          <span class="marquesina-item">Cargando noticias del barrio…</span>
+          <span class="marquesina-item">Cargando noticias del barrio…</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   <div class="boton-redondo-container">
     <svg class="cooldown-ring" viewBox="0 0 280 280">
       <circle cx="140" cy="140" r="126" id="cooldown-circle"/>
@@ -3182,9 +3406,8 @@
 </div>
 
 <!-- PIN PARA CAMBIAR UBICACIÓN -->
-<div class="pin-panel" id="pin-panel">
-  
-  <div class="pin-content">
+<div class="pin-panel" id="pin-panel" onclick="cerrarPin()" style="cursor: pointer;">
+  <div class="pin-content" onclick="event.stopPropagation()" style="cursor: default;">
     <div class="pin-title" id="pin-title-label">🔑 PIN de administrador</div>
     <div class="pin-sub" id="pin-sub-label">Para cambiar la ubicación necesitás el PIN.<br>Pedíselo a la administración del barrio.</div>
     <input class="pin-campo" id="pin-input" type="password" inputmode="numeric" maxlength="6" placeholder="····">
@@ -3196,17 +3419,45 @@
 
 <!-- MODAL PRONÓSTICO -->
 <div class="clima-overlay" id="clima-overlay" onclick="cerrarPronostico(event)">
-  <div class="clima-sheet">
+  <div class="clima-sheet" onclick="event.stopPropagation()">
     <div class="clima-handle"></div>
     <div id="clima-contenido"><div class="clima-loading">⏳ Cargando pronóstico...</div></div>
     <div class="clima-cerrar" onclick="cerrarPronosticoManual()">Cerrar</div>
   </div>
 </div>
 
+<!-- MODAL DE NOVEDADES DEL ECO-SISTEMA VECINO -->
+<div class="modal-overlay" id="modal-novedades-sistema-panico" onclick="cerrarModal('modal-novedades-sistema-panico')" style="display: none; position: fixed; inset: 0; background: rgba(9, 9, 12, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 9500; align-items: center; justify-content: center; padding: 20px; cursor: pointer;">
+  <div class="modal-box" onclick="event.stopPropagation()" style="background: rgba(14, 14, 18, 0.85); backdrop-filter: blur(30px); border-radius: 24px; border: 1.5px solid rgba(6, 182, 212, 0.35); padding: 22px; width: 100%; max-width: 380px; box-shadow: 0 10px 45px rgba(0, 0, 0, 0.7); box-sizing: border-box; text-align: center; position: relative; cursor: default;">
+    <button class="modal-close" onclick="cerrarModal('modal-novedades-sistema-panico')" style="position: absolute; top: 16px; right: 16px; background: none; border: none; color: #a1a1aa; font-size: 20px; cursor: pointer;">✕</button>
+    <div class="modal-title" style="color: var(--ac); font-size: 17px; font-weight: 900; margin-bottom: 18px; letter-spacing: 0.5px;">🚀 VECINO NEXOS v.1.2</div>
+    <div style="font-size: 12px; color: #d4d4d8; line-height: 1.6; display: flex; flex-direction: column; gap: 12px; max-height: 320px; overflow-y: auto; padding-right: 4px; text-align: left;">
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(6, 182, 212, 0.2); padding: 12px; border-radius: 12px;">
+        <strong style="color: var(--ac); display:block; margin-bottom:4px; font-size:12.5px;">⚡ SOS Táctil Ultra-Sensible</strong>
+        Bypass del retraso móvil de 300ms. La cuenta regresiva y la micro-vibración física arrancan de inmediato al tocar la pantalla.
+      </div>
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(245, 158, 11, 0.2); padding: 12px; border-radius: 12px;">
+        <strong style="color: #f59e0b; display:block; margin-bottom:4px; font-size:12.5px;">🤫 Modo Pánico Sigiloso</strong>
+        Al disparar pánico por "Robo/Intruso", la pantalla entra en negro OLED absoluto y silencia sonidos para no revelar tu ubicación en escondites.
+      </div>
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 12px;">
+        <strong style="color: #10b981; display:block; margin-bottom:4px; font-size:12.5px;">📵 Envío de Contingencia Offline</strong>
+        Si te quedas sin datos o Wi-Fi durante el pánico, el envío queda en cola local de contingencia y se retransmite al recuperar señal.
+      </div>
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(139, 92, 246, 0.2); padding: 12px; border-radius: 12px;">
+        <strong style="color: #8b5cf6; display:block; margin-bottom:4px; font-size:12.5px;">🔮 Interfaz Premium Glassmorphic</strong>
+        Menú de navegación inferior desacoplado con cápsula flotante activa y tarjetas con efecto cristal templado de alta fidelidad.
+      </div>
+    </div>
+    <button class="cfg-btn" onclick="cerrarModal('modal-novedades-sistema-panico')" style="margin-top: 18px; width: 100%; background: var(--ac); color: #000; border: none; border-radius: 14px; padding: 12px; font-size: 13.5px; font-weight: 800; cursor: pointer; transition: all 0.2s;">¡EXCELENTE!</button>
+  </div>
+</div>
+
 <!-- MODAL TIPO EMERGENCIA -->
-<div class="tipo-panel" id="tipo-panel">
-  <div class="tipo-sheet">
+<div class="tipo-panel" id="tipo-panel" onclick="cerrarTipo()">
+  <div class="tipo-sheet" onclick="event.stopPropagation()">
     <div class="tipo-handle"></div>
+    <button onclick="cerrarTipo()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#a1a1aa;font-size:16px;transition:all 0.2s;-webkit-tap-highlight-color:transparent;">✕</button>
     <div class="tipo-titulo">¿Qué tipo de emergencia?</div>
     <div class="tipo-grid">
       <button class="tipo-btn" id="tipo-robo"     style="--tc:#e74c3c;--tcr:231,76,60"   onclick="selTipo('robo')"    >
@@ -5111,6 +5362,9 @@
         const d = await r.json();
         if (d.ok && Array.isArray(d.comunicados) && d.comunicados.length > 0) {
           datos = d.comunicados;
+          if (typeof _comunicadosActuales !== 'undefined') {
+            _comunicadosActuales = d.comunicados;
+          }
         }
       }
     } catch (e) {
@@ -5190,6 +5444,33 @@
   function cerrarPronostico(e){
     if (e.target === document.getElementById('clima-overlay'))
       document.getElementById('clima-overlay').classList.remove('visible');
+  }
+
+  // Métodos de control para modales genéricos (ej: Novedades v.1.2)
+  function abrirModal(id) {
+    if (typeof triggerHaptic === 'function') triggerHaptic('soft');
+    if (typeof playSound === 'function') playSound('pop');
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.display = 'flex';
+      el.style.opacity = '0';
+      el.offsetHeight; /* trigger reflow */
+      el.style.transition = 'opacity 0.25s ease';
+      el.style.opacity = '1';
+    }
+  }
+
+  function cerrarModal(id) {
+    if (typeof triggerHaptic === 'function') triggerHaptic('soft');
+    if (typeof playSound === 'function') playSound('tap');
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.transition = 'opacity 0.2s ease';
+      el.style.opacity = '0';
+      setTimeout(() => {
+        el.style.display = 'none';
+      }, 200);
+    }
   }
 
   // ══════════════════════════════════════════════════════
@@ -5638,6 +5919,245 @@
     });
     listEl.innerHTML = html;
   }
+
+
+  // ══════════════════════════════════════════════════════
+  // MARQUESINA
+  // ══════════════════════════════════════════════════════
+  let _marquesinaMode = 0; // 0=mural, 1=dolar, 2=mundo
+  let _marquesinaData = { mural: [], dolar: [], mundo: [] };
+  let _marquesinaInited = false;
+
+  const NOTICIAS_MUNDO_FALLBACK = [
+    // Ciencia y tecnología
+    '🚀 NASA confirma nueva misión a la Luna programada para finales de año',
+    '💊 Investigadores descubren molécula que podría revertir el envejecimiento celular',
+    '🤖 Google DeepMind presenta sistema de IA capaz de razonar como un científico',
+    '⚡ Europa alcanza el 68% de su electricidad de fuentes renovables en un trimestre récord',
+    '🔬 Científicos logran fusión nuclear sostenida por más de 12 minutos consecutivos',
+    '🛰️ SpaceX lanza constelación de satélites para conectividad en zonas rurales',
+    '🧬 Primer tratamiento con edición génica CRISPR aprobado para enfermedad rara',
+    '💻 Nuevo chip cuántico de IBM supera en 10x al anterior en resolución de problemas',
+    '🌡️ Termómetros marinos registran el Atlántico Norte más cálido en 150 años de registros',
+    '🔭 Telescopio James Webb capta imagen de galaxia formándose a 13.000 millones de años luz',
+    // Política y economía
+    '🏦 FMI revisa al alza el crecimiento global: proyecta 3,4% para este año',
+    '🌍 Cumbre del G20 acuerda marco común para regular la inteligencia artificial',
+    '🇺🇳 ONU aprueba resolución histórica sobre prohibición de armas autónomas letales',
+    '💰 Banco Mundial destina 50.000 millones para infraestructura climática en África',
+    '📉 Mercados asiáticos caen ante nuevas tensiones comerciales entre EE.UU. y China',
+    '🛢️ OPEP+ decide mantener recortes de producción hasta fin de año ante caída del petróleo',
+    '🇪🇺 Parlamento Europeo aprueba ley de responsabilidad corporativa ambiental',
+    // Sociedad y cultura
+    '🎬 Festival de Cannes premia con Palma de Oro a directora latinoamericana',
+    '📚 Ventas de libros físicos superan por primera vez en 15 años a los digitales',
+    '🎵 Inteligencia artificial compone sinfonía que engaña a críticos especializados',
+    '🏛️ Descubren ciudad maya sumergida de 3.000 años en costas de Yucatán',
+    '🎨 Cuadro robado de Vermeer reaparece 30 años después en subasta europea',
+    // Medio ambiente
+    '🌱 Brasil reporta la menor tasa de deforestación amazónica en dos décadas',
+    '🦁 Censo global confirma recuperación del 18% de la población de grandes felinos',
+    '🌊 Barrera de coral de Australia muestra primeras señales de regeneración masiva',
+    '🏔️ Glaciares andinos pierden volumen a velocidad récord según estudio satelital',
+    '♻️ Países nórdicos logran reciclar el 92% de sus residuos plásticos industriales',
+    // Salud
+    '🦠 OMS eleva alerta por brote de nueva variante respiratoria en el sudeste asiático',
+    '💉 Vacuna contra el dengue muestra 94% de eficacia en ensayo de fase III',
+    '🧠 Implante cerebral permite a paciente paralítico escribir con el pensamiento a 90 ppm',
+    '🏥 Primer trasplante exitoso de riñón de cerdo modificado en paciente consciente',
+    // Deporte
+    '⚽ Argentina y Francia protagonizarán la gran final del Mundial de Clubes',
+    '🎾 Nuevo récord en Roland Garros: victoria más rápida en la historia del torneo',
+    '🏊 Nadadora rompe el récord mundial de los 200m libres con tiempo histórico',
+    '🏈 NFL anuncia expansión a Europa con dos franquicias en Madrid y Londres',
+    // Espacio e innovación
+    '🌕 China confirma base lunar permanente operativa para 2030',
+    '✈️ Primer vuelo comercial en avión de hidrógeno completa ruta de 800 km sin escalas',
+    '🚗 Tesla supera el millón de robots humanoides vendidos en un solo trimestre',
+    '🏗️ Arabia Saudita inaugura primer tramo de THE LINE, la ciudad lineal del desierto',
+    '🌐 Primer cable de fibra óptica trasatlántico cuántico entra en funcionamiento',
+  ];
+
+  // Cache de noticias mundo: se refresca cada 30 minutos
+  const MUNDO_CACHE_TTL = 30 * 60 * 1000; // 30 minutos en ms
+
+  async function marquesinaInit() {
+    if (_marquesinaInited) return;
+    _marquesinaInited = true;
+    await marquesinaCargarMural();
+    marquesinaRender();
+  }
+
+  async function marquesinaCargarMural() {
+    // Usar los comunicados ya cargados o los fallbacks
+    try {
+      const r = await fetch(PANIC_URL + '?accion=get_comunicados&t=' + Date.now());
+      if (r.ok) {
+        const d = await r.json();
+        if (d.ok && Array.isArray(d.comunicados) && d.comunicados.length > 0) {
+          _marquesinaData.mural = d.comunicados.map(c => '📋 ' + c.titulo + ' — ' + c.cuerpo);
+          return;
+        }
+      }
+    } catch(e) {}
+    _marquesinaData.mural = DEFAULT_COMUNICADOS.map(c => '📋 ' + c.titulo + ' — ' + c.cuerpo);
+  }
+
+  async function marquesinaCargarDolar() {
+    try {
+      const r = await fetch('https://dolarapi.com/v1/dolares', { signal: AbortSignal.timeout(5000) });
+      if (r.ok) {
+        const data = await r.json();
+        _marquesinaData.dolar = data.map(d => {
+          const nombre = d.nombre || d.casa || '—';
+          const compra = d.compra ? '💵 Compra: $' + d.compra.toLocaleString('es-AR') : '';
+          const venta  = d.venta  ? '  Venta: $' + d.venta.toLocaleString('es-AR')  : '';
+          return `💱 ${nombre}${compra}${venta}`;
+        });
+        return;
+      }
+    } catch(e) {}
+    // Fallback offline
+    _marquesinaData.dolar = [
+      '💱 Dólar Oficial — Sin datos en este momento',
+      '💱 Dólar Blue — Sin datos en este momento',
+      '⚠️ No se pudo obtener cotización. Verificá tu conexión.'
+    ];
+  }
+
+  async function marquesinaCargarMundo() {
+    // Verificar caché: si hay datos frescos (menos de 30 min), reutilizarlos
+    const ahora = Date.now();
+    const cacheTS = parseInt(localStorage.getItem('nx_mundo_ts') || '0');
+    const cacheData = localStorage.getItem('nx_mundo_cache');
+    if (cacheData && (ahora - cacheTS) < MUNDO_CACHE_TTL) {
+      try {
+        const parsed = JSON.parse(cacheData);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          _marquesinaData.mundo = parsed;
+          return;
+        }
+      } catch(e) {}
+    }
+
+    // Seleccionar categorías aleatorias para esta sesión (variedad garantizada)
+    const categorias = [
+      'ciencia y tecnología', 'política internacional', 'medio ambiente y clima',
+      'economía global', 'salud y medicina', 'cultura y sociedad', 'deportes', 'espacio e innovación'
+    ].sort(() => Math.random() - 0.5).slice(0, 4).join(', ');
+
+    try {
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 700,
+          tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+          messages: [{
+            role: 'user',
+            content: `Dame exactamente 10 titulares de noticias internacionales de HOY, cubriendo estas categorías: ${categorias}. IMPORTANTE: máxima variedad de temas, sin repetir categorías ni países. Responde SOLO con un JSON array de strings, sin markdown ni explicaciones. Ejemplo: ["Titular 1", "Titular 2"]. Cada titular debe empezar con un emoji relevante y ser conciso (máximo 90 caracteres). No repitas noticias que parezcan similares.`
+          }]
+        })
+      });
+      if (r.ok) {
+        const data = await r.json();
+        const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+        const clean = text.replace(/```json|```/g, '').trim();
+        const parsed = JSON.parse(clean);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Shuffle antes de guardar para que el orden también sea aleatorio
+          const shuffled = parsed.sort(() => Math.random() - 0.5);
+          _marquesinaData.mundo = shuffled;
+          // Guardar en caché con timestamp
+          localStorage.setItem('nx_mundo_cache', JSON.stringify(shuffled));
+          localStorage.setItem('nx_mundo_ts', String(Date.now()));
+          return;
+        }
+      }
+    } catch(e) {}
+    // Fallback: shuffle amplio para que cada sesión muestre noticias distintas
+    _marquesinaData.mundo = [...NOTICIAS_MUNDO_FALLBACK].sort(() => Math.random() - 0.5).slice(0, 10);
+  }
+
+  async function marquesinaToggleModo() {
+    triggerHaptic('soft');
+    playSound('tap');
+    _marquesinaMode = (_marquesinaMode + 1) % 3;
+
+    const badge = document.getElementById('marquesina-badge');
+    const ticker = document.getElementById('marquesina-ticker');
+    if (!badge || !ticker) return;
+
+    // Animación de fade out
+    ticker.style.opacity = '0';
+    ticker.style.transition = 'opacity 0.2s';
+
+    if (_marquesinaMode === 1) {
+      badge.className = 'marquesina-badge modo-dolar';
+      badge.textContent = '💵 DÓLAR';
+      if (_marquesinaData.dolar.length === 0) {
+        ticker.innerHTML = '<span class="marquesina-item dolar-item">Consultando cotización…</span><span class="marquesina-item dolar-item">Consultando cotización…</span>';
+        ticker.style.opacity = '1';
+        await marquesinaCargarDolar();
+      }
+    } else if (_marquesinaMode === 2) {
+      badge.className = 'marquesina-badge modo-mundo';
+      badge.textContent = '🌍 MUNDO';
+      if (_marquesinaData.mundo.length === 0) {
+        ticker.innerHTML = '<span class="marquesina-item mundo-item">🔍 Buscando noticias…</span><span class="marquesina-item mundo-item">🔍 Buscando noticias…</span>';
+        ticker.style.opacity = '1';
+        await marquesinaCargarMundo();
+      }
+    } else {
+      badge.className = 'marquesina-badge modo-mural';
+      badge.textContent = '📋 MURAL';
+    }
+
+    setTimeout(() => {
+      marquesinaRender();
+      ticker.style.transition = 'opacity 0.3s';
+      ticker.style.opacity = '1';
+    }, 220);
+  }
+
+  function marquesinaRender() {
+    const ticker = document.getElementById('marquesina-ticker');
+    if (!ticker) return;
+
+    let items = [];
+    if (_marquesinaMode === 0) items = _marquesinaData.mural;
+    else if (_marquesinaMode === 1) items = _marquesinaData.dolar;
+    else items = _marquesinaData.mundo;
+
+    if (!items || items.length === 0) {
+      items = ['Sin datos disponibles'];
+    }
+
+    const sep = '<span class="marquesina-dot"></span>';
+    // Duplicar para loop continuo
+    const makeItems = (cls) => items.map(txt =>
+      `<span class="marquesina-item ${cls}">${txt}${sep}</span>`
+    ).join('');
+
+    let cls = '';
+    if (_marquesinaMode === 1) cls = 'dolar-item';
+    else if (_marquesinaMode === 2) cls = 'mundo-item';
+
+    ticker.innerHTML = makeItems(cls) + makeItems(cls);
+    ticker.classList.toggle('fast', _marquesinaMode === 2);
+
+    // Reset animation
+    ticker.style.animation = 'none';
+    ticker.offsetHeight; // reflow
+    ticker.style.animation = '';
+  }
+
+  // Inicializar marquesina cuando se cargue la pantalla principal
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(marquesinaInit, 800);
+  });
+
 
 </script>
 </body>
