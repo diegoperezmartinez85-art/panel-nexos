@@ -4203,7 +4203,11 @@
     <button class="mundial-action-btn" onclick="iniciarEstadioJuego()">INGRESAR AL ESTADIO</button>
     
     <!-- RANKING DE CASAS -->
-    <div class="mundial-section-title" style="margin-top: 24px; font-size: 11px; font-weight: 900; color: #a1a1aa; text-transform: uppercase; letter-spacing: 1.5px; align-self: flex-start;">🏆 RANKING DE CASAS</div>
+    <div class="mundial-section-title" style="margin-top: 24px; font-size: 11px; font-weight: 900; color: #a1a1aa; text-transform: uppercase; letter-spacing: 1.5px; align-self: flex-start; display: flex; align-items: center; gap: 8px;">
+      🏆 RANKING COMUNITARIO
+      <span id="ranking-sync-badge" style="font-size: 9px; font-weight: 800; padding: 2px 7px; border-radius: 20px; background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.3); color: #06b6d4; letter-spacing: 1px;">🔄 SYNC</span>
+      <button onclick="loadRankingCasas(true)" title="Actualizar ahora" style="background:none;border:none;cursor:pointer;font-size:13px;padding:2px 5px;color:#52525b;transition:color 0.2s;" onmouseenter="this.style.color='#06b6d4'" onmouseleave="this.style.color='#52525b'">🔄</button>
+    </div>
     <div class="ranking-board">
       <div class="ranking-header">
         <span>CASA</span>
@@ -7345,49 +7349,149 @@
     }
   };
 
-  // Ranking autocompletado con Manzana y Casa del perfil configurado (¡Tiempo ataque incluido!)
-  function loadRankingCasas() {
+  // ══════════════════════════════════════════════════════
+  // RANKING COMUNITARIO — GET (con caché semanal)
+  // ══════════════════════════════════════════════════════
+
+  // Devuelve el número de semana ISO del año para una fecha dada
+  function getWeekNumber(date) {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  }
+
+  // Clave de semana actual: "2025-W22"
+  function currentWeekKey() {
+    const now = new Date();
+    return `${now.getFullYear()}-W${String(getWeekNumber(now)).padStart(2, '0')}`;
+  }
+
+  async function loadRankingCasas(forzarActualizacion = false) {
     const lista = document.getElementById('ranking-casas-lista');
     if (!lista) return;
-    
+
     const mza = localStorage.getItem('nx_manzana') || '12';
     const casa = localStorage.getItem('nx_casa') || '14';
     const myHouseStr = `Mza ${mza} Casa ${casa}`;
 
-    // Cargar del localStorage o inicializar con mock realista
-    let ranking = JSON.parse(localStorage.getItem('nx_futbol_ranking') || '[]');
-    if (ranking.length === 0) {
-      ranking = [
-        { casa: 'Mza 2 Casa 3', jugador: 'El Mesías', record: 600, tiempo: 14.5 },
-        { casa: 'Mza 12 Casa 14', jugador: 'Penaldo', record: 450, tiempo: 16.2 },
-        { casa: 'Mza 10 Casa 5', jugador: 'Harry Kañón', record: 300, tiempo: 18.0 },
-        { casa: 'Mza 5 Lote 8', jugador: 'MbaFest', record: 300, tiempo: 19.5 },
-        { casa: 'Mza 7 Lote 12', jugador: 'Yamalísimo', record: 150, tiempo: 22.1 }
-      ];
-      localStorage.setItem('nx_futbol_ranking', JSON.stringify(ranking));
+    // ── CACHÉ SEMANAL ──────────────────────────────────────
+    // Si ya tenemos datos de esta semana y no se fuerza actualización, los usamos
+    // directamente sin llamar al servidor.
+    const semanaActual = currentWeekKey();
+    const cachedWeek  = localStorage.getItem('nx_ranking_semana');
+    const cachedData  = localStorage.getItem('nx_ranking_cache');
+
+    if (!forzarActualizacion && cachedWeek === semanaActual && cachedData) {
+      try {
+        const ranking = JSON.parse(cachedData);
+        if (Array.isArray(ranking) && ranking.length > 0) {
+          renderRanking(ranking, myHouseStr, false, true);
+          return; // ← salimos sin tocar el servidor
+        }
+      } catch(e) {}
+    }
+    // ──────────────────────────────────────────────────────
+
+    // Mostrar skeleton mientras carga
+    lista.innerHTML = `<div style="text-align:center;padding:12px;color:#52525b;font-size:12px;">⏳ Cargando ranking…</div>`;
+    setBadge('ranking-sync-badge', '🔄 SYNC', 'cyan');
+
+    let ranking = [];
+    let fuenteOnline = false;
+
+    // 1. Intentar cargar desde el servidor (Apps Script)
+    try {
+      const r = await fetch(PANIC_URL + '?accion=get_ranking_mundial&t=' + Date.now(), { signal: AbortSignal.timeout(6000) });
+      if (r.ok) {
+        const d = await r.json();
+        if (d.ok && Array.isArray(d.ranking) && d.ranking.length > 0) {
+          ranking = d.ranking;
+          fuenteOnline = true;
+          // Fusionar con datos locales por si el servidor no tiene el nuestro aún
+          const localRaw = JSON.parse(localStorage.getItem('nx_futbol_ranking') || '[]');
+          localRaw.forEach(lr => {
+            const existe = ranking.find(rv => rv.casa.toLowerCase() === lr.casa.toLowerCase());
+            if (!existe) ranking.push(lr);
+          });
+          // ── Guardar en caché semanal ──
+          localStorage.setItem('nx_ranking_semana', semanaActual);
+          localStorage.setItem('nx_ranking_cache', JSON.stringify(ranking));
+        }
+      }
+    } catch(e) {}
+
+    // 2. Fallback: solo localStorage
+    if (!fuenteOnline) {
+      ranking = JSON.parse(localStorage.getItem('nx_futbol_ranking') || '[]');
+      if (ranking.length === 0) {
+        ranking = [
+          { casa: 'Mza 2 Casa 3',   jugador: 'El Mesías',   record: 600, tiempo: 14.5 },
+          { casa: 'Mza 12 Casa 14', jugador: 'Penaldo',     record: 450, tiempo: 16.2 },
+          { casa: 'Mza 10 Casa 5',  jugador: 'Harry Kañón', record: 300, tiempo: 18.0 },
+          { casa: 'Mza 5 Lote 8',   jugador: 'MbaFest',     record: 300, tiempo: 19.5 },
+          { casa: 'Mza 7 Lote 12',  jugador: 'Yamalísimo',  record: 150, tiempo: 22.1 }
+        ];
+        localStorage.setItem('nx_futbol_ranking', JSON.stringify(ranking));
+      }
     }
 
-    // Ordenar primero por puntos (descendente) y a igual puntaje, por menor tiempo (ascendente)
+    renderRanking(ranking, myHouseStr, fuenteOnline, false);
+  }
+
+  // Renderiza el ranking en el DOM (separado para reusar desde caché)
+  function renderRanking(ranking, myHouseStr, fuenteOnline, desdeCache) {
+    const lista = document.getElementById('ranking-casas-lista');
+    if (!lista) return;
+
+    // Ordenar: más puntos primero; empate → menor tiempo
     ranking.sort((a, b) => {
       if (b.record !== a.record) return b.record - a.record;
       return (a.tiempo || 999) - (b.tiempo || 999);
     });
-    
-    // Obtener récord personal de la casa activa para mostrar en el estadio
+
     const myRecordObj = ranking.find(r => r.casa.toLowerCase() === myHouseStr.toLowerCase());
     mundialRecord = myRecordObj ? myRecordObj.record : 0;
 
+    const medals = ['🥇','🥈','🥉'];
     lista.innerHTML = ranking.map((r, idx) => {
       const isMyHouse = r.casa.toLowerCase() === myHouseStr.toLowerCase() ? 'my-house' : '';
-      const timeStr = r.tiempo ? ` (${r.tiempo}s)` : '';
+      const medal = medals[idx] || `${idx+1}.`;
+      const timeStr = r.tiempo ? ` · ${r.tiempo}s` : '';
       return `
         <div class="ranking-item ${isMyHouse}">
-          <span class="rank-house">${r.casa}</span>
+          <span class="rank-house">${medal} ${r.casa}</span>
           <span class="rank-player">${r.jugador}</span>
-          <span class="rank-score">${r.record} PTS${timeStr}</span>
-        </div>
-      `;
+          <span class="rank-score">${r.record}<span style="font-size:9px;opacity:.6;">${timeStr}</span></span>
+        </div>`;
     }).join('');
+
+    // Badge: caché semanal, live, o local sin conexión
+    if (desdeCache) {
+      setBadge('ranking-sync-badge', '📅 ESTA SEMANA', 'amber');
+    } else {
+      setBadge('ranking-sync-badge',
+        fuenteOnline ? '🌐 LIVE' : '📴 LOCAL',
+        fuenteOnline ? 'green' : 'amber'
+      );
+    }
+  }
+
+  function setBadge(id, text, color) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const map = {
+      cyan:  ['rgba(6,182,212,.15)',  'rgba(6,182,212,.3)',  '#06b6d4'],
+      green: ['rgba(34,197,94,.15)',  'rgba(34,197,94,.3)',  '#22c55e'],
+      amber: ['rgba(245,158,11,.15)', 'rgba(245,158,11,.3)', '#f59e0b'],
+      red:   ['rgba(239,68,68,.15)',  'rgba(239,68,68,.3)',  '#ef4444'],
+    };
+    const [bg, border, fg] = map[color] || map.cyan;
+    el.style.background = bg;
+    el.style.borderColor = border;
+    el.style.color = fg;
+    el.textContent = text;
   }
 
   window.iniciarEstadioJuego = function() {
@@ -8111,7 +8215,7 @@
     document.getElementById('gameover-score-val').innerHTML = `${currentScore} PTS <span style="font-size:14px;color:#a1a1aa;margin-left:6px;">(${timeTaken}s)</span>`;
     document.getElementById('gameover-overlay').style.display = 'flex';
     
-    // Guardar récord del lote y sincronizar (¡Incluye tiempo ataque!)
+    // ── GUARDAR RÉCORD Y SINCRONIZAR CON COMUNIDAD ──
     const mza = localStorage.getItem('nx_manzana') || '12';
     const casa = localStorage.getItem('nx_casa') || '14';
     const myHouseStr = `Mza ${mza} Casa ${casa}`;
@@ -8119,10 +8223,8 @@
     let ranking = JSON.parse(localStorage.getItem('nx_futbol_ranking') || '[]');
     let recordActualizado = false;
 
-    // Buscar si ya tenemos récord guardado para este lote
     const idx = ranking.findIndex(r => r.casa.toLowerCase() === myHouseStr.toLowerCase());
     if (idx !== -1) {
-      // Si el puntaje es mayor, O si es igual pero se hizo en menos tiempo, es nuevo récord!
       if (currentScore > ranking[idx].record || (currentScore === ranking[idx].record && timeTaken < (ranking[idx].tiempo || 999))) {
         ranking[idx].record = currentScore;
         ranking[idx].tiempo = timeTaken;
@@ -8140,6 +8242,27 @@
       document.getElementById('estadio-record').innerText = String(mundialRecord).padStart(2, '0');
       document.getElementById('gameover-newrecord').style.display = 'block';
       playSound('success');
+
+      // ── Invalidar caché semanal para que en la próxima apertura
+      //    del ranking se fuerce una recarga con el nuevo récord ──
+      localStorage.removeItem('nx_ranking_semana');
+      localStorage.removeItem('nx_ranking_cache');
+
+      // ── PUSH AL SERVIDOR (fire-and-forget) ──
+      try {
+        const payload = {
+          accion: 'set_ranking_mundial',
+          casa: myHouseStr,
+          jugador: selectedPlayer.nombre,
+          record: currentScore,
+          tiempo: timeTaken,
+          deviceId: typeof DEVICE_ID !== 'undefined' ? DEVICE_ID : 'anon'
+        };
+        fetch(PANIC_URL + '?' + new URLSearchParams(payload).toString() + '&t=' + Date.now(), {
+          method: 'GET',
+          mode: 'no-cors'
+        }).catch(() => {});
+      } catch(e) {}
     } else {
       document.getElementById('gameover-newrecord').style.display = 'none';
     }
