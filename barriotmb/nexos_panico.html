@@ -2811,6 +2811,75 @@
       border: 1px solid rgba(var(--acr), 0.15);
     }
 
+    /* ── VITRINA DE LOGROS NEÓN ── */
+    .vitrina-logros {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .logro-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+      opacity: 0.45;
+      filter: grayscale(1);
+    }
+    .logro-card.desbloqueado {
+      background: rgba(234, 179, 8, 0.03);
+      border: 1.2px solid rgba(234, 179, 8, 0.3);
+      box-shadow: 0 4px 12px rgba(234, 179, 8, 0.08);
+      opacity: 1;
+      filter: grayscale(0);
+    }
+    .logro-card.desbloqueado::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(234,179,8,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .logro-card .logro-icon {
+      font-size: 20px;
+      margin-bottom: 6px;
+      transition: transform 0.3s;
+    }
+    .logro-card.desbloqueado:hover .logro-icon {
+      transform: scale(1.2) rotate(8deg);
+    }
+    .logro-card .logro-title {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: #71717a;
+      line-height: 1.2;
+    }
+    .logro-card.desbloqueado .logro-title {
+      color: #fbbf24;
+      text-shadow: 0 0 8px rgba(251, 191, 36, 0.25);
+    }
+    .logro-card .logro-desc {
+      font-size: 8.5px;
+      font-weight: 500;
+      color: #52525b;
+      margin-top: 3px;
+      line-height: 1.3;
+    }
+    .logro-card.desbloqueado .logro-desc {
+      color: #a1a1aa;
+    }
+
     /* ── ESTADIO DE JUEGO ── */
     .estadio-header {
       width: 100%;
@@ -2868,8 +2937,9 @@
 
     .canvas-wrapper {
       width: 100%;
-      flex: 1;
-      min-height: 0;
+      max-width: 400px;
+      aspect-ratio: 4 / 3;
+      margin: auto 0; /* Centra verticalmente el canvas si sobra espacio en pantallas altas */
       background: linear-gradient(180deg, #050e07 0%, #071510 100%);
       border: 1.5px solid rgba(255, 255, 255, 0.10);
       border-top: 1.5px solid rgba(255,255,255,0.18);
@@ -4256,6 +4326,15 @@
       <div class="ranking-list" id="ranking-casas-lista">
         <!-- Los ítems del ranking se cargan por JS -->
       </div>
+    </div>
+    
+    <!-- VITRINA DE LOGROS -->
+    <div class="mundial-section-title" style="margin-top: 24px; font-size: 11px; font-weight: 900; color: #fbbf24; text-transform: uppercase; letter-spacing: 1.5px; align-self: flex-start; display: flex; align-items: center; gap: 8px;">
+      🏆 VITRINA DE LOGROS NEÓN
+      <span id="logros-count-badge" style="font-size: 9px; font-weight: 800; padding: 2px 7px; border-radius: 20px; background: rgba(234,179,8,0.15); border: 1px solid rgba(234,179,8,0.3); color: #fbbf24; letter-spacing: 1px;">0 / 7</span>
+    </div>
+    <div class="vitrina-logros" id="vitrina-logros-lista">
+      <!-- Los logros se inyectan dinámicamente -->
     </div>
   </div>
 
@@ -7187,7 +7266,10 @@
     { id: 'mbafest', nombre: 'MbaFest', pais: 'Francia 🇫🇷', flag: '🇫🇷', flagColors: ['#002395','#ffffff','#ed2939'], flagType: 'v3', comba: 75, fuerza: 98, precision: 90, skin: '#78350f', hair: '#27272a', beard: null, hairType: 'buzz', jersey: ['#1e40af', '#1e40af'] },
     { id: 'neymareado', nombre: 'Neymareado', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00'], flagType: 'br', comba: 98, fuerza: 95, precision: 88, skin: '#b45309', hair: '#fef08a', beard: null, hairType: 'mohawk', jersey: ['#fbbf24', '#fbbf24'] },
     { id: 'penaldo', nombre: 'Penaldo', pais: 'Portugal 🇵🇹', flag: '🇵🇹', flagColors: ['#006600','#ff0000'], flagType: 'v2', comba: 85, fuerza: 99, precision: 96, skin: '#fed7aa', hair: '#18181b', beard: null, hairType: 'penaldo', jersey: ['#dc2626', '#dc2626'] },
-    { id: 'hajalan', nombre: 'Hajalan', pais: 'Noruega 🇳🇴', flag: '🇳🇴', flagColors: ['#ef2b2d','#ffffff','#002868'], flagType: 'cross', flagCross: '#002868', comba: 78, fuerza: 99, precision: 95, skin: '#ffedd5', hair: '#fef08a', beard: null, hairType: 'long-rubio', jersey: ['#dc2626', '#1d4ed8'] }
+    { id: 'hajalan', nombre: 'Hajalan', pais: 'Noruega 🇳🇴', flag: '🇳🇴', flagColors: ['#ef2b2d','#ffffff','#002868'], flagType: 'cross', flagCross: '#002868', comba: 78, fuerza: 99, precision: 95, skin: '#ffedd5', hair: '#fef08a', beard: null, hairType: 'long-rubio', jersey: ['#dc2626', '#1d4ed8'] },
+    { id: 'maradonuts', nombre: 'Maradonuts', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 99, fuerza: 95, precision: 97, skin: '#fed7aa', hair: '#18181b', beard: null, hairType: 'pelusa', jersey: ['#74acdf', '#ffffff'] },
+    { id: 'zazu', nombre: 'Zazu', pais: 'Francia 🇫🇷', flag: '🇫🇷', flagColors: ['#002395','#ffffff','#ed2939'], flagType: 'v3', comba: 96, fuerza: 91, precision: 98, skin: '#ffedd5', hair: '#3f3f46', beard: null, hairType: 'calvo', jersey: ['#002395', '#ffffff'] },
+    { id: 'orey', nombre: 'Orey', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00'], flagType: 'br', comba: 95, fuerza: 98, precision: 98, skin: '#653b1b', hair: '#18181b', beard: null, hairType: 'afro-short', jersey: ['#fbbf24', '#009c3b'] }
   ];
 
   let selectedPlayer = MUNDIAL_JUGADORES[0];
@@ -7201,6 +7283,14 @@
   let goalsScoredInRound = 0;
   let isCelebrating = false;
   let confettiParticles = [];
+  let fireParticles = [];
+  let unlockedAchievements = [];
+  try {
+    unlockedAchievements = JSON.parse(localStorage.getItem('nx_futbol_logros') || '[]');
+    if (!Array.isArray(unlockedAchievements)) unlockedAchievements = [];
+  } catch(e) {
+    unlockedAchievements = [];
+  }
   let trophyY = -60;
   
   // Efectos visuales de gol y tiempo
@@ -7243,6 +7333,7 @@
   let rachaDisplayTimer = 0;  // frames mostrando el banner de racha
   let rachaFlash = 0;         // destello al multiplicar
 
+
   // ── VIENTO ──
   let vientoActual = 0;       // fuerza en px/frame (negativo = izq, positivo = der)
   let vientoVisible = 0;      // frames mostrando indicador de viento antes del tiro
@@ -7274,9 +7365,47 @@
   const GOAL_LEFT = 115; // Ensanchado de 122 a 115 (Ancho total: 170px de arco!)
   const GOAL_RIGHT = 285; // Ensanchado de 278 a 285
 
+  const LISTA_LOGROS = [
+    { id: 'primer_gol', icon: '⚽', title: 'Bautismo de Red', desc: 'Marcá tu primer gol.' },
+    { id: 'palo_dentro', icon: '🎯', title: 'Palo y Adentro', desc: 'Gol rebotando en el poste.' },
+    { id: 'super_curva', icon: '🌀', title: 'Curva Mágica', desc: 'Desbloqueá la Súper Curva (Racha x2).' },
+    { id: 'racha_fuego', icon: '🔥', title: 'Racha de Fuego', desc: 'Tiro de fuego (Racha x3).' },
+    { id: 'hat_trick', icon: '🎩', title: 'Hat-Trick', desc: 'Marcá 3 goles en la misma tanda.' },
+    { id: 'cinco_goles', icon: '🐐', title: 'Mano de Dios', desc: 'Tanda perfecta de 5 goles.' },
+    { id: 'leyenda', icon: '👑', title: 'Selección de Leyenda', desc: 'Jugar con un clásico retro.' }
+  ];
+
+  function renderVitrinaLogros() {
+    const listEl = document.getElementById('vitrina-logros-lista');
+    const badgeEl = document.getElementById('logros-count-badge');
+    if (!listEl) return;
+
+    const count = unlockedAchievements.length;
+    if (badgeEl) {
+      badgeEl.innerText = `${count} / ${LISTA_LOGROS.length}`;
+      if (count === LISTA_LOGROS.length) {
+        badgeEl.style.background = 'rgba(234,179,8,0.25)';
+        badgeEl.style.borderColor = '#fbbf24';
+        badgeEl.innerText = `🏆 COMPLETADO`;
+      }
+    }
+
+    listEl.innerHTML = LISTA_LOGROS.map(l => {
+      const active = unlockedAchievements.includes(l.id);
+      return `
+        <div class="logro-card ${active ? 'desbloqueado' : ''}" title="${l.desc}">
+          <div class="logro-icon">${active ? l.icon : '🔒'}</div>
+          <div class="logro-title">${l.title}</div>
+          <div class="logro-desc">${l.desc}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
   window.initMundial = function() {
     renderPlayersList();
     loadRankingCasas();
+    renderVitrinaLogros();
   };
 
   // Dibujar cabezón en el Canvas de Selección de Jugador
@@ -7399,45 +7528,79 @@
       c.beginPath(); c.arc(-9, -6.3, 0.7, 0, Math.PI * 2); c.fill();
       c.restore();
     } else if (player.hairType === 'long-rubio') {
-      // Coleta de Haaland: pelo rubio recogido en moño/bun alto
-      c.fillStyle = '#fef08a';
-      
-      // Base del pelo pegado a la cabeza (lateral corto)
-      c.beginPath();
-      c.arc(0, -2, 16, Math.PI * 1.1, Math.PI * 1.9); // arco superior de la cabeza
-      c.closePath();
-      c.fill();
-
-      // Sides cortos (pelo liso pegado)
-      c.beginPath();
-      c.arc(0, -4, 13.5, Math.PI * 0.95, Math.PI * 0.05, true);
-      c.lineTo(14, 4);
-      c.quadraticCurveTo(15, -1, 14, -8);
-      c.closePath();
-      c.fill();
-
-      c.beginPath();
-      c.arc(0, -4, 13.5, Math.PI * 0.95, Math.PI * 1.05, false);
-      c.lineTo(-14, 4);
-      c.quadraticCurveTo(-15, -1, -14, -8);
-      c.closePath();
-      c.fill();
-
-      // Moño/bun alto en la parte de arriba (característica de Haaland)
+      // Pelo largo rubio suelto, cayendo lacio/ondulado a los costados
       c.fillStyle = '#fde047';
       c.beginPath();
-      c.ellipse(0, -19, 5, 4, 0, 0, Math.PI * 2);
+      c.arc(0, -5, 13.5, Math.PI, 0); // coronilla
       c.fill();
-      // Sombra del moño
+      
+      // Mechón izquierdo
+      c.beginPath();
+      c.moveTo(-13.5, -5);
+      c.bezierCurveTo(-17, 5, -16, 15, -13, 22);
+      c.bezierCurveTo(-10, 22, -10, 10, -10, 0);
+      c.closePath();
+      c.fill();
+
+      // Mechón derecho
+      c.beginPath();
+      c.moveTo(13.5, -5);
+      c.bezierCurveTo(17, 5, 15, 15, 13, 22);
+      c.bezierCurveTo(10, 22, 10, 10, 10, 0);
+      c.closePath();
+      c.fill();
+
+      // Flequillo / partidura
       c.fillStyle = '#ca8a04';
       c.beginPath();
-      c.ellipse(0, -17, 5, 2, 0, 0, Math.PI * 2);
+      c.moveTo(-10, -10);
+      c.quadraticCurveTo(0, -14, 10, -10);
+      c.lineTo(8, -8);
+      c.quadraticCurveTo(0, -11, -8, -8);
+      c.closePath();
       c.fill();
-      // Gomita negra
-      c.fillStyle = '#1a1a1a';
+    } else if (player.hairType === 'pelusa') {
+      // Rulos abundantes estilo Pelusa (Maradona '86)
+      c.fillStyle = player.hair;
+      const rulos = [
+        {x: -12, y: -10, r: 6.5}, {x: -14, y: -4, r: 7}, {x: -12, y: 3, r: 6.5},
+        {x: 12, y: -10, r: 6.5}, {x: 14, y: -4, r: 7}, {x: 12, y: 3, r: 6.5},
+        {x: -9, y: -14, r: 7}, {x: 9, y: -14, r: 7},
+        {x: -4, y: -17, r: 7.5}, {x: 4, y: -17, r: 7.5}, {x: 0, y: -19, r: 8}
+      ];
+      rulos.forEach(ru => {
+        c.beginPath();
+        c.arc(ru.x, ru.y, ru.r, 0, Math.PI * 2);
+        c.fill();
+      });
+    } else if (player.hairType === 'calvo') {
+      // Zidane: Corona calva. Rapado en coronilla, pelo en costados y nuca.
+      c.fillStyle = player.hair;
       c.beginPath();
-      c.arc(0, -15, 2, 0, Math.PI * 2);
+      c.arc(0, 0, 16.5, 0.05 * Math.PI, 0.95 * Math.PI); // Nuca
+      c.lineWidth = 4.5;
+      c.strokeStyle = player.hair;
+      c.stroke();
+      
+      c.beginPath();
+      c.arc(-13, -3, 4, 0, Math.PI * 2);
+      c.arc(13, -3, 4, 0, Math.PI * 2);
       c.fill();
+    } else if (player.hairType === 'afro-short') {
+      // Pelé: Afro corto texturado
+      c.fillStyle = player.hair;
+      c.beginPath();
+      c.arc(0, -5, 13.5, Math.PI * 1.05, Math.PI * 1.95);
+      c.closePath();
+      c.fill();
+      
+      for (let angle = 1.05; angle <= 1.95; angle += 0.15) {
+        const hx = Math.cos(angle * Math.PI) * 14.5;
+        const hy = Math.sin(angle * Math.PI) * 14.5 - 2;
+        c.beginPath();
+        c.arc(hx, hy, 4, 0, Math.PI * 2);
+        c.fill();
+      }
     } else if (player.hairType === 'curly') {
       // Rulos de Yamal — más compactos, solo en la parte superior
       c.fillStyle = player.hair;
@@ -7571,6 +7734,11 @@
       triggerHaptic('soft');
       playSound('tap');
       renderPlayersList();
+      
+      // Chequear logro leyenda
+      if (['maradonuts', 'zazu', 'orey'].includes(id)) {
+        unlockAchievement('leyenda', 'Selección de Leyenda', `Elegiste jugar con la leyenda ${player.nombre}.`);
+      }
     }
   };
 
@@ -7858,11 +8026,15 @@
     if (dist > 10) {
       // Activar patada física del tirador
       pelota.isShot = true;
+      pelota.hitPostThisShot = false;
       kickTimer = 16;
       shotFrameCounter = 0; // Resetear watchdog de seguridad
       
       // La fuerza del tiro escala con la stat de Fuerza del jugador (¡Súper Potenciado para todos!)
-      const fuerzaFactor = 0.22 + (selectedPlayer.fuerza / 100) * 0.065;
+      let fuerzaFactor = 0.22 + (selectedPlayer.fuerza / 100) * 0.065;
+      if (rachaActual >= 3) {
+        fuerzaFactor *= 1.35; // ¡SÚPER POTENCIA!
+      }
       pelota.vx = dx * fuerzaFactor;
       pelota.vy = dy * fuerzaFactor;
       
@@ -8008,7 +8180,145 @@
       playTrumpetNote(392.00, 0.05, 0.35); // Sol
       playTrumpetNote(523.25, 0.35, 0.35); // Do
       playTrumpetNote(659.25, 0.65, 0.85); // Mi (¡Tono largo triunfal!)
+
+      // Mariano Closs en vivo!
+      playCommentatorVoice();
     } catch(e) {}
+  }
+
+  function unlockAchievement(id, title, desc) {
+    if (unlockedAchievements.includes(id)) return;
+    unlockedAchievements.push(id);
+    try {
+      localStorage.setItem('nx_futbol_logros', JSON.stringify(unlockedAchievements));
+    } catch(e) {}
+    
+    try {
+      renderVitrinaLogros();
+    } catch(e) {}
+    
+    // Play achievement unlocked sound (synthesized ding)
+    try {
+      initAudio();
+      if (audioCtx && !modoDiscreto) {
+        const now = audioCtx.currentTime;
+        const playDing = (freq, delay) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + delay);
+          gain.gain.setValueAtTime(0.001, now + delay);
+          gain.gain.linearRampToValueAtTime(0.18, now + delay + 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.35);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + delay);
+          osc.stop(now + delay + 0.45);
+        };
+        playDing(523.25, 0.0); // Do
+        playDing(659.25, 0.08); // Mi
+        playDing(783.99, 0.16); // Sol
+        playDing(1046.50, 0.24); // Do octava
+      }
+    } catch(e) {}
+
+    // Mostrar cartel de logro flotante
+    const containerId = 'achievement-toast-container';
+    let container = document.getElementById(containerId);
+    if (!container) {
+      container = document.createElement('div');
+      container.id = containerId;
+      container.style.cssText = `
+        position: absolute;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 99999;
+        pointer-events: none;
+        width: 90%;
+        max-width: 320px;
+      `;
+      document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+      background: rgba(15, 23, 42, 0.9);
+      border: 1.5px solid rgba(234, 179, 8, 0.7);
+      box-shadow: 0 8px 30px rgba(234, 179, 8, 0.35), inset 0 0 15px rgba(234, 179, 8, 0.15);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      animation: slideUpAchievement 0.48s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      color: #fff;
+    `;
+
+    if (!document.getElementById('achievement-anim-style')) {
+      const style = document.createElement('style');
+      style.id = 'achievement-anim-style';
+      style.innerHTML = `
+        @keyframes slideUpAchievement {
+          0% { transform: translateY(30px); opacity: 0; }
+          100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeOutAchievement {
+          0% { transform: translateY(0) scale(1); opacity: 1; }
+          100% { transform: translateY(-20px) scale(0.92); opacity: 0; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    toast.innerHTML = `
+      <div style="font-size: 26px; background: rgba(234, 179, 8, 0.15); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(234, 179, 8, 0.4); flex-shrink: 0;">🏆</div>
+      <div style="flex: 1; display: flex; flex-direction: column; text-align: left;">
+        <span style="font-size: 8.5px; font-weight: 800; text-transform: uppercase; color: #fbbf24; letter-spacing: 0.8px;">Logro Desbloqueado!</span>
+        <span style="font-size: 13.5px; font-weight: 800; color: #fff; margin-top: 1px;">${title}</span>
+        <span style="font-size: 10.5px; color: #94a3b8; font-weight: 500; margin-top: 2px; line-height: 1.35;">${desc}</span>
+      </div>
+    `;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.animation = 'fadeOutAchievement 0.45s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards';
+      setTimeout(() => {
+        toast.remove();
+      }, 500);
+    }, 4000);
+  }
+
+  function playCommentatorVoice() {
+    if (modoDiscreto) return;
+    try {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const phrases = [
+          "¡Gooooool! ¡Gooooool! ¡Golaaaaaazo! ¡De otro partido! ¡Sen-sa-cio-nal!",
+          "¡Pero qué golaaaazo! ¡Extraordinario! ¡Impresionante!",
+          "¡Goooool! ¡Goooool! ¡Cantalo, cantalo, cantalo, cantalo!",
+          "¡Es una bestia, señoras y señores! ¡Imparable! ¡Golaaaaaazo!",
+          `¡Espectacular remate de ${selectedPlayer.nombre}! ¡Goooool!`
+        ];
+        const textToSpeak = phrases[Math.floor(Math.random() * phrases.length)];
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        const voices = window.speechSynthesis.getVoices();
+        let argVoice = voices.find(v => v.lang === 'es-AR');
+        if (!argVoice) argVoice = voices.find(v => v.lang.startsWith('es-'));
+        if (argVoice) utterance.voice = argVoice;
+        utterance.rate = 1.32;
+        utterance.pitch = 1.15;
+        utterance.volume = 1.0;
+        window.speechSynthesis.speak(utterance);
+      }
+    } catch(err) {}
   }
 
   // Generar ráfaga de confeti para goles individuales
@@ -8196,6 +8506,19 @@
     if (shakeIntensity > 0) shakeIntensity -= 0.6;
     if (shakeIntensity < 0) shakeIntensity = 0;
 
+    // Actualizar partículas de fuego
+    for (let i = fireParticles.length - 1; i >= 0; i--) {
+      const p = fireParticles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vx *= 0.95;
+      p.vy -= 0.06; // calor flota hacia arriba
+      p.life -= p.decay;
+      if (p.life <= 0) {
+        fireParticles.splice(i, 1);
+      }
+    }
+
     // Desvanecer flash de pantalla y actualizar destellos de fotos en la tribuna
     if (goalScreenFlash > 0) goalScreenFlash -= 0.04;
     
@@ -8220,6 +8543,26 @@
     if (pelota.isShot && !pelota.isSettled) {
       shotFrameCounter++;
       const speed = Math.sqrt(pelota.vx * pelota.vx + pelota.vy * pelota.vy);
+
+      // Generar partículas de llama y chispa si hay SÚPER POTENCIA (racha >= 3) o tiro muy rápido
+      const isFireball = (rachaActual >= 3);
+      const isFast = speed > 7.5;
+      if (isFireball || isFast) {
+        const spawnCount = isFireball ? 4 : 2;
+        for (let i = 0; i < spawnCount; i++) {
+          fireParticles.push({
+            x: pelota.x + (Math.random() - 0.5) * 8 - (pelota.vx * 0.45),
+            y: pelota.y + (Math.random() - 0.5) * 8 - (pelota.vy * 0.45),
+            vx: -pelota.vx * 0.35 + (Math.random() - 0.5) * 1.5,
+            vy: -pelota.vy * 0.35 - (Math.random() * 0.8),
+            r: 3 + Math.random() * 4.5,
+            life: 1.0,
+            decay: 0.04 + Math.random() * 0.05,
+            color: Math.random() < 0.4 ? '#f59e0b' : (Math.random() < 0.6 ? '#ef4444' : '#fde047'),
+            type: Math.random() < 0.25 ? 'spark' : 'flame'
+          });
+        }
+      }
       
       // Watchdog contra bloqueos físicos (rebotes eternos en palos, atajadas múltiples simultáneas, etc.)
       if (shotFrameCounter > 200 || (shotFrameCounter > 45 && speed < 0.18)) {
@@ -8265,7 +8608,9 @@
 
       // Efecto Comba / Curva Stat del Cabezón (Magnus Effect - ¡Súper sensible para curvas bananeras espectaculares!)
       if (pelota.y < 220 && pelota.y > 60) {
-        const combaFuerza = (selectedPlayer.comba / 100) * 0.115;
+        let combaMult = 1.0;
+        if (rachaActual >= 2) combaMult = 1.85; // ¡SÚPER CURVA!
+        const combaFuerza = (selectedPlayer.comba / 100) * 0.115 * combaMult;
         if (pelota.vx > 0.5) {
           pelota.vx += combaFuerza; // comba hacia la derecha
         } else if (pelota.vx < -0.5) {
@@ -8305,6 +8650,9 @@
           pelota.status = 'bloqueado';
           bannerTxt = '¡BARRERA!';
           bannerTimer = 100;
+          // ── RESETEAR RACHA ──
+          rachaActual = 0;
+          rachaMultiplier = 1;
           triggerHaptic('light');
           playSound('error');
         }
@@ -8341,6 +8689,7 @@
       if (pelota.x >= GOAL_LEFT - 4 && pelota.x <= GOAL_LEFT + 4 && pelota.y >= 58 && pelota.y <= 74) {
         pelota.vx = -pelota.vx * 0.5 - 1.5;
         pelota.status = 'palo';
+        pelota.hitPostThisShot = true;
         bannerTxt = '¡AL PALO!';
         bannerTimer = 100;
         triggerScreenShake(12);
@@ -8351,6 +8700,7 @@
       if (pelota.x >= GOAL_RIGHT - 4 && pelota.x <= GOAL_RIGHT + 4 && pelota.y >= 58 && pelota.y <= 74) {
         pelota.vx = -pelota.vx * 0.5 + 1.5;
         pelota.status = 'palo';
+        pelota.hitPostThisShot = true;
         bannerTxt = '¡AL PALO!';
         bannerTimer = 100;
         triggerScreenShake(12);
@@ -8364,9 +8714,27 @@
         pelota.status = 'gol';
         goalsScoredInRound++; // Aumentar contador de goles en la ronda
         
+        // ── CHEQUEAR LOGROS DE GOL ──
+        unlockAchievement('primer_gol', 'Bautismo de Red', 'Marcaste tu primer gol en el estadio.');
+        if (pelota.hitPostThisShot) {
+          unlockAchievement('palo_dentro', 'Palo y Adentro', 'Marcaste un golazo increíble rebotando en el poste.');
+        }
+        if (goalsScoredInRound === 3) {
+          unlockAchievement('hat_trick', 'Hat-Trick Legendario', 'Marcaste 3 goles en la misma tanda.');
+        }
+        if (goalsScoredInRound === 5) {
+          unlockAchievement('cinco_goles', 'Mano de Dios', 'Marcaste una tanda perfecta de 5 goles seguidos.');
+        }
+
         // ── RACHA ──
         rachaActual++;
         rachaMultiplier = Math.min(rachaActual, 5);
+        if (rachaActual === 2) {
+          unlockAchievement('super_curva', 'Curva Mágica', 'Desbloqueaste la Súper Curva con una racha de 2 goles.');
+        }
+        if (rachaActual === 3) {
+          unlockAchievement('racha_fuego', 'Racha de Fuego', 'Desbloqueaste la Súper Potencia con una racha de 3 goles.');
+        }
         if (rachaActual >= 2) {
           rachaDisplayTimer = 130;
           rachaFlash = 1.0;
@@ -8766,31 +9134,79 @@
       ctx.beginPath(); ctx.arc(-9, -6.3, 0.7, 0, Math.PI * 2); ctx.fill();
       ctx.restore();
     } else if (player.hairType === 'long-rubio') {
-      // Pelo LARGO rubio lacio de Haaland — cae por los hombros con colita alta
-      ctx.fillStyle = '#fef08a';
+      // Pelo largo rubio suelto, cayendo lacio/ondulado a los costados (Estilo Haaland femenino suelto)
+      ctx.fillStyle = '#fde047';
       ctx.beginPath();
-      ctx.arc(0, -6, 12, Math.PI, 0);
-      ctx.lineTo(14, 22); // cae largo por la derecha
-      ctx.quadraticCurveTo(11, 26, 8, 22);
-      ctx.lineTo(0, -4);
-      ctx.lineTo(-8, 22);
-      ctx.quadraticCurveTo(-11, 26, -14, 22); // cae largo por la izquierda
+      ctx.arc(0, -5, 13.5, Math.PI, 0); // coronilla
+      ctx.fill();
+      
+      // Mechón izquierdo
+      ctx.beginPath();
+      ctx.moveTo(-13.5, -5);
+      ctx.bezierCurveTo(-17, 5, -16, 15, -13, 22);
+      ctx.bezierCurveTo(-10, 22, -10, 10, -10, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // Mechón derecho
+      ctx.beginPath();
+      ctx.moveTo(13.5, -5);
+      ctx.bezierCurveTo(17, 5, 15, 15, 13, 22);
+      ctx.bezierCurveTo(10, 22, 10, 10, 10, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // Flequillo / partidura
+      ctx.fillStyle = '#ca8a04';
+      ctx.beginPath();
+      ctx.moveTo(-10, -10);
+      ctx.quadraticCurveTo(0, -14, 10, -10);
+      ctx.lineTo(8, -8);
+      ctx.quadraticCurveTo(0, -11, -8, -8);
+      ctx.closePath();
+      ctx.fill();
+    } else if (player.hairType === 'pelusa') {
+      // Rulos abundantes estilo Pelusa (Maradona '86)
+      ctx.fillStyle = player.hair;
+      const rulos = [
+        {x: -12, y: -10, r: 6.5}, {x: -14, y: -4, r: 7}, {x: -12, y: 3, r: 6.5},
+        {x: 12, y: -10, r: 6.5}, {x: 14, y: -4, r: 7}, {x: 12, y: 3, r: 6.5},
+        {x: -9, y: -14, r: 7}, {x: 9, y: -14, r: 7},
+        {x: -4, y: -17, r: 7.5}, {x: 4, y: -17, r: 7.5}, {x: 0, y: -19, r: 8}
+      ];
+      rulos.forEach(ru => {
+        ctx.beginPath();
+        ctx.arc(ru.x, ru.y, ru.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    } else if (player.hairType === 'calvo') {
+      // Zidane: Corona calva. Rapado en coronilla, pelo en costados y nuca.
+      ctx.fillStyle = player.hair;
+      ctx.beginPath();
+      ctx.arc(0, 0, 16.5, 0.05 * Math.PI, 0.95 * Math.PI); // Nuca
+      ctx.lineWidth = 4.5;
+      ctx.strokeStyle = player.hair;
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.arc(-13, -3, 4, 0, Math.PI * 2);
+      ctx.arc(13, -3, 4, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (player.hairType === 'afro-short') {
+      // Pelé: Afro corto texturado
+      ctx.fillStyle = player.hair;
+      ctx.beginPath();
+      ctx.arc(0, -5, 13.5, Math.PI * 1.05, Math.PI * 1.95);
       ctx.closePath();
       ctx.fill();
       
-      // Colita de caballo alta y prominente
-      ctx.beginPath();
-      ctx.moveTo(-4, -16);
-      ctx.quadraticCurveTo(0, -30, 4, -16);
-      ctx.quadraticCurveTo(2, -10, 0, -10);
-      ctx.quadraticCurveTo(-2, -10, -4, -16);
-      ctx.fill();
-      
-      // Gomita de pelo
-      ctx.fillStyle = '#1a1a1a';
-      ctx.beginPath();
-      ctx.arc(0, -15.5, 2.2, 0, Math.PI * 2);
-      ctx.fill();
+      for (let angle = 1.05; angle <= 1.95; angle += 0.15) {
+        const hx = Math.cos(angle * Math.PI) * 14.5;
+        const hy = Math.sin(angle * Math.PI) * 14.5 - 2;
+        ctx.beginPath();
+        ctx.arc(hx, hy, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
     } else if (player.hairType === 'curly') {
       // Rulos de Yamal — compactos, solo en la parte superior de la cabeza
       ctx.fillStyle = player.hair;
@@ -9142,17 +9558,46 @@
       ctx.stroke();
     }
 
-    // Filas de espectadores con puntos de colores (camisetas variadas)
-    const crowdColors = ['#ef4444','#3b82f6','#f59e0b','#10b981','#fff','#ec4899','#a855f7','#f97316','#06b6d4'];
+    // Filas de espectadores con puntos de colores (camisetas variadas) y animación de salto
+    const crowdColors = ['#ef4444','#3b82f6','#f59e0b','#10b981','#ffffff','#ec4899','#a855f7','#f97316','#06b6d4'];
     const crowdSeed = Math.floor(Date.now() / 800); // cambia lento para animación sutil
+    
+    // Calcular rebote / salto de la hinchada (Jumping Crowd)
+    let crowdJump = 0;
+    if (isCelebrating) {
+      crowdJump = Math.sin(Date.now() * 0.024) * 2.8 - 0.8;
+    } else if (pelota.isShot && pelota.status === '') {
+      const distToGoal = Math.max(0, pelota.y - GOAL_Y);
+      if (distToGoal < 150) {
+        crowdJump = -Math.max(0, (150 - distToGoal) / 75) * (1.0 + Math.sin(Date.now() * 0.015) * 0.4);
+      }
+    }
+
     for (let row = 0; row < 4; row++) {
-      const rowY = 6 + row * 9;
+      const rowY = 6 + row * 9 + crowdJump;
       const density = row === 0 ? 55 : (row === 1 ? 48 : (row === 2 ? 42 : 38));
       for (let i = 0; i < density; i++) {
         const seed = (i * 7 + row * 13 + crowdSeed * (row % 2 === 0 ? 1 : -1)) % crowdColors.length;
         const cx = 4 + (i / density) * 392 + (row % 2 === 0 ? 4 : -2);
         const cr = 2.2 - row * 0.2;
-        // Silhouette de cabeza
+        
+        // Dibujar pequeñas banderas ondeantes de la selección del jugador durante los festejos
+        if (isCelebrating && row === 1 && i % 9 === 0) {
+          ctx.save();
+          const flagColor = (selectedPlayer.flagColors && selectedPlayer.flagColors[0]) ? selectedPlayer.flagColors[0] : '#fbbf24';
+          ctx.fillStyle = flagColor;
+          const flagWave = Math.sin(Date.now() * 0.022 + i) * 1.5;
+          ctx.fillRect(cx - 3, rowY - 5, 5 + flagWave, 3.2);
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 0.55;
+          ctx.beginPath();
+          ctx.moveTo(cx - 3, rowY - 5);
+          ctx.lineTo(cx - 3, rowY + 1);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // Silueta de cabeza del hincha
         ctx.fillStyle = `rgba(${parseInt(crowdColors[Math.abs(seed)].slice(1,3),16)}, ${parseInt(crowdColors[Math.abs(seed)].slice(3,5),16)}, ${parseInt(crowdColors[Math.abs(seed)].slice(5,7),16)}, ${0.55 + row * 0.08})`;
         ctx.beginPath();
         ctx.arc(cx, rowY, cr, 0, Math.PI * 2);
@@ -9394,78 +9839,61 @@
       ctx.restore();
     }
 
-    // ── CARTELES DE PUBLICIDAD DETRÁS DEL ARCO (NEXOS BILLBOARD) ──
-    // Dos paneles de publicidad tipo LED con reflejo
-    const adCycle = Math.floor(Date.now() / 2200) % 3;
-
-    // Panel izquierdo
-    const adBg1 = ctx.createLinearGradient(8, 46, 8, 62);
-    adBg1.addColorStop(0, adCycle === 0 ? '#032a36' : '#0c0c10');
-    adBg1.addColorStop(1, '#090909');
-    ctx.fillStyle = adBg1;
+    // ── CARTEL DE PUBLICIDAD LED TRASERO (SCROLLING TICKER CONTINUO) ──
+    ctx.save();
+    
+    // Dibujar estructura del panel LED entero
+    const ledX = 8;
+    const ledY = 46;
+    const ledW = 384;
+    const ledH = 16;
+    
+    const ledBg = ctx.createLinearGradient(ledX, ledY, ledX, ledY + ledH);
+    ledBg.addColorStop(0, '#020617'); // azul muy oscuro slate
+    ledBg.addColorStop(1, '#0f172a');
+    ctx.fillStyle = ledBg;
     ctx.beginPath();
-    ctx.roundRect(8, 46, 118, 16, 3);
+    ctx.roundRect(ledX, ledY, ledW, ledH, 4);
     ctx.fill();
-    ctx.strokeStyle = adCycle === 0 ? 'rgba(6,182,212,0.5)' : 'rgba(50,50,60,0.5)';
-    ctx.lineWidth = 1;
+    
+    // Borde neón parpadeante sutil con gradiente
+    const tLed = Date.now();
+    const borderGlow = 0.65 + Math.sin(tLed * 0.0035) * 0.25;
+    ctx.strokeStyle = `rgba(16, 185, 129, ${borderGlow})`; // neón esmeralda
+    ctx.lineWidth = 1.2;
     ctx.beginPath();
-    ctx.roundRect(8, 46, 118, 16, 3);
+    ctx.roundRect(ledX, ledY, ledW, ledH, 4);
     ctx.stroke();
     
-    ctx.font = '900 9px system-ui, -apple-system, sans-serif';
-    ctx.textAlign = 'center';
+    // Resplandor neón exterior
+    ctx.shadowColor = '#10b981';
+    ctx.shadowBlur = 4 * borderGlow;
+    
+    // Clip para el texto en movimiento para que no se salga del panel
+    ctx.beginPath();
+    ctx.roundRect(ledX + 2, ledY + 1, ledW - 4, ledH - 2, 2);
+    ctx.clip();
+    ctx.shadowBlur = 0; // resetear shadow para el texto
+    
+    // Dibujar texto con scroll continuo
+    ctx.font = '900 8.5px "Courier New", Courier, monospace, system-ui';
+    ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = adCycle === 0 ? '#06b6d4' : '#2a2a35';
-    if (adCycle === 0) {
-      ctx.shadowColor = '#06b6d4';
-      ctx.shadowBlur = 6;
-    }
-    ctx.fillText('NEXOS VECINOS 👥', 67, 54);
-    ctx.shadowBlur = 0;
-
-    // Panel central
-    const adBg2 = ctx.createLinearGradient(141, 46, 141, 62);
-    adBg2.addColorStop(0, adCycle === 1 ? '#2a2000' : '#0c0c10');
-    adBg2.addColorStop(1, '#090909');
-    ctx.fillStyle = adBg2;
-    ctx.beginPath();
-    ctx.roundRect(141, 46, 118, 16, 3);
-    ctx.fill();
-    ctx.strokeStyle = adCycle === 1 ? 'rgba(234,179,8,0.5)' : 'rgba(50,50,60,0.5)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.roundRect(141, 46, 118, 16, 3);
-    ctx.stroke();
-
-    ctx.fillStyle = adCycle === 1 ? '#eab308' : '#2a2a35';
-    if (adCycle === 1) {
-      ctx.shadowColor = '#eab308';
-      ctx.shadowBlur = 6;
-    }
-    ctx.fillText('★ COPA NEXOS 2026 ★', 200, 54);
-    ctx.shadowBlur = 0;
-
-    // Panel derecho
-    const adBg3 = ctx.createLinearGradient(274, 46, 274, 62);
-    adBg3.addColorStop(0, adCycle === 2 ? '#012418' : '#0c0c10');
-    adBg3.addColorStop(1, '#090909');
-    ctx.fillStyle = adBg3;
-    ctx.beginPath();
-    ctx.roundRect(274, 46, 118, 16, 3);
-    ctx.fill();
-    ctx.strokeStyle = adCycle === 2 ? 'rgba(16,185,129,0.5)' : 'rgba(50,50,60,0.5)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.roundRect(274, 46, 118, 16, 3);
-    ctx.stroke();
     
-    ctx.fillStyle = adCycle === 2 ? '#10b981' : '#2a2a35';
-    if (adCycle === 2) {
-      ctx.shadowColor = '#10b981';
-      ctx.shadowBlur = 6;
-    }
-    ctx.fillText('NEXOSMAPS.COM 🗺️', 333, 54);
-    ctx.shadowBlur = 0;
+    const textToDraw = "  ★  NEXOS VECINOS 👥  ★  COPA NEXOS 2026 🏆  ★  NEXOSMAPS.COM 🗺️  ★  SÚPER DIBU MARTÍNEZ 🔥  ★  NEXOS PÁNICO JUEGAZO ⚽  ";
+    const textWidth = ctx.measureText(textToDraw).width;
+    
+    // Posición X animada por milisegundos para ser independiente del framerate
+    const scrollPos = (tLed * 0.045) % textWidth;
+    
+    // Dibujar texto duplicado para scroll infinito sin saltos
+    ctx.fillStyle = '#10b981'; // texto verde LED
+    ctx.shadowColor = '#10b981';
+    ctx.shadowBlur = 5;
+    ctx.fillText(textToDraw, ledX + 4 - scrollPos, ledY + ledH / 2 + 0.5);
+    ctx.fillText(textToDraw, ledX + 4 - scrollPos + textWidth, ledY + ledH / 2 + 0.5);
+    
+    ctx.restore();
 
     if (isCelebrating) {
       // Red del Arco mejorada durante celebración
@@ -10253,8 +10681,66 @@
       ctx.fillStyle = motionGrad;
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r * 1.5, 0, Math.PI * 2);
-      ctx.fill();
     });
+
+    // ══════════════════════════════════════════════
+    // 7.1. DIBUJAR PARTÍCULAS DE FUEGO (SÚPER LLAMAS)
+    // ══════════════════════════════════════════════
+    if (fireParticles.length > 0) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      fireParticles.forEach(p => {
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.life * 0.85;
+        ctx.beginPath();
+        if (p.type === 'spark') {
+          // Chispa de estrella neón brillante
+          ctx.arc(p.x, p.y, p.r * 0.45, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(p.x - p.r, p.y); ctx.lineTo(p.x + p.r, p.y);
+          ctx.moveTo(p.x, p.y - p.r); ctx.lineTo(p.x, p.y + p.r);
+          ctx.stroke();
+        } else {
+          // Llama
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+      ctx.restore();
+    }
+ 
+    // ══════════════════════════════════════════════
+    // 7.2. ANIME SPEED LINES (SÚPER POTENCIA)
+    // ══════════════════════════════════════════════
+    if (pelota.isShot && !pelota.isSettled && rachaActual >= 3) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(254, 240, 138, 0.26)'; // Amarillo suave neón
+      ctx.lineWidth = 1.05;
+      const speedLinesCount = 14;
+      const now = Date.now();
+      for (let i = 0; i < speedLinesCount; i++) {
+        const seed = Math.sin(i * 12 + now * 0.05);
+        if (seed > 0) {
+          const angle = (i / speedLinesCount) * Math.PI * 2;
+          const length = 40 + Math.random() * 65;
+          const startDist = 180 + seed * 40;
+          
+          const sx = 200 + Math.cos(angle) * startDist;
+          const sy = 150 + Math.sin(angle) * startDist;
+          const ex = 200 + Math.cos(angle) * (startDist - length);
+          const ey = 150 + Math.sin(angle) * (startDist - length);
+          
+          ctx.beginPath();
+          ctx.moveTo(sx, sy);
+          ctx.lineTo(ex, ey);
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+    }
 
     if (!pelota.isSettled || pelota.status === 'palo') {
       const bx = pelota.x, by = pelota.y, br = pelota.r;
@@ -10365,7 +10851,9 @@
           
           // Comba real (¡Súper sensible!)
           if (simY < 220 && simY > 60) {
-            const combaFuerza = (selectedPlayer.comba / 100) * 0.115;
+            let combaMult = 1.0;
+            if (rachaActual >= 2) combaMult = 1.85; // ¡SÚPER CURVA!
+            const combaFuerza = (selectedPlayer.comba / 100) * 0.115 * combaMult;
             if (simVx > 0.5) simVx += combaFuerza;
             else if (simVx < -0.5) simVx -= combaFuerza;
           }
