@@ -2614,6 +2614,17 @@
       align-items: center;
       gap: 14px;
     }
+    #mundial-seleccion {
+      flex: 1;
+      width: 100%;
+      overflow-y: auto;
+      padding-bottom: 40px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    #mundial-seleccion::-webkit-scrollbar {
+      display: none;
+    }
     #mundial-estadio {
       flex: 1;
       min-height: 0;
@@ -7326,6 +7337,72 @@
   let bannerTxt = '';
   let bannerTimer = 0;
   let infantinoCelebTimer = 0; // frames que Infantino festeja (solo goles del Mesías)
+  
+  // Real Human Sounds
+  let crowdCheerAudio = null;
+  let refereeWhistleAudio = null;
+
+  function preloadRealSounds() {
+    if (crowdCheerAudio) return;
+    try {
+      crowdCheerAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2042/2042-200.wav');
+      crowdCheerAudio.volume = 0.55;
+      
+      refereeWhistleAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-200.wav');
+      refereeWhistleAudio.volume = 0.45;
+    } catch(e) {}
+  }
+
+  function playWhistleSound() {
+    if (modoDiscreto) return;
+    try {
+      preloadRealSounds();
+      if (refereeWhistleAudio) {
+        refereeWhistleAudio.currentTime = 0;
+        refereeWhistleAudio.play().catch(() => {});
+      }
+    } catch(e) {}
+  }
+
+  // Precalentar voces de síntesis premium
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.getVoices();
+    };
+  }
+
+  function buscarVozHumana() {
+    if (!('speechSynthesis' in window)) return null;
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length === 0) return null;
+    
+    // 1. Buscar voz de Argentina que sea premium/natural/google/online/neural
+    let voz = voices.find(v => v.lang === 'es-AR' && (
+      v.name.toLowerCase().includes('natural') || 
+      v.name.toLowerCase().includes('google') || 
+      v.name.toLowerCase().includes('online') ||
+      v.name.toLowerCase().includes('neural')
+    ));
+    if (voz) return voz;
+    
+    // 2. Buscar cualquier voz de Argentina
+    voz = voices.find(v => v.lang === 'es-AR');
+    if (voz) return voz;
+    
+    // 3. Buscar voz de España/México/América Latina premium/natural/google/online/neural
+    voz = voices.find(v => v.lang.startsWith('es-') && (
+      v.name.toLowerCase().includes('natural') || 
+      v.name.toLowerCase().includes('google') || 
+      v.name.toLowerCase().includes('online') ||
+      v.name.toLowerCase().includes('neural')
+    ));
+    if (voz) return voz;
+    
+    // 4. Buscar cualquier voz en español
+    voz = voices.find(v => v.lang.startsWith('es-'));
+    return voz;
+  }
 
   // ── RACHA DE GOLES ──
   let rachaActual = 0;        // goles consecutivos
@@ -7890,6 +7967,7 @@
   window.iniciarEstadioJuego = function() {
     triggerHaptic('medium');
     playSound('pop');
+    preloadRealSounds();
     document.getElementById('mundial-seleccion').style.display = 'none';
     document.getElementById('mundial-estadio').style.display = 'flex';
     
@@ -8054,32 +8132,54 @@
       
       const now = audioCtx.currentTime;
       
-      // 1. Cuerpo del impacto (Frecuencia sub-baja realista)
+      // 1. Cuerpo del impacto (Frecuencia sub-baja pesada)
       const osc1 = audioCtx.createOscillator();
       const gain1 = audioCtx.createGain();
       osc1.connect(gain1);
       gain1.connect(audioCtx.destination);
       osc1.type = 'sine';
-      osc1.frequency.setValueAtTime(140, now);
-      osc1.frequency.exponentialRampToValueAtTime(38, now + 0.12);
-      gain1.gain.setValueAtTime(0.28, now);
-      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      osc1.frequency.setValueAtTime(125, now);
+      osc1.frequency.exponentialRampToValueAtTime(32, now + 0.16);
+      gain1.gain.setValueAtTime(0.55, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
       
-      // 2. Ruido sordo del cuero (Slap / Pop de media frecuencia)
+      // 2. Ruido sordo del impacto del cuero (Slap / Pop de media frecuencia)
       const osc2 = audioCtx.createOscillator();
       const gain2 = audioCtx.createGain();
       osc2.connect(gain2);
       gain2.connect(audioCtx.destination);
       osc2.type = 'triangle';
-      osc2.frequency.setValueAtTime(320, now);
-      osc2.frequency.exponentialRampToValueAtTime(80, now + 0.04);
-      gain2.gain.setValueAtTime(0.12, now);
-      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+      osc2.frequency.setValueAtTime(270, now);
+      osc2.frequency.exponentialRampToValueAtTime(68, now + 0.08);
+      gain2.gain.setValueAtTime(0.26, now);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
       
+      // 3. Golpe de aire a presión (ruido blanco filtrado de impacto rápido)
+      const bufferSize = audioCtx.sampleRate * 0.04;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      const noiseSource = audioCtx.createBufferSource();
+      noiseSource.buffer = buffer;
+      const noiseFilter = audioCtx.createBiquadFilter();
+      noiseFilter.type = 'bandpass';
+      noiseFilter.frequency.setValueAtTime(260, now);
+      noiseFilter.Q.setValueAtTime(1.8, now);
+      const noiseGain = audioCtx.createGain();
+      noiseGain.gain.setValueAtTime(0.22, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+      
+      noiseSource.connect(noiseFilter);
+      noiseFilter.connect(noiseGain);
+      noiseGain.connect(audioCtx.destination);
+      
+      noiseSource.start(now);
       osc1.start(now);
-      osc1.stop(now + 0.12);
+      osc1.stop(now + 0.16);
       osc2.start(now);
-      osc2.stop(now + 0.04);
+      osc2.stop(now + 0.08);
     } catch(e) {}
   }
 
@@ -8091,31 +8191,45 @@
       
       const now = audioCtx.currentTime;
       
-      // Mezcla de múltiples osciladores a frecuencias no armónicas (Inharmonic Metal Clang!)
-      const freqs = [385, 592, 875, 1220, 1540];
-      const gains = [0.12, 0.08, 0.06, 0.04, 0.03];
+      // Frecuencias no armónicas del metal resonante (Poste de hierro del arco)
+      const freqs = [325, 540, 885, 1145, 1590, 2210];
+      const gains = [0.42, 0.32, 0.22, 0.14, 0.09, 0.06];
       
       freqs.forEach((freq, idx) => {
         const osc = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
-        osc.connect(gainNode);
+        const metalFilter = audioCtx.createBiquadFilter();
+        
+        osc.connect(metalFilter);
+        metalFilter.connect(gainNode);
         gainNode.connect(audioCtx.destination);
         
-        osc.type = idx % 2 === 0 ? 'triangle' : 'sine';
+        osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
         osc.frequency.setValueAtTime(freq, now);
         
-        // Decaimiento natural y metálico más largo
+        // Filtro de paso banda para dar el timbre "hueco" y resonante del metal tubular
+        metalFilter.type = 'bandpass';
+        metalFilter.frequency.setValueAtTime(freq, now);
+        metalFilter.Q.setValueAtTime(7.5, now);
+        
+        // El impacto inicial es súper fuerte y decae de forma exponencial natural
         gainNode.gain.setValueAtTime(gains[idx], now);
-        gainNode.gain.exponentialRampToValueAtTime(0.0005, now + 0.4 + (idx * 0.05));
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.72 + (idx * 0.04));
         
         osc.start(now);
-        osc.stop(now + 0.6);
+        osc.stop(now + 0.98);
       });
     } catch(e) {}
   }
 
   function playGoalSound() {
     if (modoDiscreto) return;
+    try {
+      if (crowdCheerAudio) {
+        crowdCheerAudio.currentTime = 0;
+        crowdCheerAudio.play().catch(() => {});
+      }
+    } catch(e) {}
     try {
       initAudio();
       if (!audioCtx) return;
@@ -8309,12 +8423,56 @@
         ];
         const textToSpeak = phrases[Math.floor(Math.random() * phrases.length)];
         const utterance = new SpeechSynthesisUtterance(textToSpeak);
-        const voices = window.speechSynthesis.getVoices();
-        let argVoice = voices.find(v => v.lang === 'es-AR');
-        if (!argVoice) argVoice = voices.find(v => v.lang.startsWith('es-'));
-        if (argVoice) utterance.voice = argVoice;
+        const humVoz = buscarVozHumana();
+        if (humVoz) utterance.voice = humVoz;
         utterance.rate = 1.32;
         utterance.pitch = 1.15;
+        utterance.volume = 1.0;
+        window.speechSynthesis.speak(utterance);
+      }
+    } catch(err) {}
+  }
+
+  function playSaveVoice() {
+    if (modoDiscreto) return;
+    try {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const phrases = [
+          "¡Atajó el Dibu! ¡El Dibu Martínez con los pies de nuevo!",
+          "¡Grande Dibu! ¡Se hizo gigante en el arco, señoras y señores!",
+          "¡Sensacional el Dibu Martínez! ¡La pelota no entra, espectacular!",
+          "¡Increíble tapada del Dibu! ¡No se puede creer lo que acaba de sacar!"
+        ];
+        const textToSpeak = phrases[Math.floor(Math.random() * phrases.length)];
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        const humVoz = buscarVozHumana();
+        if (humVoz) utterance.voice = humVoz;
+        utterance.rate = 1.35;
+        utterance.pitch = 1.15;
+        utterance.volume = 1.0;
+        window.speechSynthesis.speak(utterance);
+      }
+    } catch(err) {}
+  }
+
+  function playMissVoice() {
+    if (modoDiscreto) return;
+    try {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const phrases = [
+          "¡Afueraaa! ¡Completamente afuera! ¡Se la regaló a la tribuna!",
+          "¡La tiró a cualquier lado! ¡Desviadísimo, no se puede creer!",
+          "¡Le erró al arco! ¡Afuera, afuera, afuera!",
+          "¡La mandó al córner de la tribuna! ¡Qué remate tan desviado!"
+        ];
+        const textToSpeak = phrases[Math.floor(Math.random() * phrases.length)];
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        const humVoz = buscarVozHumana();
+        if (humVoz) utterance.voice = humVoz;
+        utterance.rate = 1.32;
+        utterance.pitch = 1.12;
         utterance.volume = 1.0;
         window.speechSynthesis.speak(utterance);
       }
@@ -8356,6 +8514,7 @@
 
   window.iniciarRondaJuego = function() {
     document.getElementById('gameover-overlay').style.display = 'none';
+    playWhistleSound();
     
     // Resetear variables de ronda y celebración
     goalsScoredInRound = 0;
@@ -8601,6 +8760,7 @@
         pelota.status = 'afuera';
         bannerTxt = '¡AFUERAAA! 😝';
         playSound('error');
+        playMissVoice();
         bannerTimer = 100;
         setTimeout(evaluarProximoPaso, 2000);
         return;
@@ -8681,6 +8841,7 @@
         rachaMultiplier = 1;
         triggerHaptic('medium');
         playSound('error');
+        playSaveVoice();
       }
 
       // 4. Colisiones con los Postes del Arco y Travesaño (CLANG!)
@@ -8799,6 +8960,7 @@
           pelota.status = 'afuera';
           bannerTxt = '¡AFUERAAA! 😝';
           playSound('error');
+          playMissVoice();
           triggerHaptic('soft');
           // ── RESETEAR RACHA ──
           rachaActual = 0;
@@ -8819,6 +8981,7 @@
         pelota.status = 'afuera';
         bannerTxt = '¡AFUERAAA! 😝';
         playSound('error');
+        playMissVoice();
         setTimeout(evaluarProximoPaso, 2000);
       }
     }
