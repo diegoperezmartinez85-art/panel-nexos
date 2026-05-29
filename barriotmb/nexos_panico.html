@@ -2641,6 +2641,7 @@
     }
     .mundial-players-slider {
       width: 100%;
+      min-height: 240px; /* Evita que colapse y el botón se superponga */
       display: flex;
       gap: 12px;
       overflow-x: auto;
@@ -7341,6 +7342,7 @@
   // Real Human Sounds
   let crowdCheerAudio = null;
   let refereeWhistleAudio = null;
+  let stadiumAmbientAudio = null;
 
   function preloadRealSounds() {
     if (crowdCheerAudio) return;
@@ -7350,6 +7352,248 @@
       
       refereeWhistleAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-200.wav');
       refereeWhistleAudio.volume = 0.45;
+
+      stadiumAmbientAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2248/2248-200.wav');
+      stadiumAmbientAudio.volume = 0.12; // volumen de fondo bajo
+      stadiumAmbientAudio.loop = true;
+
+      crowdCheerAudio.load();
+      refereeWhistleAudio.load();
+      stadiumAmbientAudio.load();
+    } catch(e) {}
+  }
+
+  // Desbloqueo y precarga global de audio en el primer toque del usuario (crítico para celulares/iOS)
+  ['touchstart', 'click', 'mousedown'].forEach(evt => {
+    document.addEventListener(evt, () => {
+      preloadRealSounds();
+    }, { once: true, passive: true });
+  });
+
+  // --- PROCEDURAL 8-BIT RETRO SOCCER CHIPTUNE SYNTHESIZER (100% Offline-Ready & CORS/File-Proof) ---
+  let musicSeqInterval = null;
+  let seqStep = 0;
+  let activeSeqOscs = [];
+
+  function iniciarMusicaRetroArcade() {
+    if (modoDiscreto) return;
+    try {
+      initAudio();
+      if (!audioCtx) return;
+      if (musicSeqInterval) return; // ya está sonando
+      
+      const stepDuration = 0.135; // Tempo alegre y enérgico de fútbol retro
+      const ahora = audioCtx.currentTime;
+      
+      // Bajo rítmico (Bassline de 32 pasos al estilo Tecmo World Cup / Goal!)
+      const bassSeq = [
+        'C3', '', 'C3', 'E3', '', 'G3', 'C3', '',
+        'A3', '', 'A3', 'C4', '', 'E4', 'A3', '',
+        'F3', '', 'F3', 'A3', '', 'C4', 'F3', '',
+        'G3', '', 'G3', 'B3', '', 'D4', 'G3', ''
+      ];
+      
+      // Melodía principal alegre y épica
+      const melodySeq = [
+        'C5', '', 'E5', 'G5', '', 'C5', 'E5', '',
+        'A5', '', 'G5', 'F5', '', 'E5', 'D5', '',
+        'F5', '', 'A5', 'C6', '', 'F5', 'A5', '',
+        'G5', '', 'F5', 'E5', '', 'D5', 'C5', ''
+      ];
+      
+      const snareSeq = [
+        0, 0, 1, 0, 0, 0, 1, 0,
+        0, 0, 1, 0, 0, 0, 1, 0,
+        0, 0, 1, 0, 0, 0, 1, 0,
+        0, 0, 1, 0, 0, 0, 1, 0
+      ];
+      
+      const kickSeq = [
+        1, 0, 0, 0, 1, 0, 0, 0,
+        1, 0, 0, 0, 1, 0, 0, 0,
+        1, 0, 0, 0, 1, 0, 0, 0,
+        1, 0, 0, 0, 1, 0, 0, 0
+      ];
+
+      const NOTES = {
+        C3: 130.81, E3: 164.81, G3: 196.00, A3: 220.00, B3: 246.94,
+        C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.00, A4: 440.00, B4: 493.88,
+        C5: 523.25, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880.00, C6: 1046.50
+      };
+
+      function playStep() {
+        if (!audioCtx) return;
+        const t = audioCtx.currentTime;
+        const step = seqStep % 32;
+        seqStep++;
+        
+        // 1. KICK DRUM (BOMBO ARCADE DE 8 BITS)
+        if (kickSeq[step]) {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(100, t);
+          osc.frequency.exponentialRampToValueAtTime(0.01, t + 0.08);
+          
+          gain.gain.setValueAtTime(0.24, t);
+          gain.gain.linearRampToValueAtTime(0.001, t + 0.08);
+          
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(t);
+          osc.stop(t + 0.09);
+        }
+        
+        // 2. SNARE DRUM (CAJA DE 8 BITS)
+        if (snareSeq[step]) {
+          const bufferSize = audioCtx.sampleRate * 0.06;
+          const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+          }
+          const noise = audioCtx.createBufferSource();
+          noise.buffer = buffer;
+          
+          const filter = audioCtx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.setValueAtTime(900, t);
+          
+          const gain = audioCtx.createGain();
+          gain.gain.setValueAtTime(0.06, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+          
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(audioCtx.destination);
+          
+          noise.start(t);
+          noise.stop(t + 0.07);
+        }
+        
+        // 3. RETRO CHIPTUNE BASS
+        const bassNote = bassSeq[step];
+        if (bassNote && NOTES[bassNote]) {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(NOTES[bassNote], t);
+          
+          const filter = audioCtx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(320, t);
+          
+          gain.gain.setValueAtTime(0.08, t);
+          gain.gain.linearRampToValueAtTime(0.001, t + 0.12);
+          
+          osc.connect(filter);
+          filter.connect(gain);
+          gain.connect(audioCtx.destination);
+          
+          osc.start(t);
+          osc.stop(t + 0.13);
+          
+          activeSeqOscs.push(osc);
+          setTimeout(() => {
+            activeSeqOscs = activeSeqOscs.filter(o => o !== osc);
+          }, 150);
+        }
+        
+        // 4. RETRO HEROIC SQUARE LEAD
+        const melodyNote = melodySeq[step];
+        if (melodyNote && NOTES[melodyNote]) {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(NOTES[melodyNote], t);
+          
+          // Vibrato sutil retro
+          const vibrato = audioCtx.createOscillator();
+          const vibratoGain = audioCtx.createGain();
+          vibrato.frequency.setValueAtTime(7.5, t);
+          vibratoGain.gain.setValueAtTime(5, t);
+          
+          vibrato.connect(vibratoGain);
+          vibratoGain.connect(osc.frequency);
+          
+          gain.gain.setValueAtTime(0.035, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+          
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          
+          vibrato.start(t);
+          osc.start(t);
+          
+          vibrato.stop(t + 0.24);
+          osc.stop(t + 0.24);
+          
+          activeSeqOscs.push(osc);
+          activeSeqOscs.push(vibrato);
+          setTimeout(() => {
+            activeSeqOscs = activeSeqOscs.filter(o => o !== osc && o !== vibrato);
+          }, 300);
+        }
+      }
+      
+      musicSeqInterval = setInterval(playStep, stepDuration * 1000);
+    } catch(e) {}
+  }
+
+  function detenerMusicaRetroArcade() {
+    try {
+      if (musicSeqInterval) {
+        clearInterval(musicSeqInterval);
+        musicSeqInterval = null;
+      }
+      activeSeqOscs.forEach(osc => {
+        try { osc.stop(); } catch(e) {}
+      });
+      activeSeqOscs = [];
+      seqStep = 0;
+    } catch(e) {}
+  }
+
+  function explotarAmbienteSintetizado() {
+    if (modoDiscreto) return;
+    try {
+      initAudio();
+      if (!audioCtx) return;
+      
+      const ahora = audioCtx.currentTime;
+      
+      // Sintetizar una ovación masiva en tiempo real (ruido blanco filtrado con barrido de volumen de gol!)
+      const bufferSize = audioCtx.sampleRate * 2.5; // 2.5 segundos de festejo
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = buffer;
+      
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(600, ahora); // filtro más alto y brillante para simular grito
+      filter.frequency.exponentialRampToValueAtTime(200, ahora + 2.5); // bajar frecuencia al apagarse
+      
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(0.45, ahora); // volumen de explosión fuerte
+      gain.gain.exponentialRampToValueAtTime(0.001, ahora + 2.4);
+      
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      noise.start(ahora);
+      noise.stop(ahora + 2.5);
+      
+      // Fallback: reproducir también la pista de archivo por si está habilitada/cargada
+      if (crowdCheerAudio) {
+        crowdCheerAudio.currentTime = 0;
+        crowdCheerAudio.play().catch(() => {});
+      }
     } catch(e) {}
   }
 
@@ -7967,7 +8211,16 @@
   window.iniciarEstadioJuego = function() {
     triggerHaptic('medium');
     playSound('pop');
+    
+    // Iniciar melodía arcade retro
+    iniciarMusicaRetroArcade();
+    
     preloadRealSounds();
+    try {
+      if (stadiumAmbientAudio) {
+        stadiumAmbientAudio.play().catch(() => {});
+      }
+    } catch(e) {}
     document.getElementById('mundial-seleccion').style.display = 'none';
     document.getElementById('mundial-estadio').style.display = 'flex';
     
@@ -7992,6 +8245,17 @@
     if (e) e.stopPropagation();
     triggerHaptic('medium');
     playSound('pop');
+    
+    // Iniciar melodía arcade retro
+    iniciarMusicaRetroArcade();
+    
+    // Precargar sonidos reales de respaldo
+    preloadRealSounds();
+    try {
+      if (stadiumAmbientAudio) {
+        stadiumAmbientAudio.play().catch(() => {});
+      }
+    } catch(err) {}
     
     // Ocultar todas las pantallas principales
     const pantallas = ['panico', 'comunicados', 'directorio', 'reservas'];
@@ -8020,6 +8284,13 @@
         cancelAnimationFrame(physicsInterval);
         physicsInterval = null;
       }
+      
+      // Apagar la melodía retro progresivamente
+      detenerMusicaRetroArcade();
+      
+      try {
+        if (stadiumAmbientAudio) stadiumAmbientAudio.pause();
+      } catch(e) {}
       document.getElementById('pantalla-mundial').classList.remove('visible');
       mostrarPantallaPanico();
     }
@@ -8032,6 +8303,7 @@
       cancelAnimationFrame(physicsInterval);
       physicsInterval = null;
     }
+    // NOT pausing stadiumAmbientAudio so it plays continuously while choosing players!
     document.getElementById('mundial-estadio').style.display = 'none';
     document.getElementById('mundial-seleccion').style.display = 'block';
     loadRankingCasas();
@@ -8225,10 +8497,7 @@
   function playGoalSound() {
     if (modoDiscreto) return;
     try {
-      if (crowdCheerAudio) {
-        crowdCheerAudio.currentTime = 0;
-        crowdCheerAudio.play().catch(() => {});
-      }
+      explotarAmbienteEstadio();
     } catch(e) {}
     try {
       initAudio();
@@ -8415,11 +8684,11 @@
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const phrases = [
-          "¡Gooooool! ¡Gooooool! ¡Golaaaaaazo! ¡De otro partido! ¡Sen-sa-cio-nal!",
-          "¡Pero qué golaaaazo! ¡Extraordinario! ¡Impresionante!",
-          "¡Goooool! ¡Goooool! ¡Cantalo, cantalo, cantalo, cantalo!",
-          "¡Es una bestia, señoras y señores! ¡Imparable! ¡Golaaaaaazo!",
-          `¡Espectacular remate de ${selectedPlayer.nombre}! ¡Goooool!`
+          `¡Gol de ${selectedPlayer.nombre}! ¡Gol! ¡Gol! ¡Es un golazo espectacular de otro partido! ¡Sen-sa-cio-nal!`,
+          `¡Pero qué golazo de ${selectedPlayer.nombre}! ¡Extraordinario! ¡Impresionante!`,
+          `¡Gol de ${selectedPlayer.nombre}! ¡Cantalo, cantalo, cantalo, cantalo!`,
+          `¡Es una bestia ${selectedPlayer.nombre}, señoras y señores! ¡Imparable! ¡Golazo!`,
+          `¡Espectacular remate de ${selectedPlayer.nombre}! ¡Gol!`
         ];
         const textToSpeak = phrases[Math.floor(Math.random() * phrases.length)];
         const utterance = new SpeechSynthesisUtterance(textToSpeak);
@@ -8439,10 +8708,10 @@
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const phrases = [
-          "¡Atajó el Dibu! ¡El Dibu Martínez con los pies de nuevo!",
-          "¡Grande Dibu! ¡Se hizo gigante en el arco, señoras y señores!",
-          "¡Sensacional el Dibu Martínez! ¡La pelota no entra, espectacular!",
-          "¡Increíble tapada del Dibu! ¡No se puede creer lo que acaba de sacar!"
+          `¡Atajó el Dibu! ¡Le tapó el remate a ${selectedPlayer.nombre}!`,
+          `¡Grande Dibu! ¡Se hizo gigante ante el tiro de ${selectedPlayer.nombre}!`,
+          `¡Sensacional el Dibu Martínez! ¡La pelota de ${selectedPlayer.nombre} no entra!`,
+          `¡Increíble tapada del Dibu a ${selectedPlayer.nombre}! ¡No se puede creer lo que acaba de sacar!`
         ];
         const textToSpeak = phrases[Math.floor(Math.random() * phrases.length)];
         const utterance = new SpeechSynthesisUtterance(textToSpeak);
@@ -8462,10 +8731,10 @@
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const phrases = [
-          "¡Afueraaa! ¡Completamente afuera! ¡Se la regaló a la tribuna!",
-          "¡La tiró a cualquier lado! ¡Desviadísimo, no se puede creer!",
-          "¡Le erró al arco! ¡Afuera, afuera, afuera!",
-          "¡La mandó al córner de la tribuna! ¡Qué remate tan desviado!"
+          `¡Afueraaa! ¡Completamente afuera de ${selectedPlayer.nombre}! ¡Se la regaló a la tribuna!`,
+          `¡La tiró a cualquier lado ${selectedPlayer.nombre}! ¡Desviadísimo, no se puede creer!`,
+          `¡Le erró al arco ${selectedPlayer.nombre}! ¡Afuera, afuera, afuera!`,
+          `¡La mandó al córner de la tribuna ${selectedPlayer.nombre}! ¡Qué remate tan desviado!`
         ];
         const textToSpeak = phrases[Math.floor(Math.random() * phrases.length)];
         const utterance = new SpeechSynthesisUtterance(textToSpeak);
@@ -9139,6 +9408,28 @@
       const hipRotation = Math.sin(Date.now() * 0.02) * 0.28;
       ctx.translate(danceOffset, Math.abs(Math.sin(Date.now() * 0.035)) * -4.5);
       ctx.rotate(hipRotation);
+    }
+    
+    // Animaciones y traducciones de festejos icónicos para jugadores de campo
+    if (isJoyful && !isGoalie) {
+      const t = Date.now() * 0.015;
+      if (player.id === 'hajalan') {
+        // Flotación Zen
+        ctx.translate(0, -6 + Math.sin(Date.now() * 0.008) * 4);
+      } else if (player.id === 'maradonuts') {
+        // Salto puño en alto
+        ctx.translate(0, -6 - Math.abs(Math.sin(t * 1.2)) * 14);
+      } else if (player.id === 'orey') {
+        // Salto Pelé con puño al aire
+        ctx.translate(0, -8 - Math.abs(Math.sin(t * 1.4)) * 18);
+        ctx.rotate(-0.1);
+      } else if (player.id === 'zazu') {
+        // Giro elegante
+        ctx.rotate(t * 1.2);
+      } else if (player.id === 'mesias') {
+        // Pequeño rebote de gratitud
+        ctx.translate(0, Math.sin(t * 0.5) * 2);
+      }
     }
     
     // Mirroring horizontal para perfil zurdo de El Mesías y Yamalísimo
