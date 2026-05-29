@@ -2562,16 +2562,16 @@
       position: fixed;
       inset: 0;
       width: 100vw;
-      height: 100vh;
+      height: 100dvh;
       background: #09090b; /* Fondo oscuro de estadio */
       display: none;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
-      padding: env(safe-area-inset-top, 24px) 16px env(safe-area-inset-bottom, 24px) 16px;
+      gap: 8px;
+      padding: env(safe-area-inset-top, 12px) 12px env(safe-area-inset-bottom, 12px) 12px;
       box-sizing: border-box;
       z-index: 9500;
-      overflow-y: auto; /* Scroll vertical si la pantalla es chica */
+      overflow: hidden;
     }
     .pantalla-mundial.visible {
       display: flex;
@@ -2613,6 +2613,11 @@
       flex-direction: column;
       align-items: center;
       gap: 14px;
+    }
+    #mundial-estadio {
+      flex: 1;
+      min-height: 0;
+      gap: 8px;
     }
     .mundial-subtitle {
       font-size: 11px;
@@ -2863,7 +2868,8 @@
 
     .canvas-wrapper {
       width: 100%;
-      aspect-ratio: 4 / 3;
+      flex: 1;
+      min-height: 0;
       background: linear-gradient(180deg, #050e07 0%, #071510 100%);
       border: 1.5px solid rgba(255, 255, 255, 0.10);
       border-top: 1.5px solid rgba(255,255,255,0.18);
@@ -2877,6 +2883,8 @@
       height: 100%;
       display: block;
       touch-action: none; /* Bloquea cualquier scroll nativo del teléfono al patear! */
+      position: absolute;
+      inset: 0;
     }
     .swipe-hint {
       position: absolute;
@@ -3529,17 +3537,20 @@
     }
     
     .clima-overlay.clima-rainy::before {
-      content: '';
+      display: none;
+    }
+    #rain-canvas {
       position: absolute;
       inset: 0;
-      background: linear-gradient(170deg, transparent 95%, rgba(6, 182, 212, 0.12) 95%) 0 0 / 20px 45px, linear-gradient(175deg, transparent 94%, rgba(6, 182, 212, 0.08) 94%) 10px 22px / 16px 36px;
+      width: 100%;
+      height: 100%;
       pointer-events: none;
-      animation: rainScroll 1.1s linear infinite;
       z-index: 1;
+      display: none;
+      border-radius: inherit;
     }
-    @keyframes rainScroll {
-      0% { background-position: 0 0, 10px 22px; }
-      100% { background-position: 20px 45px, 26px 58px; }
+    .clima-overlay.clima-rainy #rain-canvas {
+      display: block;
     }
     .settings-cerrar-btn {
       width: 100%;
@@ -4083,6 +4094,7 @@
 
 <!-- MODAL PRONÓSTICO -->
 <div class="clima-overlay" id="clima-overlay" onclick="cerrarPronostico(event)">
+  <canvas id="rain-canvas"></canvas>
   <div class="clima-sheet" onclick="event.stopPropagation()">
     <div class="clima-handle"></div>
     <div id="clima-contenido"><div class="clima-loading">⏳ Cargando pronóstico...</div></div>
@@ -6355,6 +6367,85 @@
       document.getElementById('clima-overlay').classList.remove('visible');
   }
 
+  // ── RAIN CANVAS ANIMATION ──
+  (function() {
+    const canvas = document.getElementById('rain-canvas');
+    const ctx = canvas.getContext('2d');
+    let drops = [];
+    let rafId = null;
+    let running = false;
+
+    function resize() {
+      const overlay = document.getElementById('clima-overlay');
+      canvas.width = overlay.offsetWidth || window.innerWidth;
+      canvas.height = overlay.offsetHeight || window.innerHeight;
+    }
+
+    function initDrops() {
+      drops = [];
+      const count = Math.floor((canvas.width * canvas.height) / 8000);
+      for (let i = 0; i < Math.max(40, count); i++) {
+        drops.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          len: 8 + Math.random() * 14,
+          speed: 6 + Math.random() * 10,
+          alpha: 0.15 + Math.random() * 0.35,
+          width: 0.8 + Math.random() * 0.8
+        });
+      }
+    }
+
+    function drawRain() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let d of drops) {
+        ctx.save();
+        ctx.globalAlpha = d.alpha;
+        ctx.strokeStyle = 'rgba(6, 182, 212, 1)';
+        ctx.lineWidth = d.width;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        // Slight diagonal (rain angle ~10deg)
+        ctx.moveTo(d.x, d.y);
+        ctx.lineTo(d.x + d.len * 0.18, d.y + d.len);
+        ctx.stroke();
+        ctx.restore();
+        // Move drop down
+        d.y += d.speed;
+        d.x += d.speed * 0.18;
+        if (d.y > canvas.height + d.len) {
+          d.y = -d.len - Math.random() * 20;
+          d.x = Math.random() * canvas.width;
+          d.speed = 6 + Math.random() * 10;
+          d.alpha = 0.15 + Math.random() * 0.35;
+        }
+      }
+    }
+
+    function loop() {
+      if (!running) return;
+      drawRain();
+      rafId = requestAnimationFrame(loop);
+    }
+
+    // Watch overlay class changes
+    const observer = new MutationObserver(() => {
+      const overlay = document.getElementById('clima-overlay');
+      const isRainy = overlay.classList.contains('clima-rainy') && overlay.classList.contains('visible');
+      if (isRainy && !running) {
+        resize();
+        initDrops();
+        running = true;
+        loop();
+      } else if (!isRainy && running) {
+        running = false;
+        cancelAnimationFrame(rafId);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    });
+    observer.observe(document.getElementById('clima-overlay'), { attributes: true, attributeFilter: ['class'] });
+  })();
+
   // Métodos de control para modales genéricos (ej: Novedades v.1.2)
   function abrirModal(id) {
     if (typeof triggerHaptic === 'function') triggerHaptic('soft');
@@ -7166,6 +7257,18 @@
   let replayTimer = 0;        // frames totales del replay (90 = 1.5s a 60fps)
   let replaySpeed = 0.35;     // velocidad de avance (< 1 = slow motion)
 
+  // ── SISTEMA DE CLIMA ──
+  let weatherRoundCounter = 0;    // partidas jugadas (para trigger ~cada 3)
+  let weatherActive = false;      // si hay lluvia activa
+  let weatherIntensity = 0;       // 0..1 fade in/out
+  let weatherTargetIntensity = 0; // 0 = apagado, 1 = lluvia plena
+  let rainDrops = [];             // partículas de lluvia { x, y, vy, len, alpha }
+  let lightningTimer = 0;         // frames hasta próximo relámpago
+  let lightningFlash = 0;         // intensidad del flash (0..1, decae)
+  let lightningBolt = null;       // { x, segments[] } forma del rayo actual
+  let fogOpacity = 0;             // niebla de fondo (0..0.18)
+  let grassWetness = 0;           // brillo mojado del césped (0..1)
+
   // Límites del arco (Arco más amplio y justo para mejores chances de gol!)
   const GOAL_Y = 60;
   const GOAL_LEFT = 115; // Ensanchado de 122 a 115 (Ancho total: 170px de arco!)
@@ -7620,7 +7723,7 @@
     triggerHaptic('medium');
     playSound('pop');
     document.getElementById('mundial-seleccion').style.display = 'none';
-    document.getElementById('mundial-estadio').style.display = 'block';
+    document.getElementById('mundial-estadio').style.display = 'flex';
     
     currentScore = 0;
     remainingShots = 5;
@@ -7630,8 +7733,13 @@
     document.getElementById('estadio-record').innerText = String(mundialRecord).padStart(2, '0');
     document.getElementById('gameover-overlay').style.display = 'none';
 
-    initCanvas();
-    iniciarRondaJuego();
+    // Esperar dos frames para que el browser calcule el layout y el canvas tenga dimensiones reales
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        initCanvas();
+        iniciarRondaJuego();
+      });
+    });
   };
 
   window.abrirMundial = function(e) {
@@ -7959,7 +8067,25 @@
     replayActive = false;
     replayIndex = 0;
     replayTimer = 0;
-    
+
+    // ── CLIMA: incrementar contador y decidir si llueve ──
+    weatherRoundCounter++;
+    const shouldRain = weatherRoundCounter >= 3 && Math.random() < 0.65;
+    if (shouldRain) {
+      weatherRoundCounter = 0;
+      weatherActive = true;
+      weatherTargetIntensity = 0.6 + Math.random() * 0.4;
+      lightningTimer = Math.floor(80 + Math.random() * 120);
+    } else if (weatherRoundCounter >= 4) {
+      weatherRoundCounter = 0;
+      weatherActive = true;
+      weatherTargetIntensity = 0.75;
+      lightningTimer = Math.floor(100 + Math.random() * 80);
+    } else {
+      weatherActive = false;
+      weatherTargetIntensity = 0;
+    }
+
     if (remainingShots === 5 || remainingShots <= 0) {
       roundStartTime = Date.now(); // Iniciar cronómetro de tiempo ataque!
     }
@@ -8056,6 +8182,7 @@
 
   function gameLoop() {
     updatePhysics();
+    updateWeather();
     drawGame();
     physicsInterval = requestAnimationFrame(gameLoop);
   }
@@ -8769,6 +8896,204 @@
       ctx.restore();
     }
 
+    ctx.restore();
+  }
+
+  // ══════════════════════════════════════════════
+  // SISTEMA DE CLIMA — Update (se llama en game loop)
+  // ══════════════════════════════════════════════
+  function updateWeather() {
+    // Fade in/out de intensidad
+    const fadeSpeed = 0.008;
+    if (weatherIntensity < weatherTargetIntensity) {
+      weatherIntensity = Math.min(weatherTargetIntensity, weatherIntensity + fadeSpeed);
+    } else if (weatherIntensity > weatherTargetIntensity) {
+      weatherIntensity = Math.max(0, weatherIntensity - fadeSpeed * 0.5);
+    }
+
+    const intensity = weatherIntensity;
+    if (intensity <= 0) {
+      rainDrops = [];
+      fogOpacity = 0;
+      grassWetness = 0;
+      lightningBolt = null;
+      return;
+    }
+
+    // Actualizar niebla y pasto mojado
+    fogOpacity = intensity * 0.14;
+    grassWetness = Math.min(1, intensity * 1.4);
+
+    // Generar gotas nuevas
+    const dropRate = Math.floor(intensity * 14);
+    for (let i = 0; i < dropRate; i++) {
+      rainDrops.push({
+        x: Math.random() * 420 - 10,
+        y: Math.random() * -20,
+        vy: 5 + Math.random() * 4 + intensity * 3,
+        len: 6 + Math.random() * 8,
+        alpha: 0.35 + Math.random() * 0.4,
+        vx: -0.8 + Math.random() * 0.4 // leve inclinación
+      });
+    }
+
+    // Actualizar y depurar gotas
+    for (let i = rainDrops.length - 1; i >= 0; i--) {
+      const d = rainDrops[i];
+      d.x += d.vx;
+      d.y += d.vy;
+      if (d.y > 315) rainDrops.splice(i, 1);
+    }
+    // Cap para rendimiento
+    if (rainDrops.length > 280) rainDrops.splice(0, rainDrops.length - 280);
+
+    // Lógica de relámpagos
+    if (lightningTimer > 0) {
+      lightningTimer--;
+    } else if (intensity > 0.4) {
+      // Disparar relámpago
+      lightningFlash = 1.0;
+      lightningTimer = Math.floor(90 + Math.random() * 200); // siguiente en 1.5~5s
+      // Generar forma zigzag del rayo
+      const startX = 60 + Math.random() * 280;
+      const segs = [];
+      let cx = startX, cy = 0;
+      for (let s = 0; s < 8; s++) {
+        cx += (Math.random() - 0.5) * 30;
+        cy += 12 + Math.random() * 8;
+        segs.push({ x: cx, y: cy });
+      }
+      lightningBolt = { x: startX, segs };
+      // Sonido de trueno
+      try {
+        initAudio();
+        if (audioCtx && !modoDiscreto) {
+          const now = audioCtx.currentTime;
+          const thunder = audioCtx.createOscillator();
+          const tGain = audioCtx.createGain();
+          thunder.connect(tGain); tGain.connect(audioCtx.destination);
+          thunder.type = 'sawtooth';
+          thunder.frequency.setValueAtTime(55, now);
+          thunder.frequency.exponentialRampToValueAtTime(20, now + 0.8);
+          tGain.gain.setValueAtTime(0.0, now);
+          tGain.gain.linearRampToValueAtTime(0.18, now + 0.04);
+          tGain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+          thunder.start(now); thunder.stop(now + 0.9);
+        }
+      } catch(e) {}
+    }
+
+    // Decaer el flash del relámpago
+    if (lightningFlash > 0) {
+      lightningFlash -= 0.07;
+      if (lightningFlash < 0) { lightningFlash = 0; lightningBolt = null; }
+    }
+  }
+
+  // ══════════════════════════════════════════════
+  // SISTEMA DE CLIMA — Draw (overlay sobre el campo)
+  // ══════════════════════════════════════════════
+  function drawWeather() {
+    if (weatherIntensity <= 0) return;
+    const intensity = weatherIntensity;
+
+    ctx.save();
+
+    // 1. NIEBLA / BRUMA (capa semitransparente azul-gris en el fondo)
+    if (fogOpacity > 0) {
+      const fogGrad = ctx.createLinearGradient(0, 0, 0, gameCanvas.height);
+      fogGrad.addColorStop(0, `rgba(80, 100, 130, ${fogOpacity * 1.4})`);
+      fogGrad.addColorStop(0.4, `rgba(70, 90, 120, ${fogOpacity * 0.9})`);
+      fogGrad.addColorStop(1, `rgba(40, 60, 90, ${fogOpacity * 0.4})`);
+      ctx.fillStyle = fogGrad;
+      ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+    }
+
+    // 2. PASTO MOJADO — destello especular sobre las franjas del campo
+    if (grassWetness > 0) {
+      const standH = 48;
+      const wetGrad = ctx.createLinearGradient(0, standH, 0, gameCanvas.height);
+      wetGrad.addColorStop(0, `rgba(120, 200, 160, ${grassWetness * 0.10})`);
+      wetGrad.addColorStop(0.5, `rgba(80, 160, 120, ${grassWetness * 0.07})`);
+      wetGrad.addColorStop(1, `rgba(40, 100, 80, ${grassWetness * 0.04})`);
+      ctx.fillStyle = wetGrad;
+      ctx.fillRect(0, standH, gameCanvas.width, gameCanvas.height - standH);
+
+      // Reflejos de luz especulares aleatorios (charcos)
+      const t = Date.now() * 0.0008;
+      for (let i = 0; i < 5; i++) {
+        const px = 40 + i * 70 + Math.sin(t + i * 1.3) * 12;
+        const py = 210 + (i % 3) * 28 + Math.cos(t * 0.7 + i) * 6;
+        const pr = 18 + i * 8;
+        const puddleGrad = ctx.createRadialGradient(px, py, 0, px, py, pr);
+        puddleGrad.addColorStop(0, `rgba(150, 200, 220, ${grassWetness * 0.18})`);
+        puddleGrad.addColorStop(0.5, `rgba(100, 160, 190, ${grassWetness * 0.09})`);
+        puddleGrad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = puddleGrad;
+        ctx.beginPath();
+        ctx.ellipse(px, py, pr, pr * 0.35, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // 3. GOTAS DE LLUVIA
+    ctx.lineCap = 'round';
+    for (let i = 0; i < rainDrops.length; i++) {
+      const d = rainDrops[i];
+      ctx.globalAlpha = d.alpha * intensity;
+      ctx.strokeStyle = `rgba(180, 210, 240, 1)`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(d.x, d.y);
+      ctx.lineTo(d.x + d.vx * 1.5, d.y - d.len);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    // 4. FLASH DE RELÁMPAGO (overlay blanco azulado sobre toda la pantalla)
+    if (lightningFlash > 0) {
+      ctx.fillStyle = `rgba(200, 220, 255, ${lightningFlash * 0.55})`;
+      ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+      // Rayo (zigzag luminoso)
+      if (lightningBolt && lightningFlash > 0.4) {
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, lightningFlash * 1.5);
+        ctx.strokeStyle = '#ffffff';
+        ctx.shadowColor = '#99ccff';
+        ctx.shadowBlur = 12;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(lightningBolt.x, 0);
+        lightningBolt.segs.forEach(s => ctx.lineTo(s.x, s.y));
+        ctx.stroke();
+        // Núcleo brillante del rayo
+        ctx.strokeStyle = '#e0f0ff';
+        ctx.lineWidth = 0.5;
+        ctx.shadowBlur = 5;
+        ctx.beginPath();
+        ctx.moveTo(lightningBolt.x, 0);
+        lightningBolt.segs.forEach(s => ctx.lineTo(s.x, s.y));
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    // 5. Indicador de lluvia en la esquina (pequeño ícono)
+    if (intensity > 0.2) {
+      ctx.globalAlpha = Math.min(1, intensity * 1.5) * 0.85;
+      ctx.fillStyle = 'rgba(0,0,0,0.45)';
+      ctx.beginPath();
+      ctx.roundRect(gameCanvas.width - 34, 6, 28, 16, 5);
+      ctx.fill();
+      ctx.fillStyle = '#93c5fd';
+      ctx.font = '700 8px system-ui, -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🌧️ WET', gameCanvas.width - 20, 14);
+    }
+
+    ctx.globalAlpha = 1;
     ctx.restore();
   }
 
@@ -10097,6 +10422,9 @@
         ctx.restore();
       }
     }
+
+    // ── EFECTOS DE CLIMA (lluvia, niebla, relámpagos) sobre el campo ──
+    drawWeather();
 
     // Flash de pantalla completo cuando se mete gol!
     if (goalScreenFlash > 0) {
