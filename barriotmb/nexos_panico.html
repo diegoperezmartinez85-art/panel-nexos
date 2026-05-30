@@ -2617,6 +2617,7 @@
     #mundial-seleccion {
       flex: 1;
       width: 100%;
+      max-width: min(96vw, 680px); /* Centrado y ampliado para pantallas grandes */
       overflow-y: auto;
       padding-bottom: 40px;
       scrollbar-width: none;
@@ -2630,7 +2631,7 @@
       min-height: 0;
       gap: 10px;
       width: 100%;
-      max-width: min(94vw, 520px); /* Permite ver el estadio un 30% más grande en computadoras/tablets sin deformar nada */
+      max-width: min(96vw, 680px); /* Ampliado un 30% más en pantallas grandes sin deformar el canvas */
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -4646,6 +4647,46 @@
   </div>
 </div>
 
+<!-- OVERLAY DE FIXTURE/LLAVES DEL TORNEO DE PENALES (EA Sports Premium Style) -->
+<div id="penales-fixture-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 8, 20, 0.96); z-index: 9998; flex-direction: column; align-items: center; justify-content: flex-start; padding: 20px 10px; box-sizing: border-box; backdrop-filter: blur(15px); color: #fff; font-family: 'Outfit', system-ui, -apple-system, sans-serif; overflow-y: auto;">
+  
+  <!-- Header EA Sports Style -->
+  <div style="width: 100%; max-width: 500px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 2px solid rgba(6, 182, 212, 0.2); padding-bottom: 12px; margin-top: 10px;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 26px; filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.5));">🏆</span>
+      <div>
+        <h2 style="font-size: 15px; font-weight: 900; letter-spacing: 1.5px; background: linear-gradient(135deg, #fbbf24, #f59e0b, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; text-transform: uppercase;">COPA DE PENALES</h2>
+        <span style="font-size: 8px; color: #a1a1aa; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">EA SPORTS COPA NEXOS</span>
+      </div>
+    </div>
+    <div id="torneo-ronda-tag" style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(8, 145, 178, 0.2)); border: 1.5px solid #06b6d4; color: #06b6d4; padding: 4px 12px; border-radius: 12px; font-size: 9px; font-weight: 900; letter-spacing: 0.5px; box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);">
+      CUARTOS DE FINAL
+    </div>
+  </div>
+
+  <!-- Bracket Slider Scroll Container -->
+  <div class="bracket-scroll-container" id="bracket-scroll-container" onscroll="updateBracketDots()">
+     <!-- Columns filled dynamically via JS -->
+  </div>
+  
+  <!-- Dots Page Indicators -->
+  <div style="display: flex; gap: 8px; margin: 0 0 25px 0; justify-content: center; z-index: 10;">
+    <div class="bracket-dot active" id="dot-octavos" onclick="scrollToBracketColumn(0)"></div>
+    <div class="bracket-dot" id="dot-cuartos" onclick="scrollToBracketColumn(1)"></div>
+    <div class="bracket-dot" id="dot-semis" onclick="scrollToBracketColumn(2)"></div>
+    <div class="bracket-dot" id="dot-final" onclick="scrollToBracketColumn(3)"></div>
+  </div>
+
+  <!-- Action Button -->
+  <button id="fixture-jugar-btn" onclick="jugarPartidoTorneo()" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); color: white; border: none; font-size: 12px; font-weight: 900; padding: 15px 35px; border-radius: 30px; cursor: pointer; letter-spacing: 1.5px; box-shadow: 0 4px 18px rgba(6, 182, 212, 0.55); transition: all 0.25s ease; width: 100%; max-width: 320px; text-transform: uppercase; margin-bottom: 8px; outline: none;" onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform='scale(1)'">
+    JUGAR CUARTOS DE FINAL ➔
+  </button>
+  
+  <button onclick="volverASeleccionDesdeTorneo()" style="background: transparent; color: #a1a1aa; border: none; font-size: 11px; font-weight: bold; cursor: pointer; letter-spacing: 0.5px; text-decoration: underline; margin-bottom: 25px; outline: none; padding: 5px;">
+    Abandonar Torneo 🏠
+  </button>
+</div>
+
 <!-- OVERLAY DE CAMPEÓN MUNDIAL DE PENALES (Anime Premium Ceremony) -->
 <div id="penales-campeon-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 8, 20, 0.97); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px); color: #fff; font-family: system-ui, -apple-system, sans-serif; overflow: hidden;">
   <!-- Canvas para destellos de flashes de cámaras y confeti incesante -->
@@ -4697,6 +4738,166 @@
   @keyframes cupWave {
     0%, 100% { transform: translate(0, 0) rotate(0deg); }
     50% { transform: translate(2px, -4px) rotate(12deg); }
+  }
+  
+  /* ESTILOS DE FIXTURE BRACKET EA SPORTS */
+  .bracket-scroll-container {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    max-width: 1200px;
+    overflow-x: auto;
+    padding: 15px 5px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    flex-grow: 1;
+    margin-bottom: 15px;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  @media (min-width: 900px) {
+    .bracket-scroll-container {
+      justify-content: center;
+      gap: 25px;
+    }
+  }
+  .bracket-scroll-container::-webkit-scrollbar {
+    display: none;
+  }
+  .bracket-column {
+    flex: 0 0 270px;
+    scroll-snap-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: rgba(10, 15, 30, 0.45);
+    border: 1px solid rgba(6, 182, 212, 0.15);
+    border-radius: 18px;
+    padding: 12px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    height: 350px;
+    overflow-y: auto;
+    justify-content: flex-start;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(6, 182, 212, 0.3) transparent;
+  }
+  .bracket-column::-webkit-scrollbar {
+    width: 4px;
+  }
+  .bracket-column::-webkit-scrollbar-thumb {
+    background: rgba(6, 182, 212, 0.3);
+    border-radius: 4px;
+  }
+  .bracket-col-title {
+    font-size: 11px;
+    font-weight: 900;
+    color: #06b6d4;
+    text-shadow: 0 0 8px rgba(6, 182, 212, 0.4);
+    letter-spacing: 1.5px;
+    text-align: center;
+    margin-bottom: 8px;
+    border-bottom: 1px dashed rgba(6, 182, 212, 0.25);
+    padding-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .fixture-match-card {
+    background: rgba(15, 23, 42, 0.65);
+    border: 1.5px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .fixture-match-card.player-active {
+    border: 1.8px solid #06b6d4 !important;
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+    background: rgba(6, 182, 212, 0.06);
+  }
+  .fixture-team {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #9ca3af;
+  }
+  .fixture-team.team-winner {
+    color: #34d399 !important;
+    font-weight: 900;
+  }
+  .fixture-team.team-winner .team-score {
+    color: #34d399 !important;
+    background: rgba(52, 211, 153, 0.15) !important;
+    border: 1px solid rgba(52, 211, 153, 0.25);
+  }
+  .team-name {
+    max-width: 130px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.3px;
+  }
+  .team-score {
+    font-family: monospace;
+    font-size: 12px;
+    font-weight: 900;
+    color: #e5e7eb;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1px 6px;
+    border-radius: 6px;
+    min-width: 22px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .match-badge {
+    position: absolute;
+    top: -7px;
+    right: 12px;
+    font-size: 7px;
+    font-weight: 900;
+    padding: 2px 7px;
+    border-radius: 8px;
+    letter-spacing: 0.5px;
+  }
+  .match-badge.pulsing {
+    background: #06b6d4;
+    color: #fff;
+    box-shadow: 0 0 8px rgba(6, 182, 212, 0.6);
+    animation: badgePulse 1.5s infinite alternate ease-in-out;
+  }
+  @keyframes badgePulse {
+    0% { opacity: 0.7; transform: scale(0.96); }
+    100% { opacity: 1; transform: scale(1.04); }
+  }
+  .tu-partido-tag {
+    position: absolute;
+    top: -7px;
+    left: 12px;
+    font-size: 7px;
+    font-weight: 900;
+    padding: 2px 7px;
+    border-radius: 8px;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #000;
+    box-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+  }
+  .bracket-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .bracket-dot.active {
+    background: #06b6d4;
+    box-shadow: 0 0 8px #06b6d4;
+    width: 18px;
+    border-radius: 4px;
   }
 </style>
 
@@ -5291,6 +5492,27 @@
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
         osc.start();
         osc.stop(audioCtx.currentTime + 0.08);
+      } else if (type === 'heartbeat') {
+        const now = audioCtx.currentTime;
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(55, now);
+        osc.frequency.exponentialRampToValueAtTime(10, now + 0.12);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        osc.start(now);
+        osc.stop(now + 0.12);
+        
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.connect(gain2);
+        gain2.connect(audioCtx.destination);
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(45, now + 0.18);
+        osc2.frequency.exponentialRampToValueAtTime(10, now + 0.32);
+        gain2.gain.setValueAtTime(0.20, now + 0.18);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+        osc2.start(now + 0.18);
+        osc2.stop(now + 0.32);
       }
     } catch(e) {}
   }
@@ -7604,18 +7826,19 @@
     { id: 'neymareado', nombre: 'Neymareado', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00'], flagType: 'br', comba: 98, fuerza: 95, precision: 88, skin: '#b45309', hair: '#fef08a', beard: null, hairType: 'mohawk', jersey: ['#fbbf24', '#fbbf24'] },
     { id: 'penaldo', nombre: 'Penaldo', pais: 'Portugal 🇵🇹', flag: '🇵🇹', flagColors: ['#006600','#ff0000'], flagType: 'v2', comba: 85, fuerza: 99, precision: 96, skin: '#fed7aa', hair: '#18181b', beard: null, hairType: 'penaldo', jersey: ['#dc2626', '#dc2626'] },
     { id: 'hajalan', nombre: 'Hajalan', pais: 'Noruega 🇳🇴', flag: '🇳🇴', flagColors: ['#ef2b2d','#ffffff','#002868'], flagType: 'cross', flagCross: '#002868', comba: 78, fuerza: 99, precision: 95, skin: '#ffedd5', hair: '#fef08a', beard: null, hairType: 'long-rubio', jersey: ['#dc2626', '#1d4ed8'] },
-    { id: 'woltemadre', nombre: 'Woltemadre', pais: 'Alemania 🇩🇪', flag: '🇩🇪', flagColors: ['#000000','#dd0000','#ffcf00'], flagType: 'h3', comba: 82, fuerza: 96, precision: 93, skin: '#ffedd5', hair: '#fde047', beard: '#5c4033', beardType: 'bigote', hairType: 'rubio-ondulado-medio', jersey: ['#ffffff', '#000000'] },
+    { id: 'woltemadre', nombre: 'Woltemadre', pais: 'Alemania 🇩🇪', flag: '🇩🇪', flagColors: ['#000000','#dd0000','#ffcf00'], flagType: 'h3', comba: 82, fuerza: 96, precision: 93, skin: '#ffedd5', hair: '#fde047', beard: '#5c4033', beardType: 'bigote', hairType: 'rubio-ondulado-medio', jersey: ['#ffffff', '#ffffff'] },
     { id: 'maradonuts', nombre: 'Maradonuts', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 99, fuerza: 95, precision: 97, skin: '#fed7aa', hair: '#18181b', beard: null, hairType: 'pelusa', jersey: ['#74acdf', '#ffffff'], locked: true, unlockPrice: 80, unlockDesc: 'Racha 3 ⚽ o 80 🪙' },
     { id: 'zazu', nombre: 'Zazu', pais: 'Francia 🇫🇷', flag: '🇫🇷', flagColors: ['#002395','#ffffff','#ed2939'], flagType: 'v3', comba: 96, fuerza: 91, precision: 98, skin: '#ffedd5', hair: '#3f3f46', beard: null, hairType: 'calvo', jersey: ['#002395', '#002395'], locked: true, unlockPrice: 60, unlockDesc: 'Racha 2 ⚡ o 60 🪙' },
-    { id: 'orey', nombre: 'Orey', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00'], flagType: 'br', comba: 95, fuerza: 98, precision: 98, skin: '#653b1b', hair: '#18181b', beard: null, hairType: 'afro-short', jersey: ['#fbbf24', '#009c3b'], locked: true, unlockPrice: 80, unlockDesc: 'Récord 4 🏆 o 80 🪙' },
-    { id: 'fenomeno', nombre: 'El Fenómeno', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00','#002277'], flagType: 'br', comba: 94, fuerza: 98, precision: 96, skin: '#b45309', hair: '#18181b', beard: null, hairType: 'calva-flequillo', jersey: ['#fedf00', '#009c3b'], locked: true, unlockPrice: 50, unlockDesc: 'Racha 3 ⚽ o 50 🪙' },
+    { id: 'orey', nombre: 'Orey', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00'], flagType: 'br', comba: 95, fuerza: 98, precision: 98, skin: '#653b1b', hair: '#18181b', beard: null, hairType: 'afro-short', jersey: ['#fbbf24', '#fbbf24'], locked: true, unlockPrice: 80, unlockDesc: 'Récord 4 🏆 o 80 🪙' },
+    { id: 'fenomeno', nombre: 'El Fenómeno', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00','#002277'], flagType: 'br', comba: 94, fuerza: 98, precision: 96, skin: '#b45309', hair: '#18181b', beard: null, hairType: 'calva-flequillo', jersey: ['#fbbf24', '#fbbf24'], locked: true, unlockPrice: 50, unlockDesc: 'Racha 3 ⚽ o 50 🪙' },
     { id: 'becan', nombre: 'Becan', pais: 'Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', flagColors: ['#ffffff'], flagType: 'cross', flagCross: '#cf111b', comba: 99, fuerza: 93, precision: 97, skin: '#ffedd5', hair: '#fef08a', beard: null, hairType: 'beckham-mohawk', jersey: ['#cf142b', '#cf142b'], locked: true, unlockPrice: 60, unlockDesc: 'Récord 5 🏆 o 60 🪙' },
-    { id: 'witch', nombre: 'The Witch', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 96, fuerza: 94, precision: 95, skin: '#fed7aa', hair: '#18181b', beard: '#18181b', hairType: 'calvo', jersey: ['#0ea5e9', '#ffffff'], locked: true, unlockPrice: 40, unlockDesc: 'Racha 2 ⚡ o 40 🪙' },
+    { id: 'witch', nombre: 'The Witch', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 96, fuerza: 94, precision: 95, skin: '#fed7aa', hair: '#18181b', beard: '#18181b', beardType: 'candado-chico', hairType: 'calvo-total', jersey: ['#0ea5e9', '#ffffff'], locked: true, unlockPrice: 40, unlockDesc: 'Racha 2 ⚡ o 40 🪙' },
     { id: 'david', nombre: 'David', pais: 'Países Bajos 🇳🇱', flag: '🇳🇱', flagColors: ['#ff4f00','#ffffff','#21468b'], flagType: 'h3', comba: 94, fuerza: 97, precision: 92, skin: '#5c4033', hair: '#1c1917', beard: null, hairType: 'rastas', jersey: ['#ff4f00', '#ff4f00'], locked: true, unlockPrice: 40, unlockDesc: 'Récord 3 🏆 o 40 🪙' },
     { id: 'kingsman', nombre: 'Kingsman', pais: 'Alemania 🇩🇪', flag: '🇩🇪', flagColors: ['#000000','#dd0000','#ffcf00'], flagType: 'h3', comba: 91, fuerza: 96, precision: 98, skin: '#ffedd5', hair: '#fde047', beard: null, hairType: 'long-rubio', jersey: ['#10b981', '#10b981'], locked: true, unlockPrice: 50, unlockDesc: 'Récord 4 🏆 o 50 🪙' },
     { id: 'pirgo', nombre: 'Pirgo', pais: 'Italia 🇮🇹', flag: '🇮🇹', flagColors: ['#009246','#ffffff','#ce2b37'], flagType: 'v3', comba: 98, fuerza: 88, precision: 99, skin: '#fed7aa', hair: '#451a03', beard: '#451a03', hairType: 'pirlo', jersey: ['#0087e0', '#0087e0'], locked: true, unlockPrice: 50, unlockDesc: 'Racha 2 ⚡ o 50 🪙' },
     { id: 'totto', nombre: 'Totto', pais: 'Italia 🇮🇹', flag: '🇮🇹', flagColors: ['#009246','#ffffff','#ce2b37'], flagType: 'v3', comba: 95, fuerza: 96, precision: 95, skin: '#fed7aa', hair: '#ca8a04', beard: null, hairType: 'totti', jersey: ['#0087e0', '#0087e0'], locked: true, unlockPrice: 50, unlockDesc: 'Récord 4 🏆 o 50 🪙' },
-    { id: 'craft', nombre: 'Craft', pais: 'Países Bajos 🇳🇱', flag: '🇳🇱', flagColors: ['#ff4f00','#ffffff','#21468b'], flagType: 'h3', comba: 98, fuerza: 94, precision: 97, skin: '#ffedd5', hair: '#854d0e', beard: null, hairType: 'long-lasio', jersey: ['#ff4f00', '#ff4f00'], locked: true, unlockPrice: 70, unlockDesc: 'Racha 4 🏆 o 70 🪙' }
+    { id: 'craft', nombre: 'Craft', pais: 'Países Bajos 🇳🇱', flag: '🇳🇱', flagColors: ['#ff4f00','#ffffff','#21468b'], flagType: 'h3', comba: 98, fuerza: 94, precision: 97, skin: '#ffedd5', hair: '#854d0e', beard: null, hairType: 'long-lasio', jersey: ['#ff4f00', '#ff4f00'], locked: true, unlockPrice: 70, unlockDesc: 'Racha 4 🏆 o 70 🪙' },
+    { id: 'batifrutta', nombre: 'Batifrutta', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 88, fuerza: 99, precision: 96, skin: '#fed7aa', hair: '#5c4033', beard: '#5c4033', beardType: 'candado-chico', hairType: 'long-rubio', jersey: ['#74acdf', '#ffffff'], locked: true, unlockPrice: 65, unlockDesc: 'Récord 6 🏆 o 65 🪙' }
   ];
 
   // Tirador activo seleccionado inicialmente
@@ -7780,6 +8003,8 @@
   // Récords y Celebración de Copa
   let goalsScoredInRound = 0;
   let isCelebrating = false;
+  let isCopaCelebracion = false;
+  let celebrationTeammates = [];
   let confettiParticles = [];
   let fireParticles = [];
   let unlockedAchievements = [];
@@ -8162,9 +8387,10 @@
   let rachaFlash = 0;         // destello al multiplicar
 
 
-  // ── VIENTO ──
   let vientoActual = 0;       // fuerza en px/frame (negativo = izq, positivo = der)
   let vientoVisible = 0;      // frames mostrando indicador de viento antes del tiro
+  let isDecisiveShot = false; // indica si es tiro decisivo (Match/Championship Point)
+  let heartbeatSoundTimer = 0; // temporizador para reproducir el latido del corazón
 
   // ── MARCAS EN EL PASTO ──
   let marcasPasto = [];       // { x, y, opacity, r }
@@ -8200,7 +8426,10 @@
     { id: 'racha_fuego', icon: '🔥', title: 'Racha de Fuego', desc: 'Tiro de fuego (Racha x3).' },
     { id: 'hat_trick', icon: '🎩', title: 'Hat-Trick', desc: 'Marcá 3 goles en la misma tanda.' },
     { id: 'cinco_goles', icon: '🐐', title: 'Mano de Dios', desc: 'Tanda perfecta de 5 goles.' },
-    { id: 'leyenda', icon: '👑', title: 'Selección de Leyenda', desc: 'Jugar con un clásico retro.' }
+    { id: 'leyenda', icon: '👑', title: 'Selección de Leyenda', desc: 'Jugar con un clásico retro.' },
+    { id: 'campeon_penales', icon: '🏆', title: 'Rey de Penales', desc: 'Ganá una tanda en modo Penales.' },
+    { id: 'timeattack_master', icon: '⚡', title: 'Velocidad Luz', desc: 'Sumá 600+ pts en Time Attack.' },
+    { id: 'survival_master', icon: '💀', title: 'Inmortal', desc: 'Sumá 800+ pts en Supervivencia.' }
   ];
 
   function renderVitrinaLogros() {
@@ -8264,8 +8493,8 @@
     c.arc(0, 0, 14, 0.8 * Math.PI, 0.2 * Math.PI, true);
     c.fill();
 
-    // Barba de El Mesías (solo si no es bigote)
-    if (player.beard && player.beardType !== 'bigote') {
+    // Barba de El Mesías (solo si no es bigote ni candado-chico)
+    if (player.beard && player.beardType !== 'bigote' && player.beardType !== 'candado-chico') {
       c.fillStyle = player.beard;
       c.beginPath();
       c.arc(0, 0, 16, 0.1 * Math.PI, 0.9 * Math.PI);
@@ -8382,6 +8611,38 @@
 
       // Flequillo / partidura
       c.fillStyle = '#ca8a04';
+      c.beginPath();
+      c.moveTo(-10, -10);
+      c.quadraticCurveTo(0, -14, 10, -10);
+      c.lineTo(8, -8);
+      c.quadraticCurveTo(0, -11, -8, -8);
+      c.closePath();
+      c.fill();
+    } else if (player.hairType === 'long-lasio') {
+      // Pelo largo lacio marrón/cualquier color (estilo Craft) cayendo a los lados de la cabeza de forma elegante
+      c.fillStyle = player.hair || '#854d0e';
+      c.beginPath();
+      c.arc(0, -5, 13.5, Math.PI, 0); // coronilla
+      c.fill();
+      
+      // Mechón izquierdo
+      c.beginPath();
+      c.moveTo(-13.5, -5);
+      c.bezierCurveTo(-18, 6, -17, 18, -14, 25);
+      c.bezierCurveTo(-10.5, 25, -10, 12, -10, 0);
+      c.closePath();
+      c.fill();
+
+      // Mechón derecho
+      c.beginPath();
+      c.moveTo(13.5, -5);
+      c.bezierCurveTo(18, 6, 17, 18, 14, 25);
+      c.bezierCurveTo(10.5, 25, 10, 12, 10, 0);
+      c.closePath();
+      c.fill();
+
+      // Sombras/Brillo de flequillo
+      c.fillStyle = 'rgba(0, 0, 0, 0.18)';
       c.beginPath();
       c.moveTo(-10, -10);
       c.quadraticCurveTo(0, -14, 10, -10);
@@ -8634,6 +8895,18 @@
       c.fill();
     }
 
+    // Barba candado chico (si corresponde, estilo Batifrutta o The Witch)
+    if (player.beard && player.beardType === 'candado-chico') {
+      c.strokeStyle = player.beard;
+      c.lineWidth = 1.8;
+      c.beginPath();
+      c.arc(0, 5, 4.5, 0, Math.PI);
+      c.stroke();
+      
+      c.fillStyle = player.beard;
+      c.fillRect(-0.8, 5, 1.6, 4.2);
+    }
+
     c.restore();
   }
 
@@ -8686,6 +8959,7 @@
     if (p.id === 'pirgo' && maxRacha >= 2) return false;
     if (p.id === 'totto' && realRecord >= 4) return false;
     if (p.id === 'craft' && maxRacha >= 4) return false;
+    if (p.id === 'batifrutta' && realRecord >= 6) return false;
     
     return true;
   }
@@ -9146,6 +9420,97 @@
     } catch(e) {}
   }
 
+  function drawWorldCupTrophy(c, x, y, h) {
+    c.save();
+    c.translate(x, y);
+
+    // Gradient de oro premium
+    const gold = c.createLinearGradient(-h*0.3, -h, h*0.3, 0);
+    gold.addColorStop(0, '#fef08a');
+    gold.addColorStop(0.3, '#f59e0b');
+    gold.addColorStop(0.7, '#d97706');
+    gold.addColorStop(1, '#78350f');
+
+    const malachite = '#047857';
+
+    // 1. Base del trofeo (cónica / cilíndrica escalonada)
+    c.fillStyle = '#451a03'; // base de madera oscura
+    c.beginPath();
+    c.moveTo(-h*0.25, 0);
+    c.lineTo(h*0.25, 0);
+    c.lineTo(h*0.2, -h*0.1);
+    c.lineTo(-h*0.2, -h*0.1);
+    c.closePath();
+    c.fill();
+
+    // Franjas doradas y verdes alternadas
+    c.fillStyle = gold;
+    c.fillRect(-h*0.18, -h*0.14, h*0.36, h*0.04);
+    c.fillStyle = malachite;
+    c.fillRect(-h*0.16, -h*0.18, h*0.32, h*0.04);
+    c.fillStyle = gold;
+    c.fillRect(-h*0.15, -h*0.22, h*0.3, h*0.04);
+    c.fillStyle = malachite;
+    c.fillRect(-h*0.14, -h*0.26, h*0.28, h*0.04);
+
+    // 2. Tallo / Cuerpo curvado del trofeo (figuras estilizadas sosteniendo el mundo)
+    c.fillStyle = gold;
+    c.beginPath();
+    c.moveTo(-h*0.12, -h*0.26);
+    c.quadraticCurveTo(-h*0.18, -h*0.45, -h*0.08, -h*0.65);
+    c.lineTo(-h*0.14, -h*0.75); // brazos sosteniendo el balón
+    c.quadraticCurveTo(-h*0.02, -h*0.78, 0, -h*0.7);
+    c.quadraticCurveTo(h*0.02, -h*0.78, h*0.14, -h*0.75);
+    c.lineTo(h*0.08, -h*0.65);
+    c.quadraticCurveTo(h*0.18, -h*0.45, h*0.12, -h*0.26);
+    c.closePath();
+    c.fill();
+
+    // Copa / Cáliz interior
+    c.fillStyle = '#78350f'; // sombra interna
+    c.beginPath();
+    c.moveTo(-h*0.06, -h*0.62);
+    c.quadraticCurveTo(0, -h*0.5, h*0.06, -h*0.62);
+    c.quadraticCurveTo(0, -h*0.7, -h*0.06, -h*0.62);
+    c.fill();
+
+    // Detalles en relieve del cuerpo
+    c.strokeStyle = '#fffbeb';
+    c.lineWidth = 1.5;
+    c.beginPath();
+    c.moveTo(-h*0.07, -h*0.35);
+    c.quadraticCurveTo(-h*0.12, -h*0.48, -h*0.06, -h*0.6);
+    c.moveTo(h*0.07, -h*0.35);
+    c.quadraticCurveTo(h*0.12, -h*0.48, h*0.06, -h*0.6);
+    c.stroke();
+
+    // 3. El Globo (Mundo en la cima con gradiente 3D esférico)
+    const globGrad = c.createRadialGradient(-h*0.05, -h*0.82, h*0.05, 0, -h*0.78, h*0.18);
+    globGrad.addColorStop(0, '#ffffff');
+    globGrad.addColorStop(0.2, '#fef08a');
+    globGrad.addColorStop(0.5, '#f59e0b');
+    globGrad.addColorStop(0.8, '#d97706');
+    globGrad.addColorStop(1, '#78350f');
+
+    c.fillStyle = globGrad;
+    c.beginPath();
+    c.arc(0, -h*0.78, h*0.18, 0, Math.PI * 2);
+    c.fill();
+
+    // Líneas del globo terráqueo (continentes estilizados o meridianos en relieve)
+    c.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+    c.lineWidth = 1;
+    c.beginPath();
+    c.arc(0, -h*0.78, h*0.18, -Math.PI*0.3, Math.PI*0.7);
+    c.stroke();
+    
+    c.beginPath();
+    c.ellipse(0, -h*0.78, h*0.14, h*0.06, Math.PI*0.1, 0, Math.PI*2);
+    c.stroke();
+
+    c.restore();
+  }
+
   window.iniciarIntroAnimeCinematica = function(playerLeft, playerRight, callback) {
     const canvasIntro = document.getElementById('canvas-intro-anime');
     const btnSkip = document.getElementById('intro-skip-btn');
@@ -9179,7 +9544,8 @@
     const cCtx = canvasIntro.getContext('2d');
     
     let frame = 0;
-    const maxFrames = isMultiStage ? 180 : 90;
+    const isPenalesIntro = (gameMode === 'penales' && playerLeft && playerRight);
+    const maxFrames = isPenalesIntro ? 165 : (isMultiStage ? 180 : 90);
     
     playIntroAnimeSound();
     
@@ -9330,9 +9696,90 @@
         
         cCtx.restore();
         
+      } else if (isPenalesIntro && frame <= 95) {
+        // --- STAGE 1: ROAD TO GLORY & COPA DEL MUNDO ---
+        // Deep space background with a beautiful golden radiant core
+        const bgGrad = cCtx.createRadialGradient(W*0.65, H*0.5, 10, W*0.65, H*0.5, W*0.7);
+        bgGrad.addColorStop(0, '#2e1c0c'); // warm golden center
+        bgGrad.addColorStop(0.4, '#0e0b16');
+        bgGrad.addColorStop(1, '#020208');
+        cCtx.fillStyle = bgGrad;
+        cCtx.fillRect(0, 0, W, H);
+        
+        // Vortex/floating golden dust/stars
+        cCtx.fillStyle = '#fbbf24';
+        for (let i = 0; i < 20; i++) {
+          const osc = Math.sin(frame * 0.03 + i) * 12;
+          const px = (W * 0.1 + (i * 38) % (W * 0.8)) + osc;
+          const py = (H * 0.9 - (i * 18 + frame * 1.2) % (H * 0.8));
+          const size = Math.max(0.8, 3.5 * (1 - py / H));
+          cCtx.beginPath();
+          cCtx.arc(px, py, size, 0, Math.PI*2);
+          cCtx.fill();
+        }
+        
+        // Dibujar el jugador seleccionado a la izquierda (entrando con un suave fade/slide en los primeros 15 frames)
+        let playerX = W * 0.22;
+        let pAlpha = 1;
+        if (frame < 15) {
+          playerX = -100 + (frame / 15) * (W * 0.22 + 100);
+          pAlpha = frame / 15;
+        }
+        cCtx.save();
+        cCtx.translate(playerX, H * 0.58);
+        cCtx.scale(2.2, 2.2); // Proud player size
+        drawCabezon(cCtx, 0, 0, playerLeft, false, false, false);
+        cCtx.restore();
+        
+        // Dibujar el Trofeo de la Copa del Mundo gigante a la derecha/centro
+        let trophyY = H * 0.72;
+        let tScale = 1;
+        if (frame < 25) {
+          // Aparece rebotando hacia arriba
+          tScale = Math.min(1.1, (frame / 25) * 1.1);
+          if (frame >= 20) tScale = 1.1 - (frame - 20) * 0.02;
+        }
+        // Agregamos un leve brillo pulsante al trofeo
+        const glow = Math.abs(Math.sin(frame * 0.05)) * 15;
+        cCtx.shadowColor = '#fbbf24';
+        cCtx.shadowBlur = 10 + glow;
+        drawWorldCupTrophy(cCtx, W * 0.66, trophyY, H * 0.62);
+        cCtx.shadowBlur = 0;
+        
+        // Dibujar Cartel / Textos de ROAD TO GLORY
+        cCtx.save();
+        cCtx.textAlign = 'center';
+        
+        // Título de la Copa
+        cCtx.font = '900 italic 12px sans-serif';
+        cCtx.fillStyle = '#4ade80'; // Emerald / green glow
+        cCtx.shadowColor = '#22c55e';
+        cCtx.shadowBlur = 8;
+        cCtx.fillText('🏆 MUNDIAL DE PENALES 🏆', W * 0.5, H * 0.14);
+        cCtx.shadowBlur = 0;
+        
+        // ROAD TO GLORY
+        cCtx.strokeStyle = '#000000';
+        cCtx.lineWidth = 6;
+        cCtx.font = '900 italic 30px sans-serif';
+        cCtx.strokeText('ROAD TO GLORY', W * 0.5, H * 0.24);
+        
+        const titleGrad = cCtx.createLinearGradient(W*0.3, H*0.2, W*0.7, H*0.28);
+        titleGrad.addColorStop(0, '#fef08a'); // golden yellow
+        titleGrad.addColorStop(0.5, '#ffffff'); // pure white shine
+        titleGrad.addColorStop(1, '#f59e0b'); // amber gold
+        cCtx.fillStyle = titleGrad;
+        cCtx.fillText('ROAD TO GLORY', W * 0.5, H * 0.24);
+        
+        // Nombre del jugador
+        cCtx.fillStyle = '#ffffff';
+        cCtx.font = '900 13px sans-serif';
+        cCtx.fillText(playerLeft.nombre.toUpperCase(), W * 0.22, H * 0.88);
+        
+        cCtx.restore();
       } else if (currentLeft && currentRight) {
         // --- DIBUJAR COMBATE / ENFRENTAMIENTO ---
-        const subFrame = isMultiStage ? (frame % 30 || 30) : frame;
+        const subFrame = isPenalesIntro ? (frame - 95) : (isMultiStage ? (frame % 30 || 30) : frame);
         
         // 1. Lado Izquierdo
         cCtx.save();
@@ -9571,41 +10018,27 @@
         stadiumAmbientAudio.play().catch(() => {});
       }
     } catch(e) {}
+    
+    if (gameMode === 'penales') {
+      inicializarTorneoPenales();
+      mostrarBracketTorneoScreen();
+      return;
+    }
+    
     document.getElementById('mundial-seleccion').style.display = 'none';
     document.getElementById('mundial-estadio').style.display = 'flex';
     
-    if (gameMode === 'penales') {
-      // 1. Filtrar los rivales posibles: todos menos el seleccionado y Dibu
-      const posiblesRivales = MUNDIAL_JUGADORES.filter(p => p.id !== 'dibu' && p.id !== selectedPlayer.id);
-      // 2. Barajar los rivales
-      penalesRivalsQueue = posiblesRivales.sort(() => Math.random() - 0.5);
-      // 3. Empezar en la ronda 0
-      penalesRivalIdx = 0;
-      
-      currentScore = 0;
-      remainingShots = 999;
-    } else {
-      currentScore = 0;
-      remainingShots = 5;
-    }
+    currentScore = 0;
+    remainingShots = 5;
     
     document.getElementById('estadio-puntos').innerText = '00';
-    if (gameMode === 'penales') {
-      actualizarMarcadorPenales();
-    } else {
-      document.getElementById('estadio-tiros').innerText = '5/5';
-    }
+    document.getElementById('estadio-tiros').innerText = '5/5';
     document.getElementById('estadio-record').innerText = String(mundialRecord).padStart(2, '0');
     document.getElementById('gameover-overlay').style.display = 'none';
 
-    // Iniciar la cinemática anime con el jugador seleccionado contra el Dibu Martínez, y luego empezar
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        iniciarIntroAnimeCinematica(selectedPlayer, dibuPlayer, () => {
-          initCanvas();
-          iniciarRondaJuego();
-        });
-      });
+      initCanvas();
+      iniciarRondaJuego();
     });
   };
 
@@ -9677,54 +10110,384 @@
 
   // ── CONTROLES Y LOGICA DEL TORNEO DE PENALES ──
   let campeonEfectosInterval = null;
+  let torneoPenales = null;
 
-  window.avanzarSiguienteRondaPenales = function() {
-    triggerHaptic('medium');
-    playSound('pop');
+  // Inicialización del Torneo (Octavos de final)
+  function inicializarTorneoPenales() {
+    // 1. Filtrar rivales posibles (excluyendo el jugador y Dibu)
+    const posiblesRivales = MUNDIAL_JUGADORES.filter(p => p.id !== 'dibu' && p.id !== selectedPlayer.id);
+    // Barajar
+    const rivalesBarajados = posiblesRivales.sort(() => Math.random() - 0.5);
+    // Tomar 15 para armar un cuadro de 16 (1 player + 15 CPU)
+    const rivalesTorneo = rivalesBarajados.slice(0, 15);
+    const jugadores = [selectedPlayer, ...rivalesTorneo];
     
-    // Ocultar overlay
-    document.getElementById('gameover-overlay').style.display = 'none';
+    // Octavos de final (8 partidos)
+    const octavos = [
+      { id: 1, p1: jugadores[0], p2: jugadores[1], score1: null, score2: null, winner: null, active: true },
+      { id: 2, p1: jugadores[2], p2: jugadores[3], score1: null, score2: null, winner: null, active: false },
+      { id: 3, p1: jugadores[4], p2: jugadores[5], score1: null, score2: null, winner: null, active: false },
+      { id: 4, p1: jugadores[6], p2: jugadores[7], score1: null, score2: null, winner: null, active: false },
+      { id: 5, p1: jugadores[8], p2: jugadores[9], score1: null, score2: null, winner: null, active: false },
+      { id: 6, p1: jugadores[10], p2: jugadores[11], score1: null, score2: null, winner: null, active: false },
+      { id: 7, p1: jugadores[12], p2: jugadores[13], score1: null, score2: null, winner: null, active: false },
+      { id: 8, p1: jugadores[14], p2: jugadores[15], score1: null, score2: null, winner: null, active: false }
+    ];
     
-    // Incrementar rival de la tanda
-    penalesRivalIdx++;
+    // Cuartos de final vacíos (4 partidos)
+    const cuartos = [
+      { id: 9, p1: null, p2: null, score1: null, score2: null, winner: null, active: false },
+      { id: 10, p1: null, p2: null, score1: null, score2: null, winner: null, active: false },
+      { id: 11, p1: null, p2: null, score1: null, score2: null, winner: null, active: false },
+      { id: 12, p1: null, p2: null, score1: null, score2: null, winner: null, active: false }
+    ];
     
-    // Resetear contadores de la tanda para el nuevo rival
-    penalesRondaActual = 1;
-    penalesGolesFavor = 0;
-    penalesGolesContra = 0;
-    penalesResultados = { chutes: [], defensas: [] };
-    penalesTurno = 'chute';
-    isCelebrating = false;
+    // Semifinales vacías (2 partidos)
+    const semis = [
+      { id: 13, p1: null, p2: null, score1: null, score2: null, winner: null, active: false },
+      { id: 14, p1: null, p2: null, score1: null, score2: null, winner: null, active: false }
+    ];
     
-    actualizarMarcadorPenales();
-    resetPelota();
+    const final = { id: 15, p1: null, p2: null, score1: null, score2: null, winner: null, active: false };
     
-    // Volver a activar bucle físico
-    if (physicsInterval) cancelAnimationFrame(physicsInterval);
-    physicsInterval = requestAnimationFrame(gameLoop);
+    torneoPenales = {
+      active: true,
+      ronda: 0, // 0 = Octavos, 1 = Cuartos, 2 = Semis, 3 = Final
+      jugadores: jugadores,
+      llaves: {
+        octavos: octavos,
+        cuartos: cuartos,
+        semis: semis,
+        final: final
+      }
+    };
+    
+    // Simular los otros partidos de Octavos inmediatamente
+    simularPartidosCpuOctavos();
+  }
+
+  function simularPartidosCpuOctavos() {
+    const llaves = torneoPenales.llaves;
+    for (let i = 1; i < 8; i++) {
+      const match = llaves.octavos[i];
+      const s1 = Math.floor(Math.random() * 3) + 3; // 3 a 5 goles
+      let s2 = Math.floor(Math.random() * 3) + 3;
+      while (s1 === s2) {
+        s2 = Math.floor(Math.random() * 3) + 3;
+      }
+      match.score1 = s1;
+      match.score2 = s2;
+      match.winner = s1 > s2 ? match.p1 : match.p2;
+    }
+  }
+
+  function avanzarRondaTorneo(golesFavor, golesContra) {
+    const llaves = torneoPenales.llaves;
+    
+    if (torneoPenales.ronda === 0) {
+      // Registrar partido de octavos del jugador
+      const matchJugador = llaves.octavos[0];
+      matchJugador.score1 = golesFavor;
+      matchJugador.score2 = golesContra;
+      matchJugador.winner = selectedPlayer;
+      matchJugador.active = false;
+      
+      // Armar cuartos de final
+      llaves.cuartos[0].p1 = selectedPlayer;
+      llaves.cuartos[0].p2 = llaves.octavos[1].winner;
+      llaves.cuartos[0].active = true;
+      
+      llaves.cuartos[1].p1 = llaves.octavos[2].winner;
+      llaves.cuartos[1].p2 = llaves.octavos[3].winner;
+      llaves.cuartos[1].active = false;
+      
+      llaves.cuartos[2].p1 = llaves.octavos[4].winner;
+      llaves.cuartos[2].p2 = llaves.octavos[5].winner;
+      llaves.cuartos[2].active = false;
+      
+      llaves.cuartos[3].p1 = llaves.octavos[6].winner;
+      llaves.cuartos[3].p2 = llaves.octavos[7].winner;
+      llaves.cuartos[3].active = false;
+      
+      // Simular partidos CPU de cuartos
+      for (let i = 1; i < 4; i++) {
+        const match = llaves.cuartos[i];
+        const s1 = Math.floor(Math.random() * 3) + 3;
+        let s2 = Math.floor(Math.random() * 3) + 3;
+        while (s1 === s2) {
+          s2 = Math.floor(Math.random() * 3) + 3;
+        }
+        match.score1 = s1;
+        match.score2 = s2;
+        match.winner = s1 > s2 ? match.p1 : match.p2;
+      }
+      
+      torneoPenales.ronda = 1;
+      
+    } else if (torneoPenales.ronda === 1) {
+      // Registrar partido de cuartos del jugador
+      const matchJugador = llaves.cuartos[0];
+      matchJugador.score1 = golesFavor;
+      matchJugador.score2 = golesContra;
+      matchJugador.winner = selectedPlayer;
+      matchJugador.active = false;
+      
+      // Armar semifinales
+      llaves.semis[0].p1 = selectedPlayer;
+      llaves.semis[0].p2 = llaves.cuartos[1].winner;
+      llaves.semis[0].active = true;
+      
+      llaves.semis[1].p1 = llaves.cuartos[2].winner;
+      llaves.semis[1].p2 = llaves.cuartos[3].winner;
+      llaves.semis[1].active = false;
+      
+      // Simular semifinal 2 CPU vs CPU
+      const semiCpu = llaves.semis[1];
+      const s1 = Math.floor(Math.random() * 3) + 3;
+      let s2 = Math.floor(Math.random() * 3) + 3;
+      while (s1 === s2) {
+        s2 = Math.floor(Math.random() * 3) + 3;
+      }
+      semiCpu.score1 = s1;
+      semiCpu.score2 = s2;
+      semiCpu.winner = s1 > s2 ? semiCpu.p1 : semiCpu.p2;
+      
+      torneoPenales.ronda = 2;
+      
+    } else if (torneoPenales.ronda === 2) {
+      // Registrar semifinal del jugador
+      const matchJugador = llaves.semis[0];
+      matchJugador.score1 = golesFavor;
+      matchJugador.score2 = golesContra;
+      matchJugador.winner = selectedPlayer;
+      matchJugador.active = false;
+      
+      // Armar final
+      llaves.final.p1 = selectedPlayer;
+      llaves.final.p2 = llaves.semis[1].winner;
+      llaves.final.active = true;
+      
+      torneoPenales.ronda = 3;
+      
+    } else if (torneoPenales.ronda === 3) {
+      // Registrar gran final del jugador
+      const matchJugador = llaves.final;
+      matchJugador.score1 = golesFavor;
+      matchJugador.score2 = golesContra;
+      matchJugador.winner = selectedPlayer;
+      matchJugador.active = false;
+      
+      torneoPenales.winner = selectedPlayer;
+    }
+  }
+
+  // Helper para construir el HTML de la bandera (copiando la lógica existente en la app!)
+  function buildFlagHTML(player) {
+    if (player.id === 'maradonuts' || player.id === 'the_witch') return '🇦🇷';
+    if (player.id === 'zazu') return '🇫🇷';
+    if (player.id === 'orey') return '🇧🇷';
+    if (player.id === 'batifrutta') return '🇦🇷';
+    if (player.id === 'the_kid') return '🇨🇴';
+    if (player.id === 'kingsman') return '🇩🇪';
+    if (player.id === 'david') return '🇳🇱';
+    if (player.id === 'edgar') return '🇳🇱';
+    if (player.flag) return player.flag;
+    return '⚽';
+  }
+
+  function renderMatchCard(match) {
+    if (!match) return '';
+    const isPlayerMatch = (match.p1 && match.p1.id === selectedPlayer.id) || (match.p2 && match.p2.id === selectedPlayer.id);
+    const cardClass = isPlayerMatch ? 'fixture-match-card player-active' : 'fixture-match-card';
+    const activeBadge = match.active ? '<span class="match-badge pulsing">ACTIVO</span>' : '';
+    
+    const p1Name = match.p1 ? match.p1.nombre.toUpperCase() : 'POR DEFINIR';
+    const p2Name = match.p2 ? match.p2.nombre.toUpperCase() : 'POR DEFINIR';
+    
+    const p1Flag = match.p1 ? buildFlagHTML(match.p1) : '🏳️';
+    const p2Flag = match.p2 ? buildFlagHTML(match.p2) : '🏳️';
+    
+    const score1 = match.score1 !== null ? match.score1 : '-';
+    const score2 = match.score2 !== null ? match.score2 : '-';
+    
+    const p1WinnerClass = match.winner && match.p1 && match.winner.id === match.p1.id ? 'team-winner' : '';
+    const p2WinnerClass = match.winner && match.p2 && match.winner.id === match.p2.id ? 'team-winner' : '';
+    
+    return `
+      <div class="${cardClass}" style="position: relative;">
+        ${activeBadge}
+        ${isPlayerMatch ? '<span class="tu-partido-tag">TU PARTIDO</span>' : ''}
+        
+        <div class="fixture-team ${p1WinnerClass}">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span>${p1Flag}</span>
+            <span class="team-name">${p1Name}</span>
+          </div>
+          <span class="team-score">${score1}</span>
+        </div>
+        
+        <div style="height: 1px; background: rgba(255, 255, 255, 0.05); margin: 6px 0;"></div>
+        
+        <div class="fixture-team ${p2WinnerClass}">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span>${p2Flag}</span>
+            <span class="team-name">${p2Name}</span>
+          </div>
+          <span class="team-score">${score2}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  window.scrollToBracketColumn = function(colIndex) {
+    const container = document.getElementById('bracket-scroll-container');
+    if (container) {
+      const col = container.children[colIndex];
+      if (col) {
+        container.scrollTo({
+          left: col.offsetLeft - 15,
+          behavior: 'smooth'
+        });
+      }
+    }
   };
 
-  window.reintentarRondaPenales = function() {
-    triggerHaptic('medium');
-    playSound('pop');
+  window.updateBracketDots = function() {
+    const container = document.getElementById('bracket-scroll-container');
+    if (container) {
+      const scrollLeft = container.scrollLeft;
+      const width = container.clientWidth;
+      let index = 0;
+      if (scrollLeft > width * 2.5) index = 3;
+      else if (scrollLeft > width * 1.5) index = 2;
+      else if (scrollLeft > width * 0.5) index = 1;
+      
+      document.querySelectorAll('.bracket-dot').forEach((dot, idx) => {
+        if (idx === index) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+    }
+  };
+
+  window.mostrarBracketTorneoScreen = function(perdioPartido = false) {
+    const overlay = document.getElementById('penales-fixture-overlay');
+    overlay.style.display = 'flex';
     
-    // Ocultar overlay
+    // Ocultar nav-bar si está presente
+    const navBar = document.getElementById('app-nav-bar');
+    if (navBar) navBar.style.display = 'none';
+    
+    const container = document.getElementById('bracket-scroll-container');
+    const llaves = torneoPenales.llaves;
+    
+    // Octavos
+    let octavosHTML = `<div class="bracket-col-title">OCTAVOS DE FINAL</div>`;
+    llaves.octavos.forEach(match => { octavosHTML += renderMatchCard(match); });
+    
+    // Cuartos
+    let cuartosHTML = `<div class="bracket-col-title">CUARTOS DE FINAL</div>`;
+    llaves.cuartos.forEach(match => { cuartosHTML += renderMatchCard(match); });
+    
+    // Semis
+    let semisHTML = `<div class="bracket-col-title">SEMIFINALES</div>`;
+    llaves.semis.forEach(match => { semisHTML += renderMatchCard(match); });
+    
+    // Final
+    let finalHTML = `<div class="bracket-col-title">GRAN FINAL</div>`;
+    finalHTML += renderMatchCard(llaves.final);
+    
+    container.innerHTML = `
+      <div class="bracket-column">${octavosHTML}</div>
+      <div class="bracket-column">${cuartosHTML}</div>
+      <div class="bracket-column">${semisHTML}</div>
+      <div class="bracket-column">${finalHTML}</div>
+    `;
+    
+    const btn = document.getElementById('fixture-jugar-btn');
+    const tag = document.getElementById('torneo-ronda-tag');
+    
+    if (perdioPartido) {
+      btn.innerText = 'REINTENTAR PARTIDO ↻';
+      btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+      btn.style.boxShadow = '0 4px 18px rgba(239, 68, 68, 0.4)';
+      
+      if (torneoPenales.ronda === 0) tag.innerText = 'OCTAVOS - ELIMINADO';
+      else if (torneoPenales.ronda === 1) tag.innerText = 'CUARTOS - ELIMINADO';
+      else if (torneoPenales.ronda === 2) tag.innerText = 'SEMIFINAL - ELIMINADO';
+      else tag.innerText = 'FINAL - SUB-CAMPEÓN';
+    } else {
+      btn.style.background = 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)';
+      btn.style.boxShadow = '0 4px 18px rgba(6, 182, 212, 0.55)';
+      
+      if (torneoPenales.ronda === 0) {
+        btn.innerText = 'JUGAR OCTAVOS DE FINAL ➔';
+        tag.innerText = 'OCTAVOS DE FINAL';
+      } else if (torneoPenales.ronda === 1) {
+        btn.innerText = 'JUGAR CUARTOS DE FINAL ➔';
+        tag.innerText = 'CUARTOS DE FINAL';
+      } else if (torneoPenales.ronda === 2) {
+        btn.innerText = 'JUGAR SEMIFINAL ➔';
+        tag.innerText = 'SEMIFINALES';
+      } else if (torneoPenales.ronda === 3) {
+        btn.innerText = 'JUGAR GRAN FINAL ➔';
+        tag.innerText = 'GRAN FINAL';
+      }
+    }
+    
+    setTimeout(() => {
+      scrollToBracketColumn(torneoPenales.ronda);
+      updateBracketDots();
+    }, 120);
+  };
+
+  window.jugarPartidoTorneo = function() {
+    playSound('pop');
+    triggerHaptic('medium');
+    
+    document.getElementById('penales-fixture-overlay').style.display = 'none';
+    document.getElementById('mundial-seleccion').style.display = 'none';
+    document.getElementById('mundial-estadio').style.display = 'flex';
+    
+    // Obtener rival
+    const llaves = torneoPenales.llaves;
+    let rivalActual;
+    if (torneoPenales.ronda === 0) rivalActual = llaves.octavos[0].p2;
+    else if (torneoPenales.ronda === 1) rivalActual = llaves.cuartos[0].p2;
+    else if (torneoPenales.ronda === 2) rivalActual = llaves.semis[0].p2;
+    else rivalActual = llaves.final.p2;
+    
+    penalesRivalsQueue = [rivalActual];
+    penalesRivalIdx = 0;
+    
+    currentScore = 0;
+    remainingShots = 999;
+    
+    document.getElementById('estadio-puntos').innerText = '00';
+    actualizarMarcadorPenales();
+    document.getElementById('estadio-record').innerText = String(mundialRecord).padStart(2, '0');
     document.getElementById('gameover-overlay').style.display = 'none';
     
-    // Resetear contadores de la tanda pero manteniendo el mismo rival de la ronda actual
-    penalesRondaActual = 1;
-    penalesGolesFavor = 0;
-    penalesGolesContra = 0;
-    penalesResultados = { chutes: [], defensas: [] };
-    penalesTurno = 'chute';
-    isCelebrating = false;
+    requestAnimationFrame(() => {
+      iniciarIntroAnimeCinematica(selectedPlayer, rivalActual, () => {
+        initCanvas();
+        iniciarRondaJuego();
+      });
+    });
+  };
+
+  window.volverASeleccionDesdeTorneo = function() {
+    playSound('tap');
+    triggerHaptic('medium');
+    torneoPenales = null;
+    document.getElementById('penales-fixture-overlay').style.display = 'none';
+    document.getElementById('mundial-estadio').style.display = 'none';
+    document.getElementById('mundial-seleccion').style.display = 'flex';
     
-    actualizarMarcadorPenales();
-    resetPelota();
-    
-    // Volver a activar bucle físico
-    if (physicsInterval) cancelAnimationFrame(physicsInterval);
-    physicsInterval = requestAnimationFrame(gameLoop);
+    const navBar = document.getElementById('app-nav-bar');
+    if (navBar) navBar.style.display = 'flex';
   };
 
   window.mostrarCeremoniaFinalCampeon = function() {
@@ -9871,6 +10634,10 @@
     // Resetear variables del torneo de penales
     penalesRivalsQueue = [];
     penalesRivalIdx = 0;
+    torneoPenales = null;
+    
+    const fixtureOverlay = document.getElementById('penales-fixture-overlay');
+    if (fixtureOverlay) fixtureOverlay.style.display = 'none';
     
     // NOT pausing stadiumAmbientAudio so it plays continuously while choosing players!
     document.getElementById('mundial-estadio').style.display = 'none';
@@ -10555,6 +11322,8 @@
     // Resetear variables de ronda y celebración
     goalsScoredInRound = 0;
     isCelebrating = false;
+    isCopaCelebracion = false;
+    celebrationTeammates = [];
     confettiParticles = [];
     activeFlashes = [];
     goalScreenFlash = 0;
@@ -10661,7 +11430,10 @@
       isShot: false,
       isSettled: false,
       status: ''
-  };
+    };
+    
+    isDecisiveShot = checkDecisivePenalty();
+    heartbeatSoundTimer = 0;
     
     if (gameMode === 'penales') {
       defensores = []; // Sin barrera en penales
@@ -10669,7 +11441,7 @@
         // La CPU patea con el rival actual del torneo de penales
         const rivalActual = (penalesRivalsQueue.length > 0 && penalesRivalIdx < penalesRivalsQueue.length) ? penalesRivalsQueue[penalesRivalIdx] : null;
         cpuTirador = rivalActual || MUNDIAL_JUGADORES[0];
-        const isCpuLeft = cpuTirador.id === 'mesias' || cpuTirador.id === 'yamalisimo';
+        const isCpuLeft = ['mesias', 'yamalisimo', 'maradonuts', 'hajalan'].includes(cpuTirador.id);
         playerX = isCpuLeft ? 218 : 150;
         playerY = 242;
         penalesCPUPreparando = true;
@@ -10680,7 +11452,7 @@
           arqueroJugador.jersey = ['#ef4444', '#ef4444'];
         }
       } else {
-        const isLeftFooted = selectedPlayer.id === 'mesias' || selectedPlayer.id === 'yamalisimo';
+        const isLeftFooted = ['mesias', 'yamalisimo', 'maradonuts', 'hajalan'].includes(selectedPlayer.id);
         playerX = isLeftFooted ? 218 : 150;
         playerY = 242;
         penalesCPUPreparando = false;
@@ -10692,7 +11464,7 @@
       }
       kickTimer = 0;
     } else {
-      const isLeftFooted = selectedPlayer.id === 'mesias' || selectedPlayer.id === 'yamalisimo';
+      const isLeftFooted = ['mesias', 'yamalisimo', 'maradonuts', 'hajalan'].includes(selectedPlayer.id);
       playerX = isLeftFooted ? 218 : 150;
       playerY = 242;
       kickTimer = 0;
@@ -10817,6 +11589,16 @@
   }
 
   function updatePhysics() {
+    // Latidos del corazón en momentos decisivos antes del disparo
+    if (isDecisiveShot && !pelota.isShot && !isCelebrating && document.getElementById('gameover-overlay').style.display !== 'flex') {
+      heartbeatSoundTimer++;
+      if (heartbeatSoundTimer % 45 === 1) {
+        playSound('heartbeat');
+      }
+    } else {
+      heartbeatSoundTimer = 0;
+    }
+
     // Reducir temblor de pantalla suavemente
     if (shakeIntensity > 0) shakeIntensity -= 0.6;
     if (shakeIntensity < 0) shakeIntensity = 0;
@@ -11287,6 +12069,12 @@
           playVictorySound();
           unlockAchievement('campeon_penales', 'Especialista en Penales', 'Ganaste una definición por penales de infarto.');
           isCelebrating = true;
+          isCopaCelebracion = true;
+          const otherPlayers = MUNDIAL_JUGADORES.filter(p => p.id !== selectedPlayer.id);
+          celebrationTeammates = [
+            otherPlayers[Math.floor(Math.random() * otherPlayers.length)],
+            otherPlayers[(Math.floor(Math.random() * otherPlayers.length) + 1) % otherPlayers.length]
+          ];
           trophyY = -60;
           confettiParticles = [];
           for (let i = 0; i < 80; i++) {
@@ -11326,6 +12114,30 @@
     }
   }
 }
+
+  function checkDecisivePenalty() {
+    if (gameMode !== 'penales') return false;
+    const favor = penalesGolesFavor;
+    const contra = penalesGolesContra;
+    const chutesChutados = penalesResultados.chutes.length;
+    const defensasChutados = penalesResultados.defensas.length;
+    
+    const chutesRestantes = Math.max(0, 5 - chutesChutados);
+    const defensasRestantes = Math.max(0, 5 - defensasChutados);
+    
+    if (chutesChutados >= 5 && defensasChutados >= 5) {
+      return true; // En muerte súbita todo tiro es de infarto
+    }
+    
+    if (penalesTurno === 'chute') {
+      if (favor + 1 > contra + defensasRestantes) return true;
+      if (contra > favor + (chutesRestantes - 1)) return true;
+    } else {
+      if (contra + 1 > favor + chutesRestantes) return true;
+      if (favor > contra + (defensasRestantes - 1)) return true;
+    }
+    return false;
+  }
 
   function actualizarMarcadorPenales() {
     const contenedor = document.getElementById('estadio-tiros');
@@ -11401,57 +12213,25 @@
         physicsInterval = null;
       }
       triggerHaptic('heavy');
-      document.getElementById('gameover-score-val').innerHTML = `Goles a Favor: <span style="color:#4ade80;font-weight:bold;">${penalesGolesFavor}</span><br>Goles en Contra: <span style="color:#f87171;font-weight:bold;">${penalesGolesContra}</span>`;
       
-      const primaryBtn = document.getElementById('gameover-btn-primary');
-      const secondaryBtn = document.getElementById('gameover-btn-secondary');
+      // Ocultar estadio
+      document.getElementById('mundial-estadio').style.display = 'none';
       
       if (penalesVictoria) {
-        // ¿Es el último rival del torneo?
-        if (penalesRivalIdx >= penalesRivalsQueue.length - 1) {
-          // ¡Ganó la copa mundial completa!
-          document.getElementById('gameover-overlay').style.display = 'none';
-          mostrarCeremoniaCampeon();
-          return;
-        }
+        // Guardar marcador y avanzar
+        avanzarRondaTorneo(penalesGolesFavor, penalesGolesContra);
         
-        // No es el último, avanzar a la siguiente ronda
-        const titleEl = document.querySelector('.gameover-title');
-        if (titleEl) {
-          titleEl.innerText = '🏆 ¡RONDA GANADA! 🏆';
-          titleEl.style.color = '#fbbf24';
-          titleEl.style.textShadow = '0 0 10px rgba(251, 191, 36, 0.6)';
-        }
-        
-        if (primaryBtn) {
-          primaryBtn.innerText = 'Siguiente Rival ➔';
-          primaryBtn.setAttribute('onclick', 'avanzarSiguienteRondaPenales()');
-        }
-        if (secondaryBtn) {
-          secondaryBtn.innerText = 'Menú Principal 🏠';
-          secondaryBtn.setAttribute('onclick', 'volverASeleccion()');
+        if (torneoPenales.winner) {
+          // Ganó el torneo (la gran final)!
+          mostrarCeremoniaFinalCampeon();
+        } else {
+          // Avanza a la siguiente ronda
+          mostrarBracketTorneoScreen(false);
         }
       } else {
-        // Derrota
-        const titleEl = document.querySelector('.gameover-title');
-        if (titleEl) {
-          titleEl.innerText = '😞 DERROTA 😞';
-          titleEl.style.color = '#f87171';
-          titleEl.style.textShadow = '0 0 10px rgba(248, 113, 113, 0.6)';
-        }
-        
-        if (primaryBtn) {
-          primaryBtn.innerText = 'Reintentar Tanda ↻';
-          primaryBtn.setAttribute('onclick', 'reintentarRondaPenales()');
-        }
-        if (secondaryBtn) {
-          secondaryBtn.innerText = 'Menú Principal 🏠';
-          secondaryBtn.setAttribute('onclick', 'volverASeleccion()');
-        }
+        // Perdió el partido: mostrar el bracket pero en modo derrota (con reintentar activo)
+        mostrarBracketTorneoScreen(true);
       }
-      
-      document.getElementById('gameover-overlay').style.display = 'flex';
-      document.getElementById('gameover-newrecord').style.display = 'none';
       return;
     }
 
@@ -11459,6 +12239,12 @@
     
     if (isPerfectRound) {
       isCelebrating = true;
+      isCopaCelebracion = true;
+      const otherPlayers = MUNDIAL_JUGADORES.filter(p => p.id !== selectedPlayer.id);
+      celebrationTeammates = [
+        otherPlayers[Math.floor(Math.random() * otherPlayers.length)],
+        otherPlayers[(Math.floor(Math.random() * otherPlayers.length) + 1) % otherPlayers.length]
+      ];
       trophyY = -60;
       confettiParticles = [];
       
@@ -11489,6 +12275,8 @@
       }
     } else {
       isCelebrating = false;
+      isCopaCelebracion = false;
+      celebrationTeammates = [];
       if (physicsInterval) {
         cancelAnimationFrame(physicsInterval);
         physicsInterval = null;
@@ -11616,7 +12404,6 @@
       ctx.rotate(hipRotation);
     }
     
-    // Animaciones y traducciones de festejos icónicos para jugadores de campo
     if (isJoyful && !isGoalie) {
       const t = Date.now() * 0.015;
       if (player.id === 'hajalan') {
@@ -11635,6 +12422,13 @@
       } else if (player.id === 'mesias') {
         // Pequeño rebote de gratitud
         ctx.translate(0, Math.sin(t * 0.5) * 2);
+      } else if (player.id === 'infantino') {
+        // Salto y aplauso de Infantino
+        ctx.translate(0, -4 - Math.abs(Math.sin(t * 1.3)) * 8);
+      } else {
+        // Salto desincronizado de los otros cabezones en el campo
+        const seed = (player.id ? player.id.charCodeAt(0) : 7) * 0.15;
+        ctx.translate(0, -4 - Math.abs(Math.sin(t * 1.25 + seed)) * 11);
       }
     }
     
@@ -11672,6 +12466,26 @@
       ctx.stroke();
     }
     
+    // Infantino suit details (white shirt and red tie)
+    if (player.id === 'infantino') {
+      ctx.fillStyle = '#ffffff'; // White shirt collar V
+      ctx.beginPath();
+      ctx.moveTo(-3, 16);
+      ctx.lineTo(3, 16);
+      ctx.lineTo(0, 22);
+      ctx.closePath();
+      ctx.fill();
+      
+      ctx.fillStyle = '#ef4444'; // Red tie
+      ctx.beginPath();
+      ctx.moveTo(0, 18);
+      ctx.lineTo(1.5, 23);
+      ctx.lineTo(0, 25);
+      ctx.lineTo(-1.5, 23);
+      ctx.closePath();
+      ctx.fill();
+    }
+    
     // Piernas diminutas y botines neón
     ctx.strokeStyle = '#000000';
     ctx.lineWidth = 2.5;
@@ -11701,8 +12515,8 @@
     ctx.arc(0, 0, 14, 0.8 * Math.PI, 0.2 * Math.PI, true);
     ctx.fill();
 
-    // 3. BARBA DE MESSI (El Mesías) (solo si no es bigote)
-    if (player.beard && player.beardType !== 'bigote') {
+    // 3. BARBA DE MESSI (El Mesías) (solo si no es bigote ni candado-chico)
+    if (player.beard && player.beardType !== 'bigote' && player.beardType !== 'candado-chico') {
       ctx.fillStyle = player.beard;
       ctx.beginPath();
       ctx.arc(0, 0, 16, 0.1 * Math.PI, 0.9 * Math.PI);
@@ -11818,6 +12632,38 @@
 
       // Flequillo / partidura
       ctx.fillStyle = '#ca8a04';
+      ctx.beginPath();
+      ctx.moveTo(-10, -10);
+      ctx.quadraticCurveTo(0, -14, 10, -10);
+      ctx.lineTo(8, -8);
+      ctx.quadraticCurveTo(0, -11, -8, -8);
+      ctx.closePath();
+      ctx.fill();
+    } else if (player.hairType === 'long-lasio') {
+      // Pelo largo lacio marrón/cualquier color (estilo Craft) cayendo a los lados de la cabeza de forma elegante
+      ctx.fillStyle = player.hair || '#854d0e';
+      ctx.beginPath();
+      ctx.arc(0, -5, 13.5, Math.PI, 0); // coronilla
+      ctx.fill();
+      
+      // Mechón izquierdo (largo cayendo recto con leve curvatura retro)
+      ctx.beginPath();
+      ctx.moveTo(-13.5, -5);
+      ctx.bezierCurveTo(-18, 6, -17, 18, -14, 25);
+      ctx.bezierCurveTo(-10.5, 25, -10, 12, -10, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // Mechón derecho
+      ctx.beginPath();
+      ctx.moveTo(13.5, -5);
+      ctx.bezierCurveTo(18, 6, 17, 18, 14, 25);
+      ctx.bezierCurveTo(10.5, 25, 10, 12, 10, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // Sombras/Brillo de flequillo
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
       ctx.beginPath();
       ctx.moveTo(-10, -10);
       ctx.quadraticCurveTo(0, -14, 10, -10);
@@ -12081,6 +12927,18 @@
       ctx.fill();
     }
 
+    // Barba candado chico (si corresponde, estilo Batifrutta o The Witch)
+    if (player.beard && player.beardType === 'candado-chico') {
+      ctx.strokeStyle = player.beard;
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.arc(0, 5, 4.5, 0, Math.PI);
+      ctx.stroke();
+      
+      ctx.fillStyle = player.beard;
+      ctx.fillRect(-0.8, 5, 1.6, 4.2);
+    }
+
     // Dibujar guantes de arquero flotantes si corresponde
     if (isGoalie) {
       ctx.fillStyle = '#eab308'; // Guantes gigantes amarillo neón
@@ -12327,15 +13185,121 @@
     ctx.restore();
   }
 
+  function drawWavingFlag(ctx, x, y, width, height, colors, type) {
+    // A flagpole
+    ctx.strokeStyle = '#9ca3af';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x, y + height + 35);
+    ctx.lineTo(x, y - 5);
+    ctx.stroke();
+    
+    // Draw waving flag block
+    const time = Date.now() * 0.015;
+    const flagX = x + 1;
+    const flagY = y;
+    const numStrips = 28;
+    const stripWidth = width / numStrips;
+    
+    ctx.save();
+    // Loop through vertical strips to simulate waving wave
+    for (let i = 0; i < numStrips; i++) {
+      const sx = flagX + i * stripWidth;
+      // Wave offset
+      const sy = flagY + Math.sin(time + i * 0.25) * 2.8;
+      
+      // Select color based on strip position and flagType
+      let color = colors[0];
+      if (type === 'v3') {
+        // Vertical tricolor (e.g. France, Italy)
+        if (i < numStrips / 3) color = colors[0];
+        else if (i < (numStrips * 2) / 3) color = colors[1];
+        else color = colors[2];
+      } else if (type === 'v2') {
+        // Vertical bicolor (e.g. Portugal)
+        if (i < numStrips * 0.4) color = colors[0];
+        else color = colors[1];
+      } else {
+        // Default to first color, overwritten by specific layouts below
+        color = colors[0];
+      }
+      
+      ctx.fillStyle = color;
+      
+      if (type === 'h3') {
+        // Horizontal tricolor (e.g. Argentina, Germany)
+        const h = height / 3;
+        ctx.fillStyle = colors[0];
+        ctx.fillRect(sx, sy, stripWidth + 0.5, h);
+        ctx.fillStyle = colors[1];
+        ctx.fillRect(sx, sy + h, stripWidth + 0.5, h);
+        ctx.fillStyle = colors[2];
+        ctx.fillRect(sx, sy + 2 * h, stripWidth + 0.5, h);
+      } else if (type === 'cross') {
+        // Cross (e.g. Norway, England)
+        ctx.fillStyle = colors[0];
+        ctx.fillRect(sx, sy, stripWidth + 0.5, height);
+        // Cross intersection lines
+        ctx.fillStyle = selectedPlayer.flagCross || '#ffffff';
+        if (i >= numStrips * 0.28 && i <= numStrips * 0.42) {
+          ctx.fillRect(sx, sy, stripWidth + 0.5, height);
+        } else {
+          ctx.fillRect(sx, sy + height * 0.4, stripWidth + 0.5, height * 0.2);
+        }
+      } else if (type === 'br') {
+        // Brazil style
+        ctx.fillStyle = colors[0]; // Green base
+        ctx.fillRect(sx, sy, stripWidth + 0.5, height);
+        
+        // Yellow diamond inside strip
+        ctx.fillStyle = colors[1]; // Yellow
+        const progress = i / numStrips;
+        const dist = Math.abs(progress - 0.5) * 2;
+        const dy = (height / 2) * dist;
+        ctx.fillRect(sx, sy + dy, stripWidth + 0.5, height - 2 * dy);
+      } else {
+        if (type !== 'v3' && type !== 'v2') {
+          ctx.fillRect(sx, sy, stripWidth + 0.5, height);
+        } else {
+          ctx.fillRect(sx, sy, stripWidth + 0.5, height);
+        }
+      }
+    }
+    ctx.restore();
+  }
+
   function drawGame() {
     if (!ctx) return;
     
     ctx.save();
     
+    // Temblor de pantalla
     if (shakeIntensity > 0) {
       const dx = (Math.random() - 0.5) * shakeIntensity;
       const dy = (Math.random() - 0.5) * shakeIntensity;
       ctx.translate(dx, dy);
+    }
+    
+    // Latido de pantalla en tiros decisivos
+    let decisiveVignetteOpacity = 0;
+    if (isDecisiveShot && !pelota.isShot && !isCelebrating && document.getElementById('gameover-overlay').style.display !== 'flex') {
+      let phase = heartbeatSoundTimer % 45;
+      let pulse = 0;
+      if (phase >= 0 && phase < 12) {
+        pulse = Math.sin((phase / 12) * Math.PI) * 0.020;
+      } else if (phase >= 11 && phase < 23) {
+        pulse = Math.sin(((phase - 11) / 12) * Math.PI) * 0.012;
+      }
+      const pScale = 1.0 + pulse;
+      
+      // Aplicar escala alrededor del centro del canvas (200, 150)
+      ctx.translate(200, 150);
+      ctx.scale(pScale, pScale);
+      ctx.translate(-200, -150);
+      
+      // Opacidad del vignette rojo que late
+      decisiveVignetteOpacity = pulse * 15.0; // Oscila de 0 a ~0.3
+      if (decisiveVignetteOpacity > 0.35) decisiveVignetteOpacity = 0.35;
     }
     
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
@@ -13474,7 +14438,7 @@
     if (gameMode === 'penales' && penalesTurno === 'defensa') {
       tiradorADibujar = cpuTirador || selectedPlayer;
     }
-    const isLeftFooted = tiradorADibujar.id === 'mesias' || tiradorADibujar.id === 'yamalisimo';
+    const isLeftFooted = ['mesias', 'yamalisimo', 'maradonuts', 'hajalan'].includes(tiradorADibujar.id);
     let finalPlayerX = playerX;
     if (isAiming) {
       const adx = aimStart.x - aimCurrent.x;
@@ -14067,6 +15031,26 @@
         ctx.shadowBlur = 0;
       }
 
+      ctx.restore();
+    }
+    // Dibujar vignette de tensión roja en tiros decisivos antes de patear
+    if (decisiveVignetteOpacity > 0) {
+      ctx.save();
+      const vignette = ctx.createRadialGradient(200, 150, 100, 200, 150, 280);
+      vignette.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      vignette.addColorStop(0.5, `rgba(139, 0, 0, ${decisiveVignetteOpacity * 0.5})`);
+      vignette.addColorStop(1, `rgba(255, 0, 0, ${decisiveVignetteOpacity})`);
+      ctx.fillStyle = vignette;
+      ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+      
+      // Texto sutil que late con el corazón "¡TIRO DECISIVO!"
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.font = '900 9px system-ui, -apple-system, sans-serif';
+      ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + decisiveVignetteOpacity * 1.5})`;
+      ctx.shadowColor = 'rgba(255, 0, 0, 0.8)';
+      ctx.shadowBlur = 4;
+      ctx.fillText('¡MOMENTO DECISIVO!', 200, 68);
       ctx.restore();
     }
     
