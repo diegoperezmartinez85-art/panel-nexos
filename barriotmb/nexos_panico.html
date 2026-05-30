@@ -4301,6 +4301,10 @@
 
 <!-- COPA NEXOS - JUEGO DE TIROS LIBRES -->
 <div class="pantalla-mundial" id="pantalla-mundial">
+  <!-- Canvas de Intro Anime de Pantalla Completa -->
+  <canvas id="canvas-intro-anime" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9900; display: none; background: #0b0f19;"></canvas>
+  <button id="intro-skip-btn" style="position: absolute; bottom: 25px; right: 25px; z-index: 9910; background: rgba(0, 0, 0, 0.75); border: 1px solid rgba(255, 255, 255, 0.35); color: #fff; padding: 8px 16px; font-size: 10px; font-weight: 900; border-radius: 20px; cursor: pointer; letter-spacing: 1px; transition: all 0.2s; display: none;" onmouseenter="this.style.background='rgba(6,182,212,0.45)'" onmouseleave="this.style.background='rgba(0,0,0,0.75)'" onclick="skipIntroAnime()">SALTAR ⏩</button>
+
   <!-- Botón cerrar con cruz de salida segura -->
   <button class="cerrar-mundial-btn" onclick="intentarCerrarMundial()" title="Salir del Juego">✕</button>
   
@@ -4319,6 +4323,231 @@
     
     <div class="mundial-players-slider" id="players-slider">
       <!-- Los jugadores se inyectan dinámicamente por JS -->
+    </div>
+    
+    <!-- SELECCIÓN DE PELOTA ESPECIAL -->
+    <div class="mundial-section-title" style="margin-top: 18px; font-size: 11px; font-weight: 900; color: #a1a1aa; text-transform: uppercase; letter-spacing: 1.5px; align-self: flex-start; display: flex; align-items: center; gap: 8px;">
+      ⚽ SELECCIONÁ TU BALÓN ESPECIAL
+    </div>
+    <style>
+      .ball-selector-container {
+        display: flex; 
+        gap: 10px; 
+        width: 100%; 
+        overflow-x: auto; 
+        padding: 10px 4px 14px 4px; 
+        scrollbar-width: none; 
+        -ms-overflow-style: none;
+        flex-shrink: 0 !important;
+        min-height: 94px; /* Asegura altura suficiente sin importar la pantalla */
+      }
+      .ball-selector-container::-webkit-scrollbar { display: none; }
+      .ball-skin-card {
+        flex: 0 0 calc(25% - 8px);
+        min-width: 80px;
+        min-height: 70px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 10px 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        flex-shrink: 0 !important;
+      }
+      .ball-skin-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+        z-index: 0;
+      }
+      .ball-skin-card .ball-preview-glow {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        z-index: 1;
+        transition: transform 0.3s;
+      }
+      .ball-skin-card .ball-name {
+        font-size: 9.5px;
+        font-weight: 850;
+        color: #a1a1aa;
+        letter-spacing: 0.5px;
+        z-index: 1;
+        transition: color 0.2s;
+      }
+      .ball-skin-card.selected {
+        background: rgba(6, 182, 212, 0.09);
+        border-color: rgba(6, 182, 212, 0.55);
+        box-shadow: 0 0 10px rgba(6, 182, 212, 0.25);
+      }
+      .ball-skin-card.selected .ball-name {
+        color: #06b6d4;
+      }
+      .ball-skin-card.selected .ball-preview-glow {
+        transform: scale(1.18) rotate(15deg);
+      }
+      .ball-skin-card.locked {
+        opacity: 0.55;
+      }
+      .ball-skin-card.locked::after {
+        content: '🔒';
+        position: absolute;
+        top: 5px; right: 5px;
+        font-size: 8px;
+      }
+      .ball-skin-card .ball-desc {
+        font-size: 7px;
+        font-weight: 600;
+        color: #71717a;
+        line-height: 1.15;
+        z-index: 1;
+      }
+
+      /* Regla global de no-encogimiento para componentes clave en la pantalla de selección */
+      .mundial-players-slider,
+      .game-modes-container,
+      .mundial-action-btn,
+      .ranking-board,
+      .vitrina-logros,
+      .mundial-section-title,
+      .mundial-subtitle {
+        flex-shrink: 0 !important;
+      }
+    </style>
+    <div class="ball-selector-container">
+      
+      <div class="ball-skin-card selected" id="ball-skin-clasica" onclick="seleccionarBalon('clasica')">
+        <div class="ball-preview-glow">⚽</div>
+        <div class="ball-name">TANGO</div>
+        <div class="ball-desc">Clásica retro</div>
+      </div>
+      
+      <div class="ball-skin-card locked" id="ball-skin-oro" onclick="seleccionarBalon('oro')">
+        <div class="ball-preview-glow" style="text-shadow: 0 0 8px #f59e0b;">🪙</div>
+        <div class="ball-name" style="color: #fbbf24;">DE ORO</div>
+        <div class="ball-desc" id="ball-desc-oro">Récord 5 goles</div>
+      </div>
+      
+      <div class="ball-skin-card locked" id="ball-skin-fuego" onclick="seleccionarBalon('fuego')">
+        <div class="ball-preview-glow" style="text-shadow: 0 0 8px #ef4444;">☄️</div>
+        <div class="ball-name" style="color: #f87171;">FUEGO</div>
+        <div class="ball-desc" id="ball-desc-fuego">Racha de 3</div>
+      </div>
+      
+      <div class="ball-skin-card locked" id="ball-skin-hielo" onclick="seleccionarBalon('hielo')">
+        <div class="ball-preview-glow" style="text-shadow: 0 0 8px #06b6d4;">❄️</div>
+        <div class="ball-name" style="color: #22d3ee;">HIELO</div>
+        <div class="ball-desc" id="ball-desc-hielo">Racha de 2</div>
+      </div>
+    </div>
+
+    <!-- SELECTOR DE MODO DE JUEGO -->
+    <div class="mundial-section-title" style="margin-top: 18px; font-size: 11px; font-weight: 900; color: #a1a1aa; text-transform: uppercase; letter-spacing: 1.5px; align-self: flex-start; display: flex; align-items: center; gap: 8px;">
+      🎮 SELECCIONÁ EL MODO DE JUEGO
+    </div>
+    <style>
+      .game-mode-card {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 12px 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        text-align: center;
+        position: relative;
+        flex-shrink: 0 !important;
+      }
+      .game-mode-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+        border-radius: 12px;
+        z-index: 0;
+      }
+      .game-mode-card .mode-icon {
+        font-size: 20px;
+        z-index: 1;
+        transition: transform 0.3s;
+      }
+      .game-mode-card .mode-title {
+        font-size: 10.5px;
+        font-weight: 900;
+        color: #e4e4e7;
+        letter-spacing: 0.5px;
+        z-index: 1;
+      }
+      .game-mode-card .mode-desc {
+        font-size: 8px;
+        font-weight: 600;
+        color: #71717a;
+        line-height: 1.25;
+        z-index: 1;
+      }
+      .game-mode-card .mode-record {
+        font-size: 8px;
+        font-weight: 800;
+        color: #a1a1aa;
+        background: rgba(255,255,255,0.05);
+        padding: 2px 6px;
+        border-radius: 20px;
+        margin-top: 4px;
+        z-index: 1;
+      }
+      .game-mode-card.selected {
+        background: rgba(6, 182, 212, 0.09);
+        border-color: rgba(6, 182, 212, 0.55);
+        box-shadow: 0 0 10px rgba(6, 182, 212, 0.25);
+      }
+      .game-mode-card.selected .mode-icon {
+        transform: scale(1.15) rotate(-5deg);
+      }
+      .game-mode-card.selected .mode-title {
+        color: #06b6d4;
+      }
+      .game-mode-card.selected .mode-record {
+        background: rgba(6, 182, 212, 0.2);
+        color: #06b6d4;
+      }
+    </style>
+    <div class="game-modes-container" style="display: flex; gap: 10px; width: 100%; margin-top: 8px; margin-bottom: 20px;">
+      <div class="game-mode-card selected" id="mode-card-clasico" onclick="seleccionarModo('clasico')">
+        <div class="mode-icon">🏆</div>
+        <div class="mode-title">CLÁSICO</div>
+        <div class="mode-desc">Tanda de 5 tiros libres clásicos por la gloria.</div>
+        <div class="mode-record" id="mode-record-clasico">Récord: -- PTS</div>
+      </div>
+      
+      <div class="game-mode-card" id="mode-card-timeattack" onclick="seleccionarModo('timeattack')">
+        <div class="mode-icon">⚡</div>
+        <div class="mode-title">TIME ATTACK</div>
+        <div class="mode-desc">Tiros ilimitados en 60s. ¡Goles de ángulo dan +4s!</div>
+        <div class="mode-record" id="mode-desc-timeattack">Récord: 0 PTS</div>
+      </div>
+      
+      <div class="game-mode-card" id="mode-card-survival" onclick="seleccionarModo('survival')">
+        <div class="mode-icon">❤️</div>
+        <div class="mode-title">SUPERVIVENCIA</div>
+        <div class="mode-desc">Tiros ilimitados con 3 vidas. Si errás, perdés vida.</div>
+        <div class="mode-record" id="mode-desc-survival">Récord: 0 PTS</div>
+      </div>
     </div>
     
     <button class="mundial-action-btn" onclick="iniciarEstadioJuego()">INGRESAR AL ESTADIO</button>
@@ -7279,17 +7508,155 @@
     { id: 'neymareado', nombre: 'Neymareado', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00'], flagType: 'br', comba: 98, fuerza: 95, precision: 88, skin: '#b45309', hair: '#fef08a', beard: null, hairType: 'mohawk', jersey: ['#fbbf24', '#fbbf24'] },
     { id: 'penaldo', nombre: 'Penaldo', pais: 'Portugal 🇵🇹', flag: '🇵🇹', flagColors: ['#006600','#ff0000'], flagType: 'v2', comba: 85, fuerza: 99, precision: 96, skin: '#fed7aa', hair: '#18181b', beard: null, hairType: 'penaldo', jersey: ['#dc2626', '#dc2626'] },
     { id: 'hajalan', nombre: 'Hajalan', pais: 'Noruega 🇳🇴', flag: '🇳🇴', flagColors: ['#ef2b2d','#ffffff','#002868'], flagType: 'cross', flagCross: '#002868', comba: 78, fuerza: 99, precision: 95, skin: '#ffedd5', hair: '#fef08a', beard: null, hairType: 'long-rubio', jersey: ['#dc2626', '#1d4ed8'] },
-    { id: 'maradonuts', nombre: 'Maradonuts', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 99, fuerza: 95, precision: 97, skin: '#fed7aa', hair: '#18181b', beard: null, hairType: 'pelusa', jersey: ['#74acdf', '#ffffff'] },
-    { id: 'zazu', nombre: 'Zazu', pais: 'Francia 🇫🇷', flag: '🇫🇷', flagColors: ['#002395','#ffffff','#ed2939'], flagType: 'v3', comba: 96, fuerza: 91, precision: 98, skin: '#ffedd5', hair: '#3f3f46', beard: null, hairType: 'calvo', jersey: ['#002395', '#ffffff'] },
-    { id: 'orey', nombre: 'Orey', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00'], flagType: 'br', comba: 95, fuerza: 98, precision: 98, skin: '#653b1b', hair: '#18181b', beard: null, hairType: 'afro-short', jersey: ['#fbbf24', '#009c3b'] }
+    { id: 'maradonuts', nombre: 'Maradonuts', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 99, fuerza: 95, precision: 97, skin: '#fed7aa', hair: '#18181b', beard: null, hairType: 'pelusa', jersey: ['#74acdf', '#ffffff'], locked: true, unlockDesc: 'Racha de 3 goles 🔥' },
+    { id: 'zazu', nombre: 'Zazu', pais: 'Francia 🇫🇷', flag: '🇫🇷', flagColors: ['#002395','#ffffff','#ed2939'], flagType: 'v3', comba: 96, fuerza: 91, precision: 98, skin: '#ffedd5', hair: '#3f3f46', beard: null, hairType: 'calvo', jersey: ['#002395', '#002395'], locked: true, unlockDesc: 'Racha de 2 goles ⚡' },
+    { id: 'orey', nombre: 'Orey', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00'], flagType: 'br', comba: 95, fuerza: 98, precision: 98, skin: '#653b1b', hair: '#18181b', beard: null, hairType: 'afro-short', jersey: ['#fbbf24', '#009c3b'], locked: true, unlockDesc: 'Récord global 4 goles 🥈' },
+    { id: 'fenomeno', nombre: 'El Fenómeno', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00','#002277'], flagType: 'br', comba: 94, fuerza: 98, precision: 96, skin: '#b45309', hair: '#18181b', beard: null, hairType: 'calva-flequillo', jersey: ['#fedf00', '#009c3b'], locked: true, unlockDesc: 'Racha de 3 goles 🔥' },
+    { id: 'becan', nombre: 'Becan', pais: 'Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', flagColors: ['#ffffff'], flagType: 'cross', flagCross: '#cf111b', comba: 99, fuerza: 93, precision: 97, skin: '#ffedd5', hair: '#fef08a', beard: null, hairType: 'beckham-mohawk', jersey: ['#cf142b', '#cf142b'], locked: true, unlockDesc: 'Récord global 5 goles 🪙' },
+    { id: 'witch', nombre: 'The Witch', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 96, fuerza: 94, precision: 95, skin: '#fed7aa', hair: '#18181b', beard: '#18181b', hairType: 'calvo', jersey: ['#0ea5e9', '#ffffff'], locked: true, unlockDesc: 'Racha de 2 goles ⚡' },
+    { id: 'david', nombre: 'David', pais: 'Países Bajos 🇳🇱', flag: '🇳🇱', flagColors: ['#ff4f00','#ffffff','#21468b'], flagType: 'h3', comba: 94, fuerza: 97, precision: 92, skin: '#5c4033', hair: '#1c1917', beard: null, hairType: 'rastas', jersey: ['#ff4f00', '#ff4f00'], locked: true, unlockDesc: 'Récord global 3 goles 🥉' },
+    { id: 'kingsman', nombre: 'Kingsman', pais: 'Alemania 🇩🇪', flag: '🇩🇪', flagColors: ['#000000','#dd0000','#ffcf00'], flagType: 'h3', comba: 91, fuerza: 96, precision: 98, skin: '#ffedd5', hair: '#fde047', beard: null, hairType: 'long-rubio', jersey: ['#10b981', '#10b981'], locked: true, unlockDesc: 'Récord global 4 goles 🥈' },
+    { id: 'pirgo', nombre: 'Pirgo', pais: 'Italia 🇮🇹', flag: '🇮🇹', flagColors: ['#009246','#ffffff','#ce2b37'], flagType: 'v3', comba: 98, fuerza: 88, precision: 99, skin: '#fed7aa', hair: '#451a03', beard: '#451a03', hairType: 'pirlo', jersey: ['#0087e0', '#0087e0'], locked: true, unlockDesc: 'Racha de 2 goles ⚡' },
+    { id: 'totto', nombre: 'Totto', pais: 'Italia 🇮🇹', flag: '🇮🇹', flagColors: ['#009246','#ffffff','#ce2b37'], flagType: 'v3', comba: 95, fuerza: 96, precision: 95, skin: '#fed7aa', hair: '#ca8a04', beard: null, hairType: 'totti', jersey: ['#0087e0', '#0087e0'], locked: true, unlockDesc: 'Récord global 4 goles 🥈' }
   ];
 
   let selectedPlayer = MUNDIAL_JUGADORES[0];
+  let selectedBallSkin = 'clasica'; // skin seleccionada: 'clasica', 'oro', 'fuego', 'hielo'
   let currentScore = 0;
   let remainingShots = 5;
   let physicsInterval = null;
   let gameCanvas = null;
   let ctx = null;
+  let mundialRecord = 0;
+  let gameMode = 'clasico'; // 'clasico', 'timeattack', 'survival'
+  let gameDifficulty = 'normal'; // 'facil', 'normal', 'dificil'
+  let timeAttackTimeLeft = 60;
+  let survivalLives = 3;
+
+  window.seleccionarModo = function(modo) {
+    gameMode = modo;
+    triggerHaptic('medium');
+    playSound('tap');
+    
+    document.querySelectorAll('.game-mode-card').forEach(card => {
+      card.classList.remove('selected');
+    });
+    const selectedCard = document.getElementById(`mode-card-${modo}`);
+    if (selectedCard) selectedCard.classList.add('selected');
+    
+    // Cambiar la visualización de los récords específicos
+    const recordElement = document.getElementById('estadio-record');
+    if (recordElement) {
+      if (modo === 'clasico') {
+        recordElement.innerText = String(mundialRecord).padStart(2, '0');
+      } else if (modo === 'timeattack') {
+        const record = localStorage.getItem('nx_futbol_record_timeattack') || '0';
+        recordElement.innerText = String(record).padStart(2, '0');
+      } else if (modo === 'survival') {
+        const record = localStorage.getItem('nx_futbol_record_survival') || '0';
+        recordElement.innerText = String(record).padStart(2, '0');
+      }
+    }
+  };
+
+  window.seleccionarDificultad = function(diff) {
+    gameDifficulty = diff;
+    triggerHaptic('medium');
+    playSound('tap');
+    
+    document.querySelectorAll('.difficulty-card').forEach(card => {
+      card.classList.remove('selected');
+    });
+    const selectedCard = document.getElementById(`diff-card-${diff}`);
+    if (selectedCard) selectedCard.classList.add('selected');
+  };
+
+  window.seleccionarBalon = function(skin) {
+    const maxRacha = Math.max(
+      parseInt(localStorage.getItem('nx_futbol_racha_max') || 0),
+      rachaActual
+    );
+    const realRecord = Math.max(
+      parseInt(localStorage.getItem('nx_futbol_record_global') || 0),
+      mundialRecord || 0
+    );
+    
+    let isLocked = false;
+    if (skin === 'oro' && realRecord < 5) isLocked = true;
+    if (skin === 'fuego' && maxRacha < 3) isLocked = true;
+    if (skin === 'hielo' && maxRacha < 2) isLocked = true;
+    
+    if (isLocked) {
+      triggerHaptic('heavy');
+      playSound('error');
+      mostrarToastLogro('Balón Bloqueado 🔒', `Cumplí el objetivo requerido para desbloquear este balón.`, true);
+      return;
+    }
+    
+    selectedBallSkin = skin;
+    triggerHaptic('medium');
+    playSound('tap');
+    
+    document.querySelectorAll('.ball-skin-card').forEach(card => {
+      card.classList.remove('selected');
+    });
+    const selectedCard = document.getElementById(`ball-skin-${skin}`);
+    if (selectedCard) selectedCard.classList.add('selected');
+
+    // Toast de éxito
+    const skinNames = { clasica: 'Tango Clásica', oro: 'De Oro 🪙', fuego: 'De Fuego ☄️', hielo: 'De Hielo ❄️' };
+    mostrarToastLogro(`Equipaste: ${skinNames[skin]}`, `¡Listo para patear tiros libres con estilo!`, false);
+  };
+
+  window.actualizarBloqueosBalones = function() {
+    const maxRacha = Math.max(
+      parseInt(localStorage.getItem('nx_futbol_racha_max') || 0),
+      rachaActual
+    );
+    const realRecord = Math.max(
+      parseInt(localStorage.getItem('nx_futbol_record_global') || 0),
+      mundialRecord || 0
+    );
+    
+    // 1. Balón de Oro (Récord 5 goles)
+    const oroCard = document.getElementById('ball-skin-oro');
+    const oroDesc = document.getElementById('ball-desc-oro');
+    if (oroCard) {
+      if (realRecord >= 5) {
+        oroCard.classList.remove('locked');
+        if (oroDesc) oroDesc.innerHTML = `<span style="color: #22c55e; font-weight:750;">¡Desbloqueado!</span>`;
+      } else {
+        oroCard.classList.add('locked');
+        if (oroDesc) oroDesc.innerText = `Récord 5 goles (Llevás ${realRecord})`;
+      }
+    }
+    
+    // 2. Balón de Fuego (Racha de 3)
+    const fuegoCard = document.getElementById('ball-skin-fuego');
+    const fuegoDesc = document.getElementById('ball-desc-fuego');
+    if (fuegoCard) {
+      if (maxRacha >= 3) {
+        fuegoCard.classList.remove('locked');
+        if (fuegoDesc) fuegoDesc.innerHTML = `<span style="color: #22c55e; font-weight:750;">¡Desbloqueado!</span>`;
+      } else {
+        fuegoCard.classList.add('locked');
+        if (fuegoDesc) fuegoDesc.innerText = `Racha de 3 (Llevás ${maxRacha})`;
+      }
+    }
+    
+    // 3. Balón de Hielo (Racha de 2)
+    const hieloCard = document.getElementById('ball-skin-hielo');
+    const hieloDesc = document.getElementById('ball-desc-hielo');
+    if (hieloCard) {
+      if (maxRacha >= 2) {
+        hieloCard.classList.remove('locked');
+        if (hieloDesc) hieloDesc.innerHTML = `<span style="color: #22c55e; font-weight:750;">¡Desbloqueado!</span>`;
+      } else {
+        hieloCard.classList.add('locked');
+        if (hieloDesc) hieloDesc.innerText = `Racha de 2 (Llevás ${maxRacha})`;
+      }
+    }
+  };
   
   // Récords y Celebración de Copa
   let goalsScoredInRound = 0;
@@ -7608,12 +7975,26 @@
     } catch(e) {}
   }
 
-  // Precalentar voces de síntesis premium
+  // Precalentar voces de síntesis premium y desbloquear canal de celular
   if ('speechSynthesis' in window) {
     window.speechSynthesis.getVoices();
     window.speechSynthesis.onvoiceschanged = () => {
       window.speechSynthesis.getVoices();
     };
+  }
+
+  // Calentamiento/Desbloqueo directo de síntesis de voz en interacción móvil
+  function warmUpSpeechSynthesis() {
+    if (modoDiscreto) return;
+    try {
+      if ('speechSynthesis' in window) {
+        // Forzar inicialización del sintetizador mediante frase silenciosa
+        const silentUtterance = new SpeechSynthesisUtterance('');
+        silentUtterance.lang = 'es-AR';
+        silentUtterance.volume = 0;
+        window.speechSynthesis.speak(silentUtterance);
+      }
+    } catch(e) {}
   }
 
   function buscarVozHumana() {
@@ -7639,7 +8020,7 @@
       v.name.toLowerCase().includes('natural') || 
       v.name.toLowerCase().includes('google') || 
       v.name.toLowerCase().includes('online') ||
-      v.name.toLowerCase().includes('neural')
+      v.name.toLowerCase().includes('neutral')
     ));
     if (voz) return voz;
     
@@ -7727,6 +8108,7 @@
     renderPlayersList();
     loadRankingCasas();
     renderVitrinaLogros();
+    if (typeof actualizarVisualizacionModos === 'function') actualizarVisualizacionModos();
   };
 
   // Dibujar cabezón en el Canvas de Selección de Jugador
@@ -7932,6 +8314,88 @@
         c.arc(hx, hy - 2, 5, 0, Math.PI * 2);
         c.fill();
       }
+    } else if (player.hairType === 'calva-flequillo') {
+      c.fillStyle = player.hair;
+      c.beginPath();
+      c.moveTo(-5, -11);
+      c.lineTo(5, -11);
+      c.lineTo(0, -17);
+      c.closePath();
+      c.fill();
+    } else if (player.hairType === 'beckham-mohawk') {
+      c.fillStyle = player.hair;
+      c.beginPath();
+      c.moveTo(-3, -15);
+      c.quadraticCurveTo(0, -28, 3, -15);
+      c.lineTo(1.5, -14);
+      c.lineTo(0, -30);
+      c.lineTo(-1.5, -14);
+      c.closePath();
+      c.fill();
+      
+      c.strokeStyle = 'rgba(0,0,0,0.1)';
+      c.lineWidth = 1.5;
+      c.beginPath();
+      c.arc(-13, -8, 2, 0, Math.PI*2);
+      c.arc(13, -8, 2, 0, Math.PI*2);
+      c.stroke();
+    } else if (player.hairType === 'rastas') {
+      c.fillStyle = player.hair;
+      c.beginPath();
+      c.arc(0, -6, 13.5, Math.PI, 0);
+      c.fill();
+      
+      const rastasX = [-13, -10, -7, 7, 10, 13];
+      rastasX.forEach((rx, idx) => {
+        const length = 12 + (idx % 2) * 4;
+        c.beginPath();
+        for (let dy = -4; dy <= length; dy += 3) {
+          const osc = Math.sin(dy * 0.25 + idx) * 1.2;
+          c.arc(rx + osc, dy, 2.2, 0, Math.PI * 2);
+        }
+        c.fill();
+      });
+    } else if (player.hairType === 'pirlo') {
+      // Cabello castaño ondulado y elegante de Andrea Pirlo cayendo a los lados
+      c.fillStyle = player.hair;
+      c.beginPath();
+      c.arc(0, -5, 13.5, Math.PI, 0); // coronilla
+      c.fill();
+      
+      // Mechones ondulados a los lados
+      const ladosX = [-13.5, 13.5];
+      ladosX.forEach((lx, idx) => {
+        c.beginPath();
+        c.moveTo(lx, -5);
+        c.bezierCurveTo(lx + (idx === 0 ? -3 : 3), 4, lx + (idx === 0 ? -2 : 2), 10, lx + (idx === 0 ? 1.5 : -1.5), 14);
+        c.bezierCurveTo(lx + (idx === 0 ? 3.5 : -3.5), 10, lx + (idx === 0 ? 3.5 : -3.5), 2, lx + (idx === 0 ? 3.5 : -3.5), -5);
+        c.closePath();
+        c.fill();
+      });
+    } else if (player.hairType === 'totti') {
+      // Cabello rubio medio de Francesco Totti con vincha/headband negra
+      c.fillStyle = player.hair;
+      c.beginPath();
+      c.arc(0, -6, 13, Math.PI, 0); // corona base
+      c.fill();
+      
+      // Patillas y volumen lateral
+      c.beginPath();
+      c.moveTo(-13, -6); c.lineTo(-13, 1); c.lineTo(-9, -2); c.lineTo(-9, -6);
+      c.closePath();
+      c.fill();
+      
+      c.beginPath();
+      c.moveTo(13, -6); c.lineTo(13, 1); c.lineTo(9, -2); c.lineTo(9, -6);
+      c.closePath();
+      c.fill();
+      
+      // Vincha fina negra cruzando la frente/coronilla
+      c.strokeStyle = '#18181b';
+      c.lineWidth = 1.35;
+      c.beginPath();
+      c.arc(0, -6, 13.6, Math.PI * 1.05, Math.PI * 1.95);
+      c.stroke();
     }
 
     // Ojos
@@ -7962,6 +8426,47 @@
     c.moveTo(-8, -6); c.lineTo(-2, -4);
     c.moveTo(8, -6); c.lineTo(2, -4);
     c.stroke();
+
+    // Dibujar Lentes Especiales de David (Edgar Davids) en vista previa
+    if (player.id === 'david') {
+      c.strokeStyle = '#18181b'; // marco negro
+      c.lineWidth = 2.2;
+      c.fillStyle = 'rgba(220, 38, 38, 0.85)'; // vidrios rojos translúcidos
+      
+      c.beginPath();
+      if (c.roundRect) {
+        c.roundRect(-9, -5.5, 7.5, 6.5, 3);
+      } else {
+        c.rect(-9, -5.5, 7.5, 6.5);
+      }
+      c.fill();
+      c.stroke();
+
+      c.beginPath();
+      if (c.roundRect) {
+        c.roundRect(1.5, -5.5, 7.5, 6.5, 3);
+      } else {
+        c.rect(1.5, -5.5, 7.5, 6.5);
+      }
+      c.fill();
+      c.stroke();
+
+      c.strokeStyle = '#18181b'; // puente negro
+      c.lineWidth = 2.2;
+      c.beginPath();
+      c.moveTo(-1.5, -3.5);
+      c.lineTo(1.5, -3.5);
+      c.stroke();
+
+      c.strokeStyle = '#18181b';
+      c.lineWidth = 1.8;
+      c.beginPath();
+      c.moveTo(-9, -3.5);
+      c.lineTo(-14, -3);
+      c.moveTo(9, -3.5);
+      c.lineTo(14, -3);
+      c.stroke();
+    }
 
     // Boca
     c.strokeStyle = '#000000';
@@ -8009,11 +8514,42 @@
   function renderPlayersList() {
     const slider = document.getElementById('players-slider');
     if (!slider) return;
+    
+    const maxRacha = Math.max(
+      parseInt(localStorage.getItem('nx_futbol_racha_max') || 0),
+      rachaActual
+    );
+    const realRecord = Math.max(
+      parseInt(localStorage.getItem('nx_futbol_record_global') || 0),
+      mundialRecord || 0
+    );
+
     slider.innerHTML = MUNDIAL_JUGADORES.map((p, idx) => {
       const isSel = p.id === selectedPlayer.id ? 'selected' : '';
       
+      let isLocked = false;
+      if (p.id === 'fenomeno' && maxRacha < 3) isLocked = true;
+      if (p.id === 'becan' && realRecord < 5) isLocked = true;
+      if (p.id === 'witch' && maxRacha < 2) isLocked = true;
+      if (p.id === 'david' && realRecord < 3) isLocked = true;
+      if (p.id === 'kingsman' && realRecord < 4) isLocked = true;
+      if (p.id === 'maradonuts' && maxRacha < 3) isLocked = true;
+      if (p.id === 'zazu' && maxRacha < 2) isLocked = true;
+      if (p.id === 'orey' && realRecord < 4) isLocked = true;
+      if (p.id === 'pirgo' && maxRacha < 2) isLocked = true;
+      if (p.id === 'totto' && realRecord < 4) isLocked = true;
+      
+      const lockOverlay = isLocked ? `
+        <div class="player-lock-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.85);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:5;backdrop-filter:blur(3px);border:1px solid rgba(255,255,255,0.05);pointer-events:none;">
+          <span style="font-size:20px;margin-bottom:4px;">🔒</span>
+          <span style="font-size:9px;color:#cbd5e1;font-weight:750;text-align:center;padding:0 8px;text-transform:uppercase;letter-spacing:0.5px;">Bloqueado</span>
+          <span style="font-size:8px;color:#94a3b8;text-align:center;padding:0 6px;margin-top:4px;line-height:1.2;">${p.unlockDesc}</span>
+        </div>
+      ` : '';
+      
       return `
-        <div class="player-card ${isSel}" onclick="selectPlayerById('${p.id}')">
+        <div class="player-card ${isSel} ${isLocked ? 'locked-player' : ''}" onclick="selectPlayerById('${p.id}')" style="position:relative;">
+          ${lockOverlay}
           <div class="player-card-face-wrap" style="height: 70px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; position: relative;">
             <canvas id="face-canvas-${p.id}" width="70" height="70" style="width: 70px; height: 70px; display: block; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.45));"></canvas>
             ${buildFlagHTML(p)}
@@ -8043,6 +8579,7 @@
       const canvas = document.getElementById(`face-canvas-${p.id}`);
       if (canvas) {
         const c = canvas.getContext('2d');
+        c.clearRect(0, 0, 70, 70);
         drawCabezonPreview(c, 35, 30, p);
       }
     });
@@ -8051,16 +8588,88 @@
   window.selectPlayerById = function(id) {
     const player = MUNDIAL_JUGADORES.find(p => p.id === id);
     if (player) {
+      const maxRacha = Math.max(
+        parseInt(localStorage.getItem('nx_futbol_racha_max') || 0),
+        rachaActual
+      );
+      const realRecord = Math.max(
+        parseInt(localStorage.getItem('nx_futbol_record_global') || 0),
+        mundialRecord || 0
+      );
+
+      let isLocked = false;
+      if (id === 'fenomeno' && maxRacha < 3) isLocked = true;
+      if (id === 'becan' && realRecord < 5) isLocked = true;
+      if (id === 'witch' && maxRacha < 2) isLocked = true;
+      if (id === 'david' && realRecord < 3) isLocked = true;
+      if (id === 'kingsman' && realRecord < 4) isLocked = true;
+      if (id === 'maradonuts' && maxRacha < 3) isLocked = true;
+      if (id === 'zazu' && maxRacha < 2) isLocked = true;
+      if (id === 'orey' && realRecord < 4) isLocked = true;
+      if (id === 'pirgo' && maxRacha < 2) isLocked = true;
+      if (id === 'totto' && realRecord < 4) isLocked = true;
+
+      if (isLocked) {
+        triggerHaptic('heavy');
+        playSound('error');
+        mostrarToastLogro('Jugador Bloqueado 🔒', `Cumplí el objetivo para desbloquear a ${player.nombre}: ${player.unlockDesc}`, true);
+        return;
+      }
+
       selectedPlayer = player;
       triggerHaptic('soft');
       playSound('tap');
       renderPlayersList();
       
       // Chequear logro leyenda
-      if (['maradonuts', 'zazu', 'orey'].includes(id)) {
+      if (['maradonuts', 'zazu', 'orey', 'fenomeno', 'becan', 'witch', 'david', 'kingsman', 'pirgo', 'totto'].includes(id)) {
         unlockAchievement('leyenda', 'Selección de Leyenda', `Elegiste jugar con la leyenda ${player.nombre}.`);
       }
     }
+  };
+
+  window.seleccionarModo = function(modo) {
+    gameMode = modo;
+    triggerHaptic('medium');
+    playSound('tap');
+    
+    document.querySelectorAll('.game-mode-card').forEach(card => {
+      card.classList.remove('selected');
+    });
+    const selectedCard = document.getElementById(`mode-card-${modo}`);
+    if (selectedCard) selectedCard.classList.add('selected');
+
+    // Cambiar la visualización de los récords específicos en el marcador LED del estadio
+    const recordElement = document.getElementById('estadio-record');
+    if (recordElement) {
+      if (modo === 'clasico') {
+        recordElement.innerText = String(mundialRecord).padStart(2, '0');
+      } else if (modo === 'timeattack') {
+        const record = localStorage.getItem('nx_futbol_record_timeattack') || '0';
+        recordElement.innerText = String(record).padStart(2, '0');
+      } else if (modo === 'survival') {
+        const record = localStorage.getItem('nx_futbol_record_survival') || '0';
+        recordElement.innerText = String(record).padStart(2, '0');
+      }
+    }
+
+    // Toast de éxito
+    const modeNames = { clasico: 'Copa Clásica 🏆', timeattack: 'Time Attack ⏳', survival: 'Supervivencia ❤️' };
+    mostrarToastLogro(`Modo: ${modeNames[modo]}`, modo === 'clasico' ? '¡Competí en el ranking del barrio!' : 'Modo recreativo (no suma para el ranking).', false);
+  };
+
+  window.actualizarVisualizacionModos = function() {
+    const recordTimeAttack = localStorage.getItem('nx_futbol_record_timeattack') || '0';
+    const recordSurvival = localStorage.getItem('nx_futbol_record_survival') || '0';
+    
+    const descClasico = document.getElementById('mode-record-clasico');
+    if (descClasico) descClasico.innerText = `Récord: ${mundialRecord} PTS`;
+
+    const descTime = document.getElementById('mode-desc-timeattack');
+    if (descTime) descTime.innerText = `Récord: ${recordTimeAttack} PTS`;
+    
+    const descSurv = document.getElementById('mode-desc-survival');
+    if (descSurv) descSurv.innerText = `Récord: ${recordSurvival} PTS`;
   };
 
   // ══════════════════════════════════════════════════════
@@ -8208,9 +8817,545 @@
     el.textContent = text;
   }
 
+  let introAnimId = null;
+  let introActive = false;
+  let onIntroEndCallback = null;
+
+  window.skipIntroAnime = function() {
+    if (!introActive) return;
+    if (introAnimId) cancelAnimationFrame(introAnimId);
+    introActive = false;
+    
+    // Ocultar canvas de intro
+    const canvasIntro = document.getElementById('canvas-intro-anime');
+    const btnSkip = document.getElementById('intro-skip-btn');
+    if (canvasIntro) canvasIntro.style.display = 'none';
+    if (btnSkip) btnSkip.style.display = 'none';
+    
+    triggerHaptic('medium');
+    playSound('pop');
+    
+    if (onIntroEndCallback) {
+      onIntroEndCallback();
+      onIntroEndCallback = null;
+    }
+  };
+
+  function playIntroAnimeSound() {
+    if (modoDiscreto || !audioCtx) return;
+    try {
+      // 1. Barrido de bajo ascendente (Bass Sweep)
+      let oscSweep = audioCtx.createOscillator();
+      let gainSweep = audioCtx.createGain();
+      oscSweep.type = 'sawtooth';
+      oscSweep.frequency.setValueAtTime(70, audioCtx.currentTime);
+      oscSweep.frequency.exponentialRampToValueAtTime(320, audioCtx.currentTime + 0.7);
+      
+      gainSweep.gain.setValueAtTime(0.18, audioCtx.currentTime);
+      gainSweep.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.7);
+      
+      let filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(500, audioCtx.currentTime);
+      
+      oscSweep.connect(filter);
+      filter.connect(gainSweep);
+      gainSweep.connect(audioCtx.destination);
+      
+      oscSweep.start();
+      oscSweep.stop(audioCtx.currentTime + 0.7);
+      
+      // 2. Acorde metálico de impacto "Clang" (a los 0.75s)
+      setTimeout(() => {
+        if (!introActive) return;
+        
+        let now = audioCtx.currentTime;
+        let osc1 = audioCtx.createOscillator();
+        let osc2 = audioCtx.createOscillator();
+        let osc3 = audioCtx.createOscillator();
+        let gainImpact = audioCtx.createGain();
+        
+        osc1.type = 'sawtooth';
+        osc1.frequency.setValueAtTime(180, now);
+        osc1.frequency.exponentialRampToValueAtTime(80, now + 1.2);
+        
+        osc2.type = 'square';
+        osc2.frequency.setValueAtTime(380, now);
+        
+        osc3.type = 'triangle';
+        osc3.frequency.setValueAtTime(520, now);
+        
+        gainImpact.gain.setValueAtTime(0.28, now);
+        gainImpact.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+        
+        osc1.connect(gainImpact);
+        osc2.connect(gainImpact);
+        osc3.connect(gainImpact);
+        gainImpact.connect(audioCtx.destination);
+        
+        osc1.start();
+        osc2.start();
+        osc3.start();
+        
+        osc1.stop(now + 1.5);
+        osc2.stop(now + 1.5);
+        osc3.stop(now + 1.5);
+      }, 750);
+    } catch(e) {}
+  }
+
+  const dibuPlayer = {
+    id: 'dibu',
+    nombre: 'Dibu Martínez',
+    flagColors: ['#22c55e', '#ffffff', '#22c55e'],
+    skin: '#fed7aa',
+    hair: '#5c4033',
+    hairType: 'messi',
+    beard: null,
+    jersey: ['#16a34a', '#16a34a']
+  };
+
+  function playWorldCupTitleSound() {
+    if (modoDiscreto || !audioCtx) return;
+    try {
+      let now = audioCtx.currentTime;
+      let osc = audioCtx.createOscillator();
+      let gain = audioCtx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.exponentialRampToValueAtTime(880, now + 0.6);
+      
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+      
+      let filter = audioCtx.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.setValueAtTime(400, now);
+      
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.start();
+      osc.stop(now + 0.8);
+    } catch(e) {}
+  }
+
+  window.iniciarIntroAnimeCinematica = function(playerLeft, playerRight, callback) {
+    const canvasIntro = document.getElementById('canvas-intro-anime');
+    const btnSkip = document.getElementById('intro-skip-btn');
+    if (!canvasIntro) {
+      if (typeof playerLeft === 'function') playerLeft();
+      else if (callback) callback();
+      return;
+    }
+    
+    let isMultiStage = false;
+    let actualCallback = callback;
+    
+    if (typeof playerLeft === 'function') {
+      actualCallback = playerLeft;
+      playerLeft = null;
+      playerRight = null;
+      isMultiStage = true;
+    } else if (!playerLeft || !playerRight) {
+      isMultiStage = true;
+    }
+    
+    onIntroEndCallback = actualCallback;
+    introActive = true;
+    
+    canvasIntro.style.display = 'block';
+    if (btnSkip) btnSkip.style.display = 'block';
+    
+    const rect = canvasIntro.getBoundingClientRect();
+    canvasIntro.width = rect.width || window.innerWidth || 400;
+    canvasIntro.height = rect.height || window.innerHeight || 300;
+    const cCtx = canvasIntro.getContext('2d');
+    
+    let frame = 0;
+    const maxFrames = isMultiStage ? 180 : 90;
+    
+    playIntroAnimeSound();
+    
+    function animLoop() {
+      if (!introActive) return;
+      frame++;
+      
+      const W = canvasIntro.width;
+      const H = canvasIntro.height;
+      
+      cCtx.fillStyle = '#0b0f19';
+      cCtx.fillRect(0, 0, W, H);
+      
+      let currentLeft = playerLeft;
+      let currentRight = playerRight;
+      
+      if (isMultiStage) {
+        if (frame <= 30) {
+          currentLeft = MUNDIAL_JUGADORES.find(p => p.id === 'mesias');
+          currentRight = MUNDIAL_JUGADORES.find(p => p.id === 'penaldo');
+        } else if (frame <= 60) {
+          currentLeft = MUNDIAL_JUGADORES.find(p => p.id === 'mbafest');
+          currentRight = MUNDIAL_JUGADORES.find(p => p.id === 'yamalisimo');
+        } else if (frame <= 90) {
+          currentLeft = MUNDIAL_JUGADORES.find(p => p.id === 'neymareado');
+          currentRight = MUNDIAL_JUGADORES.find(p => p.id === 'kanyon');
+        } else if (frame <= 120) {
+          currentLeft = MUNDIAL_JUGADORES.find(p => p.id === 'maradonuts');
+          currentRight = MUNDIAL_JUGADORES.find(p => p.id === 'orey');
+        }
+      }
+      
+      // Control de Sonidos y Haptics de Transición en Multi-stage
+      if (isMultiStage && (frame === 31 || frame === 61 || frame === 91)) {
+        triggerHaptic('medium');
+        try {
+          if (audioCtx && !modoDiscreto) {
+            let now = audioCtx.currentTime;
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.frequency.setValueAtTime(150, now);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(now + 0.15);
+          }
+        } catch(e) {}
+      }
+      
+      if (isMultiStage && frame === 121) {
+        triggerHaptic('heavy');
+        playWorldCupTitleSound();
+      }
+      
+      // --- STAGE 5: CARTEL FINAL "NEXOS WORLD CUP 26" ---
+      if (isMultiStage && frame > 120) {
+        const stage5Frame = frame - 120;
+        
+        // Deep space gradient
+        const bgGrad = cCtx.createRadialGradient(W*0.5, H*0.5, 20, W*0.5, H*0.5, W*0.8);
+        bgGrad.addColorStop(0, '#0e172c');
+        bgGrad.addColorStop(1, '#020617');
+        cCtx.fillStyle = bgGrad;
+        cCtx.fillRect(0, 0, W, H);
+        
+        // Vortex de estrellas doradas y chispas
+        cCtx.fillStyle = '#fde047';
+        for (let i = 0; i < 25; i++) {
+          const angle = i * 0.25 + frame * 0.02;
+          const dist = 50 + (i * 8 + stage5Frame * 1.5) % 180;
+          const px = W * 0.5 + Math.cos(angle) * dist;
+          const py = H * 0.5 + Math.sin(angle) * dist * 0.85;
+          const size = Math.max(1, 4 * (1 - dist / 180));
+          cCtx.beginPath();
+          cCtx.arc(px, py, size, 0, Math.PI*2);
+          cCtx.fill();
+        }
+        
+        // Dibujar el cartel premium
+        cCtx.save();
+        const cardScale = Math.min(1, stage5Frame / 15);
+        cCtx.translate(W * 0.5, H * 0.5);
+        cCtx.scale(cardScale, cardScale);
+        
+        cCtx.fillStyle = 'rgba(15, 23, 42, 0.82)';
+        cCtx.strokeStyle = 'rgba(234, 179, 8, 0.55)';
+        cCtx.lineWidth = 3;
+        cCtx.shadowColor = '#eab308';
+        cCtx.shadowBlur = 20;
+        
+        const cardW = Math.min(360, W * 0.85);
+        const cardH = Math.min(200, H * 0.65);
+        cCtx.beginPath();
+        if (cCtx.roundRect) {
+          cCtx.roundRect(-cardW*0.5, -cardH*0.5, cardW, cardH, 15);
+        } else {
+          cCtx.rect(-cardW*0.5, -cardH*0.5, cardW, cardH);
+        }
+        cCtx.fill();
+        cCtx.stroke();
+        cCtx.shadowBlur = 0;
+        
+        // Escaneo de luz oblicuo cruzando el vidrio
+        cCtx.save();
+        cCtx.beginPath();
+        if (cCtx.roundRect) {
+          cCtx.roundRect(-cardW*0.5, -cardH*0.5, cardW, cardH, 15);
+        } else {
+          cCtx.rect(-cardW*0.5, -cardH*0.5, cardW, cardH);
+        }
+        cCtx.clip();
+        cCtx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+        const scanX = -cardW + (stage5Frame * 12) % (cardW * 2);
+        cCtx.beginPath();
+        cCtx.moveTo(scanX, -cardH);
+        cCtx.lineTo(scanX + 80, -cardH);
+        cCtx.lineTo(scanX + 80 + cardW*0.5, cardH);
+        cCtx.lineTo(scanX + cardW*0.5, cardH);
+        cCtx.closePath();
+        cCtx.fill();
+        cCtx.restore();
+        
+        // Textos del Cartel
+        cCtx.fillStyle = '#fde047';
+        cCtx.font = '900 italic 15px sans-serif';
+        cCtx.textAlign = 'center';
+        cCtx.textBaseline = 'middle';
+        cCtx.fillText('🏆 COPA NEXOS 🏆', 0, -cardH*0.25);
+        
+        cCtx.strokeStyle = '#000000';
+        cCtx.lineWidth = 7;
+        cCtx.font = '900 italic 34px sans-serif';
+        cCtx.strokeText('WORLD CUP 26', 0, 8);
+        
+        const titleGrad = cCtx.createLinearGradient(-100, -20, 100, 20);
+        titleGrad.addColorStop(0, '#ef4444');
+        titleGrad.addColorStop(0.5, '#ffffff');
+        titleGrad.addColorStop(1, '#3b82f6');
+        cCtx.fillStyle = titleGrad;
+        cCtx.fillText('WORLD CUP 26', 0, 8);
+        
+        const pulse = Math.abs(Math.sin(stage5Frame * 0.15));
+        cCtx.fillStyle = `rgba(147, 197, 253, ${pulse})`;
+        cCtx.font = '900 11px sans-serif';
+        cCtx.fillText('¡EL TIRO LIBRE DEFINITIVO!', 0, cardH*0.28);
+        
+        cCtx.restore();
+        
+      } else if (currentLeft && currentRight) {
+        // --- DIBUJAR COMBATE / ENFRENTAMIENTO ---
+        const subFrame = isMultiStage ? (frame % 30 || 30) : frame;
+        
+        // 1. Lado Izquierdo
+        cCtx.save();
+        cCtx.beginPath();
+        cCtx.moveTo(0, 0);
+        const splitX = W * 0.45 + Math.sin(subFrame * 0.05) * 10;
+        cCtx.lineTo(splitX + 40, 0);
+        cCtx.lineTo(splitX - 40, H);
+        cCtx.lineTo(0, H);
+        cCtx.closePath();
+        cCtx.clip();
+        
+        const gradLeft = cCtx.createLinearGradient(0, 0, W * 0.5, H);
+        const leftColors = currentLeft.flagColors || ['#1e3a8a', '#0284c7'];
+        gradLeft.addColorStop(0, leftColors[0]);
+        gradLeft.addColorStop(0.5, leftColors[1] || leftColors[0]);
+        gradLeft.addColorStop(1, '#0b1329');
+        cCtx.fillStyle = gradLeft;
+        cCtx.fillRect(0, 0, W, H);
+        
+        cCtx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        cCtx.lineWidth = 1.5;
+        for (let i = 0; i < 15; i++) {
+          const yLine = (i * 25 + subFrame * 8) % H;
+          cCtx.beginPath();
+          cCtx.moveTo(0, yLine);
+          cCtx.lineTo(W * 0.6, yLine - H * 0.2);
+          cCtx.stroke();
+        }
+        
+        if (subFrame > 15) {
+          cCtx.strokeStyle = 'rgba(254, 240, 138, 0.5)';
+          cCtx.lineWidth = 2.5;
+          cCtx.beginPath();
+          for (let r = 0; r < 3; r++) {
+            const rx = 35 + Math.random() * 85;
+            const ry = 40 + Math.random() * (H - 80);
+            cCtx.moveTo(rx, ry);
+            cCtx.lineTo(rx + (Math.random() - 0.5) * 20, ry + 25);
+          }
+          cCtx.stroke();
+        }
+        
+        let mX = -120;
+        if (subFrame < 15) {
+          mX = -120 + (subFrame / 15) * (W * 0.22 + 120);
+        } else {
+          mX = W * 0.22 + Math.cos(subFrame * 0.08) * 2;
+        }
+        cCtx.save();
+        cCtx.translate(mX, H * 0.52);
+        cCtx.scale(1.85, 1.85);
+        drawCabezon(cCtx, 0, 0, currentLeft, false, (currentLeft.id === 'dibu'), false);
+        cCtx.restore();
+        
+        cCtx.fillStyle = '#ffffff';
+        cCtx.font = '900 13px sans-serif';
+        cCtx.shadowColor = currentLeft.jersey ? currentLeft.jersey[0] : '#0284c7';
+        cCtx.shadowBlur = 8;
+        cCtx.fillText(currentLeft.nombre.toUpperCase(), 15, H * 0.16);
+        cCtx.shadowBlur = 0;
+        
+        cCtx.restore();
+        
+        // 2. Lado Derecho
+        cCtx.save();
+        cCtx.beginPath();
+        const splitX2 = W * 0.45 + Math.sin(subFrame * 0.05) * 10;
+        cCtx.moveTo(splitX2 + 40, 0);
+        cCtx.lineTo(W, 0);
+        cCtx.lineTo(W, H);
+        cCtx.lineTo(splitX2 - 40, H);
+        cCtx.closePath();
+        cCtx.clip();
+        
+        const gradRight = cCtx.createLinearGradient(W * 0.5, 0, W, H);
+        const rightColors = currentRight.flagColors || ['#7f1d1d', '#064e3b'];
+        gradRight.addColorStop(0, rightColors[0]);
+        gradRight.addColorStop(0.5, rightColors[1] || rightColors[0]);
+        gradRight.addColorStop(1, '#0b1329');
+        cCtx.fillStyle = gradRight;
+        cCtx.fillRect(0, 0, W, H);
+        
+        cCtx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+        cCtx.lineWidth = 1.5;
+        for (let i = 0; i < 15; i++) {
+          const yLine = (i * 25 - subFrame * 8) % H;
+          const correctY = yLine < 0 ? yLine + H : yLine;
+          cCtx.beginPath();
+          cCtx.moveTo(W * 0.4, correctY);
+          cCtx.lineTo(W, correctY + H * 0.2);
+          cCtx.stroke();
+        }
+        
+        if (subFrame > 15) {
+          cCtx.strokeStyle = 'rgba(34, 211, 238, 0.55)';
+          cCtx.lineWidth = 2.5;
+          cCtx.beginPath();
+          for (let r = 0; r < 3; r++) {
+            const rx = W - 120 + Math.random() * 80;
+            const ry = 40 + Math.random() * (H - 80);
+            cCtx.moveTo(rx, ry);
+            cCtx.lineTo(rx + (Math.random() - 0.5) * 20, ry + 25);
+          }
+          cCtx.stroke();
+        }
+        
+        let pX = W + 120;
+        if (subFrame < 15) {
+          pX = (W + 120) - (subFrame / 15) * (120 + W * 0.28);
+        } else {
+          pX = W * 0.72 - Math.cos(subFrame * 0.08) * 2;
+        }
+        cCtx.save();
+        cCtx.translate(pX, H * 0.52);
+        cCtx.scale(1.85, 1.85);
+        drawCabezon(cCtx, 0, 0, currentRight, false, (currentRight.id === 'dibu'), false);
+        cCtx.restore();
+        
+        cCtx.fillStyle = '#ffffff';
+        cCtx.font = '900 13px sans-serif';
+        cCtx.shadowColor = currentRight.jersey ? currentRight.jersey[0] : '#ef4444';
+        cCtx.shadowBlur = 8;
+        cCtx.textAlign = 'right';
+        cCtx.fillText(currentRight.nombre.toUpperCase(), W - 15, H * 0.16);
+        cCtx.shadowBlur = 0;
+        cCtx.textAlign = 'left';
+        
+        cCtx.restore();
+        
+        // 3. Diagonal glowing slash
+        const splitX3 = W * 0.45 + Math.sin(subFrame * 0.05) * 10;
+        cCtx.strokeStyle = '#fef08a';
+        cCtx.lineWidth = 5;
+        cCtx.shadowColor = '#eab308';
+        cCtx.shadowBlur = 12;
+        cCtx.beginPath();
+        cCtx.moveTo(splitX3 + 40, -10);
+        cCtx.lineTo(splitX3 - 40, H + 10);
+        cCtx.stroke();
+        cCtx.shadowBlur = 0;
+        
+        // 4. Patrocinador Nexos
+        cCtx.save();
+        cCtx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+        cCtx.strokeStyle = 'rgba(6, 182, 212, 0.4)';
+        cCtx.lineWidth = 1.5;
+        const pbW = W * 0.65;
+        const pbH = 22;
+        const pbX = (W - pbW) * 0.5;
+        const pbY = 14;
+        cCtx.beginPath();
+        if (cCtx.roundRect) {
+          cCtx.roundRect(pbX, pbY, pbW, pbH, 5);
+        } else {
+          cCtx.rect(pbX, pbY, pbW, pbH);
+        }
+        cCtx.fill();
+        cCtx.stroke();
+        
+        const alphaGlow = 0.6 + Math.abs(Math.sin(subFrame * 0.1)) * 0.4;
+        cCtx.fillStyle = `rgba(6, 182, 212, ${alphaGlow})`;
+        cCtx.font = '900 8px sans-serif';
+        cCtx.textAlign = 'center';
+        cCtx.textBaseline = 'middle';
+        cCtx.shadowColor = '#06b6d4';
+        cCtx.shadowBlur = 5;
+        cCtx.fillText('🛡️ PATROCINADO POR NEXOS SEGURIDAD 🛡️', W * 0.5, pbY + pbH * 0.5);
+        cCtx.shadowBlur = 0;
+        cCtx.restore();
+        
+        // 5. VS Logo
+        if (subFrame > 15) {
+          cCtx.save();
+          const vsScale = Math.max(1, 4 - (subFrame - 15) * 0.35);
+          cCtx.translate(W * 0.5, H * 0.48);
+          cCtx.scale(vsScale, vsScale);
+          
+          if (subFrame < 25) {
+            const waveRadius = (subFrame - 15) * 6;
+            cCtx.strokeStyle = 'rgba(255,255,255,' + (1 - (subFrame - 15)/10) + ')';
+            cCtx.lineWidth = 2;
+            cCtx.beginPath();
+            cCtx.arc(0, 0, waveRadius, 0, Math.PI * 2);
+            cCtx.stroke();
+          }
+          
+          cCtx.font = '900 italic 34px sans-serif';
+          const vsGrad = cCtx.createLinearGradient(-15, -15, 15, 15);
+          vsGrad.addColorStop(0, '#ffffff');
+          vsGrad.addColorStop(0.4, '#e2e8f0');
+          vsGrad.addColorStop(0.5, '#94a3b8');
+          vsGrad.addColorStop(1, '#475569');
+          cCtx.fillStyle = vsGrad;
+          
+          cCtx.strokeStyle = '#000000';
+          cCtx.lineWidth = 4.5;
+          cCtx.textAlign = 'center';
+          cCtx.textBaseline = 'middle';
+          cCtx.strokeText('VS', 0, 0);
+          cCtx.fillText('VS', 0, 0);
+          cCtx.restore();
+        }
+      }
+      
+      // 6. Control de fade out al final
+      if (frame >= maxFrames - 20) {
+        const fadeAlpha = (frame - (maxFrames - 20)) / 20;
+        cCtx.fillStyle = `rgba(11, 15, 25, ${fadeAlpha})`;
+        cCtx.fillRect(0, 0, W, H);
+      }
+      
+      if (frame < maxFrames) {
+        introAnimId = requestAnimationFrame(animLoop);
+      } else {
+        skipIntroAnime();
+      }
+    }
+    
+    animLoop();
+  };
+
   window.iniciarEstadioJuego = function() {
     triggerHaptic('medium');
     playSound('pop');
+    
+    // Desbloquear canal de voz de celular
+    warmUpSpeechSynthesis();
     
     // Iniciar melodía arcade retro
     iniciarMusicaRetroArcade();
@@ -8232,11 +9377,13 @@
     document.getElementById('estadio-record').innerText = String(mundialRecord).padStart(2, '0');
     document.getElementById('gameover-overlay').style.display = 'none';
 
-    // Esperar dos frames para que el browser calcule el layout y el canvas tenga dimensiones reales
+    // Iniciar la cinemática anime con el jugador seleccionado contra el Dibu Martínez, y luego empezar
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        initCanvas();
-        iniciarRondaJuego();
+        iniciarIntroAnimeCinematica(selectedPlayer, dibuPlayer, () => {
+          initCanvas();
+          iniciarRondaJuego();
+        });
       });
     });
   };
@@ -8246,11 +9393,17 @@
     triggerHaptic('medium');
     playSound('pop');
     
+    // Desbloquear canal de voz de celular
+    warmUpSpeechSynthesis();
+    
     // Iniciar melodía arcade retro
     iniciarMusicaRetroArcade();
     
     // Precargar sonidos reales de respaldo
     preloadRealSounds();
+    
+    // Actualizar bloqueos de balones especiales
+    actualizarBloqueosBalones();
     try {
       if (stadiumAmbientAudio) {
         stadiumAmbientAudio.play().catch(() => {});
@@ -8274,6 +9427,11 @@
     const targetEl = document.getElementById('pantalla-mundial');
     if (targetEl) targetEl.classList.add('visible');
     initMundial(); // Renderiza cabezones y records al instante!
+
+    // Disparar cinemática anime inicial tipo reel con todos los personajes y el cartel del torneo!
+    requestAnimationFrame(() => {
+      iniciarIntroAnimeCinematica(() => {});
+    });
   };
 
   window.intentarCerrarMundial = function() {
@@ -8348,6 +9506,10 @@
   // Jugabilidad de tiro elástica mejorada: podés arrastrar desde CUALQUIER LUGAR para apuntar cómodamente!
   function onAimStart(e) {
     if (e && e.cancelable) e.preventDefault();
+    
+    // Desbloquear canal de voz en celulares
+    warmUpSpeechSynthesis();
+    
     if (pelota.isShot || pelota.isSettled) return;
     const pos = getMousePos(e);
     
@@ -8381,8 +9543,10 @@
       shotFrameCounter = 0; // Resetear watchdog de seguridad
       
       // La fuerza del tiro escala con la stat de Fuerza del jugador (¡Súper Potenciado para todos!)
-      let fuerzaFactor = 0.22 + (selectedPlayer.fuerza / 100) * 0.065;
-      if (rachaActual >= 3) {
+      let effFuerza = selectedPlayer.fuerza;
+      if (rachaActual >= 3) effFuerza = 160; // Súper Potencia física racha
+      let fuerzaFactor = 0.22 + (effFuerza / 100) * 0.065;
+      if (rachaActual >= 3 || selectedBallSkin === 'fuego' || selectedBallSkin === 'oro') {
         fuerzaFactor *= 1.35; // ¡SÚPER POTENCIA!
       }
       pelota.vx = dx * fuerzaFactor;
@@ -8391,8 +9555,10 @@
       triggerHaptic('medium');
       playKickSound();
       
-      remainingShots--;
-      document.getElementById('estadio-tiros').innerText = remainingShots + '/5';
+      if (gameMode === 'clasico') {
+        remainingShots--;
+        document.getElementById('estadio-tiros').innerText = remainingShots + '/5';
+      }
     }
   }
 
@@ -8678,6 +9844,70 @@
     }, 4000);
   }
 
+  window.mostrarToastLogro = function(title, desc, isLocked = true) {
+    const containerId = 'achievement-toast-container';
+    let container = document.getElementById(containerId);
+    if (!container) {
+      container = document.createElement('div');
+      container.id = containerId;
+      container.style.cssText = `
+        position: absolute;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 99999;
+        pointer-events: none;
+        width: 90%;
+        max-width: 320px;
+      `;
+      document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    const borderColor = isLocked ? 'rgba(239, 68, 68, 0.7)' : 'rgba(6, 182, 212, 0.7)';
+    const shadowColor = isLocked ? 'rgba(239, 68, 68, 0.35)' : 'rgba(6, 182, 212, 0.35)';
+    const innerShadow = isLocked ? 'rgba(239, 68, 68, 0.15)' : 'rgba(6, 182, 212, 0.15)';
+    const badgeColor = isLocked ? '#f87171' : '#22d3ee';
+    const badgeIcon = isLocked ? '🔒' : '⚽';
+    const subTitle = isLocked ? '¡ÍTEM BLOQUEADO!' : '¡CAMBIO DE BALÓN!';
+
+    toast.style.cssText = `
+      background: rgba(15, 23, 42, 0.92);
+      border: 1.5px solid ${borderColor};
+      box-shadow: 0 8px 30px ${shadowColor}, inset 0 0 15px ${innerShadow};
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      animation: slideUpAchievement 0.48s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      color: #fff;
+    `;
+
+    toast.innerHTML = `
+      <div style="font-size: 26px; background: ${innerShadow}; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px ${shadowColor}; flex-shrink: 0;">${badgeIcon}</div>
+      <div style="flex: 1; display: flex; flex-direction: column; text-align: left;">
+        <span style="font-size: 8.5px; font-weight: 800; text-transform: uppercase; color: ${badgeColor}; letter-spacing: 0.8px;">${subTitle}</span>
+        <span style="font-size: 13.5px; font-weight: 800; color: #fff; margin-top: 1px;">${title}</span>
+        <span style="font-size: 10.5px; color: #94a3b8; font-weight: 500; margin-top: 2px; line-height: 1.35;">${desc}</span>
+      </div>
+    `;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.animation = 'fadeOutAchievement 0.45s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards';
+      setTimeout(() => {
+        toast.remove();
+      }, 500);
+    }, 3200);
+  };
+
   function playCommentatorVoice() {
     if (modoDiscreto) return;
     try {
@@ -8692,12 +9922,26 @@
         ];
         const textToSpeak = phrases[Math.floor(Math.random() * phrases.length)];
         const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        
+        // Configuración de idioma robusta
+        utterance.lang = 'es-AR';
         const humVoz = buscarVozHumana();
-        if (humVoz) utterance.voice = humVoz;
-        utterance.rate = 1.32;
-        utterance.pitch = 1.15;
+        if (humVoz) {
+          utterance.voice = humVoz;
+        } else {
+          utterance.lang = 'es'; // 'es' genérico es mucho más compatible en celulares
+        }
+        
+        utterance.rate = 1.28;
+        utterance.pitch = 1.12;
         utterance.volume = 1.0;
-        window.speechSynthesis.speak(utterance);
+        
+        // Retardo de 80ms para evitar el bug de bloqueo de habla de iOS Safari al hacer cancel() previo
+        setTimeout(() => {
+          try {
+            window.speechSynthesis.speak(utterance);
+          } catch(e) {}
+        }, 80);
       }
     } catch(err) {}
   }
@@ -8715,12 +9959,25 @@
         ];
         const textToSpeak = phrases[Math.floor(Math.random() * phrases.length)];
         const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        
+        utterance.lang = 'es-AR';
         const humVoz = buscarVozHumana();
-        if (humVoz) utterance.voice = humVoz;
-        utterance.rate = 1.35;
-        utterance.pitch = 1.15;
+        if (humVoz) {
+          utterance.voice = humVoz;
+        } else {
+          utterance.lang = 'es'; // 'es' genérico es mucho más compatible en celulares
+        }
+        
+        utterance.rate = 1.30;
+        utterance.pitch = 1.12;
         utterance.volume = 1.0;
-        window.speechSynthesis.speak(utterance);
+        
+        // Retardo de 80ms para evitar el bug de bloqueo de habla de iOS Safari al hacer cancel() previo
+        setTimeout(() => {
+          try {
+            window.speechSynthesis.speak(utterance);
+          } catch(e) {}
+        }, 80);
       }
     } catch(err) {}
   }
@@ -8738,12 +9995,25 @@
         ];
         const textToSpeak = phrases[Math.floor(Math.random() * phrases.length)];
         const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        
+        utterance.lang = 'es-AR';
         const humVoz = buscarVozHumana();
-        if (humVoz) utterance.voice = humVoz;
-        utterance.rate = 1.32;
-        utterance.pitch = 1.12;
+        if (humVoz) {
+          utterance.voice = humVoz;
+        } else {
+          utterance.lang = 'es'; // 'es' genérico es mucho más compatible en celulares
+        }
+        
+        utterance.rate = 1.28;
+        utterance.pitch = 1.10;
         utterance.volume = 1.0;
-        window.speechSynthesis.speak(utterance);
+        
+        // Retardo de 80ms para evitar el bug de bloqueo de habla de iOS Safari al hacer cancel() previo
+        setTimeout(() => {
+          try {
+            window.speechSynthesis.speak(utterance);
+          } catch(e) {}
+        }, 80);
       }
     } catch(err) {}
   }
@@ -8824,22 +10094,42 @@
       weatherTargetIntensity = 0;
     }
 
-    if (remainingShots === 5 || remainingShots <= 0) {
-      roundStartTime = Date.now(); // Iniciar cronómetro de tiempo ataque!
+    if (gameMode === 'clasico') {
+      if (remainingShots === 5 || remainingShots <= 0) {
+        roundStartTime = Date.now(); // Iniciar cronómetro de tiempo ataque!
+      }
+      if (remainingShots <= 0) {
+        remainingShots = 5;
+        currentScore = 0;
+        document.getElementById('estadio-puntos').innerText = '00';
+        document.getElementById('estadio-tiros').innerText = '5/5';
+      }
+      document.getElementById('estadio-record').innerText = String(mundialRecord).padStart(2, '0');
+    } else if (gameMode === 'timeattack') {
+      remainingShots = 999;
+      timeAttackTimeLeft = 60;
+      currentScore = 0;
+      roundStartTime = Date.now();
+      document.getElementById('estadio-puntos').innerText = '00';
+      document.getElementById('estadio-tiros').innerText = '60s';
+      const personalRecord = localStorage.getItem('nx_futbol_record_timeattack') || '0';
+      document.getElementById('estadio-record').innerText = String(personalRecord).padStart(2, '0');
+    } else if (gameMode === 'survival') {
+      remainingShots = 999;
+      survivalLives = 3;
+      currentScore = 0;
+      document.getElementById('estadio-puntos').innerText = '00';
+      document.getElementById('estadio-tiros').innerText = '❤️❤️ Bak'; // Wait, let's write hearts directly: '❤️❤️❤️'
+      document.getElementById('estadio-tiros').innerText = '❤️❤️❤️';
+      const personalRecord = localStorage.getItem('nx_futbol_record_survival') || '0';
+      document.getElementById('estadio-record').innerText = String(personalRecord).padStart(2, '0');
     }
-    
+
     const titleEl = document.querySelector('.gameover-title');
     if (titleEl) {
       titleEl.innerText = 'FIN DE LA RONDA';
       titleEl.style.color = '#fff';
       titleEl.style.textShadow = 'none';
-    }
-
-    if (remainingShots <= 0) {
-      remainingShots = 5;
-      currentScore = 0;
-      document.getElementById('estadio-puntos').innerText = '00';
-      document.getElementById('estadio-tiros').innerText = '5/5';
     }
     
     // Elegir arquero y defensores al azar (¡Arquero SIEMPRE es el Dibu Martínez!)
@@ -8871,21 +10161,48 @@
     playerY = 242;
     kickTimer = 0;
     
-    // Reposicionar barrera dinámicamente según perfil de tiro (zurdo/diestro) para abrir carriles de gol reales!
-    if (isLeftFooted) {
-      // Perfil zurdo: la barrera cubre el poste izquierdo, dejando el ángulo derecho libre
-      defensores = [
-        { x: 155, y: 165, r: 8.5, targetY: 165, vy: 0 },
-        { x: 180, y: 155, r: 8.5, targetY: 155, vy: 0 },
-        { x: 205, y: 165, r: 8.5, targetY: 165, vy: 0 }
-      ];
+    // Reposicionar barrera dinámicamente según perfil de tiro (zurdo/diestro) y DIFICULTAD
+    if (gameDifficulty === 'facil') {
+      if (isLeftFooted) {
+        defensores = [
+          { x: 180, y: 155, r: 8.5, targetY: 155, vy: 0 }
+        ];
+      } else {
+        defensores = [
+          { x: 220, y: 155, r: 8.5, targetY: 155, vy: 0 }
+        ];
+      }
+    } else if (gameDifficulty === 'dificil') {
+      if (isLeftFooted) {
+        defensores = [
+          { x: 142, y: 165, r: 8.5, targetY: 165, vy: 0 },
+          { x: 165, y: 155, r: 8.5, targetY: 155, vy: 0 },
+          { x: 188, y: 155, r: 8.5, targetY: 155, vy: 0 },
+          { x: 211, y: 165, r: 8.5, targetY: 165, vy: 0 }
+        ];
+      } else {
+        defensores = [
+          { x: 189, y: 165, r: 8.5, targetY: 165, vy: 0 },
+          { x: 212, y: 155, r: 8.5, targetY: 155, vy: 0 },
+          { x: 235, y: 155, r: 8.5, targetY: 155, vy: 0 },
+          { x: 258, y: 165, r: 8.5, targetY: 165, vy: 0 }
+        ];
+      }
     } else {
-      // Perfil diestro: la barrera cubre el poste derecho, dejando el ángulo izquierdo libre
-      defensores = [
-        { x: 195, y: 165, r: 8.5, targetY: 165, vy: 0 },
-        { x: 220, y: 155, r: 8.5, targetY: 155, vy: 0 },
-        { x: 245, y: 165, r: 8.5, targetY: 165, vy: 0 }
-      ];
+      // Normal
+      if (isLeftFooted) {
+        defensores = [
+          { x: 155, y: 165, r: 8.5, targetY: 165, vy: 0 },
+          { x: 180, y: 155, r: 8.5, targetY: 155, vy: 0 },
+          { x: 205, y: 165, r: 8.5, targetY: 165, vy: 0 }
+        ];
+      } else {
+        defensores = [
+          { x: 195, y: 165, r: 8.5, targetY: 165, vy: 0 },
+          { x: 220, y: 155, r: 8.5, targetY: 155, vy: 0 },
+          { x: 245, y: 165, r: 8.5, targetY: 165, vy: 0 }
+        ];
+      }
     }
     
     trail = [];
@@ -8903,13 +10220,21 @@
     vientoActual = vientoFuerza;
     vientoVisible = 90; // mostrar indicador 1.5s antes del tiro
     
-    // Posicionar arquero al centro con velocidad ultrarápida y competitiva!
+    // Posicionar arquero al centro con velocidad de la dificultad seleccionada
     arquero.x = 200;
     const randomDir = Math.random() < 0.5 ? 1 : -1;
     // ── DIBU NIVELES: se acelera con cada gol recibido ──
-    const dibuBase = 2.05 + (5 - remainingShots) * 0.22;
+    const dibuBase = 2.05 + (5 - Math.max(0, Math.min(5, remainingShots))) * 0.22;
     const dibuBonus = goalsScoredInRound * 0.28; // +0.28 por cada gol que ya le metieron
-    arquero.vx = randomDir * (dibuBase + dibuBonus);
+    let finalDibuSpeed = (dibuBase + dibuBonus);
+    
+    if (gameDifficulty === 'facil') {
+      finalDibuSpeed *= 0.70; // -30% lento
+    } else if (gameDifficulty === 'dificil') {
+      finalDibuSpeed *= 1.25; // +25% felino y ultrarápido
+    }
+    
+    arquero.vx = randomDir * finalDibuSpeed;
     
     const hint = document.getElementById('swipe-hint');
     if (hint) {
@@ -8933,6 +10258,16 @@
     // Reducir temblor de pantalla suavemente
     if (shakeIntensity > 0) shakeIntensity -= 0.6;
     if (shakeIntensity < 0) shakeIntensity = 0;
+
+    if (gameMode === 'timeattack' && !isCelebrating && document.getElementById('gameover-overlay').style.display !== 'flex') {
+      timeAttackTimeLeft = Math.max(0, timeAttackTimeLeft - 1/60); // 60fps
+      document.getElementById('estadio-tiros').innerText = Math.ceil(timeAttackTimeLeft) + 's';
+      if (timeAttackTimeLeft <= 0) {
+        timeAttackTimeLeft = 0;
+        finalizarRondaJuego();
+        return;
+      }
+    }
 
     // Actualizar partículas de fuego
     for (let i = fireParticles.length - 1; i >= 0; i--) {
@@ -9037,9 +10372,11 @@
 
       // Efecto Comba / Curva Stat del Cabezón (Magnus Effect - ¡Súper sensible para curvas bananeras espectaculares!)
       if (pelota.y < 220 && pelota.y > 60) {
+        let effComba = selectedPlayer.comba;
+        if (rachaActual >= 2) effComba = 150; // Súper Curva física racha
         let combaMult = 1.0;
-        if (rachaActual >= 2) combaMult = 1.85; // ¡SÚPER CURVA!
-        const combaFuerza = (selectedPlayer.comba / 100) * 0.115 * combaMult;
+        if (rachaActual >= 2 || selectedBallSkin === 'hielo' || selectedBallSkin === 'oro') combaMult = 1.85; // ¡SÚPER CURVA!
+        const combaFuerza = (effComba / 100) * 0.115 * combaMult;
         if (pelota.vx > 0.5) {
           pelota.vx += combaFuerza; // comba hacia la derecha
         } else if (pelota.vx < -0.5) {
@@ -9257,11 +10594,33 @@
   }
 
   function evaluarProximoPaso() {
-    if (remainingShots > 0) {
+    if (gameMode === 'clasico') {
+      if (remainingShots > 0) {
+        resetPelota();
+      } else {
+        finalizarRondaJuego();
+      }
+    } else if (gameMode === 'timeattack') {
+      if (timeAttackTimeLeft > 0) {
+        resetPelota();
+      } else {
+        finalizarRondaJuego();
+      }
+    } else if (gameMode === 'survival') {
+      if (pelota.status !== 'gol') {
+        survivalLives--;
+        triggerScreenShake(10);
+        if (survivalLives <= 0) {
+          survivalLives = 0;
+          document.getElementById('estadio-tiros').innerText = '☠️ SIN VIDAS';
+          finalizarRondaJuego();
+          return;
+        }
+      }
+      let hearts = '';
+      for (let i = 0; i < survivalLives; i++) hearts += '❤️';
+      document.getElementById('estadio-tiros').innerText = hearts;
       resetPelota();
-    } else {
-      // Game Over de la Ronda
-      finalizarRondaJuego();
     }
   }
 
@@ -9344,56 +10703,98 @@
     document.getElementById('gameover-score-val').innerHTML = `${currentScore} PTS <span style="font-size:14px;color:#a1a1aa;margin-left:6px;">(${timeTaken}s)</span>`;
     document.getElementById('gameover-overlay').style.display = 'flex';
     
-    // ── GUARDAR RÉCORD Y SINCRONIZAR CON COMUNIDAD ──
-    const mza = localStorage.getItem('nx_manzana') || '12';
-    const casa = localStorage.getItem('nx_casa') || '14';
-    const myHouseStr = `Mza ${mza} Casa ${casa}`;
-    
-    let ranking = JSON.parse(localStorage.getItem('nx_futbol_ranking') || '[]');
-    let recordActualizado = false;
+    if (gameMode === 'timeattack') {
+      const personalRecord = parseInt(localStorage.getItem('nx_futbol_record_timeattack') || '0');
+      let isNewRecord = false;
+      if (currentScore > personalRecord) {
+        localStorage.setItem('nx_futbol_record_timeattack', currentScore);
+        document.getElementById('estadio-record').innerText = String(currentScore).padStart(2, '0');
+        isNewRecord = true;
+      }
+      
+      if (isNewRecord) {
+        document.getElementById('gameover-newrecord').style.display = 'block';
+        playSound('success');
+      } else {
+        document.getElementById('gameover-newrecord').style.display = 'none';
+      }
 
-    const idx = ranking.findIndex(r => r.casa.toLowerCase() === myHouseStr.toLowerCase());
-    if (idx !== -1) {
-      if (currentScore > ranking[idx].record || (currentScore === ranking[idx].record && timeTaken < (ranking[idx].tiempo || 999))) {
-        ranking[idx].record = currentScore;
-        ranking[idx].tiempo = timeTaken;
-        ranking[idx].jugador = selectedPlayer.nombre;
-        recordActualizado = true;
+      // Desbloquear logro Time Attack
+      if (currentScore >= 600) {
+        unlockAchievement('timeattack_master', 'Velocidad de Luz', 'Sumaste más de 600 puntos en Time Attack.');
+      }
+    } else if (gameMode === 'survival') {
+      const personalRecord = parseInt(localStorage.getItem('nx_futbol_record_survival') || '0');
+      let isNewRecord = false;
+      if (currentScore > personalRecord) {
+        localStorage.setItem('nx_futbol_record_survival', currentScore);
+        document.getElementById('estadio-record').innerText = String(currentScore).padStart(2, '0');
+        isNewRecord = true;
+      }
+
+      if (isNewRecord) {
+        document.getElementById('gameover-newrecord').style.display = 'block';
+        playSound('success');
+      } else {
+        document.getElementById('gameover-newrecord').style.display = 'none';
+      }
+
+      // Desbloquear logro Supervivencia
+      if (currentScore >= 800) {
+        unlockAchievement('survival_master', 'Inmortal en la Red', 'Sumaste más de 800 puntos en modo Supervivencia.');
       }
     } else {
-      ranking.push({ casa: myHouseStr, jugador: selectedPlayer.nombre, record: currentScore, tiempo: timeTaken });
-      recordActualizado = true;
-    }
+      // ── GUARDAR RÉCORD Y SINCRONIZAR CON COMUNIDAD (Modo Clásico) ──
+      const mza = localStorage.getItem('nx_manzana') || '12';
+      const casa = localStorage.getItem('nx_casa') || '14';
+      const myHouseStr = `Mza ${mza} Casa ${casa}`;
+      
+      let ranking = JSON.parse(localStorage.getItem('nx_futbol_ranking') || '[]');
+      let recordActualizado = false;
 
-    if (recordActualizado) {
-      localStorage.setItem('nx_futbol_ranking', JSON.stringify(ranking));
-      mundialRecord = currentScore;
-      document.getElementById('estadio-record').innerText = String(mundialRecord).padStart(2, '0');
-      document.getElementById('gameover-newrecord').style.display = 'block';
-      playSound('success');
+      const idx = ranking.findIndex(r => r.casa.toLowerCase() === myHouseStr.toLowerCase());
+      if (idx !== -1) {
+        if (currentScore > ranking[idx].record || (currentScore === ranking[idx].record && timeTaken < (ranking[idx].tiempo || 999))) {
+          ranking[idx].record = currentScore;
+          ranking[idx].tiempo = timeTaken;
+          ranking[idx].jugador = selectedPlayer.nombre;
+          recordActualizado = true;
+        }
+      } else {
+        ranking.push({ casa: myHouseStr, jugador: selectedPlayer.nombre, record: currentScore, tiempo: timeTaken });
+        recordActualizado = true;
+      }
 
-      // ── Invalidar caché semanal para que en la próxima apertura
-      //    del ranking se fuerce una recarga con el nuevo récord ──
-      localStorage.removeItem('nx_ranking_semana');
-      localStorage.removeItem('nx_ranking_cache');
+      if (recordActualizado) {
+        localStorage.setItem('nx_futbol_ranking', JSON.stringify(ranking));
+        mundialRecord = currentScore;
+        document.getElementById('estadio-record').innerText = String(mundialRecord).padStart(2, '0');
+        document.getElementById('gameover-newrecord').style.display = 'block';
+        playSound('success');
 
-      // ── PUSH AL SERVIDOR (fire-and-forget) ──
-      try {
-        const payload = {
-          accion: 'set_ranking_mundial',
-          casa: myHouseStr,
-          jugador: selectedPlayer.nombre,
-          record: currentScore,
-          tiempo: timeTaken,
-          deviceId: typeof DEVICE_ID !== 'undefined' ? DEVICE_ID : 'anon'
-        };
-        fetch(PANIC_URL + '?' + new URLSearchParams(payload).toString() + '&t=' + Date.now(), {
-          method: 'GET',
-          mode: 'no-cors'
-        }).catch(() => {});
-      } catch(e) {}
-    } else {
-      document.getElementById('gameover-newrecord').style.display = 'none';
+        // ── Invalidar caché semanal para que en la próxima apertura
+        //    del ranking se fuerce una recarga con el nuevo récord ──
+        localStorage.removeItem('nx_ranking_semana');
+        localStorage.removeItem('nx_ranking_cache');
+
+        // ── PUSH AL SERVIDOR (fire-and-forget) ──
+        try {
+          const payload = {
+            accion: 'set_ranking_mundial',
+            casa: myHouseStr,
+            jugador: selectedPlayer.nombre,
+            record: currentScore,
+            tiempo: timeTaken,
+            deviceId: typeof DEVICE_ID !== 'undefined' ? DEVICE_ID : 'anon'
+          };
+          fetch(PANIC_URL + '?' + new URLSearchParams(payload).toString() + '&t=' + Date.now(), {
+            method: 'GET',
+            mode: 'no-cors'
+          }).catch(() => {});
+        } catch(e) {}
+      } else {
+        document.getElementById('gameover-newrecord').style.display = 'none';
+      }
     }
   }
 
@@ -9671,6 +11072,91 @@
         ctx.arc(hx, hy - 2, 5, 0, Math.PI * 2);
         ctx.fill();
       }
+    } else if (player.hairType === 'calva-flequillo') {
+      ctx.fillStyle = player.hair;
+      ctx.beginPath();
+      ctx.moveTo(-5, -11);
+      ctx.lineTo(5, -11);
+      ctx.lineTo(0, -17);
+      ctx.closePath();
+      ctx.fill();
+    } else if (player.hairType === 'beckham-mohawk') {
+      ctx.fillStyle = player.hair;
+      ctx.beginPath();
+      ctx.moveTo(-3, -15);
+      ctx.quadraticCurveTo(0, -28, 3, -15);
+      ctx.lineTo(1.5, -14);
+      ctx.lineTo(0, -30);
+      ctx.lineTo(-1.5, -14);
+      ctx.closePath();
+      ctx.fill();
+      
+      ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(-13, -8, 2, 0, Math.PI*2);
+      ctx.arc(13, -8, 2, 0, Math.PI*2);
+      ctx.stroke();
+    } else if (player.hairType === 'rastas') {
+      // Rastas estilo Edgar Davids: varias trencitas cayendo a los lados y nuca
+      ctx.fillStyle = player.hair;
+      // Corona superior
+      ctx.beginPath();
+      ctx.arc(0, -6, 13.5, Math.PI, 0);
+      ctx.fill();
+      
+      // Rastas colgantes individuales (circulitos encadenados)
+      const rastasX = [-13, -10, -7, 7, 10, 13, -15, 15];
+      rastasX.forEach((rx, idx) => {
+        const length = 18 + (idx % 3) * 6; // longitud variable
+        ctx.beginPath();
+        for (let dy = -4; dy <= length; dy += 3) {
+          const osc = Math.sin(dy * 0.2 + idx) * 1.5;
+          ctx.arc(rx + osc, dy, 2.5, 0, Math.PI * 2);
+        }
+        ctx.fill();
+      });
+    } else if (player.hairType === 'pirlo') {
+      // Cabello castaño ondulado y elegante de Andrea Pirlo cayendo a los lados
+      ctx.fillStyle = player.hair;
+      ctx.beginPath();
+      ctx.arc(0, -5, 13.5, Math.PI, 0); // coronilla
+      ctx.fill();
+      
+      // Mechones ondulados a los lados
+      const ladosX = [-13.5, 13.5];
+      ladosX.forEach((lx, idx) => {
+        ctx.beginPath();
+        ctx.moveTo(lx, -5);
+        ctx.bezierCurveTo(lx + (idx === 0 ? -3 : 3), 4, lx + (idx === 0 ? -2 : 2), 10, lx + (idx === 0 ? 1.5 : -1.5), 14);
+        ctx.bezierCurveTo(lx + (idx === 0 ? 3.5 : -3.5), 10, lx + (idx === 0 ? 3.5 : -3.5), 2, lx + (idx === 0 ? 3.5 : -3.5), -5);
+        ctx.closePath();
+        ctx.fill();
+      });
+    } else if (player.hairType === 'totti') {
+      // Cabello rubio medio de Francesco Totti con vincha/headband negra
+      ctx.fillStyle = player.hair;
+      ctx.beginPath();
+      ctx.arc(0, -6, 13, Math.PI, 0); // corona base
+      ctx.fill();
+      
+      // Patillas y volumen lateral
+      ctx.beginPath();
+      ctx.moveTo(-13, -6); ctx.lineTo(-13, 1); ctx.lineTo(-9, -2); ctx.lineTo(-9, -6);
+      ctx.closePath();
+      ctx.fill();
+      
+      ctx.beginPath();
+      ctx.moveTo(13, -6); ctx.lineTo(13, 1); ctx.lineTo(9, -2); ctx.lineTo(9, -6);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Vincha fina negra cruzando la frente/coronilla
+      ctx.strokeStyle = '#18181b';
+      ctx.lineWidth = 1.35;
+      ctx.beginPath();
+      ctx.arc(0, -6, 13.6, Math.PI * 1.05, Math.PI * 1.95);
+      ctx.stroke();
     }
 
     // 5. OJOS TÁCTICOS Y CEJAS FOCALIZADAS
@@ -9711,6 +11197,43 @@
       ctx.beginPath();
       ctx.moveTo(-8, -6); ctx.lineTo(-2, -4);
       ctx.moveTo(8, -6); ctx.lineTo(2, -4);
+      ctx.stroke();
+    }
+
+    // Dibujar Lentes Especiales de David (Edgar Davids) en el juego real
+    if (player.id === 'david') {
+      ctx.strokeStyle = '#18181b'; // marco negro
+      ctx.lineWidth = 2.2;
+      ctx.fillStyle = 'rgba(220, 38, 38, 0.85)'; // lentes rojas translúcidas
+      
+      // Lente izquierdo
+      ctx.beginPath();
+      ctx.roundRect(-9, -5.5, 7.5, 6.5, 3);
+      ctx.fill();
+      ctx.stroke();
+
+      // Lente derecho
+      ctx.beginPath();
+      ctx.roundRect(1.5, -5.5, 7.5, 6.5, 3);
+      ctx.fill();
+      ctx.stroke();
+
+      // Puente
+      ctx.strokeStyle = '#18181b'; // puente negro
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(-1.5, -3.5);
+      ctx.lineTo(1.5, -3.5);
+      ctx.stroke();
+
+      // Correa de sujeción
+      ctx.strokeStyle = '#18181b';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(-9, -3.5);
+      ctx.lineTo(-14, -3);
+      ctx.moveTo(9, -3.5);
+      ctx.lineTo(14, -3);
       ctx.stroke();
     }
 
@@ -11215,51 +12738,133 @@
         ctx.restore();
       }
       
-      // Base blanca de la pelota
-      const ballGrad = ctx.createRadialGradient(bx - br * 0.3, by - br * 0.3, br * 0.1, bx, by, br);
-      ballGrad.addColorStop(0, '#ffffff');
-      ballGrad.addColorStop(0.6, '#f0f0f0');
-      ballGrad.addColorStop(1, '#cccccc');
-      ctx.fillStyle = ballGrad;
-      ctx.beginPath();
-      ctx.arc(bx, by, br, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Pentágonos del balón (negro) — Adidas Telstar clásico
-      const t = Date.now() * 0.012;
-      ctx.fillStyle = '#111111';
-      const penPositions = [
-        [0, -0.7],
-        [0.62, -0.22],
-        [0.38, 0.58],
-        [-0.38, 0.58],
-        [-0.62, -0.22]
-      ];
-      penPositions.forEach(([px, py]) => {
-        const rotX = px * Math.cos(t) - py * Math.sin(t * 0.7);
-        const rotY = px * Math.sin(t) + py * Math.cos(t * 0.7);
-        const visib = 0.5 + rotX * 0.4;
-        if (visib < 0.1) return;
-        ctx.globalAlpha = Math.min(1, visib) * 0.85;
+      // Base de la pelota según Skin seleccionada
+      if (selectedBallSkin === 'oro') {
+        // BALÓN DE ORO
+        const ballGrad = ctx.createRadialGradient(bx - br * 0.35, by - br * 0.35, br * 0.1, bx, by, br);
+        ballGrad.addColorStop(0, '#fef08a'); // Amarillo oro muy claro
+        ballGrad.addColorStop(0.5, '#fbbf24'); // Oro medio brillante
+        ballGrad.addColorStop(1, '#b45309'); // Oro oscuro bronceado
+        ctx.fillStyle = ballGrad;
         ctx.beginPath();
-        const px2 = bx + rotX * br * 0.7;
-        const py2 = by + rotY * br * 0.7;
-        const ps = br * 0.28;
-        for (let v = 0; v < 5; v++) {
-          const angle = (v / 5) * Math.PI * 2 - Math.PI / 2;
-          const vx2 = px2 + Math.cos(angle) * ps;
-          const vy2 = py2 + Math.sin(angle) * ps;
-          v === 0 ? ctx.moveTo(vx2, vy2) : ctx.lineTo(vx2, vy2);
-        }
-        ctx.closePath();
+        ctx.arc(bx, by, br, 0, Math.PI * 2);
         ctx.fill();
-        ctx.globalAlpha = 1;
-      });
 
-      // Reflejo de luz cenital en la pelota
+        // Brillo metálico o patrón circular de moneda de oro
+        ctx.strokeStyle = 'rgba(251, 191, 36, 0.4)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(bx, by, br * 0.65, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Estrella de destello de oro
+        const tGold = Date.now() * 0.005;
+        ctx.save();
+        ctx.translate(bx, by);
+        ctx.rotate(tGold);
+        ctx.fillStyle = '#ffffff';
+        ctx.globalAlpha = 0.55;
+        for (let i = 0; i < 4; i++) {
+          ctx.rotate(Math.PI / 2);
+          ctx.beginPath();
+          ctx.moveTo(-1.8, 0);
+          ctx.quadraticCurveTo(0, 0, 0, -br * 0.75);
+          ctx.quadraticCurveTo(0, 0, 1.8, 0);
+          ctx.quadraticCurveTo(0, 0, 0, br * 0.75);
+          ctx.quadraticCurveTo(0, 0, -1.8, 0);
+          ctx.fill();
+        }
+        ctx.restore();
+      } else if (selectedBallSkin === 'fuego') {
+        // BALÓN DE FUEGO
+        const ballGrad = ctx.createRadialGradient(bx - br * 0.3, by - br * 0.3, br * 0.1, bx, by, br);
+        ballGrad.addColorStop(0, '#fef08a'); // Núcleo amarillo incandescente
+        ballGrad.addColorStop(0.4, '#f97316'); // Naranja fuego
+        ballGrad.addColorStop(1, '#7f1d1d'); // Rojo carbón apagado
+        ctx.fillStyle = ballGrad;
+        ctx.beginPath();
+        ctx.arc(bx, by, br, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Patrón de lenguas de fuego en el balón
+        const tFire = Date.now() * 0.008;
+        ctx.fillStyle = 'rgba(239, 68, 68, 0.45)';
+        for (let i = 0; i < 5; i++) {
+          const angle = (i / 5) * Math.PI * 2 + tFire;
+          const fx = bx + Math.cos(angle) * br * 0.4;
+          const fy = by + Math.sin(angle) * br * 0.4;
+          ctx.beginPath();
+          ctx.arc(fx, fy, br * 0.28, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      } else if (selectedBallSkin === 'hielo') {
+        // BALÓN DE HIELO
+        const ballGrad = ctx.createRadialGradient(bx - br * 0.35, by - br * 0.35, br * 0.1, bx, by, br);
+        ballGrad.addColorStop(0, '#ffffff'); // Blanco escarcha pura
+        ballGrad.addColorStop(0.5, '#7dd3fc'); // Celeste hielo
+        ballGrad.addColorStop(1, '#0c4a6e'); // Azul ártico profundo
+        ctx.fillStyle = ballGrad;
+        ctx.beginPath();
+        ctx.arc(bx, by, br, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Líneas concéntricas de cristal de hielo
+        ctx.strokeStyle = 'rgba(224, 242, 254, 0.5)';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        for (let i = 0; i < 3; i++) {
+          const angle = (i / 3) * Math.PI * 2;
+          ctx.moveTo(bx, by);
+          ctx.lineTo(bx + Math.cos(angle) * br * 0.85, by + Math.sin(angle) * br * 0.85);
+        }
+        ctx.stroke();
+      } else {
+        // BALÓN CLÁSICO (TANGO)
+        const ballGrad = ctx.createRadialGradient(bx - br * 0.3, by - br * 0.3, br * 0.1, bx, by, br);
+        ballGrad.addColorStop(0, '#ffffff');
+        ballGrad.addColorStop(0.6, '#f0f0f0');
+        ballGrad.addColorStop(1, '#cccccc');
+        ctx.fillStyle = ballGrad;
+        ctx.beginPath();
+        ctx.arc(bx, by, br, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Pentágonos clásicos
+        const t = Date.now() * 0.012;
+        ctx.fillStyle = '#111111';
+        const penPositions = [
+          [0, -0.7],
+          [0.62, -0.22],
+          [0.38, 0.58],
+          [-0.38, 0.58],
+          [-0.62, -0.22]
+        ];
+        penPositions.forEach(([px, py]) => {
+          const rotX = px * Math.cos(t) - py * Math.sin(t * 0.7);
+          const rotY = px * Math.sin(t) + py * Math.cos(t * 0.7);
+          const visib = 0.5 + rotX * 0.4;
+          if (visib < 0.1) return;
+          ctx.globalAlpha = Math.min(1, visib) * 0.85;
+          ctx.beginPath();
+          const px2 = bx + rotX * br * 0.7;
+          const py2 = by + rotY * br * 0.7;
+          const ps = br * 0.28;
+          for (let v = 0; v < 5; v++) {
+            const angle = (v / 5) * Math.PI * 2 - Math.PI / 2;
+            const vx2 = px2 + Math.cos(angle) * ps;
+            const vy2 = py2 + Math.sin(angle) * ps;
+            v === 0 ? ctx.moveTo(vx2, vy2) : ctx.lineTo(vx2, vy2);
+          }
+          ctx.closePath();
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        });
+      }
+
+      // Reflejo de luz cenital común a todos los balones (para volumen 3D premium)
       const highlight = ctx.createRadialGradient(bx - br * 0.35, by - br * 0.38, 0, bx - br * 0.2, by - br * 0.2, br * 0.55);
-      highlight.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
-      highlight.addColorStop(0.4, 'rgba(255, 255, 255, 0.35)');
+      highlight.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
+      highlight.addColorStop(0.4, 'rgba(255, 255, 255, 0.3)');
       highlight.addColorStop(1, 'rgba(255, 255, 255, 0)');
       ctx.fillStyle = highlight;
       ctx.beginPath();
@@ -11275,7 +12880,10 @@
       
       if (dist > 10) {
         const angle = Math.atan2(dy, dx);
-        const fuerzaFactor = 0.22 + (selectedPlayer.fuerza / 100) * 0.065;
+        let fuerzaFactor = 0.22 + (selectedPlayer.fuerza / 100) * 0.065;
+        if (rachaActual >= 3 || selectedBallSkin === 'fuego' || selectedBallSkin === 'oro') {
+          fuerzaFactor *= 1.35; // ¡SÚPER POTENCIA!
+        }
         
         // Simulamos la trayectoria real
         let simX = pelota.x;
@@ -11306,7 +12914,7 @@
           // Comba real (¡Súper sensible!)
           if (simY < 220 && simY > 60) {
             let combaMult = 1.0;
-            if (rachaActual >= 2) combaMult = 1.85; // ¡SÚPER CURVA!
+            if (rachaActual >= 2 || selectedBallSkin === 'hielo' || selectedBallSkin === 'oro') combaMult = 1.85; // ¡SÚPER CURVA!
             const combaFuerza = (selectedPlayer.comba / 100) * 0.115 * combaMult;
             if (simVx > 0.5) simVx += combaFuerza;
             else if (simVx < -0.5) simVx -= combaFuerza;
