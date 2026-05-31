@@ -7860,6 +7860,8 @@
   let penalesRondaActual = 1;
   let penalesRivalsQueue = [];
   let penalesRivalIdx = 0;
+  let penalesArqueroUser = null;
+  let penalesArqueroCpu = null;
   let selectedBallSkin = 'clasica'; // skin seleccionada: 'clasica', 'oro', 'fuego', 'hielo'
   let currentScore = 0;
   let remainingShots = 5;
@@ -8004,6 +8006,7 @@
   let goalsScoredInRound = 0;
   let isCelebrating = false;
   let isCopaCelebracion = false;
+  let isSuperFinalCopaCelebracion = false;
   let celebrationTeammates = [];
   let confettiParticles = [];
   let fireParticles = [];
@@ -8032,6 +8035,37 @@
   // El arquero (elegido al azar de los otros jugadores de la lista)
   let arqueroJugador = { id: 'dibu', nombre: 'Dibu Martínez', pais: 'Argentina 🇦🇷', skin: '#ffedd5', hair: '#5c4033', beard: null, hairType: 'dibu', jersey: ['#22c55e', '#22c55e'] }; 
   let arquero = { x: 200, y: 75, vx: 1.3, r: 8.5 }; // El Dibu Martínez fijo!
+
+  function obtenerArqueroAleatorio() {
+    const arqueros = [
+      { id: 'dibu', nombre: 'Dibu Martínez', pais: 'Argentina 🇦🇷', skin: '#ffedd5', hair: '#5c4033', beard: null, hairType: 'dibu', jersey: ['#22c55e', '#22c55e'] },
+      { id: 'curpua', nombre: 'Curpua', pais: 'Bélgica 🇧🇪', skin: '#fdecda', hair: '#2b1a0a', beard: null, hairType: 'corto-oscuro', jersey: ['#fbbf24', '#fbbf24'] },
+      { id: 'neube', nombre: 'Neube', pais: 'Alemania 🇩🇪', skin: '#fee2e2', hair: '#eab308', beard: '#ca8a04', beardType: 'bigote', hairType: 'rubio-corto', jersey: ['#06b6d4', '#06b6d4'] },
+      { id: 'malisson', nombre: 'Malisson', pais: 'Brasil 🇧🇷', skin: '#f5d0a9', hair: '#1a0f00', beard: '#1a0f00', beardType: 'beard', hairType: 'corto-oscuro', jersey: ['#1e293b', '#1e293b'] }
+    ];
+    return JSON.parse(JSON.stringify(arqueros[Math.floor(Math.random() * arqueros.length)]));
+  }
+
+  function obtenerArqueroPorJugador(player) {
+    if (!player) return obtenerArqueroAleatorio();
+    const id = player.id ? player.id.toLowerCase() : '';
+    const flag = player.flag || '';
+    
+    // Brasil
+    if (id === 'orey' || id === 'neymareado' || id === 'fenomeno' || flag.includes('🇧🇷')) {
+      return { id: 'malisson', nombre: 'Malisson', pais: 'Brasil 🇧🇷', skin: '#f5d0a9', hair: '#1a0f00', beard: '#1a0f00', beardType: 'beard', hairType: 'corto-oscuro', jersey: ['#1e293b', '#1e293b'] };
+    }
+    // Alemania
+    if (id === 'woltemadre' || id === 'kingsman' || flag.includes('🇩🇪')) {
+      return { id: 'neube', nombre: 'Neube', pais: 'Alemania 🇩🇪', skin: '#fee2e2', hair: '#eab308', beard: '#ca8a04', beardType: 'bigote', hairType: 'rubio-corto', jersey: ['#06b6d4', '#06b6d4'] };
+    }
+    // Argentina
+    if (id === 'mesias' || id === 'maradonuts' || id === 'batifrutta' || id === 'witch' || flag.includes('🇦🇷')) {
+      return { id: 'dibu', nombre: 'Dibu Martínez', pais: 'Argentina 🇦🇷', skin: '#ffedd5', hair: '#5c4033', beard: null, hairType: 'dibu', jersey: ['#22c55e', '#22c55e'] };
+    }
+    // Por defecto (Europa / Bélgica / otros): Curpua (Courtois)
+    return { id: 'curpua', nombre: 'Curpua', pais: 'Bélgica 🇧🇪', skin: '#fdecda', hair: '#2b1a0a', beard: null, hairType: 'corto-oscuro', jersey: ['#fbbf24', '#fbbf24'] };
+  }
   
   // Los 3 defensores cabezones de la barrera (jugadores aleatorios)
   let defensorJugador = MUNDIAL_JUGADORES[2];
@@ -11120,12 +11154,18 @@
     try {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
+        
+        let scorer = selectedPlayer;
+        if (gameMode === 'penales' && penalesTurno === 'defensa') {
+          scorer = cpuTirador || MUNDIAL_JUGADORES[0];
+        }
+
         const phrases = [
-          `¡Gol de ${selectedPlayer.nombre}! ¡Gol! ¡Gol! ¡Es un golazo espectacular de otro partido! ¡Sen-sa-cio-nal!`,
-          `¡Pero qué golazo de ${selectedPlayer.nombre}! ¡Extraordinario! ¡Impresionante!`,
-          `¡Gol de ${selectedPlayer.nombre}! ¡Cantalo, cantalo, cantalo, cantalo!`,
-          `¡Es una bestia ${selectedPlayer.nombre}, señoras y señores! ¡Imparable! ¡Golazo!`,
-          `¡Espectacular remate de ${selectedPlayer.nombre}! ¡Gol!`
+          `¡Gol de ${scorer.nombre}! ¡Gol! ¡Gol! ¡Es un golazo espectacular de otro partido! ¡Sen-sa-cio-nal!`,
+          `¡Pero qué golazo de ${scorer.nombre}! ¡Extraordinario! ¡Impresionante!`,
+          `¡Gol de ${scorer.nombre}! ¡Cantalo, cantalo, cantalo, cantalo!`,
+          `¡Es una bestia ${scorer.nombre}, señoras y señores! ¡Imparable! ¡Golazo!`,
+          `¡Espectacular remate de ${scorer.nombre}! ¡Gol!`
         ];
         const textToSpeak = phrases[Math.floor(Math.random() * phrases.length)];
         const utterance = new SpeechSynthesisUtterance(textToSpeak);
@@ -11158,12 +11198,30 @@
     try {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const phrases = [
-          `¡Atajó el Dibu! ¡Le tapó el remate a ${selectedPlayer.nombre}!`,
-          `¡Grande Dibu! ¡Se hizo gigante ante el tiro de ${selectedPlayer.nombre}!`,
-          `¡Sensacional el Dibu Martínez! ¡La pelota de ${selectedPlayer.nombre} no entra!`,
-          `¡Increíble tapada del Dibu a ${selectedPlayer.nombre}! ¡No se puede creer lo que acaba de sacar!`
-        ];
+        
+        let scorer = selectedPlayer;
+        if (gameMode === 'penales' && penalesTurno === 'defensa') {
+          scorer = cpuTirador || MUNDIAL_JUGADORES[0];
+        }
+
+        const gName = (arqueroJugador && arqueroJugador.nombre) ? arqueroJugador.nombre : 'el arquero';
+        let phrases = [];
+        if (gName.includes('Dibu')) {
+          phrases = [
+            `¡Atajó el Dibu! ¡Le tapó el remate a ${scorer.nombre}!`,
+            `¡Grande Dibu! ¡Se hizo gigante ante el tiro de ${scorer.nombre}!`,
+            `¡Sensacional el Dibu Martínez! ¡La pelota de ${scorer.nombre} no entra!`,
+            `¡Increíble tapada del Dibu a ${scorer.nombre}! ¡No se puede creer lo que acaba de sacar!`
+          ];
+        } else {
+          phrases = [
+            `¡Atajó ${gName}! ¡Le tapó el remate a ${scorer.nombre}!`,
+            `¡Grande ${gName}! ¡Se hizo gigante ante el tiro de ${scorer.nombre}!`,
+            `¡Sensacional ${gName}! ¡La pelota de ${scorer.nombre} no entra!`,
+            `¡Increíble tapada de ${gName} a ${scorer.nombre}! ¡No se puede creer lo que acaba de sacar!`
+          ];
+        }
+        
         const textToSpeak = phrases[Math.floor(Math.random() * phrases.length)];
         const utterance = new SpeechSynthesisUtterance(textToSpeak);
         
@@ -11195,20 +11253,26 @@
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         
+        let scorer = selectedPlayer;
+        if (gameMode === 'penales' && penalesTurno === 'defensa') {
+          scorer = cpuTirador || MUNDIAL_JUGADORES[0];
+        }
+
+        const gNameShort = (arqueroJugador && arqueroJugador.nombre.includes('Dibu')) ? 'el Dibu' : ((arqueroJugador && arqueroJugador.nombre) ? arqueroJugador.nombre : 'el arquero');
         let phrases;
         if (pelota.hitPostThisShot) {
           phrases = [
             `¡Y la pelota termina yéndose afuera después de pegar en el palo! ¡Increíble!`,
             `¡Mala suerte! ¡Dio en el poste y se fue desviada!`,
             `¡No quiere entrar! ¡Pegó en el caño y salió despedida!`,
-            `¡Quedó latiendo el arco de la vibración! ¡Se salvó el Dibu tras el rebote!`
+            `¡Quedó latiendo el arco de la vibración! ¡Se salvó ${gNameShort} tras el rebote!`
           ];
         } else {
           phrases = [
-            `¡Afueraaa! ¡Completamente afuera de ${selectedPlayer.nombre}! ¡Se la regaló a la tribuna!`,
-            `¡La tiró a cualquier lado ${selectedPlayer.nombre}! ¡Desviadísimo, no se puede creer!`,
-            `¡Le erró al arco ${selectedPlayer.nombre}! ¡Afuera, afuera, afuera!`,
-            `¡La mandó al córner de la tribuna ${selectedPlayer.nombre}! ¡Qué remate tan desviado!`
+            `¡Afueraaa! ¡Completamente afuera de ${scorer.nombre}! ¡Se la regaló a la tribuna!`,
+            `¡La tiró a cualquier lado ${scorer.nombre}! ¡Desviadísimo, no se puede creer!`,
+            `¡Le erró al arco ${scorer.nombre}! ¡Afuera, afuera, afuera!`,
+            `¡La mandó al córner de la tribuna ${scorer.nombre}! ¡Qué remate tan desviado!`
           ];
         }
         const textToSpeak = phrases[Math.floor(Math.random() * phrases.length)];
@@ -11241,12 +11305,19 @@
     try {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
+        
+        let scorer = selectedPlayer;
+        if (gameMode === 'penales' && penalesTurno === 'defensa') {
+          scorer = cpuTirador || MUNDIAL_JUGADORES[0];
+        }
+
+        const gNameShort = (arqueroJugador && arqueroJugador.nombre.includes('Dibu')) ? 'el Dibu' : ((arqueroJugador && arqueroJugador.nombre) ? arqueroJugador.nombre : 'el arquero');
         const phrases = [
-          `¡Palo! ¡Palo, palo, palo! ¡Se salva el Dibu de milagro!`,
-          `¡Rebotó en el poste! ¡El palo le niega el grito a ${selectedPlayer.nombre}!`,
+          `¡Palo! ¡Palo, palo, palo! ¡Se salva ${gNameShort} de milagro!`,
+          `¡Rebotó en el poste! ¡El palo le niega el grito a ${scorer.nombre}!`,
           `¡Qué cerca estuvo! ¡Estalló el poste de metal!`,
-          `¡El caño le dice que no a ${selectedPlayer.nombre}! ¡No se puede creer la mala suerte!`,
-          `¡Sonó el metal! ¡Rebote en el palo de ${selectedPlayer.nombre}!`
+          `¡El caño le dice que no a ${scorer.nombre}! ¡No se puede creer la mala suerte!`,
+          `¡Sonó el metal! ¡Rebote en el palo de ${scorer.nombre}!`
         ];
         const textToSpeak = phrases[Math.floor(Math.random() * phrases.length)];
         const utterance = new SpeechSynthesisUtterance(textToSpeak);
@@ -11399,6 +11470,30 @@
       document.getElementById('estadio-puntos').innerText = '00';
       actualizarMarcadorPenales();
       document.getElementById('estadio-record').innerText = '--';
+
+      // Inicializar los arqueros específicos fijos de cada tanda de penales
+      const rivalActual = (penalesRivalsQueue.length > 0 && penalesRivalIdx < penalesRivalsQueue.length) ? penalesRivalsQueue[penalesRivalIdx] : MUNDIAL_JUGADORES[0];
+      penalesArqueroUser = obtenerArqueroPorJugador(selectedPlayer);
+      
+      // Asignar arquero rival progresivo según la ronda del torneo de penales (Octavos: Curpua, Cuartos: Malisson, Semis: Neube, Final: Dibu Martínez)
+      if (torneoPenales && torneoPenales.active) {
+        if (torneoPenales.ronda === 0) {
+          penalesArqueroCpu = { id: 'curpua', nombre: 'Curpua', pais: 'Bélgica 🇧🇪', skin: '#fdecda', hair: '#2b1a0a', beard: null, hairType: 'corto-oscuro', jersey: ['#fbbf24', '#fbbf24'] };
+        } else if (torneoPenales.ronda === 1) {
+          penalesArqueroCpu = { id: 'malisson', nombre: 'Malisson', pais: 'Brasil 🇧🇷', skin: '#f5d0a9', hair: '#1a0f00', beard: '#1a0f00', beardType: 'beard', hairType: 'corto-oscuro', jersey: ['#1e293b', '#1e293b'] };
+        } else if (torneoPenales.ronda === 2) {
+          penalesArqueroCpu = { id: 'neube', nombre: 'Neube', pais: 'Alemania 🇩🇪', skin: '#fee2e2', hair: '#eab308', beard: '#ca8a04', beardType: 'bigote', hairType: 'rubio-corto', jersey: ['#06b6d4', '#06b6d4'] };
+        } else {
+          // Final: Dibu Martínez! Si el usuario tiene a Dibu, el rival final es Neube Supremo (buzo violeta neón) para mayor espectacularidad
+          if (penalesArqueroUser && penalesArqueroUser.id === 'dibu') {
+            penalesArqueroCpu = { id: 'neube', nombre: 'Neube Supremo', pais: 'Alemania 🇩🇪', skin: '#fee2e2', hair: '#eab308', beard: '#ca8a04', beardType: 'bigote', hairType: 'rubio-corto', jersey: ['#a855f7', '#a855f7'] };
+          } else {
+            penalesArqueroCpu = { id: 'dibu', nombre: 'Dibu Martínez', pais: 'Argentina 🇦🇷', skin: '#ffedd5', hair: '#5c4033', beard: null, hairType: 'dibu', jersey: ['#22c55e', '#22c55e'] };
+          }
+        }
+      } else {
+        penalesArqueroCpu = obtenerArqueroPorJugador(rivalActual);
+      }
     }
 
     const titleEl = document.querySelector('.gameover-title');
@@ -11408,9 +11503,13 @@
       titleEl.style.textShadow = 'none';
     }
     
-    // Elegir arquero y defensores al azar (¡Arquero SIEMPRE es el Dibu Martínez!)
+    // Elegir arquero y defensores al azar de forma dinámica
     const otros = MUNDIAL_JUGADORES.filter(p => p.id !== selectedPlayer.id);
-    arqueroJugador = { id: 'dibu', nombre: 'Dibu Martínez', pais: 'Argentina 🇦🇷', skin: '#ffedd5', hair: '#5c4033', beard: null, hairType: 'dibu', jersey: ['#22c55e', '#22c55e'] };
+    if (gameMode === 'penales') {
+      arqueroJugador = penalesArqueroCpu ? JSON.parse(JSON.stringify(penalesArqueroCpu)) : obtenerArqueroPorJugador(MUNDIAL_JUGADORES[0]);
+    } else {
+      arqueroJugador = { id: 'dibu', nombre: 'Dibu Martínez', pais: 'Argentina 🇦🇷', skin: '#ffedd5', hair: '#5c4033', beard: null, hairType: 'dibu', jersey: ['#22c55e', '#22c55e'] };
+    }
     defensorJugador = otros[Math.floor(Math.random() * otros.length)];
     
     resetPelota();
@@ -11447,23 +11546,27 @@
         penalesCPUPreparando = true;
         penalesCPUShotTimer = 90;
         
-        // Cuando ataja el usuario, Dibu usa buzo rojo neón para diferenciarlo
-        if (arqueroJugador) {
-          arqueroJugador.jersey = ['#ef4444', '#ef4444'];
-        }
+        // Cuando ataja el usuario, usa su arquero asignado penalesArqueroUser
+        arqueroJugador = JSON.parse(JSON.stringify(penalesArqueroUser || { id: 'dibu', nombre: 'Dibu Martínez', pais: 'Argentina 🇦🇷', skin: '#ffedd5', hair: '#5c4033', beard: null, hairType: 'dibu', jersey: ['#22c55e', '#22c55e'] }));
+        // Forzar buzo rojo/naranja neón para diferenciar al arquero del usuario
+        arqueroJugador.jersey = ['#ef4444', '#ef4444'];
       } else {
         const isLeftFooted = ['mesias', 'yamalisimo', 'maradonuts', 'hajalan'].includes(selectedPlayer.id);
         playerX = isLeftFooted ? 218 : 150;
         playerY = 242;
         penalesCPUPreparando = false;
         
-        // Cuando patea el usuario (y ataja la CPU), Dibu usa su clásico buzo verde neón
-        if (arqueroJugador) {
-          arqueroJugador.jersey = ['#22c55e', '#22c55e'];
-        }
+        // Cuando patea el usuario (y ataja la CPU), usa penalesArqueroCpu
+        arqueroJugador = JSON.parse(JSON.stringify(penalesArqueroCpu || obtenerArqueroAleatorio()));
+        // Forzar buzo verde neón para el arquero rival atajador
+        arqueroJugador.jersey = ['#22c55e', '#22c55e'];
       }
       kickTimer = 0;
     } else {
+      // Elegir defensor al azar de la barrera para cada tiro (el arquero se mantiene fijo por ronda)
+      const otros = MUNDIAL_JUGADORES.filter(p => p.id !== selectedPlayer.id);
+      defensorJugador = otros[Math.floor(Math.random() * otros.length)];
+
       const isLeftFooted = ['mesias', 'yamalisimo', 'maradonuts', 'hajalan'].includes(selectedPlayer.id);
       playerX = isLeftFooted ? 218 : 150;
       playerY = 242;
@@ -11542,8 +11645,13 @@
       if (penalesTurno === 'defensa') {
         arquero.vx = 0; // Controlado por el usuario
       } else {
-        // Dibu IA rápido e inteligente
+        // IA de arquero rival rápido e inteligente, escalando velocidad con las rondas del torneo
         let speed = 4.2 + (penalesGolesFavor * 0.35);
+        if (torneoPenales && torneoPenales.active) {
+          // Multiplicador progresivo de velocidad: Octavos = 0.82, Cuartos = 1.0, Semis = 1.18, Final = 1.35
+          const rondaMult = 0.82 + (torneoPenales.ronda * 0.17 || 0);
+          speed *= rondaMult;
+        }
         if (gameDifficulty === 'facil') speed *= 0.65;
         else if (gameDifficulty === 'dificil') speed *= 1.35;
         arquero.vx = randomDir * speed;
@@ -11818,7 +11926,8 @@
         if (gameMode === 'penales' && penalesTurno === 'defensa') {
           bannerTxt = '🧤 ¡¡¡ATAJASTE!!!';
         } else {
-          bannerTxt = '🧤 ¡¡¡ATAJA EL DIBUUUU!!!';
+          const nameGoalie = (arqueroJugador && arqueroJugador.nombre) ? arqueroJugador.nombre.toUpperCase() : 'EL ARQUERO';
+          bannerTxt = `🧤 ¡¡¡ATAJA ${nameGoalie}!!!`;
         }
         bannerTimer = 140;
         // ── RESETEAR RACHA ──
@@ -13658,11 +13767,11 @@
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
 
-    let textToDraw = "  ★  NEXOS VECINOS 👥  ★  COPA NEXOS 2026 🏆  ★  NEXOSMAPS.COM 🗺️  ★  SÚPER DIBU MARTÍNEZ 🔥  ★  NEXOS PÁNICO JUEGAZO ⚽  ";
+    let textToDraw = "  ★  🛡️ NEXOS SEGURIDAD 🛡️  ★  DESCARGÁ NUESTRA APP: https://nexos.tally.so/r/nexos 📲  ★  ";
     if (gameMode === 'penales') {
       const rival = (penalesRivalsQueue.length > 0 && penalesRivalIdx < penalesRivalsQueue.length) ? penalesRivalsQueue[penalesRivalIdx] : null;
       const rivalNombre = rival ? rival.nombre.toUpperCase() : 'RIVAL';
-      textToDraw = `  ★  🏆 COPA DE PENALES 🏆  ★  🆚 VERSUS: ${rivalNombre}  ★  RONDA ${penalesRivalIdx + 1} DE ${penalesRivalsQueue.length}  ★  🧤 ARQUERO: DIBU MARTÍNEZ  ★  `;
+      textToDraw = `  ★  🛡️ NEXOS SEGURIDAD 🛡️  ★  🆚 VS ${rivalNombre}  ★  APP: https://nexos.tally.so/r/nexos 📲  ★  `;
     }
     
     const textWidth = ctx.measureText(textToDraw).width;
