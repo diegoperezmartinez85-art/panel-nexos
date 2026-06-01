@@ -2646,13 +2646,14 @@
     #mundial-estadio {
       flex: 1;
       min-height: 0;
-      gap: 4px;
+      gap: 8px;
       width: 100%;
       max-width: min(100vw, 840px);
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start; /* Subimos el marcador hacia arriba */
+      padding-top: calc(env(safe-area-inset-top, 12px) + 18px); /* Posicionamiento premium esquivando el botón cerrar */
     }
     .mundial-subtitle {
       font-size: 11px;
@@ -2964,50 +2965,50 @@
       text-transform: uppercase;
     }
     .marcador-item .val {
-      font-size: 15px;
-      font-family: monospace;
-      font-weight: 900;
+      font-size: 20px; /* ¡Valores de marcador más grandes y claros! */
+      font-family: 'Outfit', monospace;
+      font-weight: 950;
       color: var(--ac);
-      text-shadow: 0 0 6px var(--ac);
+      text-shadow: 0 0 8px var(--ac);
     }
 
     /* ── ONOMATOPEYA — barra compacta entre header y canvas ── */
     .onomatopeya-overlay {
       position: relative;
       width: 100%;
-      height: 48px;
+      min-height: 64px; /* Permite expandirse verticalmente si el texto es muy largo */
+      height: auto;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       opacity: 0;
-      transform: scale(0.92);
-      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transform: scale(0.8); /* Empieza encogido para un efecto pop más potente */
+      transition: all 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       pointer-events: none;
-      overflow: hidden;
+      margin: 6px 0;
     }
     .onomatopeya-overlay.show {
       opacity: 1;
-      transform: scale(1);
+      transform: scale(1.12); /* Pop gigante explosivo */
     }
     .onomatopeya-text {
-      font-size: clamp(12px, 3.8vw, 18px);
-      font-weight: 900;
+      font-size: clamp(14px, 4.2vw, 22px); /* Ajustado para que el texto largo no se vea inmenso en pantallas pequeñas */
+      font-weight: 950; /* Super negrita retro */
       font-family: 'Outfit', system-ui, sans-serif;
       text-transform: uppercase;
       text-align: center;
-      letter-spacing: 0.8px;
+      letter-spacing: 1px;
       line-height: 1.2;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      padding: 8px 18px;
-      border-radius: 14px;
-      background: rgba(10, 10, 15, 0.75);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      max-width: 98%;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      white-space: normal; /* ¡PERMITE SALTOS DE LÍNEA ELEGANTES PARA QUE NUNCA SE CORTE! */
+      word-wrap: break-word;
+      padding: 10px 20px; /* Espaciado premium */
+      border-radius: 16px;
+      background: rgba(8, 8, 12, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      max-width: 95%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
     
     .onomatopeya-text.goal {
@@ -4430,6 +4431,10 @@
     <div class="mundial-players-slider" id="players-slider">
       <!-- Los jugadores se inyectan dinámicamente por JS -->
     </div>
+    
+    <!-- Botón del Editor de Personajes -->
+    <button class="mundial-action-btn secondary-neon" onclick="abrirEditorPersonaje()" style="margin-top: 10px; margin-bottom: 5px; background: rgba(168, 85, 247, 0.08); border: 1.5px solid rgba(168, 85, 247, 0.35); color: #c084fc; box-shadow: 0 0 10px rgba(168, 85, 247, 0.15); font-size: 11.5px; padding: 10px 0; border-radius: 12px; width: 100%; font-weight: 900; letter-spacing: 1px; cursor: pointer; transition: all 0.2s;">👑 CREAR O EDITAR MI LEYENDA</button>
+
     
     <!-- SELECCIÓN DE PELOTA ESPECIAL -->
     <div class="mundial-section-title" style="margin-top: 18px; font-size: 11px; font-weight: 900; color: #a1a1aa; text-transform: uppercase; letter-spacing: 1.5px; align-self: flex-start; display: flex; align-items: center; gap: 8px;">
@@ -8123,6 +8128,14 @@
     }
   } catch(e) {}
 
+  let unlockedBalls = [];
+  try {
+    const saved = localStorage.getItem('nx_futbol_unlocked_balls');
+    if (saved) {
+      unlockedBalls = JSON.parse(saved);
+    }
+  } catch(e) {}
+
   function actualizarMonedasDisplay() {
     const val = String(totalCoins).padStart(2, '0');
     const menuEl = document.getElementById('menu-monedas-val');
@@ -8140,18 +8153,18 @@
     { id: 'penaldo', nombre: 'Penaldo', pais: 'Portugal 🇵🇹', flag: '🇵🇹', flagColors: ['#006600','#ff0000'], flagType: 'v2', comba: 85, fuerza: 99, precision: 96, skin: '#fed7aa', hair: '#18181b', beard: null, hairType: 'penaldo', jersey: ['#dc2626', '#dc2626'] },
     { id: 'hajalan', nombre: 'Hajalan', pais: 'Noruega 🇳🇴', flag: '🇳🇴', flagColors: ['#ef2b2d','#ffffff','#002868'], flagType: 'cross', flagCross: '#002868', comba: 78, fuerza: 99, precision: 95, skin: '#ffedd5', hair: '#fef08a', beard: null, hairType: 'long-rubio', jersey: ['#dc2626', '#1d4ed8'] },
     { id: 'woltemadre', nombre: 'Woltemadre', pais: 'Alemania 🇩🇪', flag: '🇩🇪', flagColors: ['#000000','#dd0000','#ffcf00'], flagType: 'h3', comba: 82, fuerza: 96, precision: 93, skin: '#ffedd5', hair: '#fde047', beard: '#5c4033', beardType: 'bigote', hairType: 'rubio-ondulado-medio', jersey: ['#ffffff', '#ffffff'] },
-    { id: 'maradonuts', nombre: 'Maradonuts', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 99, fuerza: 95, precision: 97, skin: '#fed7aa', hair: '#18181b', beard: null, hairType: 'pelusa', jersey: ['#74acdf', '#ffffff'], locked: true, unlockPrice: 80, unlockDesc: 'Racha 3 ⚽ o 80 🪙' },
-    { id: 'zazu', nombre: 'Zazu', pais: 'Francia 🇫🇷', flag: '🇫🇷', flagColors: ['#002395','#ffffff','#ed2939'], flagType: 'v3', comba: 96, fuerza: 91, precision: 98, skin: '#ffedd5', hair: '#3f3f46', beard: null, hairType: 'calvo', jersey: ['#002395', '#002395'], locked: true, unlockPrice: 60, unlockDesc: 'Racha 2 ⚡ o 60 🪙' },
-    { id: 'orey', nombre: 'Orey', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00'], flagType: 'br', comba: 95, fuerza: 98, precision: 98, skin: '#653b1b', hair: '#18181b', beard: null, hairType: 'afro-short', jersey: ['#fbbf24', '#fbbf24'], locked: true, unlockPrice: 80, unlockDesc: 'Récord 4 🏆 o 80 🪙' },
-    { id: 'fenomeno', nombre: 'El Fenómeno', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00','#002277'], flagType: 'br', comba: 94, fuerza: 98, precision: 96, skin: '#b45309', hair: '#18181b', beard: null, hairType: 'calva-flequillo', jersey: ['#fbbf24', '#fbbf24'], locked: true, unlockPrice: 50, unlockDesc: 'Racha 3 ⚽ o 50 🪙' },
-    { id: 'becan', nombre: 'Becan', pais: 'Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', flagColors: ['#ffffff'], flagType: 'cross', flagCross: '#cf111b', comba: 99, fuerza: 93, precision: 97, skin: '#ffedd5', hair: '#fef08a', beard: null, hairType: 'beckham-mohawk', jersey: ['#cf142b', '#cf142b'], locked: true, unlockPrice: 60, unlockDesc: 'Récord 5 🏆 o 60 🪙' },
-    { id: 'witch', nombre: 'The Witch', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 96, fuerza: 94, precision: 95, skin: '#fed7aa', hair: '#18181b', beard: '#18181b', beardType: 'candado-chico', hairType: 'calvo-total', jersey: ['#0ea5e9', '#ffffff'], locked: true, unlockPrice: 40, unlockDesc: 'Racha 2 ⚡ o 40 🪙' },
-    { id: 'david', nombre: 'David', pais: 'Países Bajos 🇳🇱', flag: '🇳🇱', flagColors: ['#ff4f00','#ffffff','#21468b'], flagType: 'h3', comba: 94, fuerza: 97, precision: 92, skin: '#5c4033', hair: '#1c1917', beard: null, hairType: 'rastas', jersey: ['#ff4f00', '#ff4f00'], locked: true, unlockPrice: 40, unlockDesc: 'Récord 3 🏆 o 40 🪙' },
-    { id: 'kingsman', nombre: 'Kingsman', pais: 'Alemania 🇩🇪', flag: '🇩🇪', flagColors: ['#000000','#dd0000','#ffcf00'], flagType: 'h3', comba: 91, fuerza: 96, precision: 98, skin: '#ffedd5', hair: '#fde047', beard: null, hairType: 'long-rubio', jersey: ['#10b981', '#10b981'], locked: true, unlockPrice: 50, unlockDesc: 'Récord 4 🏆 o 50 🪙' },
-    { id: 'pirgo', nombre: 'Pirgo', pais: 'Italia 🇮🇹', flag: '🇮🇹', flagColors: ['#009246','#ffffff','#ce2b37'], flagType: 'v3', comba: 98, fuerza: 88, precision: 99, skin: '#fed7aa', hair: '#451a03', beard: '#451a03', hairType: 'pirlo', jersey: ['#0087e0', '#0087e0'], locked: true, unlockPrice: 50, unlockDesc: 'Racha 2 ⚡ o 50 🪙' },
-    { id: 'totto', nombre: 'Totto', pais: 'Italia 🇮🇹', flag: '🇮🇹', flagColors: ['#009246','#ffffff','#ce2b37'], flagType: 'v3', comba: 95, fuerza: 96, precision: 95, skin: '#fed7aa', hair: '#ca8a04', beard: null, hairType: 'totti', jersey: ['#0087e0', '#0087e0'], locked: true, unlockPrice: 50, unlockDesc: 'Récord 4 🏆 o 50 🪙' },
-    { id: 'craft', nombre: 'Craft', pais: 'Países Bajos 🇳🇱', flag: '🇳🇱', flagColors: ['#ff4f00','#ffffff','#21468b'], flagType: 'h3', comba: 98, fuerza: 94, precision: 97, skin: '#ffedd5', hair: '#854d0e', beard: null, hairType: 'long-lasio', jersey: ['#ff4f00', '#ff4f00'], locked: true, unlockPrice: 70, unlockDesc: 'Racha 4 🏆 o 70 🪙' },
-    { id: 'batifrutta', nombre: 'Batifrutta', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 88, fuerza: 99, precision: 96, skin: '#fed7aa', hair: '#5c4033', beard: '#5c4033', beardType: 'candado-chico', hairType: 'long-rubio', jersey: ['#74acdf', '#ffffff'], locked: true, unlockPrice: 65, unlockDesc: 'Récord 6 🏆 o 65 🪙' },
+    { id: 'maradonuts', nombre: 'Maradonuts', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 99, fuerza: 95, precision: 97, skin: '#fed7aa', hair: '#18181b', beard: null, hairType: 'pelusa', jersey: ['#74acdf', '#ffffff'], locked: true, classic: true, unlockPrice: 80, unlockDesc: 'Racha 3 ⚽ o 80 🪙' },
+    { id: 'zazu', nombre: 'Zazu', pais: 'Francia 🇫🇷', flag: '🇫🇷', flagColors: ['#002395','#ffffff','#ed2939'], flagType: 'v3', comba: 96, fuerza: 91, precision: 98, skin: '#ffedd5', hair: '#3f3f46', beard: null, hairType: 'calvo', jersey: ['#002395', '#002395'], locked: true, classic: true, unlockPrice: 60, unlockDesc: 'Racha 2 ⚡ o 60 🪙' },
+    { id: 'orey', nombre: 'Orey', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00'], flagType: 'br', comba: 95, fuerza: 98, precision: 98, skin: '#653b1b', hair: '#18181b', beard: null, hairType: 'afro-short', jersey: ['#fbbf24', '#fbbf24'], locked: true, classic: true, unlockPrice: 80, unlockDesc: 'Récord 4 🏆 o 80 🪙' },
+    { id: 'fenomeno', nombre: 'El Fenómeno', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00','#002277'], flagType: 'br', comba: 94, fuerza: 98, precision: 96, skin: '#b45309', hair: '#18181b', beard: null, hairType: 'calva-flequillo', jersey: ['#fbbf24', '#fbbf24'], locked: true, classic: true, unlockPrice: 50, unlockDesc: 'Racha 3 ⚽ o 50 🪙' },
+    { id: 'becan', nombre: 'Becan', pais: 'Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', flagColors: ['#ffffff'], flagType: 'cross', flagCross: '#cf111b', comba: 99, fuerza: 93, precision: 97, skin: '#ffedd5', hair: '#fef08a', beard: null, hairType: 'beckham-mohawk', jersey: ['#cf142b', '#cf142b'], locked: true, classic: true, unlockPrice: 60, unlockDesc: 'Récord 5 🏆 o 60 🪙' },
+    { id: 'witch', nombre: 'The Witch', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 96, fuerza: 94, precision: 95, skin: '#fed7aa', hair: '#18181b', beard: '#18181b', beardType: 'candado-chico', hairType: 'calvo-total', jersey: ['#0ea5e9', '#ffffff'], locked: true, classic: true, unlockPrice: 40, unlockDesc: 'Racha 2 ⚡ o 40 🪙' },
+    { id: 'david', nombre: 'David', pais: 'Países Bajos 🇳🇱', flag: '🇳🇱', flagColors: ['#ff4f00','#ffffff','#21468b'], flagType: 'h3', comba: 94, fuerza: 97, precision: 92, skin: '#5c4033', hair: '#1c1917', beard: null, hairType: 'rastas', jersey: ['#ff4f00', '#ff4f00'], locked: true, classic: true, unlockPrice: 40, unlockDesc: 'Récord 3 🏆 o 40 🪙' },
+    { id: 'kingsman', nombre: 'Kingsman', pais: 'Alemania 🇩🇪', flag: '🇩🇪', flagColors: ['#000000','#dd0000','#ffcf00'], flagType: 'h3', comba: 91, fuerza: 96, precision: 98, skin: '#ffedd5', hair: '#fde047', beard: null, hairType: 'long-rubio', jersey: ['#10b981', '#10b981'], locked: true, classic: true, unlockPrice: 50, unlockDesc: 'Récord 4 🏆 o 50 🪙' },
+    { id: 'pirgo', nombre: 'Pirgo', pais: 'Italia 🇮🇹', flag: '🇮🇹', flagColors: ['#009246','#ffffff','#ce2b37'], flagType: 'v3', comba: 98, fuerza: 88, precision: 99, skin: '#fed7aa', hair: '#451a03', beard: '#451a03', hairType: 'pirlo', jersey: ['#0087e0', '#0087e0'], locked: true, classic: true, unlockPrice: 50, unlockDesc: 'Racha 2 ⚡ o 50 🪙' },
+    { id: 'totto', nombre: 'Totto', pais: 'Italia 🇮🇹', flag: '🇮🇹', flagColors: ['#009246','#ffffff','#ce2b37'], flagType: 'v3', comba: 95, fuerza: 96, precision: 95, skin: '#fed7aa', hair: '#ca8a04', beard: null, hairType: 'totti', jersey: ['#0087e0', '#0087e0'], locked: true, classic: true, unlockPrice: 50, unlockDesc: 'Récord 4 🏆 o 50 🪙' },
+    { id: 'craft', nombre: 'Craft', pais: 'Países Bajos 🇳🇱', flag: '🇳🇱', flagColors: ['#ff4f00','#ffffff','#21468b'], flagType: 'h3', comba: 98, fuerza: 94, precision: 97, skin: '#ffedd5', hair: '#854d0e', beard: null, hairType: 'long-lasio', jersey: ['#ff4f00', '#ff4f00'], locked: true, classic: true, unlockPrice: 70, unlockDesc: 'Racha 4 🏆 o 70 🪙' },
+    { id: 'batifrutta', nombre: 'Batifrutta', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 88, fuerza: 99, precision: 96, skin: '#fed7aa', hair: '#5c4033', beard: '#5c4033', beardType: 'candado-chico', hairType: 'long-rubio', jersey: ['#74acdf', '#ffffff'], locked: true, classic: true, unlockPrice: 65, unlockDesc: 'Récord 6 🏆 o 65 🪙' },
     { id: 'lakaka', nombre: 'Lakaka', pais: 'Bélgica 🇧🇪', flag: '🇧🇪', flagColors: ['#000000','#ffd700','#ff0000'], flagType: 'v3', comba: 68, fuerza: 98, precision: 75, skin: '#4a3319', hair: '#18181b', beard: null, hairType: 'rapado-oscuro', jersey: ['#800020', '#800020'] },
     { id: 'lucho', nombre: 'Lucho', pais: 'Uruguay 🇺🇾', flag: '🇺🇾', flagColors: ['#ffffff','#007fff','#ffffff'], flagType: 'uy', comba: 80, fuerza: 88, precision: 95, skin: '#fed7aa', hair: '#18181b', beard: null, hairType: 'corto-despeinado', jersey: ['#5ca2db', '#5ca2db'] }
   ];
@@ -8699,33 +8712,55 @@
     'jorge', 'carlos', 'diego', 'pablo', 'miguel', 'juan', 'antonio',
     'andres', 'andrés', 'rodrigo', 'sergio', 'alejandro', 'enrique',
     'alvaro', 'álvaro', 'damian', 'damián', 'hector', 'héctor',
-    'male', 'hombre', 'masculin', 'man'
+    'luis', 'mateo', 'javier', 'jose', 'josé', 'manuel', 'pedro',
+    'francisco', 'tomas', 'tomás', 'gonzalo', 'gonzalez', 'male', 'hombre', 
+    'masculin', 'man', 'aod', 'esc', 'sfg', 'ycm', 'tux', 'rdb' // Identificadores masculinos en Google TTS y Microsoft Gonzalo
   ];
 
   const NOMBRES_VOZ_FEMENINA = [
-    'monica', 'mónica', 'maria', 'maría', 'rosa', 'elena', 'laura',
+    'monica', 'mónica', 'maria', 'maría', 'rosa', 'elena', 'helena', 'laura',
     'paula', 'isabel', 'luciana', 'valentina', 'sabina', 'carmen',
-    'female', 'mujer', 'femeni', 'woman', 'girl'
+    'female', 'mujer', 'femeni', 'woman', 'girl', 'daria', 'yolanda', 'elisa',
+    'paloma', 'karina', 'dalia', 'catalina', 'sofia', 'sofía', 'zariyah', 'paloma',
+    'default'
   ];
 
   function esFemenina(v) {
     const n = v.name.toLowerCase();
-    return NOMBRES_VOZ_FEMENINA.some(k => n.includes(k));
+    
+    // Si contiene explícitamente algún nombre femenino conocido
+    if (NOMBRES_VOZ_FEMENINA.some(k => n.includes(k))) return true;
+    
+    // Las voces por defecto de Google en español que son femeninas (Google español, Google español de EE.UU.)
+    if (n.includes('google') && n.includes('español')) {
+      // Solo tratamos como masculina si contiene un código masculino de Google (aod, esc, sfg, ycm, tux, rdb)
+      const codigosMasculinosGoogle = ['aod', 'esc', 'sfg', 'ycm', 'tux', 'rdb'];
+      if (!codigosMasculinosGoogle.some(k => n.includes(k))) {
+        return true; 
+      }
+    }
+    
+    // Si no contiene ningún nombre masculino conocido, la consideramos femenina por seguridad
+    // ya que casi todas las voces por defecto de los navegadores son femeninas.
+    const matchesMale = NOMBRES_VOZ_MASCULINA.some(k => n.includes(k));
+    if (!matchesMale) return true;
+    
+    return false;
   }
 
   function puntuarVoz(v) {
     if (esFemenina(v)) return -999;
     const n = v.name.toLowerCase();
     let score = 0;
-    if (!v.localService) score += 40;
+    if (!v.localService) score += 40; // Voces online Premium (ej. Microsoft Online Natural)
     if (n.includes('neural')) score += 30;
     if (n.includes('natural')) score += 20;
     if (n.includes('google')) score += 15;
-    if (NOMBRES_VOZ_MASCULINA.some(k => n.includes(k))) score += 25;
+    if (NOMBRES_VOZ_MASCULINA.some(k => n.includes(k))) score += 50; // Gran puntuación para masculinas confirmadas
+    if (v.lang === 'es-AR') score += 60; // ¡Máxima prioridad para acento rioplatense (Mariano Closs)!
     if (v.lang === 'es-419') score += 10;
     if (v.lang === 'es-MX') score += 8;
     if (v.lang === 'es-US') score += 6;
-    if (v.lang === 'es-AR') score += 5;
     if (v.lang.startsWith('es')) score += 3;
     return score;
   }
@@ -8736,18 +8771,19 @@
     if (!voices.length) return null;
     const vocesEs = voices.filter(v => v.lang.startsWith('es'));
     if (!vocesEs.length) return null;
-    return [...vocesEs].sort((a, b) => puntuarVoz(b) - puntuarVoz(a))[0];
+    
+    // Filtrar y ordenar las voces masculinas
+    const masculinas = vocesEs.filter(v => !esFemenina(v));
+    if (masculinas.length === 0) return null;
+    
+    return [...masculinas].sort((a, b) => puntuarVoz(b) - puntuarVoz(a))[0];
   }
 
   function hayVozRealmenteMasculina() {
     if (!('speechSynthesis' in window)) return false;
     const voices = window.speechSynthesis.getVoices();
     const vocesEs = voices.filter(v => v.lang.startsWith('es'));
-    // Hay voz masculina real si alguna tiene nombre masculino conocido
-    return vocesEs.some(v => {
-      const n = v.name.toLowerCase();
-      return NOMBRES_VOZ_MASCULINA.some(k => n.includes(k));
-    });
+    return vocesEs.some(v => !esFemenina(v));
   }
 
   function buscarVozHumana() { return buscarVozMasculina(); }
@@ -8767,43 +8803,70 @@
       .replace(/¡¡/g, '¡').replace(/!!/g, '!');
   }
 
-  // ── MOTOR DE VOZ — Web Speech API, pitch forzado grave si no hay voz masculina ──
+  // ── MOTOR DE VOZ — Web Speech API, con tonos naturales y fluidos sin robotización ──
   let _relatoAudio = null;
 
   function speakRelato(text) {
     if (modoDiscreto) return;
     if (_relatoAudio) { try { _relatoAudio.pause(); } catch(e) {} _relatoAudio = null; }
-    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    
+    if ('speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.resume();
+        window.speechSynthesis.cancel();
+      } catch(e) {}
+    }
     if (!('speechSynthesis' in window)) return;
 
     const tipo = detectarTipoRelato(text);
     const utterance = new SpeechSynthesisUtterance(preprocesarTexto(text));
 
     const voz = buscarVozMasculina();
-    const tieneMasculina = hayVozRealmenteMasculina();
+    
+    // Si no hay voz masculina nativa disponible, elegimos cualquier voz en español para no quedarnos mudos,
+    // pero le bajaremos el tono (pitch) para que suene de forma barítona / masculina.
+    let selectedVoice = voz;
+    if (!selectedVoice) {
+      const voices = window.speechSynthesis.getVoices();
+      const vocesEs = voices.filter(v => v.lang.startsWith('es'));
+      if (vocesEs.length > 0) {
+        selectedVoice = [...vocesEs].sort((a, b) => {
+          let scoreA = a.lang === 'es-AR' ? 50 : (a.lang === 'es-419' ? 20 : 0);
+          let scoreB = b.lang === 'es-AR' ? 50 : (b.lang === 'es-419' ? 20 : 0);
+          return scoreB - scoreA;
+        })[0];
+      }
+    }
 
-    if (voz) { utterance.voice = voz; utterance.lang = voz.lang; }
-    else { utterance.lang = 'es-419'; }
+    if (selectedVoice) { 
+      utterance.voice = selectedVoice; 
+      utterance.lang = selectedVoice.lang; 
+    } else { 
+      utterance.lang = 'es-419'; 
+    }
 
-    // Si no hay voz masculina real disponible, forzar pitch muy bajo
-    // para masculinizar la voz femenina lo más posible (0.1 = mínimo de la API)
-    const pitchBase = tieneMasculina ? 0 : -0.5; // offset extra si es femenina
+    const tieneMasculina = selectedVoice ? !esFemenina(selectedVoice) : false;
+
+    // Si es una voz masculina real, usamos pitch nativo (1.02 para más energía deportiva).
+    // Si la voz de respaldo seleccionada es femenina, bajamos el pitch a 0.72 para que suene como un hombre (voz gruesa/barítona de comentarista).
+    const pitchBase = tieneMasculina ? 1.02 : 0.72;
 
     if (tipo === 'gol') {
-      utterance.rate   = 1.18;
-      utterance.pitch  = Math.max(0.1, 0.88 + pitchBase);
+      utterance.rate   = 1.15; // Velocidad con energía deportiva
+      utterance.pitch  = pitchBase;
       utterance.volume = 1.0;
     } else if (tipo === 'atajada') {
-      utterance.rate   = 1.10;
-      utterance.pitch  = Math.max(0.1, 0.82 + pitchBase);
+      utterance.rate   = 1.08;
+      utterance.pitch  = pitchBase;
       utterance.volume = 1.0;
     } else {
-      utterance.rate   = 1.02;
-      utterance.pitch  = Math.max(0.1, 0.72 + pitchBase);
+      utterance.rate   = 1.0;
+      utterance.pitch  = pitchBase;
       utterance.volume = 1.0;
     }
 
-    setTimeout(() => { try { window.speechSynthesis.speak(utterance); } catch(e) {} }, 60);
+    // Un timeout mínimo de 30ms para dar tiempo a la cancelación e iniciar el relato instantáneamente sin retrasos
+    setTimeout(() => { try { window.speechSynthesis.speak(utterance); } catch(e) {} }, 30);
   }
 
   // ── RACHA DE GOLES ──
@@ -12580,13 +12643,52 @@
       scorer = cpuTirador || MUNDIAL_JUGADORES[0];
     }
 
-    const phrases = [
-      `¡Gol de ${scorer.nombre}! ¡Gol! ¡Gol! ¡Es un golazo espectacular de otro partido! ¡Sen-sa-cio-nal!`,
-      `¡Pero qué golazo de ${scorer.nombre}! ¡Extraordinario! ¡Impresionante!`,
-      `¡Gol de ${scorer.nombre}! ¡Cantalo, cantalo, cantalo, cantalo!`,
-      `¡Es una bestia ${scorer.nombre}, señoras y señores! ¡Imparable! ¡Golazo!`,
-      `¡Espectacular remate de ${scorer.nombre}! ¡Gol!`
-    ];
+    let phrases = [];
+    if (pelota.hitPostThisShot) {
+      phrases = [
+        `¡Gooooool! ¡Gooooool! ¡Palo y adentro, señoras y señores! ¡Es un golazo dramático de ${scorer.nombre}! ¡El poste ayudó al goleador!`,
+        `¡Golazo de ${scorer.nombre}! ¡Dio en el palo y se metió al fondo de la red! ¡Cantalo, cantalo, cantalo! ¡Sen-sa-cio-nal!`,
+        `¡Gooooool de ${scorer.nombre}! ¡La pelota pegó en el poste y entró! ¡La suerte del campeón, señoras y señores!`
+      ];
+    } else if (scorer.id === 'maradonuts') {
+      phrases = [
+        `¡Gooooool! ¡Gooooool de Maradonuts! ¡Es el Diego, de pie señoras y señores! ¡Cantalo, cantalo, cantalo! ¡Es el genio del fútbol mundial, ta-ta-ta-ta-ta, gooooool!`,
+        `¡Golazo de Maradonuts! ¡La pelusa nos regala una obra de arte, señoras y señores! ¡Sen-sa-cio-nal!`,
+        `¡Maradonuts! ¡Pero qué golazo, por favoooor! ¡Sencillamente magistral, de otro planeta!`
+      ];
+    } else if (scorer.id === 'zazu') {
+      phrases = [
+        `¡Gooooool! ¡Zazu! ¡La clavó de tres dedos en un ángulo! ¡Qué elegancia, qué plasticidad! ¡Sen-sa-cio-nal!`,
+        `¡Golazo de Zazu! ¡Le pegó con un guante de seda, señoras y señores! ¡Impresionante!`,
+        `¡Zazu, golazo magistral! ¡Cantalo, cantalo, cantalo! ¡Absolutamente extraordinario!`
+      ];
+    } else if (scorer.id === 'orey') {
+      phrases = [
+        `¡Gooooool! ¡Orey, orey, orey! ¡El rey del fútbol la mandó a guardar con una clase infinita! ¡Imparable!`,
+        `¡Pero qué golazo de Orey! ¡Un remate colosal de leyenda, señoras y señores! ¡Cantalo, cantalo!`,
+        `¡Orey! ¡Sencillamente magnífico, de otra galaxia, señoras y señores!`
+      ];
+    } else if (scorer.id === 'hajalan') {
+      phrases = [
+        `¡Gooooool de Noruega! ¡Hajalan, el androide de la red! ¡Qué bestia, qué animal del área! ¡Rompió el arco!`,
+        `¡Golazo de Hajalan! ¡Le pegó un cañonazo de fuego que venció las manos del arquero! ¡Bestial!`,
+        `¡Monstruoso Hajalan! ¡Imparable, señoras y señores! ¡Cantalo, cantalo, cantalo!`
+      ];
+    } else if (scorer.id === 'mesias') {
+      phrases = [
+        `¡Gooooool! ¡Gooooool de El Mesías! ¡La acarició con zurda mágica, señoras y señores! ¡Sen-sa-cio-nal!`,
+        `¡Pero qué golazo de El Mesías! ¡Es el genio del fútbol moderno, de pie señoras y señores!`,
+        `¡El Mesías lo hizo de nuevo! ¡Un tiro libre colosal, majestuoso, extraordinario!`
+      ];
+    } else {
+      phrases = [
+        `¡Gooooool! ¡Gooooool de ${scorer.nombre}! ¡Es un golazo espectacular de otro partido! ¡Sen-sa-cio-nal!`,
+        `¡Pero qué golazo de ${scorer.nombre}! ¡Extraordinario! ¡Impresionante! ¡De pie señoras y señores!`,
+        `¡Gol de ${scorer.nombre}! ¡Cantalo, cantalo, cantalo, cantalo!`,
+        `¡Es una bestia ${scorer.nombre}, señoras y señores! ¡Imparable! ¡Golazo!`,
+        `¡Espectacular remate de ${scorer.nombre}! ¡Gol!`
+      ];
+    }
     const textToSpeak = phrases[Math.floor(Math.random() * phrases.length)];
     
     // Mostrar siempre visualmente
@@ -12605,10 +12707,10 @@
     let phrases = [];
     if (gName.includes('Dibu')) {
       phrases = [
-        `¡Atajó el Dibu! ¡Le tapó el remate a ${scorer.nombre}!`,
-        `¡Grande Dibu! ¡Se hizo gigante ante el tiro de ${scorer.nombre}!`,
-        `¡Sensacional el Dibu Martínez! ¡La pelota de ${scorer.nombre} no entra!`,
-        `¡Increíble tapada del Dibu a ${scorer.nombre}! ¡No se puede creer lo que acaba de sacar!`
+        `¡Atajó el Dibu! ¡Le tapó el remate a ${scorer.nombre}! ¡Y mirá cómo te baila, mirá cómo te baila, jajajajaja! ¡Se ríe a carcajadas!`,
+        `¡Grande Dibu! ¡Se hizo gigante ante el tiro de ${scorer.nombre}! ¡Le mete un baile burlón en la cara, jajaja!`,
+        `¡Sensacional el Dibu Martínez! ¡La pelota de ${scorer.nombre} no entra! ¡Te hace burla con meneo de caderas!`,
+        `¡Increíble tapada del Dibu a ${scorer.nombre}! ¡No se puede creer lo que acaba de sacar! ¡Y se le caga de risa, jajajaja!`
       ];
     } else {
       phrases = [
@@ -12636,19 +12738,36 @@
     const gNameShort = (arqueroJugador && arqueroJugador.nombre.includes('Dibu')) ? 'el Dibu' : ((arqueroJugador && arqueroJugador.nombre) ? arqueroJugador.nombre : 'el arquero');
     let phrases;
     if (pelota.hitPostThisShot) {
-      phrases = [
-        `¡Y la pelota termina yéndose afuera después de pegar en el palo! ¡Increíble!`,
-        `¡Mala suerte! ¡Dio en el poste y se fue desviada!`,
-        `¡No quiere entrar! ¡Pegó en el caño y salió despedida!`,
-        `¡Quedó latiendo el arco de la vibración! ¡Se salvó ${gNameShort} tras el rebote!`
-      ];
+      if (gNameShort.includes('Dibu')) {
+        phrases = [
+          `¡Estalló el poste! ¡Sonó el metal y la pelota se va desviada! ¡El Dibu Martínez le baila de burla y se le caga de risa, jajajajaja!`,
+          `¡Mala suerte para ${scorer.nombre}! ¡Dio en el caño de metal y afuera! ¡Mirá cómo le festeja el Dibu!`,
+          `¡No quiere entrar! ¡Pegó en el caño y salió despedida! ¡El Dibu se mata de risa!`
+        ];
+      } else {
+        phrases = [
+          `¡Y la pelota termina yéndose afuera después de pegar en el palo! ¡Increíble!`,
+          `¡Mala suerte! ¡Dio en el poste y se fue desviada!`,
+          `¡No quiere entrar! ¡Pegó en el caño y salió despedida!`,
+          `¡Quedó latiendo el arco de la vibración! ¡Se salvó ${gNameShort} tras el rebote!`
+        ];
+      }
     } else {
-      phrases = [
-        `¡Afueraaa! ¡Completamente afuera de ${scorer.nombre}! ¡Se la regaló a la tribuna!`,
-        `¡La tiró a cualquier lado ${scorer.nombre}! ¡Desviadísimo, no se puede creer!`,
-        `¡Le erró al arco ${scorer.nombre}! ¡Afuera, afuera, afuera!`,
-        `¡La mandó al córner de la tribuna ${scorer.nombre}! ¡Qué remate tan desviado!`
-      ];
+      if (gNameShort.includes('Dibu')) {
+        phrases = [
+          `¡Afueraaa! ¡Afuera, afuera, afuera! ¡La mandó a la tribuna ${scorer.nombre}! ¡Y el Dibu Martínez le baila en la cara a pura carcajada, jajajajaja!`,
+          `¡La tiró a cualquier lado ${scorer.nombre}! ¡Desviadísimo! ¡Mirá al Dibu cómo le mueve los hombros burlándose, jajaja!`,
+          `¡Le erró al arco ${scorer.nombre}! ¡Afuera! ¡Y el Dibu Martínez se descontrola bailando burla!`,
+          `¡La mandó al córner de la tribuna ${scorer.nombre}! ¡Qué remate tan horrible! ¡El Dibu le hace burla y se ríe a carcajadas!`
+        ];
+      } else {
+        phrases = [
+          `¡Afueraaa! ¡Completamente afuera de ${scorer.nombre}! ¡Se la regaló a la tribuna!`,
+          `¡La tiró a cualquier lado ${scorer.nombre}! ¡Desviadísimo, no se puede creer!`,
+          `¡Le erró al arco ${scorer.nombre}! ¡Afuera, afuera, afuera!`,
+          `¡La mandó al córner de la tribuna ${scorer.nombre}! ¡Qué remate tan desviado!`
+        ];
+      }
     }
     const textToSpeak = phrases[Math.floor(Math.random() * phrases.length)];
     
@@ -12879,7 +12998,7 @@
         // La CPU patea con el rival actual del torneo de penales
         const rivalActual = (penalesRivalsQueue.length > 0 && penalesRivalIdx < penalesRivalsQueue.length) ? penalesRivalsQueue[penalesRivalIdx] : null;
         cpuTirador = rivalActual || MUNDIAL_JUGADORES[0];
-        const isCpuLeft = ['mesias', 'yamalisimo', 'maradonuts', 'hajalan'].includes(cpuTirador.id);
+        const isCpuLeft = ['mesias', 'yamalisimo', 'maradonuts', 'hajalan', 'lakaka'].includes(cpuTirador.id);
         playerX = isCpuLeft ? 218 : 150;
         playerY = 242;
         penalesCPUPreparando = true;
@@ -12890,7 +13009,7 @@
         // Forzar buzo rojo/naranja neón para diferenciar al arquero del usuario
         arqueroJugador.jersey = ['#ef4444', '#ef4444'];
       } else {
-        const isLeftFooted = ['mesias', 'yamalisimo', 'maradonuts', 'hajalan'].includes(selectedPlayer.id);
+        const isLeftFooted = ['mesias', 'yamalisimo', 'maradonuts', 'hajalan', 'lakaka'].includes(selectedPlayer.id);
         playerX = isLeftFooted ? 218 : 150;
         playerY = 242;
         penalesCPUPreparando = false;
@@ -12906,7 +13025,7 @@
       const otros = MUNDIAL_JUGADORES.filter(p => p.id !== selectedPlayer.id);
       defensorJugador = otros[Math.floor(Math.random() * otros.length)];
 
-      const isLeftFooted = ['mesias', 'yamalisimo', 'maradonuts', 'hajalan'].includes(selectedPlayer.id);
+      const isLeftFooted = ['mesias', 'yamalisimo', 'maradonuts', 'hajalan', 'lakaka'].includes(selectedPlayer.id);
       playerX = isLeftFooted ? 218 : 150;
       playerY = 242;
       kickTimer = 0;
@@ -13854,24 +13973,38 @@
       // Ocultar estadio
       document.getElementById('mundial-estadio').style.display = 'none';
       
-      if (penalesVictoria) {
-        // Guardar marcador y avanzar (solo si no fue ya procesado, ej. empate de grupos)
+      const esFaseGrupos = torneoPenales && torneoPenales.active && torneoPenales.fase === 'grupos';
+      
+      if (esFaseGrupos) {
+        // En fase de grupos, ganar o perder da igual para la navegación: ¡siempre avanzamos al siguiente partido!
         if (!_torneoYaAvanzado) {
           avanzarRondaTorneo(penalesGolesFavor, penalesGolesContra);
         }
         _torneoYaAvanzado = false;
         
-        if (torneoPenales.winner) {
-          // Ganó el torneo (la gran final)!
-          mostrarCeremoniaFinalCampeon();
-        } else {
-          // Avanza a la siguiente ronda
-          mostrarBracketTorneoScreen(false);
-        }
+        // Se le pasa false a mostrarBracketTorneoScreen para indicar que no hay "modo derrota/reintentar" en fase de grupos
+        mostrarBracketTorneoScreen(false);
       } else {
-        _torneoYaAvanzado = false;
-        // Perdió el partido: mostrar el bracket pero en modo derrota (con reintentar activo)
-        mostrarBracketTorneoScreen(true);
+        // Fase eliminatoria directa (Cuartos, Semis, Final)
+        if (penalesVictoria) {
+          // Guardar marcador y avanzar
+          if (!_torneoYaAvanzado) {
+            avanzarRondaTorneo(penalesGolesFavor, penalesGolesContra);
+          }
+          _torneoYaAvanzado = false;
+          
+          if (torneoPenales.winner) {
+            // Ganó el torneo (la gran final)!
+            mostrarCeremoniaFinalCampeon();
+          } else {
+            // Avanza a la siguiente ronda
+            mostrarBracketTorneoScreen(false);
+          }
+        } else {
+          _torneoYaAvanzado = false;
+          // Perdió el partido en fase eliminatoria: se le pasa true para activar el modo derrota (con reintentar activo)
+          mostrarBracketTorneoScreen(true);
+        }
       }
       return;
     }
@@ -14073,8 +14206,8 @@
       }
     }
     
-    // Mirroring horizontal para perfil zurdo de El Mesías y Yamalísimo
-    const isLeftFooted = !isGoalie && (player.id === 'mesias' || player.id === 'yamalisimo');
+    // Mirroring horizontal para perfil zurdo de El Mesías, Yamalísimo, Maradonuts, Hajalan y Lakaka
+    const isLeftFooted = !isGoalie && ['mesias', 'yamalisimo', 'maradonuts', 'hajalan', 'lakaka'].includes(player.id);
     if (isLeftFooted) {
       ctx.scale(-1, 1);
     }
@@ -14482,6 +14615,41 @@
       ctx.moveTo(-6, -1); ctx.lineTo(-4, -4); ctx.lineTo(-2, -1);
       ctx.moveTo(2, -1); ctx.lineTo(4, -4); ctx.lineTo(6, -1);
       ctx.stroke();
+    } else if (isGoalie && pelota.status === 'gol') {
+      // Ojos enojados y llorando desconsolados (> <) con lágrimas animadas cayendo
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      
+      // Ojo izquierdo (>)
+      ctx.beginPath();
+      ctx.moveTo(-7, -4); ctx.lineTo(-3, -2); ctx.lineTo(-7, 0);
+      ctx.stroke();
+      
+      // Ojo derecho (<)
+      ctx.beginPath();
+      ctx.moveTo(7, -4); ctx.lineTo(3, -2); ctx.lineTo(7, 0);
+      ctx.stroke();
+      
+      // Cejas rojas super enojadas inclinadas hacia el centro
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(-8, -6); ctx.lineTo(-2, -3);
+      ctx.moveTo(8, -6); ctx.lineTo(2, -3);
+      ctx.stroke();
+
+      // Lágrimas animadas cayendo de los ojos en color azul brillante/neón
+      ctx.fillStyle = '#38bdf8';
+      const tearY1 = (Date.now() * 0.008) % 12;
+      ctx.beginPath();
+      ctx.arc(-5, 0 + tearY1, 2, 0, Math.PI * 2);
+      ctx.fill();
+      
+      const tearY2 = ((Date.now() * 0.008) + 6) % 12;
+      ctx.beginPath();
+      ctx.arc(5, 0 + tearY2, 2, 0, Math.PI * 2);
+      ctx.fill();
     } else {
       // Ojos concentrados
       ctx.fillStyle = '#ffffff';
@@ -14550,12 +14718,20 @@
       ctx.stroke();
     }
 
-    // 6. BOCA SONRIENTE O ARQUERO CON GUANTES
+    // 6. BOCA SONRIENTE O ARQUERO CON GUANTES O BOCA TRISTE/LLORANDO
     ctx.strokeStyle = '#000000';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.arc(0, 5, 3, 0, Math.PI);
-    ctx.stroke();
+    if (isGoalie && pelota.status === 'gol') {
+      // Boca abierta triste de llanto desconsolado (un círculo/elipse de grito)
+      ctx.fillStyle = '#7f1d1d';
+      ctx.arc(0, 6, 3.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    } else {
+      ctx.arc(0, 5, 3, 0, Math.PI);
+      ctx.stroke();
+    }
 
     // Bigote (si corresponde)
     if (player.beard && player.beardType === 'bigote') {
@@ -14647,6 +14823,39 @@
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('¡JAJAJA! 😂', 0, -29);
+      ctx.restore();
+    }
+
+    // ¡La burbuja de diálogo enojado/llorando si le hicieron un gol!
+    if (isGoalie && pelota.isSettled && pelota.status === 'gol') {
+      ctx.save();
+      // Dibujar globo de diálogo rojo pastel de alerta/rabia
+      ctx.fillStyle = '#f87171';
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 1.2;
+      
+      // Dibujar rectángulo redondeado arriba de su cabeza
+      ctx.beginPath();
+      ctx.roundRect(-24, -36, 48, 14, 3);
+      ctx.fill();
+      ctx.stroke();
+      
+      // Triangulito indicador apuntando hacia abajo
+      ctx.fillStyle = '#f87171';
+      ctx.beginPath();
+      ctx.moveTo(-4, -22);
+      ctx.lineTo(4, -22);
+      ctx.lineTo(0, -18);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      
+      // Texto de enojo/llanto
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 8px system-ui, -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('¡NOOO! 😭🤬', 0, -29);
       ctx.restore();
     }
 
@@ -15539,37 +15748,46 @@
     // ══════════════════════════════════════════════
     
     // Sombra proyectada de la red en el suelo (perspectiva)
-    const netShadow = ctx.createLinearGradient(GOAL_LEFT, GOAL_Y, GOAL_LEFT, GOAL_Y + 55);
-    netShadow.addColorStop(0, 'rgba(0, 0, 0, 0.65)');
-    netShadow.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    ctx.fillStyle = netShadow;
-    ctx.fillRect(GOAL_LEFT, GOAL_Y, GOAL_RIGHT - GOAL_LEFT, 55);
-
-    // Red — interior profundo con mejor profundidad
-    const netDepth = ctx.createLinearGradient(200, GOAL_Y, 200, GOAL_Y + 52);
-    netDepth.addColorStop(0, 'rgba(0, 35, 12, 0.95)');
-    netDepth.addColorStop(0.5, 'rgba(0, 20, 8, 0.80)');
-    netDepth.addColorStop(1, 'rgba(0, 10, 4, 0.55)');
-    ctx.fillStyle = netDepth;
-    ctx.fillRect(GOAL_LEFT + 2, GOAL_Y, GOAL_RIGHT - GOAL_LEFT - 4, 52);
-
-    // Toque de luz verde en el interior de la red (reflejo del césped)
-    const netGrassReflect = ctx.createLinearGradient(GOAL_LEFT, GOAL_Y + 20, GOAL_RIGHT, GOAL_Y + 52);
-    netGrassReflect.addColorStop(0, 'rgba(20, 80, 30, 0.15)');
-    netGrassReflect.addColorStop(0.5, 'rgba(30, 100, 40, 0.10)');
-    netGrassReflect.addColorStop(1, 'rgba(20, 80, 30, 0.15)');
-    ctx.fillStyle = netGrassReflect;
-    ctx.fillRect(GOAL_LEFT + 2, GOAL_Y + 22, GOAL_RIGHT - GOAL_LEFT - 4, 30);
-
-    // ── ONDA DE IMPACTO EN LA RED (cuando la pelota entra) ──
     const netW = GOAL_RIGHT - GOAL_LEFT;
     const hasWave = netWaveTimer > 0;
     const waveAge = 55 - netWaveTimer; // 0 = recién impactó, 55 = ya se desvanece
     const waveStrength = hasWave ? Math.max(0, 1 - waveAge / 55) : 0;
-    const waveRadius = hasWave ? waveAge * 4.5 : 0;
+    
+    // El radio de la onda empieza grande al impactar y se expande
+    const waveRadius = hasWave ? (waveAge + 12) * 5.0 : 0;
 
-    // Líneas verticales de la red con deformación de onda
-    ctx.lineWidth = 0.9;
+    // Multiplicador de temblor según la racha de goles (Súper Poder hace temblar la red con violencia salvaje)
+    const powerMult = rachaActual >= 3 ? 1.75 : (rachaActual === 2 ? 1.35 : 1.0);
+
+    // Temblor/vibración física oscilatoria 2D para todo el cuerpo de la red (efecto elástico)
+    const netShakeX = hasWave ? Math.sin(waveAge * 1.5) * waveStrength * 10.0 * powerMult : 0;
+    const netShakeY = hasWave ? Math.cos(waveAge * 1.9) * waveStrength * 6.5 * powerMult : 0;
+
+    // Sombra proyectada con oscilación
+    const netShadow = ctx.createLinearGradient(GOAL_LEFT, GOAL_Y, GOAL_LEFT, GOAL_Y + 55);
+    netShadow.addColorStop(0, 'rgba(0, 0, 0, 0.65)');
+    netShadow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = netShadow;
+    ctx.fillRect(GOAL_LEFT + netShakeX * 0.4, GOAL_Y, GOAL_RIGHT - GOAL_LEFT, 55 + netShakeY * 0.3);
+
+    // Red — interior profundo con mejor profundidad y temblor
+    const netDepth = ctx.createLinearGradient(200, GOAL_Y + netShakeY, 200, GOAL_Y + 52 + netShakeY);
+    netDepth.addColorStop(0, 'rgba(0, 35, 12, 0.95)');
+    netDepth.addColorStop(0.5, 'rgba(0, 20, 8, 0.80)');
+    netDepth.addColorStop(1, 'rgba(0, 10, 4, 0.55)');
+    ctx.fillStyle = netDepth;
+    ctx.fillRect(GOAL_LEFT + 2 + netShakeX, GOAL_Y + netShakeY, GOAL_RIGHT - GOAL_LEFT - 4, 52);
+
+    // Toque de luz verde en el interior de la red (reflejo del césped) con temblor
+    const netGrassReflect = ctx.createLinearGradient(GOAL_LEFT + netShakeX, GOAL_Y + 20 + netShakeY, GOAL_RIGHT + netShakeX, GOAL_Y + 52 + netShakeY);
+    netGrassReflect.addColorStop(0, 'rgba(20, 80, 30, 0.15)');
+    netGrassReflect.addColorStop(0.5, 'rgba(30, 100, 40, 0.10)');
+    netGrassReflect.addColorStop(1, 'rgba(20, 80, 30, 0.15)');
+    ctx.fillStyle = netGrassReflect;
+    ctx.fillRect(GOAL_LEFT + 2 + netShakeX, GOAL_Y + 22 + netShakeY, GOAL_RIGHT - GOAL_LEFT - 4, 30);
+
+    // Líneas verticales de la red con deformación de onda y temblor general
+    ctx.lineWidth = 0.95;
     const netLines = Math.ceil(netW / 5); // más densa: cada 5px
     for (let i = 0; i <= netLines; i++) {
       const progress = i / netLines;
@@ -15581,22 +15799,22 @@
       if (hasWave && waveStrength > 0) {
         const distFromImpact = Math.abs(topX - netWaveX);
         const wavePush = Math.max(0, waveRadius - distFromImpact) / (waveRadius + 1);
-        waveOffsetX = wavePush * waveStrength * 6 * Math.sin(waveAge * 0.4);
-        waveOffsetMid = wavePush * waveStrength * 10 * Math.sin(waveAge * 0.35 + 0.5);
+        waveOffsetX = wavePush * waveStrength * 10 * Math.sin(waveAge * 0.48) * powerMult;
+        waveOffsetMid = wavePush * waveStrength * 17 * Math.sin(waveAge * 0.42 + 0.5) * powerMult;
       }
 
       const alpha = 0.38 - progress * 0.08;
       ctx.strokeStyle = `rgba(235, 255, 235, ${Math.max(0.10, alpha)})`;
       ctx.beginPath();
-      ctx.moveTo(topX + waveOffsetX, GOAL_Y);
+      ctx.moveTo(topX + waveOffsetX + netShakeX, GOAL_Y);
       ctx.quadraticCurveTo(
-        (topX + botX) / 2 + waveOffsetMid, GOAL_Y + 26,
-        botX + waveOffsetX * 0.4, GOAL_Y + 52
+        (topX + botX) / 2 + waveOffsetMid + netShakeX * 1.15, GOAL_Y + 26 + netShakeY,
+        botX + waveOffsetX * 0.4 + netShakeX * 0.75, GOAL_Y + 52 + netShakeY
       );
       ctx.stroke();
     }
 
-    // Líneas horizontales de la red con deformación
+    // Líneas horizontales de la red con deformación y temblor general
     const netRows = 11; // más filas
     for (let j = 0; j <= netRows; j++) {
       const t = j / netRows;
@@ -15610,40 +15828,42 @@
       if (hasWave && waveStrength > 0) {
         const distFromImpactY = Math.abs(rowY - netWaveY);
         const wavePushY = Math.max(0, waveRadius - distFromImpactY) / (waveRadius + 1);
-        waveRowOffset = wavePushY * waveStrength * 5 * Math.sin(waveAge * 0.3 + j * 0.4);
+        waveRowOffset = wavePushY * waveStrength * 7.5 * Math.sin(waveAge * 0.35 + j * 0.4) * powerMult;
       }
 
       const rowAlpha = 0.28 - t * 0.06;
       ctx.strokeStyle = `rgba(235, 255, 235, ${Math.max(0.08, rowAlpha)})`;
       ctx.lineWidth = 0.75;
       ctx.beginPath();
-      ctx.moveTo(lx, rowY + waveRowOffset);
-      ctx.lineTo(rx, rowY + waveRowOffset);
+      ctx.moveTo(lx + netShakeX, rowY + waveRowOffset + netShakeY);
+      ctx.lineTo(rx + netShakeX, rowY + waveRowOffset + netShakeY);
       ctx.stroke();
     }
 
-    // ── DESTELLO DE IMPACTO en la red (flash cuando entra la pelota) ──
+    // ── DESTELLO DE IMPACTO en la red (flash vibrando con la red) ──
     if (hasWave && waveAge < 22) {
+      const fx = netWaveX + netShakeX;
+      const fy = netWaveY + netShakeY;
       const flashAlpha = Math.max(0, (22 - waveAge) / 22) * 0.70;
-      const flashGrad = ctx.createRadialGradient(netWaveX, netWaveY, 0, netWaveX, netWaveY, 38);
+      const flashGrad = ctx.createRadialGradient(fx, fy, 0, fx, fy, 38);
       flashGrad.addColorStop(0, `rgba(220, 255, 220, ${flashAlpha})`);
       flashGrad.addColorStop(0.3, `rgba(120, 255, 140, ${flashAlpha * 0.7})`);
       flashGrad.addColorStop(0.6, `rgba(60, 220, 100, ${flashAlpha * 0.4})`);
       flashGrad.addColorStop(1, 'rgba(0, 180, 80, 0)');
       ctx.fillStyle = flashGrad;
       ctx.beginPath();
-      ctx.arc(netWaveX, netWaveY, 38, 0, Math.PI * 2);
+      ctx.arc(fx, fy, 38, 0, Math.PI * 2);
       ctx.fill();
       
       // Anillo de expansión secundario
       if (waveAge > 5) {
         const ring2Alpha = Math.max(0, (22 - waveAge) / 22) * 0.3;
-        const ring2Grad = ctx.createRadialGradient(netWaveX, netWaveY, waveAge * 1.5, netWaveX, netWaveY, waveAge * 2.5);
+        const ring2Grad = ctx.createRadialGradient(fx, fy, waveAge * 1.5, fx, fy, waveAge * 2.5);
         ring2Grad.addColorStop(0, `rgba(80, 255, 120, ${ring2Alpha})`);
         ring2Grad.addColorStop(1, 'rgba(0, 200, 80, 0)');
         ctx.fillStyle = ring2Grad;
         ctx.beginPath();
-        ctx.arc(netWaveX, netWaveY, waveAge * 2.5, 0, Math.PI * 2);
+        ctx.arc(fx, fy, waveAge * 2.5, 0, Math.PI * 2);
         ctx.fill();
       }
     }
@@ -16103,7 +16323,7 @@
     if (gameMode === 'penales' && penalesTurno === 'defensa') {
       tiradorADibujar = cpuTirador || selectedPlayer;
     }
-    const isLeftFooted = ['mesias', 'yamalisimo', 'maradonuts', 'hajalan'].includes(tiradorADibujar.id);
+    const isLeftFooted = ['mesias', 'yamalisimo', 'maradonuts', 'hajalan', 'lakaka'].includes(tiradorADibujar.id);
     let finalPlayerX = playerX;
     if (isAiming) {
       const adx = aimStart.x - aimCurrent.x;
@@ -16612,7 +16832,6 @@
     // ══════════════════════════════════════════════
     if (bannerTxt && bannerTimer > 0) {
       bannerTimer--;
-      if (netWaveTimer > 0) netWaveTimer--;
       const isGol = bannerTxt.includes('GOL');
       const isPalo = bannerTxt.includes('PALO');
       const isDibu = bannerTxt.includes('DIBU');
