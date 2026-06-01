@@ -1,6 +1,6 @@
 // ── NEXOS SERVICE WORKER ─────────────────────────────────
 // ⚠️ Cambiar este número CADA VEZ que subas un HTML nuevo
-const CACHE_NAME = 'nexos-v1.21';
+const CACHE_NAME = 'nexos-v1.22';
 
 const ARCHIVOS = [
   './nexos_panico.html',
