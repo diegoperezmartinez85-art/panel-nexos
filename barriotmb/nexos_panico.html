@@ -30,7 +30,7 @@
       min-height: 100%;
     }
     body {
-      background: radial-gradient(ellipse at 30% 20%, #1a0505 0%, #0f0f11 40%, #070709 100%);
+      background: radial-gradient(ellipse at 25% 15%, #200808 0%, #130505 25%, #0f0f11 50%, #070709 100%);
       color: #f4f4f5;
       font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       min-height: 100dvh;
@@ -57,41 +57,51 @@
     .glow-sphere {
       position: absolute;
       border-radius: 50%;
-      filter: blur(90px);
-      opacity: 0.12;
+      filter: blur(80px);
+      opacity: 0.18;
       will-change: transform, opacity;
       animation: drift 25s infinite ease-in-out;
     }
     .sphere-1 {
-      width: 380px;
-      height: 380px;
-      background: radial-gradient(circle, #ef4444 0%, #b91c1c 60%, transparent 100%);
-      top: -15%;
-      left: -20%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, #ff3333 0%, #ef4444 30%, #b91c1c 60%, transparent 100%);
+      top: -20%;
+      left: -25%;
       animation-duration: 22s;
     }
     .sphere-2 {
-      width: 420px;
-      height: 420px;
-      background: radial-gradient(circle, #06b6d4 0%, #0284c7 60%, transparent 100%);
-      bottom: -15%;
-      right: -20%;
+      width: 550px;
+      height: 550px;
+      background: radial-gradient(circle, #22d3ee 0%, #06b6d4 30%, #0284c7 60%, transparent 100%);
+      bottom: -20%;
+      right: -25%;
       animation-duration: 28s;
       animation-delay: -5s;
     }
     .sphere-3 {
-      width: 250px;
-      height: 250px;
-      background: radial-gradient(circle, #8b5cf6 0%, #6d28d9 60%, transparent 100%);
-      top: 40%;
-      left: 30%;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, #a78bfa 0%, #8b5cf6 35%, #6d28d9 65%, transparent 100%);
+      top: 38%;
+      left: 28%;
       animation-duration: 35s;
       animation-delay: -12s;
     }
+    .sphere-4 {
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, #f97316 0%, #ea580c 50%, transparent 100%);
+      top: 15%;
+      right: 10%;
+      animation-duration: 30s;
+      animation-delay: -8s;
+      opacity: 0.10;
+    }
     @keyframes drift {
-      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.12; }
-      33% { transform: translate(40px, -30px) scale(1.15); opacity: 0.18; }
-      66% { transform: translate(-30px, 40px) scale(0.9); opacity: 0.10; }
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.18; }
+      33% { transform: translate(40px, -30px) scale(1.15); opacity: 0.25; }
+      66% { transform: translate(-30px, 40px) scale(0.9); opacity: 0.14; }
     }
 
     /* ── GRAIN TEXTURE OVERLAY ── */
@@ -101,9 +111,9 @@
       inset: 0;
       z-index: 1;
       pointer-events: none;
-      opacity: 0.025;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 180px 180px;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 140px 140px;
     }
 
     /* ── SHIMMER EFFECT FOR BUTTONS ── */
@@ -172,15 +182,15 @@
       margin-bottom: 24px;
     }
     .form-box {
-      background: rgba(24, 24, 27, 0.6);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(20, 20, 24, 0.70);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.10);
       border-radius: 24px;
       padding: 32px 24px;
       margin-bottom: 24px;
       width: 100%;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
     }
     .campo {
       width: 100%;
@@ -331,17 +341,18 @@
       width: 190px;
       height: 190px;
       border-radius: 50%;
-      background: radial-gradient(circle at 40% 25%, #ff6b6b 0%, #ef4444 30%, #c81e1e 65%, #8b0f0f 90%, #5a0808 100%);
+      background: radial-gradient(circle at 38% 22%, #ff7070 0%, #f43f3f 15%, #dc2020 40%, #b81a1a 70%, #8b0f0f 88%, #5a0808 100%);
       border: none;
       color: white;
       cursor: pointer;
       transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       box-shadow: 
-        0 20px 50px rgba(0, 0, 0, 0.75),
-        0 8px 25px rgba(239, 68, 68, 0.5),
-        inset 0 8px 20px rgba(255, 255, 255, 0.55),
-        inset 0 -8px 20px rgba(0, 0, 0, 0.55),
-        inset 0 0 0 3px rgba(255,255,255,0.15);
+        0 22px 55px rgba(0, 0, 0, 0.80),
+        0 8px 28px rgba(239, 68, 68, 0.55),
+        0 2px 8px rgba(239, 68, 68, 0.35),
+        inset 0 10px 22px rgba(255, 255, 255, 0.60),
+        inset 0 -10px 22px rgba(0, 0, 0, 0.60),
+        inset 0 0 0 3px rgba(255,255,255,0.18);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -367,10 +378,10 @@
     }
     @keyframes neonRedPulse {
       0%, 100% {
-        box-shadow: 0 16px 45px rgba(0, 0, 0, 0.65), 0 0 25px rgba(239, 68, 68, 0.35), inset 0 6px 15px rgba(255, 255, 255, 0.45), inset 0 -6px 15px rgba(0, 0, 0, 0.45);
+        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.70), 0 0 28px rgba(239, 68, 68, 0.40), 0 0 8px rgba(239, 68, 68, 0.20), inset 0 8px 18px rgba(255, 255, 255, 0.50), inset 0 -8px 18px rgba(0, 0, 0, 0.50);
       }
       50% {
-        box-shadow: 0 16px 45px rgba(0, 0, 0, 0.65), 0 0 45px rgba(239, 68, 68, 0.65), 0 0 15px rgba(239, 68, 68, 0.30), inset 0 6px 15px rgba(255, 255, 255, 0.55), inset 0 -6px 15px rgba(0, 0, 0, 0.45);
+        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.70), 0 0 55px rgba(239, 68, 68, 0.75), 0 0 18px rgba(239, 68, 68, 0.40), 0 0 80px rgba(239, 68, 68, 0.20), inset 0 8px 18px rgba(255, 255, 255, 0.62), inset 0 -8px 18px rgba(0, 0, 0, 0.50);
       }
     }
     .liquid-fill {
@@ -2629,9 +2640,9 @@
     #mundial-estadio {
       flex: 1;
       min-height: 0;
-      gap: 10px;
+      gap: 6px;
       width: 100%;
-      max-width: min(98vw, 840px); /* Ampliado significativamente para pantallas grandes sin deformar el canvas */
+      max-width: min(100vw, 840px); /* Usa todo el ancho disponible */
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -2955,18 +2966,21 @@
 
     /* ── ONOMATOPEYA EN ESPACIOS NEGROS ── */
     .onomatopeya-overlay {
-      width: 100%;
-      max-width: min(98vw, 840px);
+      /* Flota encima del canvas sin ocupar espacio en el layout */
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 96;
       min-height: 54px;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
-      margin: 10px 0;
+      padding-top: 8px;
       opacity: 0;
       transform: translateY(-10px) scale(0.9);
       transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       pointer-events: none;
-      z-index: 95;
     }
     .onomatopeya-overlay.show {
       opacity: 1;
@@ -3022,13 +3036,17 @@
     }
 
     .canvas-wrapper {
-      width: 100%;
+      /* Rompe el padding lateral del contenedor para usar todo el ancho de pantalla */
+      width: calc(100% + 24px);
+      margin-left: -12px;
+      margin-right: -12px;
       aspect-ratio: 4 / 3;
-      margin: auto 0; /* Centra verticalmente el canvas si sobra espacio en pantallas altas */
+      margin-top: auto;
+      margin-bottom: auto;
       background: linear-gradient(180deg, #050e07 0%, #071510 100%);
       border: 1.5px solid rgba(255, 255, 255, 0.10);
       border-top: 1.5px solid rgba(255,255,255,0.18);
-      border-radius: 20px;
+      border-radius: 16px;
       overflow: hidden;
       position: relative;
       box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
@@ -3906,6 +3924,7 @@
   <div class="glow-sphere sphere-1"></div>
   <div class="glow-sphere sphere-2"></div>
   <div class="glow-sphere sphere-3"></div>
+  <div class="glow-sphere sphere-4"></div>
 </div>
 
 <div class="offline-badge" id="offline-badge">SIN CONEXIÓN</div>
@@ -4690,13 +4709,12 @@
       </div>
     </div>
 
-    <!-- Contenedor de la onomatopeya en los espacios negros -->
-    <div id="estadio-onomatopeya-overlay" class="onomatopeya-overlay">
-      <div id="onomatopeya-text" class="onomatopeya-text"></div>
-    </div>
-
     <!-- El estadio Canvas -->
     <div class="canvas-wrapper">
+      <!-- Onomatopeya flota sobre el canvas -->
+      <div id="estadio-onomatopeya-overlay" class="onomatopeya-overlay">
+        <div id="onomatopeya-text" class="onomatopeya-text"></div>
+      </div>
       <canvas id="canvas-futbol"></canvas>
       <div class="swipe-hint" id="swipe-hint">Arrastrá la pelota y soltá para chutar</div>
       <!-- Controles de defensa en penales -->
@@ -8369,6 +8387,10 @@
   let aimStart = { x: 0, y: 0 };
   let aimCurrent = { x: 0, y: 0 };
   let shakeIntensity = 0;
+  let netWaveTimer = 0;     // frames desde que la pelota entró a la red
+  let netWaveX = 200;       // X del impacto en la red
+  let netWaveY = 40;        // Y del impacto en la red
+  let pelotaSpin = 0;       // spin visual acumulado para curva
   let bannerTxt = '';
   let bannerTimer = 0;
   let infantinoCelebTimer = 0; // frames que Infantino festeja (solo goles del Mesías)
@@ -8664,43 +8686,85 @@
     } catch(e) {}
   }
 
-  function buscarVozHumana() {
+  // ── VOZ MASCULINA: lista de nombres de voces masculinas conocidas ──
+  const NOMBRES_VOZ_MASCULINA = [
+    'diego', 'damian', 'damián', 'jorge', 'hector', 'héctor',
+    'pablo', 'miguel', 'carlos', 'juan', 'antonio', 'andrés',
+    'andres', 'rodrigo', 'male', 'hombre', 'masculin', 'man'
+  ];
+
+  function buscarVozMasculina() {
     if (!('speechSynthesis' in window)) return null;
     const voices = window.speechSynthesis.getVoices();
-    if (voices.length === 0) return null;
-    
-    // Filtramos solo voces en español
+    if (!voices.length) return null;
+
     const vocesEs = voices.filter(v => v.lang.startsWith('es'));
-    if (vocesEs.length === 0) return null;
+    if (!vocesEs.length) return null;
 
-    // 1. Prioridad Absoluta: Buscar voces de Argentina ('es-AR') de alta fidelidad/neurales/Google/Diego
-    let match = vocesEs.find(v => v.lang === 'es-AR' && (
-      v.name.toLowerCase().includes('diego') || 
-      v.name.toLowerCase().includes('natural') || 
+    // 1. Voz masculina neural/online en español (máxima calidad)
+    for (const keyword of NOMBRES_VOZ_MASCULINA) {
+      const match = vocesEs.find(v => {
+        const n = v.name.toLowerCase();
+        return n.includes(keyword) && (
+          n.includes('neural') || n.includes('natural') ||
+          n.includes('google') || n.includes('online') ||
+          v.localService === false
+        );
+      });
+      if (match) return match;
+    }
+
+    // 2. Cualquier voz masculina en español
+    for (const keyword of NOMBRES_VOZ_MASCULINA) {
+      const match = vocesEs.find(v => v.name.toLowerCase().includes(keyword));
+      if (match) return match;
+    }
+
+    // 3. Mejor voz online/neural en español (aunque sea femenina, suena más natural)
+    const premium = vocesEs.find(v =>
       v.name.toLowerCase().includes('neural') ||
-      v.name.toLowerCase().includes('google') ||
-      v.name.toLowerCase().includes('online')
-    ));
-    if (match) return match;
-
-    // 2. Cualquier voz de Argentina (es-AR)
-    match = vocesEs.find(v => v.lang === 'es-AR');
-    if (match) return match;
-
-    // 3. Voces en español premium en iOS ('monica', 'paulina', 'jorge') o naturales de Google/Microsoft
-    match = vocesEs.find(v => 
-      v.name.toLowerCase().includes('natural') || 
-      v.name.toLowerCase().includes('neural') ||
-      v.name.toLowerCase().includes('google') ||
-      v.name.toLowerCase().includes('online') ||
-      v.name.toLowerCase().includes('monica') ||
-      v.name.toLowerCase().includes('paulina') ||
-      v.name.toLowerCase().includes('jorge')
+      v.name.toLowerCase().includes('natural') ||
+      v.localService === false
     );
-    if (match) return match;
+    if (premium) return premium;
 
-    // 4. Cualquier voz en español
-    return vocesEs[0];
+    // 4. Preferir es-AR, luego es-419, luego lo que haya
+    return vocesEs.find(v => v.lang === 'es-AR') ||
+           vocesEs.find(v => v.lang === 'es-419') ||
+           vocesEs[0];
+  }
+
+  // Mantener alias por si algo lo llama por el nombre viejo
+  function buscarVozHumana() { return buscarVozMasculina(); }
+
+  // ── MOTOR CENTRAL DE VOZ: Google TTS (natural) con fallback a Web Speech ──
+  let _relatoAudio = null;
+
+  function speakRelato(text) {
+    if (modoDiscreto) return;
+
+    // Cancelar relato anterior
+    if (_relatoAudio) { try { _relatoAudio.pause(); } catch(e) {} _relatoAudio = null; }
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+
+    // ── INTENTO 1: Google TTS — voz latina masculina, suena natural ──
+    const gttsUrl = 'https://translate.googleapis.com/translate_tts?ie=UTF-8' +
+      '&q=' + encodeURIComponent(text) +
+      '&tl=es-419&client=gtx&ttsspeed=0.92';
+    _relatoAudio = new Audio(gttsUrl);
+    _relatoAudio.volume = 1.0;
+    _relatoAudio.play().catch(() => {
+      // ── FALLBACK: Web Speech API con parámetros masculinos optimizados ──
+      if (!('speechSynthesis' in window)) return;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'es-AR';
+      const voz = buscarVozMasculina();
+      if (voz) { utterance.voice = voz; } else { utterance.lang = 'es'; }
+      utterance.rate   = 1.05;   // Cadencia natural de locutor deportivo
+      utterance.pitch  = 0.78;   // Tono grave = voz masculina
+      utterance.volume = 1.0;
+      setTimeout(() => { try { window.speechSynthesis.speak(utterance); } catch(e) {} }, 80);
+    });
   }
 
   // ── RACHA DE GOLES ──
@@ -8739,8 +8803,8 @@
 
   // Límites del arco (Arco más amplio y justo para mejores chances de gol!)
   const GOAL_Y = 60;
-  const GOAL_LEFT = 115; // Ensanchado de 122 a 115 (Ancho total: 170px de arco!)
-  const GOAL_RIGHT = 285; // Ensanchado de 278 a 285
+  const GOAL_LEFT = 105; // Ancho total: 190px de arco
+  const GOAL_RIGHT = 295;
 
   const LISTA_LOGROS = [
     { id: 'primer_gol', icon: '⚽', title: 'Bautismo de Red', desc: 'Marcá tu primer gol.' },
@@ -9237,14 +9301,39 @@
 
     // Barba candado chico (si corresponde, estilo Batifrutta o The Witch)
     if (player.beard && player.beardType === 'candado-chico') {
-      c.strokeStyle = player.beard;
-      c.lineWidth = 1.8;
-      c.beginPath();
-      c.arc(0, 5, 4.5, 0, Math.PI);
-      c.stroke();
-      
+      c.save();
       c.fillStyle = player.beard;
-      c.fillRect(-0.8, 5, 1.6, 4.2);
+      c.strokeStyle = player.beard;
+      c.lineCap = 'round';
+      c.lineJoin = 'round';
+
+      // ── BIGOTE (arco superior del candado) ──
+      c.beginPath();
+      c.moveTo(-6, 2.5);
+      c.bezierCurveTo(-4.5, -0.5, -1.5, 0, 0, 1.5);
+      c.bezierCurveTo(1.5, 0, 4.5, -0.5, 6, 2.5);
+      c.bezierCurveTo(4.5, 4.5, 1.5, 3.5, 0, 4);
+      c.bezierCurveTo(-1.5, 3.5, -4.5, 4.5, -6, 2.5);
+      c.closePath();
+      c.fill();
+
+      // ── LADOS DEL CANDADO (patillas laterales) ──
+      c.lineWidth = 2.2;
+      c.beginPath();
+      c.moveTo(-6, 3.5);
+      c.lineTo(-6, 10.5);
+      c.stroke();
+      c.beginPath();
+      c.moveTo(6, 3.5);
+      c.lineTo(6, 10.5);
+      c.stroke();
+
+      // ── PERILLA (cuerpo inferior del candado) ──
+      c.beginPath();
+      c.ellipse(0, 10.5, 5.8, 2.5, 0, 0, Math.PI * 2);
+      c.fill();
+
+      c.restore();
     }
 
     c.restore();
@@ -10301,7 +10390,7 @@
         cCtx.textBaseline = 'middle';
         cCtx.shadowColor = '#06b6d4';
         cCtx.shadowBlur = 5;
-        cCtx.fillText('🛡️ PATROCINADO POR NEXOS SEGURIDAD 🛡️', W * 0.5, pbY + pbH * 0.5);
+        cCtx.fillText('🏘️ NEXOS — SISTEMAS DE GESTIÓN DE BARRIOS CERRADOS 🏘️', W * 0.5, pbY + pbH * 0.5);
         cCtx.shadowBlur = 0;
         cCtx.restore();
         
@@ -11179,125 +11268,744 @@
     if (navBar) navBar.style.display = 'flex';
   };
 
+  // ══════════════════════════════════════════════════════════════
+  // CINEMÁTICA ANIME — CAMPEÓN MUNDIAL DE PENALES
+  // ══════════════════════════════════════════════════════════════
   window.mostrarCeremoniaFinalCampeon = function() {
     triggerHaptic('success');
-    
-    // Ocultar modal de game over
     document.getElementById('gameover-overlay').style.display = 'none';
-    
-    // Mostrar overlay del campeón mundial
-    const overlay = document.getElementById('penales-campeon-overlay');
-    if (overlay) overlay.style.display = 'flex';
-    
-    // Poner el nombre del cabezón triunfador
-    const nameEl = document.getElementById('campeon-jugador-nombre');
-    if (nameEl) nameEl.innerText = selectedPlayer.nombre.toUpperCase();
-    
-    // Renderizar avatar del campeón en su canvas
-    const avatarCanvas = document.getElementById('canvas-campeon-avatar');
-    if (avatarCanvas) {
-      const actx = avatarCanvas.getContext('2d');
-      actx.clearRect(0, 0, 90, 90);
-      drawCabezonPreview(actx, 45, 42, selectedPlayer);
+
+    // Usar el canvas de intro para la cinemática
+    const canvasIntro = document.getElementById('canvas-intro-anime');
+    const btnSkip = document.getElementById('intro-skip-btn');
+    if (!canvasIntro) {
+      // Fallback al overlay viejo
+      const overlay = document.getElementById('penales-campeon-overlay');
+      if (overlay) overlay.style.display = 'flex';
+      return;
     }
-    
-    // Iniciar animación del canvas de efectos (destellos + confeti infinito)
-    const efectosCanvas = document.getElementById('canvas-campeon-efectos');
-    if (efectosCanvas) {
-      const ectx = efectosCanvas.getContext('2d');
-      
-      // Ajustar dimensiones
-      efectosCanvas.width = window.innerWidth;
-      efectosCanvas.height = window.innerHeight;
-      
-      const confetis = [];
-      for (let i = 0; i < 90; i++) {
+
+    canvasIntro.style.display = 'block';
+    if (btnSkip) {
+      btnSkip.style.display = 'block';
+      btnSkip.onclick = function() { finalizarCinematicaCampeon(); };
+    }
+
+    const rect = canvasIntro.getBoundingClientRect();
+    canvasIntro.width  = rect.width  || window.innerWidth  || 400;
+    canvasIntro.height = rect.height || window.innerHeight || 700;
+    const W = canvasIntro.width;
+    const H = canvasIntro.height;
+    const ctx = canvasIntro.getContext('2d');
+
+    // Seleccionar 4 compañeros al azar (distintos del campeón)
+    const compas = MUNDIAL_JUGADORES
+      .filter(p => p.id !== selectedPlayer.id && !p.locked)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 4);
+    while (compas.length < 4) compas.push(MUNDIAL_JUGADORES[0]);
+
+    // Confeti particles pool
+    const confetis = [];
+    const CONFETI_COLORS = ['#fbbf24','#f43f5e','#34d399','#60a5fa','#c084fc','#f472b6','#ffffff','#fb923c','#facc15'];
+    function spawnConfeti(n, fromTop) {
+      for (let i = 0; i < n; i++) {
         confetis.push({
-          x: Math.random() * efectosCanvas.width,
-          y: Math.random() * -efectosCanvas.height,
-          vx: (Math.random() - 0.5) * 3,
-          vy: 2 + Math.random() * 4,
-          color: ['#fbbf24', '#f59e0b', '#34d399', '#60a5fa', '#c084fc', '#f472b6', '#ffffff'][Math.floor(Math.random() * 7)],
-          w: 6 + Math.random() * 6,
-          h: 8 + Math.random() * 8,
-          rot: Math.random() * Math.PI,
-          rotSpeed: (Math.random() - 0.5) * 0.12
+          x: Math.random() * W,
+          y: fromTop ? (-10 - Math.random() * 60) : (Math.random() * H),
+          vx: (Math.random() - 0.5) * 4,
+          vy: 1.5 + Math.random() * 3.5,
+          color: CONFETI_COLORS[Math.floor(Math.random() * CONFETI_COLORS.length)],
+          w: 5 + Math.random() * 7,
+          h: 8 + Math.random() * 9,
+          rot: Math.random() * Math.PI * 2,
+          rotSpeed: (Math.random() - 0.5) * 0.18,
+          shape: Math.random() < 0.35 ? 'circle' : 'rect'
         });
       }
-      
-      const flashes = [];
-      
-      if (campeonEfectosInterval) cancelAnimationFrame(campeonEfectosInterval);
-      
-      function updateEfectos() {
-        if (!overlay || overlay.style.display === 'none') return;
-        
-        ectx.clearRect(0, 0, efectosCanvas.width, efectosCanvas.height);
-        
-        // Flashes aleatorios
-        if (Math.random() < 0.15) {
-          flashes.push({
-            x: Math.random() * efectosCanvas.width,
-            y: Math.random() * efectosCanvas.height,
-            opacity: 0.9,
-            r: 45 + Math.random() * 65
-          });
-          // Sonido de flash sutil con sintetizador
-          try {
-            if (audioCtx) {
-              const now = audioCtx.currentTime;
-              const osc = audioCtx.createOscillator();
-              const g = audioCtx.createGain();
-              osc.connect(g); g.connect(audioCtx.destination);
-              osc.type = 'sine'; osc.frequency.setValueAtTime(1200, now);
-              g.gain.setValueAtTime(0.015, now);
-              g.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-              osc.start(now); osc.stop(now + 0.15);
-            }
-          } catch(err) {}
-        }
-        
-        // Pintar flashes
-        for (let i = flashes.length - 1; i >= 0; i--) {
-          const f = flashes[i];
-          const grad = ectx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r);
-          grad.addColorStop(0, `rgba(255, 255, 255, ${f.opacity})`);
-          grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-          ectx.fillStyle = grad;
-          ectx.beginPath();
-          ectx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
-          ectx.fill();
-          
-          f.opacity -= 0.09;
-          if (f.opacity <= 0) {
-            flashes.splice(i, 1);
-          }
-        }
-        
-        // Dibujar confeti
-        confetis.forEach(c => {
-          c.x += c.vx;
-          c.y += c.vy;
-          c.rot += c.rotSpeed;
-          
-          if (c.y > efectosCanvas.height) {
-            c.y = -20;
-            c.x = Math.random() * efectosCanvas.width;
-          }
-          
-          ectx.save();
-          ectx.translate(c.x, c.y);
-          ectx.rotate(c.rot);
-          ectx.fillStyle = c.color;
-          ectx.fillRect(-c.w/2, -c.h/2, c.w, c.h);
-          ectx.restore();
-        });
-        
-        campeonEfectosInterval = requestAnimationFrame(updateEfectos);
-      }
-      
-      campeonEfectosInterval = requestAnimationFrame(updateEfectos);
     }
+    spawnConfeti(120, false);
+
+    // Flashes de cámara
+    const camFlashes = [];
+
+    // Fuegos artificiales
+    const fireworks = [];
+    function spawnFirework() {
+      const cx = W * 0.2 + Math.random() * W * 0.6;
+      const cy = H * 0.1 + Math.random() * H * 0.35;
+      const hue = Math.floor(Math.random() * 360);
+      const sparks = [];
+      for (let i = 0; i < 28; i++) {
+        const angle = (i / 28) * Math.PI * 2;
+        const speed = 2.5 + Math.random() * 3;
+        sparks.push({ x: cx, y: cy, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, life: 1, hue });
+      }
+      fireworks.push(...sparks);
+    }
+
+    // Sonido épico de victoria
+    function playCampeonSound() {
+      if (modoDiscreto || !audioCtx) return;
+      try {
+        const now = audioCtx.currentTime;
+        // Fanfarria de 5 notas ascendentes
+        const melody = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+        melody.forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.type = idx < 3 ? 'square' : 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.18);
+          gain.gain.setValueAtTime(0.12, now + idx * 0.18);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.18 + 0.5);
+          osc.start(now + idx * 0.18); osc.stop(now + idx * 0.18 + 0.5);
+        });
+        // Bajo de impacto
+        const bass = audioCtx.createOscillator();
+        const bassGain = audioCtx.createGain();
+        bass.connect(bassGain); bassGain.connect(audioCtx.destination);
+        bass.type = 'sawtooth';
+        bass.frequency.setValueAtTime(110, now);
+        bass.frequency.exponentialRampToValueAtTime(55, now + 0.8);
+        bassGain.gain.setValueAtTime(0.25, now);
+        bassGain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+        bass.start(now); bass.stop(now + 0.9);
+      } catch(e) {}
+    }
+
+    // Dibujar bandera del jugador en canvas
+    function drawFlag(c, player, x, y, w, h) {
+      c.save();
+      c.beginPath();
+      if (c.roundRect) c.roundRect(x, y, w, h, 4);
+      else c.rect(x, y, w, h);
+      c.clip();
+      const ft = player.flagType || 'h3';
+      const fc = player.flagColors || ['#cccccc','#ffffff','#cccccc'];
+      if (ft === 'h3') {
+        const bh = h / 3;
+        [fc[0], fc[1], fc[2]].forEach((col, i) => {
+          c.fillStyle = col || '#aaa';
+          c.fillRect(x, y + i * bh, w, bh + 1);
+        });
+      } else if (ft === 'v3') {
+        const bw = w / 3;
+        [fc[0], fc[1], fc[2]].forEach((col, i) => {
+          c.fillStyle = col || '#aaa';
+          c.fillRect(x + i * bw, y, bw + 1, h);
+        });
+      } else if (ft === 'v2') {
+        c.fillStyle = fc[0]; c.fillRect(x, y, w * 0.5, h);
+        c.fillStyle = fc[1]; c.fillRect(x + w * 0.5, y, w * 0.5, h);
+      } else if (ft === 'cross') {
+        c.fillStyle = fc[0] || '#ffffff'; c.fillRect(x, y, w, h);
+        c.fillStyle = player.flagCross || '#cc0000';
+        c.fillRect(x + w * 0.38, y, w * 0.24, h);
+        c.fillRect(x, y + h * 0.38, w, h * 0.24);
+      } else if (ft === 'br') {
+        c.fillStyle = fc[0] || '#009c3b'; c.fillRect(x, y, w, h);
+        c.fillStyle = fc[1] || '#ffdf00';
+        c.beginPath();
+        c.moveTo(x + w * 0.5, y + h * 0.08);
+        c.lineTo(x + w * 0.92, y + h * 0.5);
+        c.lineTo(x + w * 0.5, y + h * 0.92);
+        c.lineTo(x + w * 0.08, y + h * 0.5);
+        c.closePath(); c.fill();
+        c.fillStyle = fc[2] || '#002277';
+        c.beginPath(); c.arc(x + w*0.5, y + h*0.5, Math.min(w,h)*0.22, 0, Math.PI*2); c.fill();
+      } else if (ft === 'uy') {
+        const bh = h / 3;
+        c.fillStyle = '#007fff'; c.fillRect(x, y, w, bh);
+        c.fillStyle = '#ffffff'; c.fillRect(x, y+bh, w, bh);
+        c.fillStyle = '#007fff'; c.fillRect(x, y+bh*2, w, bh);
+      } else {
+        c.fillStyle = fc[0] || '#cccccc'; c.fillRect(x, y, w, h);
+      }
+      c.restore();
+      // Borde
+      c.save();
+      c.strokeStyle = 'rgba(255,255,255,0.35)'; c.lineWidth = 1;
+      c.beginPath();
+      if (c.roundRect) c.roundRect(x, y, w, h, 4);
+      else c.rect(x, y, w, h);
+      c.stroke(); c.restore();
+    }
+
+    playCampeonSound();
+    triggerHaptic('success');
+
+    let frame = 0;
+    let campeonAnimId = null;
+    const TOTAL_FRAMES = 420; // ~7 segundos a 60fps
+    let fireworkTimer = 0;
+    let lastStageTransition = -1;
+
+    // Copa lift Y offset animado
+    let copaLiftY = 0;
+    let copaLiftDir = -1;
+
+    onIntroEndCallback = null; // No hay callback — vamos al menu al cerrar
+
+    function finalizarCinematicaCampeon() {
+      if (campeonAnimId) cancelAnimationFrame(campeonAnimId);
+      campeonAnimId = null;
+      canvasIntro.style.display = 'none';
+      if (btnSkip) btnSkip.style.display = 'none';
+      triggerHaptic('medium');
+      playSound('pop');
+      // Mostrar overlay final clásico brevemente o ir directo al menú
+      window.volverASeleccion();
+    }
+    // Exponer para el botón skip
+    if (btnSkip) btnSkip.onclick = finalizarCinematicaCampeon;
+
+    function animCampeon() {
+      campeonAnimId = requestAnimationFrame(animCampeon);
+      frame++;
+
+      if (frame >= TOTAL_FRAMES) {
+        finalizarCinematicaCampeon();
+        return;
+      }
+
+      // Determinar stage
+      // Stage 1: 0-60   — flash de entrada + zoom in del jugador
+      // Stage 2: 61-150 — cancha nocturna, compañeros aplaudiendo alrededor
+      // Stage 3: 151-260 — el campeón levanta la copa lentamente + bandera gigante desplegada
+      // Stage 4: 261-340 — zoom out épico, fuegos artificiales, "CAMPEÓN MUNDIAL"
+      // Stage 5: 341-420 — freeze frame dorado con nombre + fade out
+
+      ctx.fillStyle = '#050810';
+      ctx.fillRect(0, 0, W, H);
+
+      // ── STAGE 1: Entrada dramática ──────────────────────────────
+      if (frame <= 60) {
+        const t = frame / 60;
+        const easeOut = 1 - Math.pow(1 - t, 3);
+
+        // Flash blanco inicial
+        if (frame <= 8) {
+          const flashA = 1 - frame / 8;
+          ctx.fillStyle = `rgba(255,255,255,${flashA})`;
+          ctx.fillRect(0, 0, W, H);
+          if (frame === 1) {
+            triggerHaptic('heavy');
+            spawnFirework(); spawnFirework();
+          }
+        }
+
+        // Fondo: espacio oscuro con gradient dorado
+        const bg = ctx.createRadialGradient(W*0.5, H*0.55, 10, W*0.5, H*0.55, W*0.85);
+        bg.addColorStop(0, `rgba(45, 25, 5, ${easeOut})`);
+        bg.addColorStop(0.5, `rgba(10, 8, 20, ${easeOut})`);
+        bg.addColorStop(1, `rgba(2, 2, 8, ${easeOut})`);
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        // Rayos de luz convergentes desde el centro
+        ctx.save();
+        ctx.globalAlpha = easeOut * 0.18;
+        for (let r = 0; r < 16; r++) {
+          const angle = (r / 16) * Math.PI * 2 + frame * 0.015;
+          const grad = ctx.createLinearGradient(W*0.5, H*0.5, W*0.5 + Math.cos(angle)*W, H*0.5 + Math.sin(angle)*H);
+          grad.addColorStop(0, '#fbbf24'); grad.addColorStop(1, 'transparent');
+          ctx.strokeStyle = grad; ctx.lineWidth = 18;
+          ctx.beginPath();
+          ctx.moveTo(W*0.5, H*0.5);
+          ctx.lineTo(W*0.5 + Math.cos(angle)*W*1.2, H*0.5 + Math.sin(angle)*H*1.2);
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        // Texto "FINAL" en letras enormes que se expanden
+        if (frame > 10) {
+          const textScale = 0.3 + easeOut * 1.2;
+          ctx.save();
+          ctx.translate(W*0.5, H*0.28);
+          ctx.scale(textScale, textScale);
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.font = '900 italic 42px sans-serif';
+          ctx.strokeStyle = '#000'; ctx.lineWidth = 8;
+          ctx.strokeText('¡CAMPEÓN', 0, -22);
+          ctx.strokeText('MUNDIAL!', 0, 22);
+          const tg = ctx.createLinearGradient(-150, -30, 150, 30);
+          tg.addColorStop(0, '#fef08a'); tg.addColorStop(0.5, '#ffffff'); tg.addColorStop(1, '#f59e0b');
+          ctx.fillStyle = tg;
+          ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 22;
+          ctx.fillText('¡CAMPEÓN', 0, -22);
+          ctx.fillText('MUNDIAL!', 0, 22);
+          ctx.restore();
+        }
+
+        // Cabezón entrando desde abajo con zoom in
+        const playerScale = 1.4 + easeOut * 1.6;
+        const playerY = H * 0.72 + (1 - easeOut) * H * 0.4;
+        ctx.save();
+        ctx.translate(W * 0.5, playerY);
+        ctx.scale(playerScale, playerScale);
+        drawCabezon(ctx, 0, 0, selectedPlayer, false, false, false);
+        ctx.restore();
+
+        // Nombre del jugador
+        if (frame > 20) {
+          ctx.save();
+          ctx.globalAlpha = Math.min(1, (frame - 20) / 25);
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.font = '900 16px sans-serif';
+          ctx.fillStyle = '#06b6d4';
+          ctx.shadowColor = '#06b6d4'; ctx.shadowBlur = 12;
+          ctx.fillText(selectedPlayer.nombre.toUpperCase(), W*0.5, H*0.88);
+          ctx.shadowBlur = 0; ctx.restore();
+        }
+
+      // ── STAGE 2: Cancha nocturna, compañeros aplaudiendo ────────
+      } else if (frame <= 150) {
+        const t2 = (frame - 61) / 89;
+        const easeOut2 = 1 - Math.pow(1 - t2, 2);
+        if (frame === 61) {
+          triggerHaptic('medium');
+          spawnConfeti(60, true);
+          spawnFirework();
+        }
+
+        // Fondo: cancha de noche con luces de estadio
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+        bgGrad.addColorStop(0, '#020b1a');
+        bgGrad.addColorStop(0.4, '#0a1628');
+        bgGrad.addColorStop(0.7, '#0e2010');
+        bgGrad.addColorStop(1, '#071508');
+        ctx.fillStyle = bgGrad; ctx.fillRect(0, 0, W, H);
+
+        // Césped
+        ctx.fillStyle = '#14532d';
+        ctx.fillRect(0, H * 0.7, W, H * 0.3);
+        ctx.fillStyle = '#166534';
+        for (let stripe = 0; stripe < 8; stripe++) {
+          ctx.fillRect(stripe * (W/4), H * 0.7, W/8, H * 0.3);
+        }
+        // Línea central
+        ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, H*0.7); ctx.lineTo(W, H*0.7); ctx.stroke();
+
+        // Luces del estadio (focos en las esquinas superiores)
+        [[0.05, 0.05],[0.95, 0.05],[0.15, 0.0],[0.85, 0.0]].forEach(([lx,ly]) => {
+          const lGrad = ctx.createRadialGradient(W*lx, H*ly, 2, W*lx, H*ly, W*0.45);
+          lGrad.addColorStop(0, 'rgba(255,255,200,0.45)');
+          lGrad.addColorStop(0.4, 'rgba(255,255,180,0.08)');
+          lGrad.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = lGrad; ctx.fillRect(0, 0, W, H);
+        });
+
+        // Dibujar 4 compañeros aplaudiendo, distribuidos en arco
+        const arcAngles = [-0.55, -0.25, 0.25, 0.55];
+        arcAngles.forEach((angOffset, ci) => {
+          const compa = compas[ci];
+          if (!compa) return;
+          const cx2 = W * 0.5 + Math.sin(angOffset) * W * 0.38;
+          const cy2 = H * 0.68 + Math.cos(Math.abs(angOffset)) * H * 0.04;
+          const compaScale = 0.9 - Math.abs(angOffset) * 0.25;
+          // Aplaudir: oscilación vertical
+          const bounce = Math.sin(frame * 0.22 + ci * 1.2) * 4;
+          const entryOffset = ci < 2
+            ? -W * 0.3 * Math.max(0, 1 - t2 * 2.5)
+            : W * 0.3 * Math.max(0, 1 - t2 * 2.5);
+          ctx.save();
+          ctx.translate(cx2 + entryOffset, cy2 + bounce);
+          ctx.scale(compaScale, compaScale);
+          drawCabezon(ctx, 0, 0, compa, false, false, false);
+          ctx.restore();
+          // Manos aplaudiendo emoji sobre cada uno
+          if (frame > 90) {
+            const emojiAlpha = Math.min(1, (frame - 90) / 20);
+            ctx.save(); ctx.globalAlpha = emojiAlpha;
+            ctx.font = `${12 + Math.floor(Math.abs(Math.sin(frame*0.3+ci))*6)}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText('👏', cx2 + entryOffset, cy2 + bounce - compaScale * 48 - 8);
+            ctx.restore();
+          }
+        });
+
+        // Campeón en el centro más grande
+        const heroScale = 2.5 + Math.sin(frame * 0.06) * 0.06;
+        const heroY = H * 0.665 - Math.abs(Math.sin(frame * 0.1)) * 6;
+        ctx.save();
+        ctx.translate(W * 0.5, heroY);
+        ctx.scale(heroScale, heroScale);
+        drawCabezon(ctx, 0, 0, selectedPlayer, false, false, false);
+        ctx.restore();
+
+        // Texto inferior
+        ctx.save();
+        ctx.globalAlpha = easeOut2;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.font = '900 italic 13px sans-serif';
+        const pulse2 = 0.7 + Math.abs(Math.sin(frame * 0.1)) * 0.3;
+        ctx.fillStyle = `rgba(251, 191, 36, ${pulse2})`;
+        ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 10;
+        ctx.fillText('🏟️ NEXOS WORLD CUP STADIUM 🏟️', W*0.5, H*0.12);
+        ctx.shadowBlur = 0; ctx.restore();
+
+        // Nombre del campeón
+        ctx.save();
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.font = '900 20px sans-serif';
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 5;
+        ctx.strokeText(selectedPlayer.nombre.toUpperCase(), W*0.5, H*0.22);
+        ctx.fillStyle = '#06b6d4';
+        ctx.shadowColor = '#06b6d4'; ctx.shadowBlur = 14;
+        ctx.fillText(selectedPlayer.nombre.toUpperCase(), W*0.5, H*0.22);
+        ctx.shadowBlur = 0; ctx.restore();
+
+      // ── STAGE 3: Levantamiento épico de la Copa ──────────────────
+      } else if (frame <= 260) {
+        const t3 = (frame - 151) / 109;
+        const easeOut3 = 1 - Math.pow(1 - Math.min(1,t3), 3);
+        if (frame === 151) {
+          triggerHaptic('heavy');
+          spawnConfeti(80, true);
+          spawnFirework(); spawnFirework();
+          playCampeonSound();
+        }
+
+        // Fondo épico dorado
+        const bg3 = ctx.createRadialGradient(W*0.5, H*0.4, 20, W*0.5, H*0.4, W*0.9);
+        bg3.addColorStop(0, '#1c1000');
+        bg3.addColorStop(0.4, '#0b0f19');
+        bg3.addColorStop(1, '#020208');
+        ctx.fillStyle = bg3; ctx.fillRect(0, 0, W, H);
+
+        // Rayos de luz dorada desde el trofeo hacia arriba
+        ctx.save(); ctx.globalAlpha = 0.22;
+        for (let r = 0; r < 12; r++) {
+          const angle = (r / 12) * Math.PI * 2 + frame * 0.01;
+          const rayLen = 250 + Math.sin(frame * 0.08 + r) * 50;
+          ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 12 + r % 3 * 4;
+          ctx.beginPath();
+          ctx.moveTo(W * 0.5, H * 0.25);
+          ctx.lineTo(W * 0.5 + Math.cos(angle) * rayLen, H * 0.25 + Math.sin(angle) * rayLen);
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        // Bandera grande desplegada en el fondo
+        const flagW = W * 0.72;
+        const flagH = H * 0.28;
+        const flagX = (W - flagW) * 0.5;
+        const flagY = H * 0.03;
+        // Wave effect en la bandera
+        ctx.save();
+        ctx.globalAlpha = 0.75 * easeOut3;
+        // Sombra bajo la bandera
+        ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 18;
+        drawFlag(ctx, selectedPlayer, flagX, flagY, flagW, flagH);
+        ctx.shadowBlur = 0;
+        // Brillo dorado sobre la bandera
+        const flagShine = ctx.createLinearGradient(flagX, flagY, flagX+flagW, flagY+flagH);
+        flagShine.addColorStop(0, 'rgba(255,255,200,0.0)');
+        const scanPos = ((frame - 151) * 6) % (flagW * 2);
+        ctx.fillStyle = 'rgba(255,255,200,0.15)';
+        ctx.fillRect(flagX + (scanPos % flagW), flagY, 40, flagH);
+        ctx.restore();
+
+        // Nombre del país / bandera emoji
+        ctx.save();
+        ctx.globalAlpha = easeOut3;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.font = '700 15px sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 8;
+        ctx.fillText((selectedPlayer.pais || '').toUpperCase(), W*0.5, flagY + flagH + 14);
+        ctx.shadowBlur = 0; ctx.restore();
+
+        // 4 compañeros abajo aplaudiendo (más pequeños)
+        const arcAngles3 = [-0.5, -0.2, 0.2, 0.5];
+        arcAngles3.forEach((angOffset, ci) => {
+          const compa = compas[ci]; if (!compa) return;
+          const cx3 = W * 0.5 + Math.sin(angOffset) * W * 0.4;
+          const cy3 = H * 0.82;
+          const bounce3 = Math.sin(frame * 0.28 + ci * 0.9) * 5;
+          ctx.save();
+          ctx.translate(cx3, cy3 + bounce3);
+          ctx.scale(0.85, 0.85);
+          drawCabezon(ctx, 0, 0, compa, false, false, false);
+          ctx.restore();
+          ctx.save();
+          ctx.font = '14px sans-serif'; ctx.textAlign = 'center';
+          const pulse3 = Math.abs(Math.sin(frame * 0.22 + ci));
+          ctx.globalAlpha = 0.5 + pulse3 * 0.5;
+          ctx.fillText('👏', cx3, cy3 + bounce3 - 45);
+          ctx.restore();
+        });
+
+        // Copa levantándose — animación de levantar la copa
+        const copaProgress = Math.min(1, t3 * 1.6);
+        const copaEase = 1 - Math.pow(1 - copaProgress, 3);
+        // La copa sube desde la altura del jugador hasta los brazos extendidos
+        const copaBaseY = H * 0.72;
+        const copaTargetY = H * 0.38;
+        const copaCurrentY = copaBaseY + (copaTargetY - copaBaseY) * copaEase;
+        const copaH = H * 0.22;
+        // Glow pulsante de la copa
+        const glow3 = 15 + Math.abs(Math.sin(frame * 0.12)) * 25;
+        ctx.save();
+        ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = glow3;
+        drawWorldCupTrophy(ctx, W * 0.5, copaCurrentY, copaH);
+        ctx.shadowBlur = 0; ctx.restore();
+
+        // Destellos de la copa
+        if (Math.random() < 0.3) {
+          camFlashes.push({ x: W*0.5 + (Math.random()-0.5)*40, y: copaCurrentY - copaH*0.5, opacity: 1, r: 15 + Math.random()*25 });
+        }
+
+        // Jugador con brazos arriba (escala más grande)
+        const heroScale3 = 2.4;
+        ctx.save();
+        ctx.translate(W * 0.5, H * 0.785);
+        ctx.scale(heroScale3, heroScale3);
+        drawCabezon(ctx, 0, 0, selectedPlayer, false, false, false);
+        ctx.restore();
+
+        // Texto CAMPEÓN con shimmer
+        if (frame > 185) {
+          ctx.save();
+          ctx.globalAlpha = Math.min(1, (frame - 185) / 20);
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.font = '900 italic 26px sans-serif';
+          ctx.strokeStyle = '#000'; ctx.lineWidth = 6;
+          ctx.strokeText('🏆 CAMPEÓN MUNDIAL 🏆', W*0.5, H*0.93);
+          const tg3 = ctx.createLinearGradient(0, H*0.92, W, H*0.94);
+          tg3.addColorStop(0, '#fef08a'); tg3.addColorStop(0.5, '#ffffff'); tg3.addColorStop(1, '#f59e0b');
+          ctx.fillStyle = tg3;
+          ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 18;
+          ctx.fillText('🏆 CAMPEÓN MUNDIAL 🏆', W*0.5, H*0.93);
+          ctx.shadowBlur = 0; ctx.restore();
+        }
+
+      // ── STAGE 4: Explosión de fuegos artificiales + zoom out ─────
+      } else if (frame <= 340) {
+        const t4 = (frame - 261) / 79;
+        if (frame === 261) {
+          triggerHaptic('heavy');
+          spawnFirework(); spawnFirework(); spawnFirework();
+          spawnConfeti(100, true);
+        }
+        if (frame % 18 === 0) spawnFirework();
+
+        // Fondo oscuro con destello de fuegos
+        const bg4 = ctx.createLinearGradient(0, 0, 0, H);
+        bg4.addColorStop(0, '#010208');
+        bg4.addColorStop(1, '#06150a');
+        ctx.fillStyle = bg4; ctx.fillRect(0, 0, W, H);
+
+        // Bandera de fondo, más transparente
+        ctx.save(); ctx.globalAlpha = 0.35;
+        drawFlag(ctx, selectedPlayer, W*0.1, H*0.05, W*0.8, H*0.35);
+        ctx.restore();
+
+        // Jugador + copa en pose de victoria
+        const heroScale4 = 2.0 + Math.sin(frame * 0.08) * 0.04;
+        const heroY4 = H * 0.72;
+        ctx.save();
+        ctx.translate(W * 0.5, heroY4);
+        ctx.scale(heroScale4, heroScale4);
+        drawCabezon(ctx, 0, 0, selectedPlayer, false, false, false);
+        ctx.restore();
+
+        // Copa sobre la cabeza
+        ctx.save();
+        ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 20 + Math.abs(Math.sin(frame*0.12))*15;
+        drawWorldCupTrophy(ctx, W*0.5, H*0.38 + Math.sin(frame*0.1)*5, H*0.22);
+        ctx.shadowBlur = 0; ctx.restore();
+
+        // Compañeros en los costados
+        [[-0.38, compas[0]], [0.38, compas[1]]].forEach(([xOff, compa]) => {
+          if (!compa) return;
+          const bounce4 = Math.abs(Math.sin(frame * 0.25)) * 8;
+          ctx.save();
+          ctx.translate(W*0.5 + W*xOff, H*0.78 - bounce4);
+          ctx.scale(1.1, 1.1);
+          drawCabezon(ctx, 0, 0, compa, false, false, false);
+          ctx.restore();
+        });
+
+        // Cartel "COPA NEXOS WORLD CUP 26"
+        ctx.save();
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        // Fondo del cartel
+        ctx.fillStyle = 'rgba(10, 15, 30, 0.88)';
+        ctx.strokeStyle = 'rgba(251,191,36,0.7)'; ctx.lineWidth = 2;
+        ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 12;
+        const cardW4 = W * 0.82, cardH4 = 56, cardX4 = (W - cardW4)*0.5, cardY4 = H*0.08;
+        if (ctx.roundRect) ctx.roundRect(cardX4, cardY4, cardW4, cardH4, 10);
+        else ctx.rect(cardX4, cardY4, cardW4, cardH4);
+        ctx.fill(); ctx.stroke(); ctx.shadowBlur = 0;
+        ctx.font = '900 italic 11px sans-serif';
+        ctx.fillStyle = '#fde047';
+        ctx.fillText('🌍 COPA NEXOS WORLD CUP 26 🌍', W*0.5, cardY4 + 16);
+        ctx.font = '900 15px sans-serif';
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 4;
+        ctx.strokeText(selectedPlayer.nombre.toUpperCase(), W*0.5, cardY4 + 38);
+        const tg4 = ctx.createLinearGradient(0, cardY4+30, W, cardY4+46);
+        tg4.addColorStop(0,'#fef08a'); tg4.addColorStop(0.5,'#fff'); tg4.addColorStop(1,'#f59e0b');
+        ctx.fillStyle = tg4;
+        ctx.shadowColor = '#06b6d4'; ctx.shadowBlur = 8;
+        ctx.fillText(selectedPlayer.nombre.toUpperCase(), W*0.5, cardY4 + 38);
+        ctx.shadowBlur = 0; ctx.restore();
+
+        // Texto CAMPEÓN grande pulsante
+        ctx.save();
+        const campPulse = 1 + Math.sin(frame * 0.15) * 0.04;
+        ctx.translate(W*0.5, H*0.93);
+        ctx.scale(campPulse, campPulse);
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.font = '900 italic 24px sans-serif';
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 6;
+        ctx.strokeText('¡¡¡CAMPEÓN MUNDIAL!!!', 0, 0);
+        const tg4b = ctx.createLinearGradient(-120,-12,120,12);
+        tg4b.addColorStop(0,'#fef08a'); tg4b.addColorStop(0.5,'#ffffff'); tg4b.addColorStop(1,'#f59e0b');
+        ctx.fillStyle = tg4b;
+        ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 22;
+        ctx.fillText('¡¡¡CAMPEÓN MUNDIAL!!!', 0, 0);
+        ctx.shadowBlur = 0; ctx.restore();
+
+      // ── STAGE 5: Freeze frame dorado + fade out ─────────────────
+      } else {
+        const t5 = (frame - 341) / 79;
+        const fadeAlpha = Math.min(1, t5 * 1.3);
+
+        // Fondo dorado saturado (freeze frame)
+        const bg5 = ctx.createRadialGradient(W*0.5, H*0.5, 10, W*0.5, H*0.5, W*0.9);
+        bg5.addColorStop(0, '#3d2000');
+        bg5.addColorStop(0.6, '#1a0f00');
+        bg5.addColorStop(1, '#050205');
+        ctx.fillStyle = bg5; ctx.fillRect(0, 0, W, H);
+
+        // Trama de puntos dorados (efecto manga/anime)
+        ctx.save(); ctx.globalAlpha = 0.1;
+        ctx.fillStyle = '#fbbf24';
+        for (let di = 0; di < W; di += 14) {
+          for (let dj = 0; dj < H; dj += 14) {
+            ctx.beginPath(); ctx.arc(di, dj, 2, 0, Math.PI*2); ctx.fill();
+          }
+        }
+        ctx.restore();
+
+        // Bandera de fondo grande
+        ctx.save(); ctx.globalAlpha = 0.5;
+        drawFlag(ctx, selectedPlayer, W*0.05, H*0.05, W*0.9, H*0.45);
+        ctx.restore();
+
+        // Silueta dorada del jugador
+        ctx.save();
+        ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 30;
+        ctx.translate(W*0.5, H*0.72);
+        ctx.scale(2.6, 2.6);
+        drawCabezon(ctx, 0, 0, selectedPlayer, false, false, false);
+        ctx.restore();
+
+        // Copa
+        ctx.save();
+        ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 35;
+        drawWorldCupTrophy(ctx, W*0.5, H*0.38, H*0.24);
+        ctx.shadowBlur = 0; ctx.restore();
+
+        // Panel de gloria
+        ctx.save();
+        ctx.fillStyle = 'rgba(5,8,20,0.78)';
+        ctx.strokeStyle = 'rgba(251,191,36,0.85)'; ctx.lineWidth = 2.5;
+        ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 15;
+        const gloryW = W*0.86, gloryH = 72, gloryX = (W-gloryW)*0.5, gloryY = H*0.86;
+        if (ctx.roundRect) ctx.roundRect(gloryX, gloryY, gloryW, gloryH, 12);
+        else ctx.rect(gloryX, gloryY, gloryW, gloryH);
+        ctx.fill(); ctx.stroke(); ctx.shadowBlur = 0;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.font = '700 11px sans-serif';
+        ctx.fillStyle = '#fde68a';
+        ctx.fillText('COPA NEXOS WORLD CUP 26', W*0.5, gloryY+16);
+        ctx.font = '900 20px sans-serif';
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 5;
+        ctx.strokeText(selectedPlayer.nombre.toUpperCase(), W*0.5, gloryY+42);
+        const tg5 = ctx.createLinearGradient(gloryX, gloryY+35, gloryX+gloryW, gloryY+50);
+        tg5.addColorStop(0,'#fef08a'); tg5.addColorStop(0.5,'#ffffff'); tg5.addColorStop(1,'#f59e0b');
+        ctx.fillStyle = tg5;
+        ctx.shadowColor = '#06b6d4'; ctx.shadowBlur = 10;
+        ctx.fillText(selectedPlayer.nombre.toUpperCase(), W*0.5, gloryY+42);
+        ctx.shadowBlur = 0;
+        ctx.font = '700 10px sans-serif';
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillText((selectedPlayer.pais || '').toUpperCase(), W*0.5, gloryY+60);
+        ctx.restore();
+
+        // Fade to black
+        ctx.fillStyle = `rgba(0,0,0,${fadeAlpha})`;
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      // ── CONFETI (todas las etapas) ──────────────────────────────
+      confetis.forEach(c => {
+        c.x += c.vx + Math.sin(frame * 0.04 + c.rot) * 0.4;
+        c.y += c.vy;
+        c.rot += c.rotSpeed;
+        if (c.y > H + 20) { c.y = -15; c.x = Math.random() * W; }
+        ctx.save();
+        ctx.translate(c.x, c.y);
+        ctx.rotate(c.rot);
+        ctx.fillStyle = c.color;
+        ctx.globalAlpha = 0.88;
+        if (c.shape === 'circle') {
+          ctx.beginPath(); ctx.arc(0, 0, c.w * 0.5, 0, Math.PI*2); ctx.fill();
+        } else {
+          ctx.fillRect(-c.w*0.5, -c.h*0.5, c.w, c.h);
+        }
+        ctx.restore();
+      });
+
+      // ── FUEGOS ARTIFICIALES ─────────────────────────────────────
+      fireworkTimer++;
+      if (fireworkTimer % 55 === 0 && frame > 60) spawnFirework();
+      for (let fi = fireworks.length - 1; fi >= 0; fi--) {
+        const spark = fireworks[fi];
+        spark.x += spark.vx; spark.y += spark.vy;
+        spark.vy += 0.05; // gravedad suave
+        spark.vx *= 0.97; spark.vy *= 0.97;
+        spark.life -= 0.028;
+        if (spark.life <= 0) { fireworks.splice(fi, 1); continue; }
+        ctx.save();
+        ctx.globalAlpha = spark.life * 0.9;
+        ctx.fillStyle = `hsl(${spark.hue}, 100%, 65%)`;
+        ctx.shadowColor = `hsl(${spark.hue}, 100%, 65%)`; ctx.shadowBlur = 6;
+        ctx.beginPath(); ctx.arc(spark.x, spark.y, 2.5, 0, Math.PI*2); ctx.fill();
+        ctx.restore();
+      }
+
+      // ── FLASHES DE CÁMARA ───────────────────────────────────────
+      if (frame > 60 && Math.random() < 0.06) {
+        camFlashes.push({ x: Math.random()*W, y: Math.random()*H*0.5, opacity: 0.9, r: 30+Math.random()*50 });
+      }
+      for (let fi = camFlashes.length - 1; fi >= 0; fi--) {
+        const f = camFlashes[fi];
+        const fGrad = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r);
+        fGrad.addColorStop(0, `rgba(255,255,255,${f.opacity})`);
+        fGrad.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = fGrad;
+        ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, Math.PI*2); ctx.fill();
+        f.opacity -= 0.07;
+        if (f.opacity <= 0) camFlashes.splice(fi, 1);
+      }
+
+      // ── BOTÓN SALTAR (recordatorio visual) ──────────────────────
+      if (frame > 30) {
+        ctx.save();
+        ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+        ctx.font = '600 10px sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        ctx.fillText('Toca para saltar ⏩', W - 14, H - 12);
+        ctx.restore();
+      }
+    }
+
+    campeonAnimId = requestAnimationFrame(animCampeon);
   };
 
   window.cerrarCeremoniaCampeon = function() {
@@ -11845,33 +12553,7 @@
     // Mostrar siempre visualmente
     mostrarOnomatopyaVisual('goal', textToSpeak);
 
-    if (modoDiscreto) return;
-    try {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(textToSpeak);
-        
-        // Configuración de idioma robusta
-        utterance.lang = 'es-AR';
-        const humVoz = buscarVozHumana();
-        if (humVoz) {
-          utterance.voice = humVoz;
-        } else {
-          utterance.lang = 'es'; // 'es' genérico es mucho más compatible en celulares
-        }
-        
-        utterance.rate = 1.28;
-        utterance.pitch = 1.12;
-        utterance.volume = 1.0;
-        
-        // Retardo de 80ms para evitar el bug de bloqueo de habla de iOS Safari al hacer cancel() previo
-        setTimeout(() => {
-          try {
-            window.speechSynthesis.speak(utterance);
-          } catch(e) {}
-        }, 80);
-      }
-    } catch(err) {}
+    speakRelato(textToSpeak);
   }
 
   function playSaveVoice() {
@@ -11903,32 +12585,7 @@
     // Mostrar siempre visualmente
     mostrarOnomatopyaVisual('save', textToSpeak);
 
-    if (modoDiscreto) return;
-    try {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(textToSpeak);
-        
-        utterance.lang = 'es-AR';
-        const humVoz = buscarVozHumana();
-        if (humVoz) {
-          utterance.voice = humVoz;
-        } else {
-          utterance.lang = 'es'; // 'es' genérico es mucho más compatible en celulares
-        }
-        
-        utterance.rate = 1.30;
-        utterance.pitch = 1.12;
-        utterance.volume = 1.0;
-        
-        // Retardo de 80ms para evitar el bug de bloqueo de habla de iOS Safari al hacer cancel() previo
-        setTimeout(() => {
-          try {
-            window.speechSynthesis.speak(utterance);
-          } catch(e) {}
-        }, 80);
-      }
-    } catch(err) {}
+    speakRelato(textToSpeak);
   }
 
   function playMissVoice() {
@@ -11959,75 +12616,24 @@
     // Mostrar siempre visualmente
     mostrarOnomatopyaVisual('miss', textToSpeak);
 
-    if (modoDiscreto) return;
-    try {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(textToSpeak);
-        
-        utterance.lang = 'es-AR';
-        const humVoz = buscarVozHumana();
-        if (humVoz) {
-          utterance.voice = humVoz;
-        } else {
-          utterance.lang = 'es'; // 'es' genérico es mucho más compatible en celulares
-        }
-        
-        utterance.rate = 1.28;
-        utterance.pitch = 1.10;
-        utterance.volume = 1.0;
-        
-        // Retardo de 80ms para evitar el bug de bloqueo de habla de iOS Safari al hacer cancel() previo
-        setTimeout(() => {
-          try {
-            window.speechSynthesis.speak(utterance);
-          } catch(e) {}
-        }, 80);
-      }
-    } catch(err) {}
+    speakRelato(textToSpeak);
   }
 
   function playPostVoice() {
-    if (modoDiscreto) return;
-    try {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        
-        let scorer = selectedPlayer;
-        if (gameMode === 'penales' && penalesTurno === 'defensa') {
-          scorer = cpuTirador || MUNDIAL_JUGADORES[0];
-        }
-
-        const gNameShort = (arqueroJugador && arqueroJugador.nombre.includes('Dibu')) ? 'el Dibu' : ((arqueroJugador && arqueroJugador.nombre) ? arqueroJugador.nombre : 'el arquero');
-        const phrases = [
-          `¡Palo! ¡Palo, palo, palo! ¡Se salva ${gNameShort} de milagro!`,
-          `¡Rebotó en el poste! ¡El palo le niega el grito a ${scorer.nombre}!`,
-          `¡Qué cerca estuvo! ¡Estalló el poste de metal!`,
-          `¡El caño le dice que no a ${scorer.nombre}! ¡No se puede creer la mala suerte!`,
-          `¡Sonó el metal! ¡Rebote en el palo de ${scorer.nombre}!`
-        ];
-        const textToSpeak = phrases[Math.floor(Math.random() * phrases.length)];
-        const utterance = new SpeechSynthesisUtterance(textToSpeak);
-        
-        utterance.lang = 'es-AR';
-        const humVoz = buscarVozHumana();
-        if (humVoz) {
-          utterance.voice = humVoz;
-        } else {
-          utterance.lang = 'es'; // 'es' genérico es mucho más compatible en celulares
-        }
-        
-        utterance.rate = 1.34; // Un toque más acelerado por la adrenalina del palo
-        utterance.pitch = 1.16; // Pitch más agudo de emoción
-        utterance.volume = 1.0;
-        
-        setTimeout(() => {
-          try {
-            window.speechSynthesis.speak(utterance);
-          } catch(e) {}
-        }, 80);
-      }
-    } catch(err) {}
+    let scorer = selectedPlayer;
+    if (gameMode === 'penales' && penalesTurno === 'defensa') {
+      scorer = cpuTirador || MUNDIAL_JUGADORES[0];
+    }
+    const gNameShort = (arqueroJugador && arqueroJugador.nombre.includes('Dibu')) ? 'el Dibu' : ((arqueroJugador && arqueroJugador.nombre) ? arqueroJugador.nombre : 'el arquero');
+    const phrases = [
+      `¡Palo! ¡Palo, palo, palo! ¡Se salva ${gNameShort} de milagro!`,
+      `¡Rebotó en el poste! ¡El palo le niega el grito a ${scorer.nombre}!`,
+      `¡Qué cerca estuvo! ¡Estalló el poste de metal!`,
+      `¡El caño le dice que no a ${scorer.nombre}! ¡No se puede creer la mala suerte!`,
+      `¡Sonó el metal! ¡Rebote en el palo de ${scorer.nombre}!`
+    ];
+    const textToSpeak = phrases[Math.floor(Math.random() * phrases.length)];
+    speakRelato(textToSpeak);
   }
 
   // Generar ráfaga de confeti para goles individuales
@@ -12406,6 +13012,7 @@
     // Reducir temblor de pantalla suavemente
     if (shakeIntensity > 0) shakeIntensity -= 0.6;
     if (shakeIntensity < 0) shakeIntensity = 0;
+    if (netWaveTimer > 0) netWaveTimer--; // animar onda de red
 
     if (gameMode === 'penales' && penalesTurno === 'defensa' && penalesCPUPreparando && !isCelebrating && document.getElementById('gameover-overlay').style.display !== 'flex') {
       penalesCPUShotTimer--;
@@ -12415,13 +13022,37 @@
       if (penalesCPUShotTimer <= 0) {
         penalesCPUPreparando = false;
         
-        // El CPU dispara con puntería legendaria hacia el arco
-        const targetX = GOAL_LEFT + 15 + Math.random() * (GOAL_RIGHT - GOAL_LEFT - 30);
-        const targetY = GOAL_Y + 8 + Math.random() * 26;
-        const duration = 26 + Math.random() * 8;
+        // CPU dispara con puntería letal — casi nunca falla, siempre a zonas difíciles
+        // El arco: x entre 115-285, gol detectado cuando pelota.y <= 64 (GOAL_Y+4)
+        // Zonas objetivo dentro del arco, bien adentro para no rozar postes
+        const cpuZones = [
+          { x: GOAL_LEFT  + 14, y: GOAL_Y - 8  }, // esquina baja izquierda (adentro del arco)
+          { x: GOAL_RIGHT - 14, y: GOAL_Y - 8  }, // esquina baja derecha
+          { x: GOAL_LEFT  + 14, y: GOAL_Y - 22 }, // ángulo alto izquierdo
+          { x: GOAL_RIGHT - 14, y: GOAL_Y - 22 }, // ángulo alto derecho
+          { x: GOAL_LEFT  + 22, y: GOAL_Y - 12 }, // palo corto izquierdo
+          { x: GOAL_RIGHT - 22, y: GOAL_Y - 12 }, // palo corto derecho
+        ];
+        const zona = cpuZones[Math.floor(Math.random() * cpuZones.length)];
+
+        // Probabilidad de fallo ~15% — si falla, va contra el palo o ligeramente afuera
+        const cpuFalla = Math.random() < 0.15;
+        let targetX, targetY;
+        if (cpuFalla) {
+          // Tiro que roza el palo por afuera
+          const lado = Math.random() < 0.5 ? -1 : 1;
+          targetX = lado < 0 ? GOAL_LEFT - 6 : GOAL_RIGHT + 6;
+          targetY = GOAL_Y - 10;
+        } else {
+          // Pequeña dispersión de puntería alrededor de la zona elegida (±5px max)
+          targetX = zona.x + (Math.random() - 0.5) * 8;
+          targetY = zona.y + (Math.random() - 0.5) * 6;
+        }
+
+        const duration = 24 + Math.random() * 6; // tiro rápido y consistente
         
         pelota.vx = (targetX - 200) / duration;
-        pelota.vy = ((targetY - 260) - 0.5 * 0.22 * duration * duration) / duration;
+        pelota.vy = ((targetY - 260) - 0.5 * 0.26 * duration * duration) / duration;
         pelota.isShot = true;
         pelota.hitPostThisShot = false;
         shotFrameCounter = 0;
@@ -12522,16 +13153,26 @@
       pelota.x += pelota.vx;
       pelota.y += pelota.vy;
       
-      // Gravedad
-      pelota.vy += 0.22;
+      // ── GRAVEDAD más realista (aumenta más rápido al inicio, se estabiliza) ──
+      pelota.vy += 0.26;
 
-      // ── VIENTO: desvía la pelota en vuelo ──
+      // ── RESISTENCIA DEL AIRE — frena la pelota de forma natural ──
+      const speedNow = Math.sqrt(pelota.vx * pelota.vx + pelota.vy * pelota.vy);
+      const airDrag = 0.0045 + speedNow * 0.00035; // más drag a más velocidad
+      pelota.vx *= (1 - airDrag);
+      pelota.vy *= (1 - airDrag * 0.7); // vertical un poco menos frenada
+
+      // ── VIENTO: desvía la pelota en vuelo (más efecto cuanto más alto va) ──
       if (pelota.y < 240 && pelota.y > 55) {
-        pelota.vx += vientoActual * 0.042;
+        const altitudeFactor = Math.max(0, (240 - pelota.y) / 240); // más viento en altura
+        pelota.vx += vientoActual * (0.052 + altitudeFactor * 0.025);
       }
 
-      // 1.5. Si vuela por arriba del travesaño (Y menor a 58) ¡Es fuera! (Permite errar por potencia)
-      if (pelota.y < 58 && pelota.status === '') {
+      // ── SPIN ACUMULADO: hace girar la pelota visualmente ──
+      pelotaSpin += (pelota.vx * 0.04);
+
+      // 1.5. Si vuela muy por arriba del travesaño ¡Es fuera! (Y menor a 48 = claramente sobre el arco)
+      if (pelota.y < 48 && pelota.status === '') {
         pelota.isSettled = true;
         pelota.status = 'afuera';
         bannerTxt = '¡AFUERAAA! 😝';
@@ -12542,16 +13183,19 @@
         return;
       }
 
-      // Efecto Comba / Curva Stat del Cabezón (Magnus Effect - ¡Súper sensible para curvas bananeras espectaculares!)
-      if (pelota.y < 220 && pelota.y > 60) {
+      // Efecto Comba / Curva Magnus — ¡Bananeras espectaculares con aceleración progresiva!
+      if (pelota.y < 220 && pelota.y > 58) {
         let effComba = selectedPlayer.comba;
         if (rachaActual >= 2) effComba = 150; // Súper Curva física racha
         let combaMult = 1.0;
-        if (rachaActual >= 2 || selectedBallSkin === 'hielo' || selectedBallSkin === 'oro') combaMult = 1.85; // ¡SÚPER CURVA!
-        const combaFuerza = (effComba / 100) * 0.115 * combaMult;
-        if (pelota.vx > 0.5) {
+        if (rachaActual >= 2 || selectedBallSkin === 'hielo' || selectedBallSkin === 'oro') combaMult = 1.95;
+        // El efecto Magnus es más fuerte en la mitad del vuelo (más rpm = más curva)
+        const flightProgress = Math.max(0, 1 - (pelota.y - 58) / 160);
+        const magnusMult = 0.85 + flightProgress * 0.65; // Crece hacia el arco
+        const combaFuerza = (effComba / 100) * 0.125 * combaMult * magnusMult;
+        if (pelota.vx > 0.4) {
           pelota.vx += combaFuerza; // comba hacia la derecha
-        } else if (pelota.vx < -0.5) {
+        } else if (pelota.vx < -0.4) {
           pelota.vx -= combaFuerza; // comba hacia la izquierda
         }
       }
@@ -12634,41 +13278,84 @@
         playSaveVoice();
       }
 
-      // 4. Colisiones con los Postes del Arco y Travesaño (CLANG!)
-      // Travesaño superior (Removido para abrir la portería de par en par y permitir goles fluidos!)
-      // Poste Izquierdo (Solo colisiona si llega a la profundidad real del arco!)
-      if (pelota.x >= GOAL_LEFT - 4 && pelota.x <= GOAL_LEFT + 4 && pelota.y >= 58 && pelota.y <= 74) {
-        pelota.vx = -pelota.vx * 0.5 - 1.5;
-        pelota.status = 'palo';
-        if (!pelota.hitPostThisShot) {
-          playPostVoice();
-        }
+      // 4. Colisiones con los Postes del Arco y Travesaño (CLANG! — 50% entra, 50% rebota)
+      // ── TRAVESAÑO SUPERIOR ──
+      if (pelota.y <= GOAL_Y + 4 && pelota.y >= GOAL_Y - 4 && pelota.x >= GOAL_LEFT - 3 && pelota.x <= GOAL_RIGHT + 3 && pelota.vy < 0 && pelota.status === '') {
+        if (!pelota.hitPostThisShot) { playPostVoice(); }
         pelota.hitPostThisShot = true;
-        bannerTxt = '¡AL PALO!';
-        bannerTimer = 100;
-        triggerScreenShake(12);
+        triggerScreenShake(14);
         triggerHaptic('heavy');
         playClangSound();
+        if (Math.random() < 0.5) {
+          // ¡PALO Y ADENTRO! — la pelota entra rebotando hacia abajo
+          pelota.vy = Math.abs(pelota.vy) * 0.55 + 1.5;
+          pelota.vx *= 0.75;
+          pelota.y = GOAL_Y + 6;
+          // No setear status 'palo' → se detectará como gol en el check #5
+        } else {
+          // Rebota afuera
+          pelota.vy = Math.abs(pelota.vy) * 0.55 + 1.0;
+          pelota.vx *= 0.75;
+          pelota.y = GOAL_Y + 5;
+          pelota.status = 'palo';
+          bannerTxt = '¡EN EL TRAVESAÑO!';
+          bannerTimer = 100;
+        }
       }
-      // Poste Derecho (Solo colisiona si llega a la profundidad real del arco!)
-      if (pelota.x >= GOAL_RIGHT - 4 && pelota.x <= GOAL_RIGHT + 4 && pelota.y >= 58 && pelota.y <= 74) {
-        pelota.vx = -pelota.vx * 0.5 + 1.5;
-        pelota.status = 'palo';
-        if (!pelota.hitPostThisShot) {
-          playPostVoice();
-        }
+      // ── POSTE IZQUIERDO ──
+      if (pelota.x >= GOAL_LEFT - 5 && pelota.x <= GOAL_LEFT + 5 && pelota.y >= 56 && pelota.y <= 76 && pelota.status !== 'palo') {
+        if (!pelota.hitPostThisShot) { playPostVoice(); }
         pelota.hitPostThisShot = true;
-        bannerTxt = '¡AL PALO!';
-        bannerTimer = 100;
-        triggerScreenShake(12);
+        triggerScreenShake(13);
         triggerHaptic('heavy');
         playClangSound();
+        if (Math.random() < 0.5) {
+          // ¡PALO Y ADENTRO! — entra hacia la derecha (adentro del arco)
+          pelota.vx = Math.abs(pelota.vx) * 0.65 + 1.0;
+          pelota.vy *= 0.7;
+          pelota.x = GOAL_LEFT + 7;
+          // No setear 'palo' → se detectará como gol
+        } else {
+          pelota.vx = Math.abs(pelota.vx) * 0.55 + 1.2;
+          pelota.vy *= 0.65;
+          pelota.x = GOAL_LEFT + 6;
+          pelota.status = 'palo';
+          bannerTxt = '¡AL PALO!';
+          bannerTimer = 100;
+        }
+      }
+      // ── POSTE DERECHO ──
+      if (pelota.x >= GOAL_RIGHT - 5 && pelota.x <= GOAL_RIGHT + 5 && pelota.y >= 56 && pelota.y <= 76 && pelota.status !== 'palo') {
+        if (!pelota.hitPostThisShot) { playPostVoice(); }
+        pelota.hitPostThisShot = true;
+        triggerScreenShake(13);
+        triggerHaptic('heavy');
+        playClangSound();
+        if (Math.random() < 0.5) {
+          // ¡PALO Y ADENTRO! — entra hacia la izquierda (adentro del arco)
+          pelota.vx = -(Math.abs(pelota.vx) * 0.65 + 1.0);
+          pelota.vy *= 0.7;
+          pelota.x = GOAL_RIGHT - 7;
+          // No setear 'palo' → se detectará como gol
+        } else {
+          pelota.vx = -(Math.abs(pelota.vx) * 0.55 + 1.2);
+          pelota.vy *= 0.65;
+          pelota.x = GOAL_RIGHT - 6;
+          pelota.status = 'palo';
+          bannerTxt = '¡AL PALO!';
+          bannerTimer = 100;
+        }
       }
 
-      // 5. ¡Detección de GOOOL!
-      if (pelota.y <= GOAL_Y + 4 && pelota.x >= GOAL_LEFT + 1 && pelota.x <= GOAL_RIGHT - 1 && pelota.status !== 'palo' && pelota.status !== 'bloqueado') {
+      // 5. ¡Detección de GOOOL! — la pelota cruza la línea de gol (GOAL_Y) desde abajo
+      if (pelota.y <= GOAL_Y + 6 && pelota.x >= GOAL_LEFT + 5 && pelota.x <= GOAL_RIGHT - 5 && pelota.status !== 'palo' && pelota.status !== 'bloqueado') {
+        const esPaloAdentro = pelota.hitPostThisShot; // si rebotó en el palo antes de entrar
         pelota.isSettled = true;
         pelota.status = 'gol';
+        // Activar onda de red en el punto de impacto
+        netWaveTimer = 55;
+        netWaveX = pelota.x;
+        netWaveY = Math.max(GOAL_Y + 2, Math.min(GOAL_Y + 44, pelota.y));
 
         let scorer = selectedPlayer;
         const isCpuGoal = (gameMode === 'penales' && penalesTurno === 'defensa');
@@ -12770,6 +13457,11 @@
             replayActive = true;
             replayIndex = 0;
             replayTimer = 110; // ~1.8s de replay
+          } else if (esPaloAdentro) {
+            bannerTxt = `🎯 ¡PALO Y ADENTRO! ${onoRnd} +${golPuntos}${rachaTag} (+${monedasGanadas} 🪙)`;
+            replayActive = true;
+            replayIndex = 0;
+            replayTimer = 110;
           } else {
             bannerTxt = `${onoRnd} +${golPuntos}${rachaTag} (+${monedasGanadas} 🪙)`;
           }
@@ -12885,68 +13577,138 @@
       
       const chutesRestantes = Math.max(0, 5 - chutesChutados);
       const defensasRestantes = Math.max(0, 5 - defensasChutados);
-      
-      let ganador = null;
-      if (favor > contra + defensasRestantes) {
-        ganador = 'usuario';
-      } else if (contra > favor + chutesRestantes) {
-        ganador = 'cpu';
-      } else if (chutesChutados >= 5 && defensasChutados >= 5 && chutesChutados === defensasChutados) {
-        if (favor !== contra) {
-          ganador = favor > contra ? 'usuario' : 'cpu';
-        }
-      }
 
-      if (ganador) {
-        if (ganador === 'usuario') {
-          playVictorySound();
-          unlockAchievement('campeon_penales', 'Especialista en Penales', 'Ganaste una definición por penales de infarto.');
-          isCelebrating = true;
-          isCopaCelebracion = true;
-          const otherPlayers = MUNDIAL_JUGADORES.filter(p => p.id !== selectedPlayer.id);
-          celebrationTeammates = [
-            otherPlayers[Math.floor(Math.random() * otherPlayers.length)],
-            otherPlayers[(Math.floor(Math.random() * otherPlayers.length) + 1) % otherPlayers.length]
-          ];
-          trophyY = -60;
-          confettiParticles = [];
-          for (let i = 0; i < 80; i++) {
-            confettiParticles.push({
-              x: Math.random() * 400,
-              y: Math.random() * -300,
-              vx: (Math.random() - 0.5) * 2,
-              vy: 1.5 + Math.random() * 2.2,
-              color: ['#f87171', '#fbbf24', '#34d399', '#60a5fa', '#c084fc', '#f472b6'][Math.floor(Math.random() * 6)],
-              w: 4 + Math.random() * 4,
-              h: 6 + Math.random() * 5,
-              rot: Math.random() * Math.PI,
-              rotSpeed: (Math.random() - 0.5) * 0.08
-            });
+      // Detectar si estamos en fase de grupos del torneo
+      const esFaseGrupos = torneoPenales && torneoPenales.active && torneoPenales.fase === 'grupos';
+
+      // En fase de grupos: empate = 1 punto para cada uno, no hay muerte súbita
+      // Solo se evalúa al completar la ronda completa (ambos patearon 5)
+      if (esFaseGrupos) {
+        // Ganador anticipado (dominancia matemática antes de los 5 tiros)
+        let ganadorAnticipado = null;
+        if (favor > contra + defensasRestantes) ganadorAnticipado = 'usuario';
+        else if (contra > favor + chutesRestantes) ganadorAnticipado = 'cpu';
+
+        if (ganadorAnticipado) {
+          // Hay ganador anticipado → terminar la tanda
+          if (ganadorAnticipado === 'usuario') {
+            avanzarRondaTorneoGrupos(favor, contra);
+            finalizarRondaJuego(true);
+          } else {
+            avanzarRondaTorneoGrupos(favor, contra);
+            finalizarRondaJuego(false);
           }
-          const titleEl = document.querySelector('.gameover-title');
-          if (titleEl) {
-            titleEl.innerText = '🏆 ¡CAMPEÓN DE PENALES! 🏆';
-            titleEl.style.color = '#fbbf24';
-            titleEl.style.textShadow = '0 0 10px rgba(251, 191, 36, 0.6)';
+        } else if (chutesChutados >= 5 && defensasChutados >= 5 && chutesChutados === defensasChutados) {
+          // Todos patearon los 5: decidir
+          if (favor > contra) {
+            avanzarRondaTorneoGrupos(favor, contra);
+            finalizarRondaJuego(true);
+          } else if (contra > favor) {
+            avanzarRondaTorneoGrupos(favor, contra);
+            finalizarRondaJuego(false);
+          } else {
+            // EMPATE en fase de grupos → 1 punto a cada uno
+            avanzarRondaTorneoGrupos(favor, contra); // favor === contra → empate en tabla
+            const titleEl = document.querySelector('.gameover-title');
+            if (titleEl) {
+              titleEl.innerText = '🤝 ¡EMPATE EN PENALES! +1 PTO';
+              titleEl.style.color = '#fbbf24';
+              titleEl.style.textShadow = '0 0 10px rgba(251, 191, 36, 0.6)';
+            }
+            finalizarRondaJuego(true); // avanzar al siguiente partido de grupos
           }
-          totalCoins += 15;
-          localStorage.setItem('nx_futbol_monedas', totalCoins);
-          actualizarMonedasDisplay();
-          finalizarRondaJuego(true);
         } else {
-          const titleEl = document.querySelector('.gameover-title');
-          if (titleEl) {
-            titleEl.innerText = '😞 DERROTA EN PENALES 😞';
-            titleEl.style.color = '#f87171';
-            titleEl.style.textShadow = '0 0 10px rgba(248, 113, 113, 0.6)';
-          }
-          finalizarRondaJuego(false);
+          resetPelota();
         }
       } else {
-        resetPelota();
-    }
+        // Fase eliminatoria o modo libre → lógica de muerte súbita correcta
+
+        let ganador = null;
+
+        // Rondas normales (1-5): ganador anticipado o al completar la 5ª ronda
+        if (chutesChutados <= 5 && defensasChutados <= 5) {
+          if (favor > contra + defensasRestantes) {
+            ganador = 'usuario';
+          } else if (contra > favor + chutesRestantes) {
+            ganador = 'cpu';
+          } else if (chutesChutados >= 5 && defensasChutados >= 5 && chutesChutados === defensasChutados) {
+            if (favor !== contra) {
+              ganador = favor > contra ? 'usuario' : 'cpu';
+            }
+            // Si favor === contra → continúa en muerte súbita (sin ganador)
+          }
+        }
+
+        // MUERTE SÚBITA (ronda 6 en adelante): solo se resuelve al completar la ronda completa
+        // Es decir, cuando AMBOS patearon la misma cantidad de veces (ronda simétrica)
+        if (!ganador && chutesChutados > 5 && defensasChutados > 5) {
+          // Solo evaluar cuando ambos completaron la misma ronda de muerte súbita
+          if (chutesChutados === defensasChutados) {
+            if (favor !== contra) {
+              ganador = favor > contra ? 'usuario' : 'cpu';
+            }
+            // Si siguen empatados → otra ronda de muerte súbita
+          }
+          // Si chutesChutados > defensasChutados, la CPU aún no pateó → esperar
+        }
+
+        if (ganador) {
+          if (ganador === 'usuario') {
+            playVictorySound();
+            unlockAchievement('campeon_penales', 'Especialista en Penales', 'Ganaste una definición por penales de infarto.');
+            isCelebrating = true;
+            isCopaCelebracion = true;
+            const otherPlayers = MUNDIAL_JUGADORES.filter(p => p.id !== selectedPlayer.id);
+            celebrationTeammates = [
+              otherPlayers[Math.floor(Math.random() * otherPlayers.length)],
+              otherPlayers[(Math.floor(Math.random() * otherPlayers.length) + 1) % otherPlayers.length]
+            ];
+            trophyY = -60;
+            confettiParticles = [];
+            for (let i = 0; i < 80; i++) {
+              confettiParticles.push({
+                x: Math.random() * 400,
+                y: Math.random() * -300,
+                vx: (Math.random() - 0.5) * 2,
+                vy: 1.5 + Math.random() * 2.2,
+                color: ['#f87171', '#fbbf24', '#34d399', '#60a5fa', '#c084fc', '#f472b6'][Math.floor(Math.random() * 6)],
+                w: 4 + Math.random() * 4,
+                h: 6 + Math.random() * 5,
+                rot: Math.random() * Math.PI,
+                rotSpeed: (Math.random() - 0.5) * 0.08
+              });
+            }
+            const titleEl = document.querySelector('.gameover-title');
+            if (titleEl) {
+              titleEl.innerText = '🏆 ¡CAMPEÓN DE PENALES! 🏆';
+              titleEl.style.color = '#fbbf24';
+              titleEl.style.textShadow = '0 0 10px rgba(251, 191, 36, 0.6)';
+            }
+            totalCoins += 15;
+            localStorage.setItem('nx_futbol_monedas', totalCoins);
+            actualizarMonedasDisplay();
+            finalizarRondaJuego(true);
+          } else {
+            const titleEl = document.querySelector('.gameover-title');
+            if (titleEl) {
+              titleEl.innerText = '😞 DERROTA EN PENALES 😞';
+              titleEl.style.color = '#f87171';
+              titleEl.style.textShadow = '0 0 10px rgba(248, 113, 113, 0.6)';
+            }
+            finalizarRondaJuego(false);
+          }
+        } else {
+          resetPelota();
+        }
+      }
   }
 }
+
+  // Auxiliar: avanzar torneo de grupos con el marcador dado (soporta empate)
+  function avanzarRondaTorneoGrupos(golesFavor, golesContra) {
+    _torneoYaAvanzado = true;
+    avanzarRondaTorneo(golesFavor, golesContra);
+  }
 
   function checkDecisivePenalty() {
     if (gameMode !== 'penales') return false;
@@ -13039,6 +13801,9 @@
     } catch(e) {}
   }
 
+  // Bandera para saber si avanzarRondaTorneo ya fue llamado antes de finalizarRondaJuego
+  let _torneoYaAvanzado = false;
+
   function finalizarRondaJuego(penalesVictoria) {
     if (gameMode === 'penales') {
       if (physicsInterval) {
@@ -13051,8 +13816,11 @@
       document.getElementById('mundial-estadio').style.display = 'none';
       
       if (penalesVictoria) {
-        // Guardar marcador y avanzar
-        avanzarRondaTorneo(penalesGolesFavor, penalesGolesContra);
+        // Guardar marcador y avanzar (solo si no fue ya procesado, ej. empate de grupos)
+        if (!_torneoYaAvanzado) {
+          avanzarRondaTorneo(penalesGolesFavor, penalesGolesContra);
+        }
+        _torneoYaAvanzado = false;
         
         if (torneoPenales.winner) {
           // Ganó el torneo (la gran final)!
@@ -13062,6 +13830,7 @@
           mostrarBracketTorneoScreen(false);
         }
       } else {
+        _torneoYaAvanzado = false;
         // Perdió el partido: mostrar el bracket pero en modo derrota (con reintentar activo)
         mostrarBracketTorneoScreen(true);
       }
@@ -13762,14 +14531,39 @@
 
     // Barba candado chico (si corresponde, estilo Batifrutta o The Witch)
     if (player.beard && player.beardType === 'candado-chico') {
-      ctx.strokeStyle = player.beard;
-      ctx.lineWidth = 1.8;
-      ctx.beginPath();
-      ctx.arc(0, 5, 4.5, 0, Math.PI);
-      ctx.stroke();
-      
+      ctx.save();
       ctx.fillStyle = player.beard;
-      ctx.fillRect(-0.8, 5, 1.6, 4.2);
+      ctx.strokeStyle = player.beard;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      // ── BIGOTE (arco superior del candado) ──
+      ctx.beginPath();
+      ctx.moveTo(-6, 2.5);
+      ctx.bezierCurveTo(-4.5, -0.5, -1.5, 0, 0, 1.5);
+      ctx.bezierCurveTo(1.5, 0, 4.5, -0.5, 6, 2.5);
+      ctx.bezierCurveTo(4.5, 4.5, 1.5, 3.5, 0, 4);
+      ctx.bezierCurveTo(-1.5, 3.5, -4.5, 4.5, -6, 2.5);
+      ctx.closePath();
+      ctx.fill();
+
+      // ── LADOS DEL CANDADO (patillas laterales) ──
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(-6, 3.5);
+      ctx.lineTo(-6, 10.5);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(6, 3.5);
+      ctx.lineTo(6, 10.5);
+      ctx.stroke();
+
+      // ── PERILLA (cuerpo inferior del candado) ──
+      ctx.beginPath();
+      ctx.ellipse(0, 10.5, 5.8, 2.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
     }
 
     // Dibujar guantes de arquero flotantes si corresponde
@@ -14141,31 +14935,42 @@
     // 0. TRIBUNA Y FONDO DEL ESTADIO (Fotorrealista!)
     // ══════════════════════════════════════════════
     
-    // Cielo nocturno del estadio (degradado profundo)
+    // Cielo nocturno del estadio (degradado profundo con más atmósfera)
     const skyGrad = ctx.createLinearGradient(0, 0, 0, 45);
-    skyGrad.addColorStop(0, '#05080d');
-    skyGrad.addColorStop(1, '#0c1220');
+    skyGrad.addColorStop(0, '#020508');
+    skyGrad.addColorStop(0.5, '#060b12');
+    skyGrad.addColorStop(1, '#0c1525');
     ctx.fillStyle = skyGrad;
     ctx.fillRect(0, 0, gameCanvas.width, 45);
 
     // TRIBUNA NORTE — gradas con profundidad y espectadores
     const standHeight = 45;
-    // Fondo de tribuna con gradiente oscuro
+    // Fondo de tribuna con gradiente más profundo y atmosférico
     const standGrad = ctx.createLinearGradient(0, 0, 0, standHeight);
-    standGrad.addColorStop(0, '#0e1218');
-    standGrad.addColorStop(0.6, '#141922');
-    standGrad.addColorStop(1, '#1a2230');
+    standGrad.addColorStop(0, '#080c12');
+    standGrad.addColorStop(0.4, '#101520');
+    standGrad.addColorStop(0.8, '#141c2a');
+    standGrad.addColorStop(1, '#1c2535');
     ctx.fillStyle = standGrad;
     ctx.fillRect(0, 0, gameCanvas.width, standHeight);
 
-    // Estructura del estadio: vigas y arcos de acero
-    ctx.strokeStyle = 'rgba(60, 80, 110, 0.45)';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < 7; i++) {
-      const bx = 30 + i * 57;
+    // Estructura del estadio: vigas y arcos de acero más detallados
+    ctx.strokeStyle = 'rgba(70, 100, 140, 0.5)';
+    ctx.lineWidth = 1.2;
+    for (let i = 0; i < 8; i++) {
+      const bx = 25 + i * 50;
       ctx.beginPath();
       ctx.moveTo(bx, 0);
-      ctx.lineTo(bx - 5, standHeight);
+      ctx.lineTo(bx - 6, standHeight);
+      ctx.stroke();
+    }
+    // Vigas horizontales
+    ctx.strokeStyle = 'rgba(50, 75, 110, 0.3)';
+    ctx.lineWidth = 0.7;
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.moveTo(0, 8 + i * 13);
+      ctx.lineTo(400, 8 + i * 13);
       ctx.stroke();
     }
 
@@ -14184,16 +14989,16 @@
       }
     }
 
-    for (let row = 0; row < 4; row++) {
-      const rowY = 6 + row * 9 + crowdJump;
-      const density = row === 0 ? 55 : (row === 1 ? 48 : (row === 2 ? 42 : 38));
+    for (let row = 0; row < 5; row++) {
+      const rowY = 5 + row * 8 + crowdJump;
+      const density = row === 0 ? 65 : (row === 1 ? 58 : (row === 2 ? 52 : (row === 3 ? 46 : 40)));
       for (let i = 0; i < density; i++) {
         const seed = (i * 7 + row * 13 + crowdSeed * (row % 2 === 0 ? 1 : -1)) % crowdColors.length;
         const cx = 4 + (i / density) * 392 + (row % 2 === 0 ? 4 : -2);
-        const cr = 2.2 - row * 0.2;
+        const cr = 2.4 - row * 0.2;
         
         // Dibujar pequeñas banderas ondeantes de la selección del jugador durante los festejos
-        if (isCelebrating && row === 1 && i % 9 === 0) {
+        if (isCelebrating && row === 1 && i % 8 === 0) {
           ctx.save();
           const flagColor = (selectedPlayer.flagColors && selectedPlayer.flagColors[0]) ? selectedPlayer.flagColors[0] : '#fbbf24';
           ctx.fillStyle = flagColor;
@@ -14208,28 +15013,38 @@
           ctx.restore();
         }
 
-        // Silueta de cabeza del hincha
-        ctx.fillStyle = `rgba(${parseInt(crowdColors[Math.abs(seed)].slice(1,3),16)}, ${parseInt(crowdColors[Math.abs(seed)].slice(3,5),16)}, ${parseInt(crowdColors[Math.abs(seed)].slice(5,7),16)}, ${0.55 + row * 0.08})`;
+        // Silueta de cabeza del hincha con brillo superior
+        const alpha = 0.60 + row * 0.06;
+        ctx.fillStyle = `rgba(${parseInt(crowdColors[Math.abs(seed)].slice(1,3),16)}, ${parseInt(crowdColors[Math.abs(seed)].slice(3,5),16)}, ${parseInt(crowdColors[Math.abs(seed)].slice(5,7),16)}, ${alpha})`;
         ctx.beginPath();
         ctx.arc(cx, rowY, cr, 0, Math.PI * 2);
         ctx.fill();
+        
+        // Pequeño brillo en la cabeza del hincha
+        if (row < 3) {
+          ctx.fillStyle = `rgba(255,255,255,0.08)`;
+          ctx.beginPath();
+          ctx.arc(cx - cr * 0.25, rowY - cr * 0.3, cr * 0.45, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
     }
 
-    // Flash de cámaras en la tribuna (continuo y orgánico)
+    // Flash de cámaras en la tribuna (más destellos, más orgánicos)
     const flashNow = Date.now();
-    for (let i = 0; i < 6; i++) {
-      const fOff = (i * 1337 + flashNow * (0.3 + i * 0.1)) % 3000;
-      if (fOff < 120) {
-        const fx = 20 + i * 60 + Math.sin(i) * 15;
-        const fy = 8 + (i % 3) * 10;
-        const fo = 1 - fOff / 120;
-        const fGrad = ctx.createRadialGradient(fx, fy, 0, fx, fy, 8);
-        fGrad.addColorStop(0, `rgba(255, 255, 240, ${fo * 0.9})`);
+    for (let i = 0; i < 12; i++) {
+      const fOff = (i * 1337 + flashNow * (0.25 + i * 0.08)) % 2800;
+      if (fOff < 140) {
+        const fx = 15 + i * 32 + Math.sin(i * 1.7) * 12;
+        const fy = 6 + (i % 4) * 9;
+        const fo = 1 - fOff / 140;
+        const fGrad = ctx.createRadialGradient(fx, fy, 0, fx, fy, 10);
+        fGrad.addColorStop(0, `rgba(255, 255, 245, ${fo * 1.0})`);
+        fGrad.addColorStop(0.4, `rgba(255, 248, 220, ${fo * 0.6})`);
         fGrad.addColorStop(1, 'rgba(255,255,255,0)');
         ctx.fillStyle = fGrad;
         ctx.beginPath();
-        ctx.arc(fx, fy, 8, 0, Math.PI * 2);
+        ctx.arc(fx, fy, 10, 0, Math.PI * 2);
         ctx.fill();
       }
     }
@@ -14242,6 +15057,108 @@
     ctx.fillStyle = borderGrad;
     ctx.fillRect(0, standHeight - 2, gameCanvas.width, 6);
 
+    // ── FOCOS DEL ESTADIO — rayos de luz cónica desde esquinas superiores ──
+    {
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      const spotOpacity = 0.025;
+      // Foco izquierdo
+      const spotL = ctx.createRadialGradient(-20, -10, 10, 80, 130, 230);
+      spotL.addColorStop(0, `rgba(255, 255, 220, ${spotOpacity * 2})`);
+      spotL.addColorStop(0.5, `rgba(255, 255, 200, ${spotOpacity})`);
+      spotL.addColorStop(1, 'rgba(255, 255, 180, 0)');
+      ctx.fillStyle = spotL;
+      ctx.beginPath();
+      ctx.moveTo(-20, -10);
+      ctx.lineTo(160, gameCanvas.height);
+      ctx.lineTo(-20, gameCanvas.height);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Foco derecho
+      const spotR = ctx.createRadialGradient(420, -10, 10, 320, 130, 230);
+      spotR.addColorStop(0, `rgba(255, 255, 220, ${spotOpacity * 2})`);
+      spotR.addColorStop(0.5, `rgba(255, 255, 200, ${spotOpacity})`);
+      spotR.addColorStop(1, 'rgba(255, 255, 180, 0)');
+      ctx.fillStyle = spotR;
+      ctx.beginPath();
+      ctx.moveTo(420, -10);
+      ctx.lineTo(240, gameCanvas.height);
+      ctx.lineTo(420, gameCanvas.height);
+      ctx.closePath();
+      ctx.fill();
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.restore();
+    }
+
+    // ── CARTELES PUBLICITARIOS (valla LED al borde del campo) ──
+    {
+      const adH = 16;
+      const adY = standHeight - adH;
+      const adW = gameCanvas.width;
+
+      // Fondo negro LED de la valla
+      ctx.fillStyle = '#060810';
+      ctx.fillRect(0, adY, adW, adH);
+
+      // Borde superior e inferior de la valla
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.fillRect(0, adY, adW, 1);
+      ctx.fillRect(0, adY + adH - 1, adW, 1);
+
+      // Definir los carteles
+      const ads = [
+        { text: '⚽ NEXOS WORLD CUP 26', bg: '#1a237e', fg: '#ffffff', accent: '#ffd600' },
+        { text: '🥤 COLALOCA',           bg: '#b71c1c', fg: '#ffffff', accent: '#ff8f00' },
+        { text: '🍔 MCRONALDS',          bg: '#e65100', fg: '#ffffff', accent: '#ffee58' },
+        { text: '⚽ NEXOS WORLD CUP 26', bg: '#1a237e', fg: '#ffffff', accent: '#ffd600' },
+        { text: '🥤 COLALOCA',           bg: '#b71c1c', fg: '#ffffff', accent: '#ff8f00' },
+        { text: '🍔 MCRONALDS',          bg: '#e65100', fg: '#ffffff', accent: '#ffee58' },
+      ];
+
+      // Scroll continuo
+      const slotW = 134;
+      const totalW = slotW * 3;
+      const offset = (Date.now() * 0.1) % totalW;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, adY, adW, adH);
+      ctx.clip();
+
+      for (let cycle = -1; cycle <= 1; cycle++) {
+        for (let s = 0; s < 3; s++) {
+          const ad = ads[s];
+          const sx = cycle * totalW + s * slotW - offset;
+
+          // Fondo del cartel
+          ctx.fillStyle = ad.bg;
+          ctx.fillRect(sx, adY, slotW - 1, adH);
+
+          // Línea separadora
+          ctx.fillStyle = 'rgba(255,255,255,0.30)';
+          ctx.fillRect(sx + slotW - 1, adY, 1, adH);
+
+          // Borde de acento superior e inferior
+          ctx.fillStyle = ad.accent;
+          ctx.fillRect(sx, adY, slotW - 1, 2);
+          ctx.fillRect(sx, adY + adH - 2, slotW - 1, 2);
+
+          // Texto del cartel
+          ctx.fillStyle = ad.fg;
+          ctx.font = 'bold 8px system-ui, -apple-system, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.shadowColor = ad.accent;
+          ctx.shadowBlur = 5;
+          ctx.fillText(ad.text, sx + slotW / 2, adY + adH / 2);
+          ctx.shadowBlur = 0;
+        }
+      }
+
+      ctx.restore();
+    }
+
     // ══════════════════════════════════════════════
     // 1. CÉSPED CON FRANJAS Y PERSPECTIVA REAL
     // ══════════════════════════════════════════════
@@ -14250,32 +15167,46 @@
     const FIELD_H = gameCanvas.height - FIELD_TOP;
     
     // Franjas de césped con perspectiva sutil (más anchas arriba, más anchas abajo)
-    const stripeCount = 8;
+    const stripeCount = 10;
     for (let s = 0; s < stripeCount; s++) {
       const t = s / stripeCount;
       const stripeY = FIELD_TOP + t * FIELD_H;
       const stripeH = FIELD_H / stripeCount;
-      // Alternar verde oscuro / verde medio
+      // Alternar verde oscuro / verde medio con colores más ricos
       const lightness = s % 2 === 0 ? 0 : 1;
       const g1 = ctx.createLinearGradient(0, stripeY, 0, stripeY + stripeH);
       if (lightness === 0) {
-        g1.addColorStop(0, '#0d2014');
-        g1.addColorStop(1, '#102316');
+        g1.addColorStop(0, '#0a2010');
+        g1.addColorStop(1, '#0d2514');
       } else {
-        g1.addColorStop(0, '#112718');
-        g1.addColorStop(1, '#0f2215');
+        g1.addColorStop(0, '#112c18');
+        g1.addColorStop(1, '#0e2815');
       }
       ctx.fillStyle = g1;
       ctx.fillRect(0, stripeY, gameCanvas.width, stripeH + 1);
     }
 
-    // Luz cenital del estadio — destellos verticales de los focos
-    const lightGrad = ctx.createRadialGradient(200, FIELD_TOP, 10, 200, FIELD_TOP, 320);
-    lightGrad.addColorStop(0, 'rgba(200, 240, 180, 0.06)');
-    lightGrad.addColorStop(0.5, 'rgba(160, 220, 140, 0.03)');
+    // Luces cenitales del estadio — rayos de focos más intensos
+    const lightGrad = ctx.createRadialGradient(200, FIELD_TOP, 5, 200, FIELD_TOP, 280);
+    lightGrad.addColorStop(0, 'rgba(220, 255, 200, 0.10)');
+    lightGrad.addColorStop(0.3, 'rgba(180, 240, 160, 0.05)');
+    lightGrad.addColorStop(0.7, 'rgba(100, 180, 80, 0.02)');
     lightGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
     ctx.fillStyle = lightGrad;
     ctx.fillRect(0, FIELD_TOP, gameCanvas.width, FIELD_H);
+
+    // Rayos de focos laterales — iluminación lateral dramática
+    const leftSpotGrad = ctx.createRadialGradient(0, FIELD_TOP + 20, 5, 60, FIELD_TOP + 80, 180);
+    leftSpotGrad.addColorStop(0, 'rgba(255, 255, 220, 0.06)');
+    leftSpotGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = leftSpotGrad;
+    ctx.fillRect(0, FIELD_TOP, gameCanvas.width / 2, FIELD_H);
+
+    const rightSpotGrad = ctx.createRadialGradient(400, FIELD_TOP + 20, 5, 340, FIELD_TOP + 80, 180);
+    rightSpotGrad.addColorStop(0, 'rgba(255, 255, 220, 0.06)');
+    rightSpotGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = rightSpotGrad;
+    ctx.fillRect(gameCanvas.width / 2, FIELD_TOP, gameCanvas.width / 2, FIELD_H);
 
     // ══════════════════════════════════════════════
     // LÍNEAS DEL CAMPO (perspectiva real)
@@ -14284,36 +15215,45 @@
     ctx.lineWidth = 1.5;
     ctx.setLineDash([]);
 
-    // Línea del medio campo (horizontal)
+    // Línea de meta (línea de gol) — a la altura de la base del arco, en el piso
+    ctx.beginPath();
+    ctx.moveTo(0, GOAL_Y + 56);
+    ctx.lineTo(400, GOAL_Y + 56);
+    ctx.stroke();
+
+    // Línea del medio campo
     ctx.beginPath();
     ctx.moveTo(0, 290);
     ctx.lineTo(400, 290);
     ctx.stroke();
 
-    // Área grande (caja penal principal)
+    // [Las líneas del área se dibujan DESPUÉS del arco para quedar por encima]
+
+    // Punto del penal — a 55px de la base del arco (dentro del área grande de 90px)
+    const GOAL_BASE_EARLY = GOAL_Y + 56;
+    ctx.fillStyle = 'rgba(240, 255, 235, 0.6)';
     ctx.beginPath();
-    ctx.rect(80, 60, 240, 100);
-    ctx.stroke();
-    
-    // Área chica (6 yardas)
-    ctx.beginPath();
-    ctx.rect(130, 60, 140, 35);
-    ctx.stroke();
-    
-    // Punto del penal + círculo
-    ctx.fillStyle = 'rgba(240, 255, 235, 0.5)';
-    ctx.beginPath();
-    ctx.arc(200, 145, 2.5, 0, Math.PI * 2);
+    ctx.arc(200, GOAL_BASE_EARLY + 55, 2.5, 0, Math.PI * 2);
     ctx.fill();
-    
-    // Arco del área penal (semicírculo)
-    ctx.strokeStyle = 'rgba(240, 255, 235, 0.20)';
-    ctx.lineWidth = 1.2;
+
+    // Semicírculo del área penal — la porción del círculo centrado en el punto del penal
+    // que asoma por DEBAJO del borde del área grande (hacia el jugador).
+    // El área grande termina en GOAL_BASE_EARLY + 90. El punto del penal está en GOAL_BASE_EARLY + 55.
+    // El radio 38 hace que el extremo inferior llegue a +93, asomando 3px fuera del área.
+    // Dibujamos solo la mitad inferior del círculo (0 a π), que es la que apunta hacia el jugador.
+    ctx.strokeStyle = 'rgba(240, 255, 235, 0.35)';
+    ctx.lineWidth = 1.4;
+    ctx.save();
+    // Clip para mostrar solo la parte fuera del área grande
     ctx.beginPath();
-    ctx.arc(200, 145, 40, Math.PI * 0.15, Math.PI * 0.85);
+    ctx.rect(0, GOAL_BASE_EARLY + 90, gameCanvas.width, gameCanvas.height);
+    ctx.clip();
+    ctx.beginPath();
+    ctx.arc(200, GOAL_BASE_EARLY + 55, 65, 0, Math.PI);
     ctx.stroke();
-    
-    // Pequeño dot en la posición de tiro (debajo del arco)
+    ctx.restore();
+
+    // Dot de posición de tiro libre
     ctx.fillStyle = 'rgba(255, 255, 200, 0.6)';
     ctx.beginPath();
     ctx.arc(200, 255, 2, 0, Math.PI * 2);
@@ -14450,68 +15390,6 @@
       ctx.restore();
     }
 
-    // ── CARTEL DE PUBLICIDAD LED TRASERO (SCROLLING TICKER CONTINUO) ──
-    ctx.save();
-    
-    // Dibujar estructura del panel LED entero
-    const ledX = 8;
-    const ledY = 46;
-    const ledW = 384;
-    const ledH = 16;
-    
-    const ledBg = ctx.createLinearGradient(ledX, ledY, ledX, ledY + ledH);
-    ledBg.addColorStop(0, '#020617'); // azul muy oscuro slate
-    ledBg.addColorStop(1, '#0f172a');
-    ctx.fillStyle = ledBg;
-    ctx.beginPath();
-    ctx.roundRect(ledX, ledY, ledW, ledH, 4);
-    ctx.fill();
-
-    // Borde neón parpadeante sutil con gradiente
-    const tLed = Date.now();
-    const borderGlow = 0.65 + Math.sin(tLed * 0.0035) * 0.25;
-    ctx.strokeStyle = `rgba(16, 185, 129, ${borderGlow})`; // neón esmeralda
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.roundRect(ledX, ledY, ledW, ledH, 4);
-    ctx.stroke();
-    
-    // Resplandor neón exterior
-    ctx.shadowColor = '#10b981';
-    ctx.shadowBlur = 4 * borderGlow;
-    
-    // Clip para el texto en movimiento para que no se salga del panel
-    ctx.save();
-    ctx.beginPath();
-    ctx.roundRect(ledX + 2, ledY + 1, ledW - 4, ledH - 2, 2);
-    ctx.clip();
-    ctx.shadowBlur = 0; // resetear shadow para el texto
-
-    ctx.font = '900 8.5px "Courier New", Courier, monospace, system-ui';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-
-    let textToDraw = "  ★  🛡️ NEXOS SEGURIDAD 🛡️  ★  DESCARGÁ NUESTRA APP: https://nexos.tally.so/r/nexos 📲  ★  ";
-    if (gameMode === 'penales') {
-      const rival = (penalesRivalsQueue.length > 0 && penalesRivalIdx < penalesRivalsQueue.length) ? penalesRivalsQueue[penalesRivalIdx] : null;
-      const rivalNombre = rival ? rival.nombre.toUpperCase() : 'RIVAL';
-      textToDraw = `  ★  🛡️ NEXOS SEGURIDAD 🛡️  ★  🆚 VS ${rivalNombre}  ★  APP: https://nexos.tally.so/r/nexos 📲  ★  `;
-    }
-    
-    const textWidth = ctx.measureText(textToDraw).width;
-    
-    // Posición X animada por milisegundos para ser independiente del framerate
-    const scrollPos = (tLed * 0.045) % textWidth;
-    
-    // Dibujar texto duplicado para scroll infinito sin saltos
-    ctx.fillStyle = '#10b981'; // texto verde LED
-    ctx.shadowColor = '#10b981';
-    ctx.shadowBlur = 5;
-    ctx.fillText(textToDraw, ledX + 4 - scrollPos, ledY + ledH / 2 + 0.5);
-    ctx.fillText(textToDraw, ledX + 4 - scrollPos + textWidth, ledY + ledH / 2 + 0.5);
-    
-    ctx.restore(); // restaurar clip
-    ctx.restore(); // restaurar save general
 
     if (isCelebrating) {
       const netDepth2 = ctx.createLinearGradient(200, GOAL_Y, 200, GOAL_Y + 50);
@@ -14620,195 +15498,216 @@
     }
 
     // ══════════════════════════════════════════════
-    // 2. RED DEL ARCO — Realista con profundidad 3D
+    // 2. RED DEL ARCO — Realista con profundidad 3D y onda de impacto
     // ══════════════════════════════════════════════
     
     // Sombra proyectada de la red en el suelo (perspectiva)
     const netShadow = ctx.createLinearGradient(GOAL_LEFT, GOAL_Y, GOAL_LEFT, GOAL_Y + 55);
-    netShadow.addColorStop(0, 'rgba(0, 0, 0, 0.45)');
+    netShadow.addColorStop(0, 'rgba(0, 0, 0, 0.65)');
     netShadow.addColorStop(1, 'rgba(0, 0, 0, 0)');
     ctx.fillStyle = netShadow;
     ctx.fillRect(GOAL_LEFT, GOAL_Y, GOAL_RIGHT - GOAL_LEFT, 55);
 
-    // Red — interior profundo (efecto de profundidad oscuro)
-    const netDepth = ctx.createLinearGradient(200, GOAL_Y, 200, GOAL_Y + 50);
-    netDepth.addColorStop(0, 'rgba(0, 30, 10, 0.85)');
-    netDepth.addColorStop(1, 'rgba(0, 20, 8, 0.60)');
+    // Red — interior profundo con mejor profundidad
+    const netDepth = ctx.createLinearGradient(200, GOAL_Y, 200, GOAL_Y + 52);
+    netDepth.addColorStop(0, 'rgba(0, 35, 12, 0.95)');
+    netDepth.addColorStop(0.5, 'rgba(0, 20, 8, 0.80)');
+    netDepth.addColorStop(1, 'rgba(0, 10, 4, 0.55)');
     ctx.fillStyle = netDepth;
-    ctx.fillRect(GOAL_LEFT + 2, GOAL_Y, GOAL_RIGHT - GOAL_LEFT - 4, 50);
+    ctx.fillRect(GOAL_LEFT + 2, GOAL_Y, GOAL_RIGHT - GOAL_LEFT - 4, 52);
 
-    // Líneas verticales de la red (hilo delgado perspectivado)
-    ctx.lineWidth = 0.7;
+    // Toque de luz verde en el interior de la red (reflejo del césped)
+    const netGrassReflect = ctx.createLinearGradient(GOAL_LEFT, GOAL_Y + 20, GOAL_RIGHT, GOAL_Y + 52);
+    netGrassReflect.addColorStop(0, 'rgba(20, 80, 30, 0.15)');
+    netGrassReflect.addColorStop(0.5, 'rgba(30, 100, 40, 0.10)');
+    netGrassReflect.addColorStop(1, 'rgba(20, 80, 30, 0.15)');
+    ctx.fillStyle = netGrassReflect;
+    ctx.fillRect(GOAL_LEFT + 2, GOAL_Y + 22, GOAL_RIGHT - GOAL_LEFT - 4, 30);
+
+    // ── ONDA DE IMPACTO EN LA RED (cuando la pelota entra) ──
     const netW = GOAL_RIGHT - GOAL_LEFT;
-    for (let i = 0; i <= netW; i += 8) {
-      const progress = i / netW;
-      // La red se estrecha hacia el fondo (perspectiva)
-      const topX = GOAL_LEFT + i;
-      const botX = GOAL_LEFT + 4 + i * 0.98; 
-      ctx.strokeStyle = `rgba(230, 255, 230, ${0.22 - progress * 0.04})`;
+    const hasWave = netWaveTimer > 0;
+    const waveAge = 55 - netWaveTimer; // 0 = recién impactó, 55 = ya se desvanece
+    const waveStrength = hasWave ? Math.max(0, 1 - waveAge / 55) : 0;
+    const waveRadius = hasWave ? waveAge * 4.5 : 0;
+
+    // Líneas verticales de la red con deformación de onda
+    ctx.lineWidth = 0.9;
+    const netLines = Math.ceil(netW / 5); // más densa: cada 5px
+    for (let i = 0; i <= netLines; i++) {
+      const progress = i / netLines;
+      const topX = GOAL_LEFT + progress * netW;
+      const botX = GOAL_LEFT + 2 + (progress * netW) * 0.97; // perspectiva leve
+      
+      // Calcular deformación en este hilo vertical
+      let waveOffsetX = 0, waveOffsetMid = 0;
+      if (hasWave && waveStrength > 0) {
+        const distFromImpact = Math.abs(topX - netWaveX);
+        const wavePush = Math.max(0, waveRadius - distFromImpact) / (waveRadius + 1);
+        waveOffsetX = wavePush * waveStrength * 6 * Math.sin(waveAge * 0.4);
+        waveOffsetMid = wavePush * waveStrength * 10 * Math.sin(waveAge * 0.35 + 0.5);
+      }
+
+      const alpha = 0.38 - progress * 0.08;
+      ctx.strokeStyle = `rgba(235, 255, 235, ${Math.max(0.10, alpha)})`;
       ctx.beginPath();
-      ctx.moveTo(topX, GOAL_Y);
-      ctx.lineTo(botX, GOAL_Y + 50);
-      ctx.stroke();
-    }
-    // Líneas horizontales de la red
-    for (let j = 0; j <= 50; j += 8) {
-      const perspFactor = j / 50;
-      const lx = GOAL_LEFT + perspFactor * 3;
-      const rx = GOAL_RIGHT - perspFactor * 3;
-      ctx.strokeStyle = `rgba(230, 255, 230, ${0.20 - perspFactor * 0.05})`;
-      ctx.lineWidth = 0.6;
-      ctx.beginPath();
-      ctx.moveTo(lx, GOAL_Y + j);
-      ctx.lineTo(rx, GOAL_Y + j);
+      ctx.moveTo(topX + waveOffsetX, GOAL_Y);
+      ctx.quadraticCurveTo(
+        (topX + botX) / 2 + waveOffsetMid, GOAL_Y + 26,
+        botX + waveOffsetX * 0.4, GOAL_Y + 52
+      );
       ctx.stroke();
     }
 
-    // ── 3. POSTES 3D ──
-    // Sombra del poste izquierdo
+    // Líneas horizontales de la red con deformación
+    const netRows = 11; // más filas
+    for (let j = 0; j <= netRows; j++) {
+      const t = j / netRows;
+      const rowY = GOAL_Y + t * 52;
+      const perspFactor = t * 0.95;
+      const lx = GOAL_LEFT + perspFactor * 2.5;
+      const rx = GOAL_RIGHT - perspFactor * 2.5;
+
+      // Onda horizontal
+      let waveRowOffset = 0;
+      if (hasWave && waveStrength > 0) {
+        const distFromImpactY = Math.abs(rowY - netWaveY);
+        const wavePushY = Math.max(0, waveRadius - distFromImpactY) / (waveRadius + 1);
+        waveRowOffset = wavePushY * waveStrength * 5 * Math.sin(waveAge * 0.3 + j * 0.4);
+      }
+
+      const rowAlpha = 0.28 - t * 0.06;
+      ctx.strokeStyle = `rgba(235, 255, 235, ${Math.max(0.08, rowAlpha)})`;
+      ctx.lineWidth = 0.75;
+      ctx.beginPath();
+      ctx.moveTo(lx, rowY + waveRowOffset);
+      ctx.lineTo(rx, rowY + waveRowOffset);
+      ctx.stroke();
+    }
+
+    // ── DESTELLO DE IMPACTO en la red (flash cuando entra la pelota) ──
+    if (hasWave && waveAge < 22) {
+      const flashAlpha = Math.max(0, (22 - waveAge) / 22) * 0.70;
+      const flashGrad = ctx.createRadialGradient(netWaveX, netWaveY, 0, netWaveX, netWaveY, 38);
+      flashGrad.addColorStop(0, `rgba(220, 255, 220, ${flashAlpha})`);
+      flashGrad.addColorStop(0.3, `rgba(120, 255, 140, ${flashAlpha * 0.7})`);
+      flashGrad.addColorStop(0.6, `rgba(60, 220, 100, ${flashAlpha * 0.4})`);
+      flashGrad.addColorStop(1, 'rgba(0, 180, 80, 0)');
+      ctx.fillStyle = flashGrad;
+      ctx.beginPath();
+      ctx.arc(netWaveX, netWaveY, 38, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Anillo de expansión secundario
+      if (waveAge > 5) {
+        const ring2Alpha = Math.max(0, (22 - waveAge) / 22) * 0.3;
+        const ring2Grad = ctx.createRadialGradient(netWaveX, netWaveY, waveAge * 1.5, netWaveX, netWaveY, waveAge * 2.5);
+        ring2Grad.addColorStop(0, `rgba(80, 255, 120, ${ring2Alpha})`);
+        ring2Grad.addColorStop(1, 'rgba(0, 200, 80, 0)');
+        ctx.fillStyle = ring2Grad;
+        ctx.beginPath();
+        ctx.arc(netWaveX, netWaveY, waveAge * 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // ── 3. POSTES 3D — Cilíndricos con iluminación de estadio ──
+    // Sombras
     ctx.fillStyle = 'rgba(0,0,0,0.5)';
-    ctx.fillRect(GOAL_LEFT + 3, GOAL_Y, 3, 50);
-    ctx.fillRect(GOAL_LEFT, GOAL_Y + 1, GOAL_RIGHT - GOAL_LEFT, 3);
+    ctx.fillRect(GOAL_LEFT + 4, GOAL_Y + 4, 4, 52);
+    ctx.fillRect(GOAL_RIGHT + 1, GOAL_Y + 4, 4, 52);
 
-    // Poste izquierdo — gradiente cilíndrico
-    const postGradL = ctx.createLinearGradient(GOAL_LEFT - 3, 0, GOAL_LEFT + 5, 0);
-    postGradL.addColorStop(0, '#9ca3af');
-    postGradL.addColorStop(0.3, '#ffffff');
-    postGradL.addColorStop(0.7, '#e5e7eb');
-    postGradL.addColorStop(1, '#6b7280');
+    // Poste izquierdo
+    const postGradL = ctx.createLinearGradient(GOAL_LEFT - 4, 0, GOAL_LEFT + 5, 0);
+    postGradL.addColorStop(0, '#4b5563');
+    postGradL.addColorStop(0.25, '#d1d5db');
+    postGradL.addColorStop(0.5, '#ffffff');
+    postGradL.addColorStop(0.75, '#e5e7eb');
+    postGradL.addColorStop(1, '#4b5563');
     ctx.fillStyle = postGradL;
-    ctx.fillRect(GOAL_LEFT - 3, GOAL_Y, 6, 52);
+    ctx.fillRect(GOAL_LEFT - 4, GOAL_Y + 4, 8, 52);
 
-    // Poste derecho — gradiente cilíndrico
-    const postGradR = ctx.createLinearGradient(GOAL_RIGHT - 3, 0, GOAL_RIGHT + 3, 0);
-    postGradR.addColorStop(0, '#9ca3af');
-    postGradR.addColorStop(0.3, '#ffffff');
-    postGradR.addColorStop(0.7, '#e5e7eb');
-    postGradR.addColorStop(1, '#6b7280');
+    // Poste derecho
+    const postGradR = ctx.createLinearGradient(GOAL_RIGHT - 4, 0, GOAL_RIGHT + 4, 0);
+    postGradR.addColorStop(0, '#4b5563');
+    postGradR.addColorStop(0.25, '#d1d5db');
+    postGradR.addColorStop(0.5, '#ffffff');
+    postGradR.addColorStop(0.75, '#e5e7eb');
+    postGradR.addColorStop(1, '#4b5563');
     ctx.fillStyle = postGradR;
-    ctx.fillRect(GOAL_RIGHT - 3, GOAL_Y, 6, 52);
+    ctx.fillRect(GOAL_RIGHT - 4, GOAL_Y + 4, 8, 52);
 
-    // Travesaño superior — gradiente cilíndrico
-    const crossGrad = ctx.createLinearGradient(0, GOAL_Y - 3, 0, GOAL_Y + 5);
-    crossGrad.addColorStop(0, '#9ca3af');
-    crossGrad.addColorStop(0.35, '#ffffff');
-    crossGrad.addColorStop(0.65, '#e5e7eb');
-    crossGrad.addColorStop(1, '#6b7280');
+    // Travesaño — encima de los postes, cubre la unión limpiamente
+    const crossGrad = ctx.createLinearGradient(0, GOAL_Y - 4, 0, GOAL_Y + 5);
+    crossGrad.addColorStop(0, '#4b5563');
+    crossGrad.addColorStop(0.25, '#d1d5db');
+    crossGrad.addColorStop(0.5, '#ffffff');
+    crossGrad.addColorStop(0.75, '#e5e7eb');
+    crossGrad.addColorStop(1, '#4b5563');
     ctx.fillStyle = crossGrad;
-    ctx.fillRect(GOAL_LEFT - 3, GOAL_Y - 3, GOAL_RIGHT - GOAL_LEFT + 6, 6);
+    ctx.fillRect(GOAL_LEFT - 5, GOAL_Y - 4, GOAL_RIGHT - GOAL_LEFT + 10, 9);
 
-    // Borde de luz en postes (reflejo de los focos del estadio)
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
-    ctx.lineWidth = 1;
+    // Halo de luz verde en la línea del arco (estadio iluminado)
+    const goalLineGlow = ctx.createLinearGradient(GOAL_LEFT - 8, 0, GOAL_RIGHT + 8, 0);
+    goalLineGlow.addColorStop(0, 'rgba(0,0,0,0)');
+    goalLineGlow.addColorStop(0.3, 'rgba(160, 255, 180, 0.08)');
+    goalLineGlow.addColorStop(0.7, 'rgba(160, 255, 180, 0.08)');
+    goalLineGlow.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = goalLineGlow;
+    ctx.fillRect(GOAL_LEFT - 8, GOAL_Y - 4, GOAL_RIGHT - GOAL_LEFT + 16, 12);
+
+    // ── LÍNEAS DEL ÁREA — dibujadas DESPUÉS del arco para quedar por encima ──
+    // El arco ocupa desde GOAL_Y hasta GOAL_Y+56; las líneas del área arrancan desde la base del arco
+    const GOAL_BASE = GOAL_Y + 56; // base del arco (donde termina el poste)
+    ctx.strokeStyle = 'rgba(240, 255, 235, 0.30)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([]);
+
+    // Área grande — márgenes de 15px a cada lado del arco, profundidad 90px desde base
+    const areaGrandeL = Math.max(2, GOAL_LEFT - 15);
+    const areaGrandeR = Math.min(398, GOAL_RIGHT + 15);
     ctx.beginPath();
-    ctx.moveTo(GOAL_LEFT - 2, GOAL_Y);
-    ctx.lineTo(GOAL_LEFT - 2, GOAL_Y + 52);
-    ctx.moveTo(GOAL_LEFT - 1, GOAL_Y - 2);
-    ctx.lineTo(GOAL_RIGHT + 1, GOAL_Y - 2);
+    ctx.moveTo(areaGrandeL, GOAL_BASE);
+    ctx.lineTo(areaGrandeL, GOAL_BASE + 90);
+    ctx.lineTo(areaGrandeR, GOAL_BASE + 90);
+    ctx.lineTo(areaGrandeR, GOAL_BASE);
     ctx.stroke();
 
-    // ── COPA DEL MUNDO AL COSTADO DEL ARCO ──
-    // Se dibuja a la derecha del arco, fuera de la cancha, con brillo y oscilación
+    // Área chica — 15px dentro de cada poste, 28px de profundidad desde base
+    const areaChicaL = GOAL_LEFT + 15;
+    const areaChicaR = GOAL_RIGHT - 15;
+    ctx.beginPath();
+    ctx.moveTo(areaChicaL, GOAL_BASE);
+    ctx.lineTo(areaChicaL, GOAL_BASE + 28);
+    ctx.lineTo(areaChicaR, GOAL_BASE + 28);
+    ctx.lineTo(areaChicaR, GOAL_BASE);
+    ctx.stroke();
+
+    // ── COPA DEL MUNDO FIFA AL COSTADO DEL ARCO — misma que Road to Glory ──
     {
-      const tropeX = GOAL_RIGHT + 30;
-      const tropeY = GOAL_Y + 14;
+      const tropeX = 18;
       const trophyBob = Math.sin(Date.now() * 0.002) * 1.5;
       const trophyGlow = 0.5 + Math.sin(Date.now() * 0.003) * 0.3;
+      const h = 36;
+      const tropeY = GOAL_Y + 54 - h + trophyBob; // base alineada con pies de Infantino
 
+      // Halo dorado pulsante
       ctx.save();
-      ctx.translate(tropeX, tropeY + trophyBob);
-
-      // Halo brillante dorado
-      const haloGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, 22);
-      haloGrad.addColorStop(0, `rgba(253, 224, 71, ${0.45 * trophyGlow})`);
-      haloGrad.addColorStop(0.5, `rgba(253, 180, 20, ${0.2 * trophyGlow})`);
+      const haloGrad = ctx.createRadialGradient(tropeX, tropeY - h*0.5, 2, tropeX, tropeY - h*0.5, h*0.7);
+      haloGrad.addColorStop(0, `rgba(253, 224, 71, ${0.4 * trophyGlow})`);
       haloGrad.addColorStop(1, 'rgba(253, 224, 71, 0)');
       ctx.fillStyle = haloGrad;
       ctx.beginPath();
-      ctx.arc(0, 0, 22, 0, Math.PI * 2);
+      ctx.arc(tropeX, tropeY - h*0.5, h*0.7, 0, Math.PI * 2);
       ctx.fill();
+      ctx.restore();
 
-      // Sombra bajo la copa
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
-      ctx.beginPath();
-      ctx.ellipse(0, 14, 9, 3, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Copa dorada principal
-      const cupGrad = ctx.createLinearGradient(-9, -14, 9, 4);
-      cupGrad.addColorStop(0, '#fde68a');
-      cupGrad.addColorStop(0.4, '#f59e0b');
-      cupGrad.addColorStop(0.8, '#d97706');
-      cupGrad.addColorStop(1, '#92400e');
-      ctx.fillStyle = cupGrad;
-      ctx.strokeStyle = '#b45309';
-      ctx.lineWidth = 1;
-
-      // Taza principal
-      ctx.beginPath();
-      ctx.moveTo(-9, -4);
-      ctx.quadraticCurveTo(-10, -12, 0, -14);
-      ctx.quadraticCurveTo(10, -12, 9, -4);
-      ctx.lineTo(5, 2);
-      ctx.lineTo(5, 5);
-      ctx.lineTo(-5, 5);
-      ctx.lineTo(-5, 2);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-
-      // Asas
-      ctx.strokeStyle = '#d97706';
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.arc(-10.5, -7, 3, 0.4 * Math.PI, 1.6 * Math.PI);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(10.5, -7, 3, -0.6 * Math.PI, 0.6 * Math.PI);
-      ctx.stroke();
-
-      // Pedestal
-      const pedGrad = ctx.createLinearGradient(-6, 5, 6, 11);
-      pedGrad.addColorStop(0, '#52525b');
-      pedGrad.addColorStop(1, '#18181b');
-      ctx.fillStyle = pedGrad;
-      ctx.strokeStyle = '#3f3f46';
-      ctx.lineWidth = 0.8;
-      ctx.beginPath();
-      ctx.roundRect(-7, 5, 14, 5, 1);
-      ctx.fill();
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.roundRect(-5, 10, 10, 3, 1);
-      ctx.fill();
-      ctx.stroke();
-
-      // Brillo en la copa
-      ctx.fillStyle = 'rgba(255,255,255,0.25)';
-      ctx.beginPath();
-      ctx.ellipse(-3, -10, 2.5, 4, -0.3, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Estrellita de brillo 
-      const starAlpha = 0.5 + Math.sin(Date.now() * 0.005) * 0.4;
-      ctx.strokeStyle = `rgba(255, 255, 200, ${starAlpha})`;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(5, -13); ctx.lineTo(5, -16);
-      ctx.moveTo(3.5, -11.5); ctx.lineTo(6.5, -14.5);
-      ctx.moveTo(6.5, -11.5); ctx.lineTo(3.5, -14.5);
-      ctx.stroke();
-
-      // Label "COPA" pequeño debajo
-      ctx.fillStyle = `rgba(253, 224, 71, ${0.6 + trophyGlow * 0.3})`;
-      ctx.font = '900 5.5px system-ui, -apple-system, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.shadowColor = '#f59e0b';
-      ctx.shadowBlur = 4;
-      ctx.fillText('COPA', 0, 17);
+      // Copa — misma función que Road to Glory
+      ctx.save();
+      ctx.shadowColor = '#fbbf24';
+      ctx.shadowBlur = 5 + trophyGlow * 7;
+      drawWorldCupTrophy(ctx, tropeX, tropeY, h);
       ctx.shadowBlur = 0;
-
       ctx.restore();
     }
 
@@ -15154,110 +16053,6 @@
       ctx.restore();
     }
 
-    // ── COPA DEL MUNDO (dibujo sobre el arco) ──
-    {
-      const tropeX = GOAL_RIGHT + 30;
-      const tropeY = GOAL_Y + 14;
-      const trophyBob = Math.sin(Date.now() * 0.002) * 1.5;
-      const trophyGlow = 0.5 + Math.sin(Date.now() * 0.003) * 0.3;
-
-      ctx.save();
-      ctx.translate(tropeX, tropeY + trophyBob);
-
-      // Halo brillante dorado
-      const haloGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, 22);
-      haloGrad.addColorStop(0, `rgba(253, 224, 71, ${0.45 * trophyGlow})`);
-      haloGrad.addColorStop(0.5, `rgba(253, 180, 20, ${0.2 * trophyGlow})`);
-      haloGrad.addColorStop(1, 'rgba(253, 224, 71, 0)');
-      ctx.fillStyle = haloGrad;
-      ctx.beginPath();
-      ctx.arc(0, 0, 22, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Sombra bajo la copa
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
-      ctx.beginPath();
-      ctx.ellipse(0, 14, 9, 3, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Copa dorada principal
-      const cupGrad = ctx.createLinearGradient(-9, -14, 9, 4);
-      cupGrad.addColorStop(0, '#fde68a');
-      cupGrad.addColorStop(0.4, '#f59e0b');
-      cupGrad.addColorStop(0.8, '#d97706');
-      cupGrad.addColorStop(1, '#92400e');
-      ctx.fillStyle = cupGrad;
-      ctx.strokeStyle = '#b45309';
-      ctx.lineWidth = 1;
-
-      // Taza principal
-      ctx.beginPath();
-      ctx.moveTo(-9, -4);
-      ctx.quadraticCurveTo(-10, -12, 0, -14);
-      ctx.quadraticCurveTo(10, -12, 9, -4);
-      ctx.lineTo(5, 2);
-      ctx.lineTo(5, 5);
-      ctx.lineTo(-5, 5);
-      ctx.lineTo(-5, 2);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-
-      // Asas
-      ctx.strokeStyle = '#d97706';
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.arc(-10.5, -7, 3, 0.4 * Math.PI, 1.6 * Math.PI);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(10.5, -7, 3, -0.6 * Math.PI, 0.6 * Math.PI);
-      ctx.stroke();
-
-      // Pedestal
-      const pedGrad = ctx.createLinearGradient(-6, 5, 6, 11);
-      pedGrad.addColorStop(0, '#52525b');
-      pedGrad.addColorStop(1, '#18181b');
-      ctx.fillStyle = pedGrad;
-      ctx.strokeStyle = '#3f3f46';
-      ctx.lineWidth = 0.8;
-      ctx.beginPath();
-      ctx.roundRect(-7, 5, 14, 5, 1);
-      ctx.fill();
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.roundRect(-5, 10, 10, 3, 1);
-      ctx.fill();
-      ctx.stroke();
-
-      // Brillo en la copa
-      ctx.fillStyle = 'rgba(255,255,255,0.25)';
-      ctx.beginPath();
-      ctx.ellipse(-3, -10, 2.5, 4, -0.3, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Estrellita de brillo 
-      const starAlpha = 0.5 + Math.sin(Date.now() * 0.005) * 0.4;
-      ctx.strokeStyle = `rgba(255, 255, 200, ${starAlpha})`;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(5, -13); ctx.lineTo(5, -16);
-      ctx.moveTo(3.5, -11.5); ctx.lineTo(6.5, -14.5);
-      ctx.moveTo(6.5, -11.5); ctx.lineTo(3.5, -14.5);
-      ctx.stroke();
-
-      // Label "COPA" pequeño debajo
-      ctx.fillStyle = `rgba(253, 224, 71, ${0.6 + trophyGlow * 0.3})`;
-      ctx.font = '900 5.5px system-ui, -apple-system, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.shadowColor = '#f59e0b';
-      ctx.shadowBlur = 4;
-      ctx.fillText('COPA', 0, 17);
-      ctx.shadowBlur = 0;
-
-      ctx.restore();
-    }
-
     // 4. DIBUJAR BARRERA DE DEFENSORAS (Caricaturas procedurales!)
     defensores.forEach((def, index) => {
       drawCabezon(ctx, def.x, def.y, defensorJugador, false, false, false);
@@ -15311,23 +16106,36 @@
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
       fireParticles.forEach(p => {
-        ctx.fillStyle = p.color;
-        ctx.globalAlpha = p.life * 0.85;
-        ctx.beginPath();
+        ctx.globalAlpha = p.life * 0.90;
         if (p.type === 'spark') {
-          // Chispa de estrella neón brillante
-          ctx.arc(p.x, p.y, p.r * 0.45, 0, Math.PI * 2);
+          // Chispa de estrella neón brillante con glow
+          ctx.shadowColor = p.color;
+          ctx.shadowBlur = 8;
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r * 0.5, 0, Math.PI * 2);
           ctx.fill();
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = 0.8;
+          ctx.strokeStyle = p.color;
+          ctx.lineWidth = 1.0;
           ctx.beginPath();
           ctx.moveTo(p.x - p.r, p.y); ctx.lineTo(p.x + p.r, p.y);
           ctx.moveTo(p.x, p.y - p.r); ctx.lineTo(p.x, p.y + p.r);
           ctx.stroke();
+          ctx.shadowBlur = 0;
         } else {
-          // Llama
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          // Llama con gradiente radial para mayor volumen
+          const flameGrad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 1.5);
+          flameGrad.addColorStop(0, '#ffffff');
+          flameGrad.addColorStop(0.25, p.color === '#fde047' ? '#fef08a' : (p.color === '#ef4444' ? '#ff6060' : p.color));
+          flameGrad.addColorStop(0.65, p.color);
+          flameGrad.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = flameGrad;
+          ctx.shadowColor = p.color;
+          ctx.shadowBlur = p.r * 2;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r * 1.5, 0, Math.PI * 2);
           ctx.fill();
+          ctx.shadowBlur = 0;
         }
       });
       ctx.restore();
@@ -15366,18 +16174,20 @@
     if (!pelota.isSettled || pelota.status === 'palo') {
       const bx = pelota.x, by = pelota.y, br = pelota.r;
       
-      // Sombra de la pelota (en el suelo)
+      // Sombra de la pelota (en el suelo) — más dramática y realista
       if (by > 200) {
-        const shadowScale = 1 + (by - 200) / 300;
+        const shadowScale = 1 + (by - 200) / 280;
+        const shadowAlpha = Math.min(0.40, 0.15 + (by - 200) / 600);
         ctx.save();
-        ctx.globalAlpha = 0.25;
-        ctx.scale(1, 0.35);
-        const bsh = ctx.createRadialGradient(bx, by * (1 / 0.35), 0, bx, by * (1 / 0.35), br * shadowScale * 1.5);
-        bsh.addColorStop(0, 'rgba(0,0,0,0.7)');
+        ctx.globalAlpha = shadowAlpha;
+        ctx.scale(1, 0.3);
+        const bsh = ctx.createRadialGradient(bx, by * (1 / 0.3), 0, bx, by * (1 / 0.3), br * shadowScale * 2);
+        bsh.addColorStop(0, 'rgba(0,0,0,0.85)');
+        bsh.addColorStop(0.5, 'rgba(0,0,0,0.4)');
         bsh.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = bsh;
         ctx.beginPath();
-        ctx.arc(bx, by / 0.35 + br * 0.2, br * shadowScale * 1.5, 0, Math.PI * 2);
+        ctx.arc(bx, by / 0.3 + br * 0.2, br * shadowScale * 2, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
       }
@@ -15620,10 +16430,15 @@
     // ── EFECTOS DE CLIMA (lluvia, niebla, relámpagos) sobre el campo ──
     drawWeather();
 
-    // Flash de pantalla completo cuando se mete gol!
+    // Flash de pantalla completo cuando se mete gol! — más dramático
     if (goalScreenFlash > 0) {
       ctx.save();
-      ctx.fillStyle = `rgba(255, 255, 255, ${goalScreenFlash * 0.45})`;
+      // Flash blanco central con degradado radial tipo explosión
+      const flashCenterGrad = ctx.createRadialGradient(200, 135, 0, 200, 135, 220);
+      flashCenterGrad.addColorStop(0, `rgba(255, 255, 255, ${goalScreenFlash * 0.65})`);
+      flashCenterGrad.addColorStop(0.4, `rgba(220, 255, 200, ${goalScreenFlash * 0.35})`);
+      flashCenterGrad.addColorStop(1, `rgba(100, 220, 120, ${goalScreenFlash * 0.08})`);
+      ctx.fillStyle = flashCenterGrad;
       ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
       ctx.restore();
     }
@@ -15760,6 +16575,7 @@
     // ══════════════════════════════════════════════
     if (bannerTxt && bannerTimer > 0) {
       bannerTimer--;
+      if (netWaveTimer > 0) netWaveTimer--;
       const isGol = bannerTxt.includes('GOL');
       const isPalo = bannerTxt.includes('PALO');
       const isDibu = bannerTxt.includes('DIBU');
