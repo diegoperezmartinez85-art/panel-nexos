@@ -2966,21 +2966,18 @@
 
     /* ── ONOMATOPEYA EN ESPACIOS NEGROS ── */
     .onomatopeya-overlay {
-      /* Flota encima del canvas sin ocupar espacio en el layout */
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 96;
-      min-height: 54px;
+      /* Barra fija entre el header y el canvas — ocupa el espacio negro */
+      position: relative;
+      width: 100%;
+      height: 58px;
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: center;
-      padding-top: 8px;
       opacity: 0;
-      transform: translateY(-10px) scale(0.9);
+      transform: translateY(-6px) scale(0.95);
       transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       pointer-events: none;
+      flex-shrink: 0;
     }
     .onomatopeya-overlay.show {
       opacity: 1;
@@ -4709,12 +4706,13 @@
       </div>
     </div>
 
+    <!-- Onomatopeya en la barra negra entre header y canvas -->
+    <div id="estadio-onomatopeya-overlay" class="onomatopeya-overlay">
+      <div id="onomatopeya-text" class="onomatopeya-text"></div>
+    </div>
+
     <!-- El estadio Canvas -->
     <div class="canvas-wrapper">
-      <!-- Onomatopeya flota sobre el canvas -->
-      <div id="estadio-onomatopeya-overlay" class="onomatopeya-overlay">
-        <div id="onomatopeya-text" class="onomatopeya-text"></div>
-      </div>
       <canvas id="canvas-futbol"></canvas>
       <div class="swipe-hint" id="swipe-hint">Arrastrá la pelota y soltá para chutar</div>
       <!-- Controles de defensa en penales -->
@@ -8686,85 +8684,101 @@
     } catch(e) {}
   }
 
-  // ── VOZ MASCULINA: lista de nombres de voces masculinas conocidas ──
+  // ── VOZ MASCULINA: nombres conocidos de voces masculinas en español ──
   const NOMBRES_VOZ_MASCULINA = [
-    'diego', 'damian', 'damián', 'jorge', 'hector', 'héctor',
-    'pablo', 'miguel', 'carlos', 'juan', 'antonio', 'andrés',
-    'andres', 'rodrigo', 'male', 'hombre', 'masculin', 'man'
+    'jorge', 'carlos', 'diego', 'pablo', 'miguel', 'juan', 'antonio',
+    'andres', 'andrés', 'rodrigo', 'sergio', 'alejandro', 'enrique',
+    'alvaro', 'álvaro', 'damian', 'damián', 'hector', 'héctor',
+    'male', 'hombre', 'masculin', 'man'
   ];
+
+  const NOMBRES_VOZ_FEMENINA = [
+    'monica', 'mónica', 'maria', 'maría', 'rosa', 'elena', 'laura',
+    'paula', 'isabel', 'luciana', 'valentina', 'sabina', 'carmen',
+    'female', 'mujer', 'femeni', 'woman', 'girl'
+  ];
+
+  function esFemenina(v) {
+    const n = v.name.toLowerCase();
+    return NOMBRES_VOZ_FEMENINA.some(k => n.includes(k));
+  }
+
+  function puntuarVoz(v) {
+    if (esFemenina(v)) return -999;
+    const n = v.name.toLowerCase();
+    let score = 0;
+    if (!v.localService) score += 40;
+    if (n.includes('neural')) score += 30;
+    if (n.includes('natural')) score += 20;
+    if (n.includes('google')) score += 15;
+    if (NOMBRES_VOZ_MASCULINA.some(k => n.includes(k))) score += 25;
+    if (v.lang === 'es-419') score += 10;
+    if (v.lang === 'es-MX') score += 8;
+    if (v.lang === 'es-US') score += 6;
+    if (v.lang === 'es-AR') score += 5;
+    if (v.lang.startsWith('es')) score += 3;
+    return score;
+  }
 
   function buscarVozMasculina() {
     if (!('speechSynthesis' in window)) return null;
     const voices = window.speechSynthesis.getVoices();
     if (!voices.length) return null;
-
     const vocesEs = voices.filter(v => v.lang.startsWith('es'));
     if (!vocesEs.length) return null;
-
-    // 1. Voz masculina neural/online en español (máxima calidad)
-    for (const keyword of NOMBRES_VOZ_MASCULINA) {
-      const match = vocesEs.find(v => {
-        const n = v.name.toLowerCase();
-        return n.includes(keyword) && (
-          n.includes('neural') || n.includes('natural') ||
-          n.includes('google') || n.includes('online') ||
-          v.localService === false
-        );
-      });
-      if (match) return match;
-    }
-
-    // 2. Cualquier voz masculina en español
-    for (const keyword of NOMBRES_VOZ_MASCULINA) {
-      const match = vocesEs.find(v => v.name.toLowerCase().includes(keyword));
-      if (match) return match;
-    }
-
-    // 3. Mejor voz online/neural en español (aunque sea femenina, suena más natural)
-    const premium = vocesEs.find(v =>
-      v.name.toLowerCase().includes('neural') ||
-      v.name.toLowerCase().includes('natural') ||
-      v.localService === false
-    );
-    if (premium) return premium;
-
-    // 4. Preferir es-AR, luego es-419, luego lo que haya
-    return vocesEs.find(v => v.lang === 'es-AR') ||
-           vocesEs.find(v => v.lang === 'es-419') ||
-           vocesEs[0];
+    return [...vocesEs].sort((a, b) => puntuarVoz(b) - puntuarVoz(a))[0];
   }
 
-  // Mantener alias por si algo lo llama por el nombre viejo
   function buscarVozHumana() { return buscarVozMasculina(); }
 
-  // ── MOTOR CENTRAL DE VOZ: Google TTS (natural) con fallback a Web Speech ──
+  function detectarTipoRelato(text) {
+    const t = text.toLowerCase();
+    if (t.includes('gol') || t.includes('golazo') || t.includes('cantalo')) return 'gol';
+    if (t.includes('ataj') || t.includes('dibu') || t.includes('tapó') || t.includes('tapa')) return 'atajada';
+    return 'falla';
+  }
+
+  // Preprocesa texto para que el sintetizador suene más natural:
+  // elimina guiones silábicos ("sen-sa-cio-nal" -> "sensacional") y exclamaciones triples
+  function preprocesarTexto(text) {
+    return text
+      .replace(/([a-záéíóúñ]+)-([a-záéíóúñ]+)-([a-záéíóúñ]+)-([a-záéíóúñ]+)/gi, '$1$2$3$4')
+      .replace(/([a-záéíóúñ]+)-([a-záéíóúñ]+)-([a-záéíóúñ]+)/gi, '$1$2$3')
+      .replace(/¡¡¡/g, '¡').replace(/!!!/g, '!')
+      .replace(/¡¡/g, '¡').replace(/!!/g, '!');
+  }
+
+  // ── MOTOR DE VOZ — Web Speech API con parámetros expresivos ──
   let _relatoAudio = null;
 
   function speakRelato(text) {
     if (modoDiscreto) return;
-
-    // Cancelar relato anterior
     if (_relatoAudio) { try { _relatoAudio.pause(); } catch(e) {} _relatoAudio = null; }
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    if (!('speechSynthesis' in window)) return;
 
-    // ── INTENTO 1: Google TTS — voz latina masculina, suena natural ──
-    const gttsUrl = 'https://translate.googleapis.com/translate_tts?ie=UTF-8' +
-      '&q=' + encodeURIComponent(text) +
-      '&tl=es-419&client=gtx&ttsspeed=0.92';
-    _relatoAudio = new Audio(gttsUrl);
-    _relatoAudio.volume = 1.0;
-    _relatoAudio.play().catch(() => {
-      // ── FALLBACK: Web Speech API con parámetros masculinos optimizados ──
-      if (!('speechSynthesis' in window)) return;
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'es-AR';
-      const voz = buscarVozMasculina();
-      if (voz) { utterance.voice = voz; } else { utterance.lang = 'es'; }
-      utterance.rate   = 1.05;   // Cadencia natural de locutor deportivo
-      utterance.pitch  = 0.78;   // Tono grave = voz masculina
+    const tipo = detectarTipoRelato(text);
+    const utterance = new SpeechSynthesisUtterance(preprocesarTexto(text));
+
+    const voz = buscarVozMasculina();
+    if (voz) { utterance.voice = voz; utterance.lang = voz.lang; }
+    else { utterance.lang = 'es-419'; }
+
+    if (tipo === 'gol') {
+      utterance.rate   = 1.18;  // urgente, locutor desbordado
+      utterance.pitch  = 0.88;  // grave pero con energía
       utterance.volume = 1.0;
-      setTimeout(() => { try { window.speechSynthesis.speak(utterance); } catch(e) {} }, 80);
-    });
+    } else if (tipo === 'atajada') {
+      utterance.rate   = 1.10;
+      utterance.pitch  = 0.82;
+      utterance.volume = 1.0;
+    } else {
+      utterance.rate   = 1.02;  // más pausado, dramático
+      utterance.pitch  = 0.75;  // más grave, decepcionado
+      utterance.volume = 1.0;
+    }
+
+    setTimeout(() => { try { window.speechSynthesis.speak(utterance); } catch(e) {} }, 60);
   }
 
   // ── RACHA DE GOLES ──
