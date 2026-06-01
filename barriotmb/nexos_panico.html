@@ -2652,6 +2652,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
     }
     .mundial-subtitle {
       font-size: 11px;
@@ -3042,12 +3043,11 @@
     }
 
     .canvas-wrapper {
-      /* Ocupa todo el ancho y todo el espacio vertical restante */
       width: calc(100% + 24px);
       margin-left: -12px;
       margin-right: -12px;
-      flex: 1;
-      min-height: 0;
+      aspect-ratio: 4 / 3;
+      flex-shrink: 0;
       margin-top: 0;
       margin-bottom: 0;
       background: linear-gradient(180deg, #050e07 0%, #071510 100%);
