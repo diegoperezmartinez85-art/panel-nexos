@@ -2964,40 +2964,41 @@
       text-shadow: 0 0 6px var(--ac);
     }
 
-    /* ── ONOMATOPEYA EN ESPACIOS NEGROS ── */
+    /* ── ONOMATOPEYA — barra entre el header y el canvas ── */
     .onomatopeya-overlay {
-      /* Barra fija entre el header y el canvas — ocupa el espacio negro */
       position: relative;
       width: 100%;
-      height: 58px;
+      flex: 1;               /* ocupa TODO el espacio negro disponible */
+      min-height: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       opacity: 0;
-      transform: translateY(-6px) scale(0.95);
+      transform: scale(0.92);
       transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       pointer-events: none;
-      flex-shrink: 0;
+      overflow: hidden;
     }
     .onomatopeya-overlay.show {
       opacity: 1;
-      transform: translateY(0) scale(1);
+      transform: scale(1);
     }
     .onomatopeya-text {
-      font-size: clamp(16px, 5.2vw, 28px);
-      font-weight: 950;
+      font-size: clamp(11px, 3.2vw, 16px);
+      font-weight: 900;
       font-family: 'Outfit', system-ui, sans-serif;
       text-transform: uppercase;
       text-align: center;
-      letter-spacing: 1.5px;
-      padding: 12px 28px;
-      border-radius: 20px;
-      background: rgba(10, 10, 15, 0.85);
+      letter-spacing: 0.8px;
+      line-height: 1.3;
+      padding: 7px 16px;
+      border-radius: 14px;
+      background: rgba(10, 10, 15, 0.75);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      max-width: 90%;
+      max-width: 96%;
       word-wrap: break-word;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
     
     .onomatopeya-text.goal {
@@ -3038,7 +3039,7 @@
       margin-left: -12px;
       margin-right: -12px;
       aspect-ratio: 4 / 3;
-      margin-top: auto;
+      margin-top: 0;
       margin-bottom: auto;
       background: linear-gradient(180deg, #050e07 0%, #071510 100%);
       border: 1.5px solid rgba(255, 255, 255, 0.10);
@@ -4706,7 +4707,7 @@
       </div>
     </div>
 
-    <!-- Onomatopeya en la barra negra entre header y canvas -->
+    <!-- Onomatopeya: ocupa el espacio negro entre header y canvas -->
     <div id="estadio-onomatopeya-overlay" class="onomatopeya-overlay">
       <div id="onomatopeya-text" class="onomatopeya-text"></div>
     </div>
@@ -8729,6 +8730,17 @@
     return [...vocesEs].sort((a, b) => puntuarVoz(b) - puntuarVoz(a))[0];
   }
 
+  function hayVozRealmenteMasculina() {
+    if (!('speechSynthesis' in window)) return false;
+    const voices = window.speechSynthesis.getVoices();
+    const vocesEs = voices.filter(v => v.lang.startsWith('es'));
+    // Hay voz masculina real si alguna tiene nombre masculino conocido
+    return vocesEs.some(v => {
+      const n = v.name.toLowerCase();
+      return NOMBRES_VOZ_MASCULINA.some(k => n.includes(k));
+    });
+  }
+
   function buscarVozHumana() { return buscarVozMasculina(); }
 
   function detectarTipoRelato(text) {
@@ -8738,8 +8750,6 @@
     return 'falla';
   }
 
-  // Preprocesa texto para que el sintetizador suene más natural:
-  // elimina guiones silábicos ("sen-sa-cio-nal" -> "sensacional") y exclamaciones triples
   function preprocesarTexto(text) {
     return text
       .replace(/([a-záéíóúñ]+)-([a-záéíóúñ]+)-([a-záéíóúñ]+)-([a-záéíóúñ]+)/gi, '$1$2$3$4')
@@ -8748,7 +8758,7 @@
       .replace(/¡¡/g, '¡').replace(/!!/g, '!');
   }
 
-  // ── MOTOR DE VOZ — Web Speech API con parámetros expresivos ──
+  // ── MOTOR DE VOZ — Web Speech API, pitch forzado grave si no hay voz masculina ──
   let _relatoAudio = null;
 
   function speakRelato(text) {
@@ -8761,20 +8771,26 @@
     const utterance = new SpeechSynthesisUtterance(preprocesarTexto(text));
 
     const voz = buscarVozMasculina();
+    const tieneMasculina = hayVozRealmenteMasculina();
+
     if (voz) { utterance.voice = voz; utterance.lang = voz.lang; }
     else { utterance.lang = 'es-419'; }
 
+    // Si no hay voz masculina real disponible, forzar pitch muy bajo
+    // para masculinizar la voz femenina lo más posible (0.1 = mínimo de la API)
+    const pitchBase = tieneMasculina ? 0 : -0.5; // offset extra si es femenina
+
     if (tipo === 'gol') {
-      utterance.rate   = 1.18;  // urgente, locutor desbordado
-      utterance.pitch  = 0.88;  // grave pero con energía
+      utterance.rate   = 1.18;
+      utterance.pitch  = Math.max(0.1, 0.88 + pitchBase);
       utterance.volume = 1.0;
     } else if (tipo === 'atajada') {
       utterance.rate   = 1.10;
-      utterance.pitch  = 0.82;
+      utterance.pitch  = Math.max(0.1, 0.82 + pitchBase);
       utterance.volume = 1.0;
     } else {
-      utterance.rate   = 1.02;  // más pausado, dramático
-      utterance.pitch  = 0.75;  // más grave, decepcionado
+      utterance.rate   = 1.02;
+      utterance.pitch  = Math.max(0.1, 0.72 + pitchBase);
       utterance.volume = 1.0;
     }
 
@@ -15250,20 +15266,18 @@
     ctx.arc(200, GOAL_BASE_EARLY + 55, 2.5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Semicírculo del área penal — la porción del círculo centrado en el punto del penal
-    // que asoma por DEBAJO del borde del área grande (hacia el jugador).
-    // El área grande termina en GOAL_BASE_EARLY + 90. El punto del penal está en GOAL_BASE_EARLY + 55.
-    // El radio 38 hace que el extremo inferior llegue a +93, asomando 3px fuera del área.
-    // Dibujamos solo la mitad inferior del círculo (0 a π), que es la que apunta hacia el jugador.
-    ctx.strokeStyle = 'rgba(240, 255, 235, 0.35)';
+    // Semicírculo del área penal — asoma por debajo del borde del área hacia el jugador.
+    // Punto del penal: GOAL_BASE_EARLY + 55. Área termina: GOAL_BASE_EARLY + 90.
+    // Radio 38 → extremo inferior en +93, asoma 3px fuera del área (correcto reglamentariamente).
+    ctx.strokeStyle = 'rgba(240, 255, 235, 0.45)';
     ctx.lineWidth = 1.4;
     ctx.save();
-    // Clip para mostrar solo la parte fuera del área grande
+    // Clip: solo mostrar la parte que queda FUERA (por debajo) del área grande
     ctx.beginPath();
     ctx.rect(0, GOAL_BASE_EARLY + 90, gameCanvas.width, gameCanvas.height);
     ctx.clip();
     ctx.beginPath();
-    ctx.arc(200, GOAL_BASE_EARLY + 55, 65, 0, Math.PI);
+    ctx.arc(200, GOAL_BASE_EARLY + 55, 38, 0, Math.PI);
     ctx.stroke();
     ctx.restore();
 
