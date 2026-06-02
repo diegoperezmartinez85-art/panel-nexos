@@ -12824,10 +12824,56 @@
         c.fillStyle = fc[2] || '#002277';
         c.beginPath(); c.arc(x + w*0.5, y + h*0.5, Math.min(w,h)*0.22, 0, Math.PI*2); c.fill();
       } else if (ft === 'uy') {
-        const bh = h / 3;
-        c.fillStyle = '#007fff'; c.fillRect(x, y, w, bh);
-        c.fillStyle = '#ffffff'; c.fillRect(x, y+bh, w, bh);
-        c.fillStyle = '#007fff'; c.fillRect(x, y+bh*2, w, bh);
+        // Bandera de Uruguay: 9 franjas horizontales alternadas (5 blancas y 4 celestes)
+        const stripeH = h / 9;
+        for (let i = 0; i < 9; i++) {
+          c.fillStyle = (i % 2 === 0) ? '#ffffff' : '#007fff';
+          c.fillRect(x, y + i * stripeH, w, stripeH + 0.5);
+        }
+        
+        // Cantón blanco en la esquina superior izquierda (ocupa los primeros 5 renglones, y ancho proporcional)
+        const cantonW = w * 0.38;
+        const cantonH = stripeH * 5;
+        c.fillStyle = '#ffffff';
+        c.fillRect(x, y, cantonW, cantonH);
+        
+        // Borde fino del cantón para delimitarlo
+        c.strokeStyle = '#007fff';
+        c.lineWidth = 0.5;
+        c.strokeRect(x, y, cantonW, cantonH);
+        
+        // Sol de Mayo de Uruguay (en el centro del cantón blanco)
+        const sunX = x + cantonW * 0.5;
+        const sunY = y + cantonH * 0.5;
+        const sunR = Math.min(cantonW, cantonH) * 0.26;
+        
+        // Círculo central del Sol
+        c.fillStyle = '#fbbf24'; // Amarillo oro
+        c.strokeStyle = '#d97706'; // Borde ocre
+        c.lineWidth = 0.6;
+        c.beginPath();
+        c.arc(sunX, sunY, sunR, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+        
+        // Rayos del Sol (16 rayos alternando rectos y flamígeros, representados de forma limpia)
+        c.fillStyle = '#fbbf24';
+        const raysCount = 16;
+        for (let r = 0; r < raysCount; r++) {
+          const angle = (r / raysCount) * Math.PI * 2;
+          c.save();
+          c.translate(sunX, sunY);
+          c.rotate(angle);
+          c.beginPath();
+          c.moveTo(0, -sunR);
+          c.lineTo(-1.2, -sunR * 1.55);
+          c.lineTo(0, -sunR * 1.85); // Punta del rayo
+          c.lineTo(1.2, -sunR * 1.55);
+          c.closePath();
+          c.fill();
+          c.stroke();
+          c.restore();
+        }
       } else {
         c.fillStyle = fc[0] || '#cccccc'; c.fillRect(x, y, w, h);
       }
@@ -14430,8 +14476,10 @@
         } else if (tipo === 'save') {
           drawCabezon(ctx, 0, 0, arqueroJugador, false, false, true);
         } else if (tipo === 'palo') {
-          // Dibujar a nuestro jugador oponente en desesperación absoluta
-          const shock = esGolContra ? selectedPlayer : (cpuTirador || MUNDIAL_JUGADORES[0]);
+          // Dibujar al jugador que pateó en desesperación absoluta
+          const shock = (gameMode === 'penales' && penalesTurno === 'defensa') 
+            ? (cpuTirador || MUNDIAL_JUGADORES[0]) 
+            : selectedPlayer;
           drawCabezon(ctx, 0, 0, shock, false, false, false);
           // Gota de sudor drama
           ctx.fillStyle = '#38bdf8';
