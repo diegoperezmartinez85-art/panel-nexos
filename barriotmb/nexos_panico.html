@@ -6210,13 +6210,37 @@
       const now = Date.now();
       if (now - clossLastPlayed < 3000) return; // evitar spam
       clossLastPlayed = now;
+
+      // Bajar el volumen del ambiente mientras suena Closs (ducking)
+      try {
+        if (stadiumAmbientAudio) {
+          stadiumAmbientAudio.volume = 0.03;
+        }
+      } catch(e) {}
+      if (typeof activeVoiceCount !== 'undefined') {
+        activeVoiceCount++;
+      }
+
       const src = audioCtx.createBufferSource();
       src.buffer = clossAudioBuffer;
       const gainNode = audioCtx.createGain();
-      gainNode.gain.setValueAtTime(1.0, audioCtx.currentTime);
+      gainNode.gain.setValueAtTime(1.2, audioCtx.currentTime); // Subir un poco la voz
       src.connect(gainNode);
       gainNode.connect(audioCtx.destination);
       src.start(audioCtx.currentTime);
+
+      src.onended = () => {
+        if (typeof activeVoiceCount !== 'undefined') {
+          activeVoiceCount = Math.max(0, activeVoiceCount - 1);
+          if (activeVoiceCount === 0) {
+            try {
+              if (stadiumAmbientAudio) {
+                stadiumAmbientAudio.volume = typeof targetAmbientVolume !== 'undefined' ? targetAmbientVolume : 0.20;
+              }
+            } catch(e) {}
+          }
+        }
+      };
     } catch(e) {}
   }
   function initAudio() {
@@ -7122,6 +7146,7 @@
 
   let _golAudioContext = null;
   let _golCurrentSrc = null;
+  let activeVoiceCount = 0;
 
   function _playGolCustom() {
     try {
@@ -7129,15 +7154,34 @@
       if (_golAudioContext.state === 'suspended') _golAudioContext.resume();
       // Detener el audio anterior si todavía está sonando
       if (_golCurrentSrc) { try { _golCurrentSrc.stop(); } catch(e) {} }
+
+      // Bajar el volumen del ambiente de fondo para destacar la voz del gol (ducking)
+      try {
+        if (stadiumAmbientAudio) {
+          stadiumAmbientAudio.volume = 0.03;
+        }
+      } catch(e) {}
+      activeVoiceCount++;
+
       const src = _golAudioContext.createBufferSource();
       src.buffer = _golAudioBuffer;
       const gain = _golAudioContext.createGain();
-      gain.gain.value = 0.9;
+      gain.gain.value = 1.25; // Subir volumen del gol para que suene fuerte e impactante
       src.connect(gain);
       gain.connect(_golAudioContext.destination);
       src.start(0);
       _golCurrentSrc = src;
-      src.onended = () => { _golCurrentSrc = null; };
+      src.onended = () => { 
+        _golCurrentSrc = null; 
+        activeVoiceCount = Math.max(0, activeVoiceCount - 1);
+        if (activeVoiceCount === 0) {
+          try {
+            if (stadiumAmbientAudio) {
+              stadiumAmbientAudio.volume = typeof targetAmbientVolume !== 'undefined' ? targetAmbientVolume : 0.20;
+            }
+          } catch(e) {}
+        }
+      };
     } catch(e) { console.warn('play gol error', e); }
   }
 
@@ -9038,9 +9082,16 @@
 
 
   window.seleccionarModo = function(modo) {
+    const oldMode = gameMode;
     gameMode = modo;
     triggerHaptic('medium');
     playSound('tap');
+    
+    // Si cambia el modo y estamos en la selección, reiniciar música retro para cambiar la melodía
+    if (oldMode !== modo) {
+      detenerMusicaRetroArcade();
+      iniciarMusicaRetroArcade();
+    }
     
     document.querySelectorAll('.game-mode-card').forEach(card => {
       card.classList.remove('selected');
@@ -9496,6 +9547,7 @@
   let crowdCheerAudio = null;
   let refereeWhistleAudio = null;
   let stadiumAmbientAudio = null;
+  let targetAmbientVolume = 0.20;
 
   function preloadRealSounds() {
     if (crowdCheerAudio) return;
@@ -9506,9 +9558,19 @@
       refereeWhistleAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-200.wav');
       refereeWhistleAudio.volume = 0.45;
 
-      stadiumAmbientAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2248/2248-200.wav');
-      stadiumAmbientAudio.volume = 0.12; // volumen de fondo bajo
+      // Intentar cargar primero el archivo local "ambiente.mp3" que proporcione el usuario
+      stadiumAmbientAudio = new Audio('ambiente.mp3');
+      stadiumAmbientAudio.volume = 0.20;
+      targetAmbientVolume = 0.20;
       stadiumAmbientAudio.loop = true;
+
+      // Fallback si no existe o falla el archivo local
+      stadiumAmbientAudio.addEventListener('error', function() {
+        stadiumAmbientAudio.src = 'https://assets.mixkit.co/active_storage/sfx/2248/2248-200.wav';
+        stadiumAmbientAudio.volume = 0.12;
+        targetAmbientVolume = 0.12;
+        stadiumAmbientAudio.load();
+      });
 
       crowdCheerAudio.load();
       refereeWhistleAudio.load();
@@ -9538,16 +9600,29 @@
       const stepDuration = 0.135; // Tempo alegre y enérgico de fútbol retro
       const ahora = audioCtx.currentTime;
       
+      const esPenales = (typeof gameMode !== 'undefined' && gameMode === 'penales');
+
       // Bajo rítmico (Bassline de 32 pasos al estilo Tecmo World Cup / Goal!)
-      const bassSeq = [
+      // Si es penales, usa un bajo tenso y dramático en La Menor
+      const bassSeq = esPenales ? [
+        'A3', '', 'A3', 'C4', '', 'E4', 'A3', '',
+        'F3', '', 'F3', 'A3', '', 'C4', 'F3', '',
+        'D3', '', 'D3', 'F3', '', 'A3', 'D3', '',
+        'E3', '', 'E3', 'GS3', '', 'B3', 'E3', ''
+      ] : [
         'C3', '', 'C3', 'E3', '', 'G3', 'C3', '',
         'A3', '', 'A3', 'C4', '', 'E4', 'A3', '',
         'F3', '', 'F3', 'A3', '', 'C4', 'F3', '',
         'G3', '', 'G3', 'B3', '', 'D4', 'G3', ''
       ];
       
-      // Melodía principal alegre y épica
-      const melodySeq = [
+      // Melodía principal alegre y épica para clásico, o dramática/tensa para penales
+      const melodySeq = esPenales ? [
+        'E5', '', 'A5', 'B5', '', 'C6', 'B5', '',
+        'A5', '', 'F5', 'D5', '', 'F5', 'A5', '',
+        'D5', '', 'F5', 'A5', '', 'D6', 'C6', '',
+        'B5', '', 'GS5', 'E5', '', 'GS5', 'B5', ''
+      ] : [
         'C5', '', 'E5', 'G5', '', 'C5', 'E5', '',
         'A5', '', 'G5', 'F5', '', 'E5', 'D5', '',
         'F5', '', 'A5', 'C6', '', 'F5', 'A5', '',
@@ -9569,9 +9644,9 @@
       ];
 
       const NOTES = {
-        C3: 130.81, E3: 164.81, G3: 196.00, A3: 220.00, B3: 246.94,
+        C3: 130.81, D3: 146.83, E3: 164.81, F3: 174.61, G3: 196.00, GS3: 207.65, A3: 220.00, B3: 246.94,
         C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.00, A4: 440.00, B4: 493.88,
-        C5: 523.25, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880.00, C6: 1046.50
+        C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, GS5: 830.61, A5: 880.00, B5: 987.77, C6: 1046.50, D6: 1174.66
       };
 
       function playStep() {
@@ -9704,6 +9779,134 @@
       });
       activeSeqOscs = [];
       seqStep = 0;
+    } catch(e) {}
+  }
+
+  // --- 8-BIT RENDITION OF "WE ARE THE CHAMPIONS" FOR PENALTY WORLD CUP CELEBRATION ---
+  let musicChampionsInterval = null;
+  let championsSeqStep = 0;
+  let activeChampionsOscs = [];
+
+  function iniciarMusicaChampions() {
+    if (modoDiscreto) return;
+    try {
+      initAudio();
+      if (!audioCtx) return;
+      if (musicChampionsInterval) return; // ya está sonando
+      
+      // Detener cualquier otra música de fondo
+      detenerMusicaRetroArcade();
+      
+      const stepDuration = 0.16; // Tempo majestuoso
+      
+      const melodySeq = [
+        'E5', '', 'D5', 'E5', 'C5', '', 'A4', '', '', '', 'C5', '', 'F5', '', '', '', // 16
+        'G5', '', 'A5', 'AS5', 'A5', '', 'G5', '', 'D5', '', '', '', 'E5', 'F5', 'G5', '', // 32
+        'A5', '', 'G5', 'A5', 'F5', '', 'D5', '', '', '', 'C6', '', 'AS5', 'C6', 'A5', 'G5', // 48
+        'F5', '', 'D5', 'G5', 'F5', '', 'G5', 'F5', 'G5', 'A5', 'AS5', 'C6', 'D6', '', '', '', // 64
+        'C6', '', 'D6', '', 'F6', '', '', '', '', '', '', '', '', '', '', '' // 80
+      ];
+      
+      const bassSeq = [
+        'F3', '', '', '', 'A3', '', '', '', 'D3', '', '', '', 'F3', '', '', '', // 16
+        'G3', '', '', '', 'AS3', '', '', '', 'C3', '', '', '', 'E3', '', '', '', // 32
+        'F3', '', '', '', 'C3', '', '', '', 'AS3', '', '', '', 'D3', '', '', '', // 48
+        'C3', '', '', '', 'E3', '', '', '', 'G3', '', '', '', 'C3', '', '', '', // 64
+        'F3', '', '', '', 'A3', '', '', '', 'C4', '', '', '', 'F4', '', '', '' // 80
+      ];
+      
+      const NOTES = {
+        F3: 174.61, G3: 196.00, A3: 220.00, AS3: 233.08, C3: 130.81, D3: 146.83, E3: 164.81,
+        C4: 261.63, E4: 329.63, F4: 349.23, G4: 392.00, A4: 440.00, AS4: 466.16,
+        C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880.00, AS5: 932.33,
+        C6: 1046.50, D6: 1174.66, F6: 1396.91
+      };
+
+      function playStep() {
+        if (!audioCtx) return;
+        const t = audioCtx.currentTime;
+        const step = championsSeqStep % 80;
+        championsSeqStep++;
+        
+        // Bajo
+        const bassNote = bassSeq[step];
+        if (bassNote && NOTES[bassNote]) {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(NOTES[bassNote], t);
+          
+          const filter = audioCtx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(350, t);
+          
+          gain.gain.setValueAtTime(0.08, t);
+          gain.gain.linearRampToValueAtTime(0.001, t + 0.35);
+          
+          osc.connect(filter);
+          filter.connect(gain);
+          gain.connect(audioCtx.destination);
+          
+          osc.start(t);
+          osc.stop(t + 0.36);
+          
+          activeChampionsOscs.push(osc);
+          setTimeout(() => {
+            activeChampionsOscs = activeChampionsOscs.filter(o => o !== osc);
+          }, 400);
+        }
+        
+        // Melodía
+        const melodyNote = melodySeq[step];
+        if (melodyNote && NOTES[melodyNote]) {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(NOTES[melodyNote], t);
+          
+          const vibrato = audioCtx.createOscillator();
+          const vibratoGain = audioCtx.createGain();
+          vibrato.frequency.setValueAtTime(6.0, t);
+          vibratoGain.gain.setValueAtTime(6, t);
+          
+          vibrato.connect(vibratoGain);
+          vibratoGain.connect(osc.frequency);
+          
+          gain.gain.setValueAtTime(0.045, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+          
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          
+          vibrato.start(t);
+          osc.start(t);
+          
+          vibrato.stop(t + 0.48);
+          osc.stop(t + 0.48);
+          
+          activeChampionsOscs.push(osc);
+          activeChampionsOscs.push(vibrato);
+          setTimeout(() => {
+            activeChampionsOscs = activeChampionsOscs.filter(o => o !== osc && o !== vibrato);
+          }, 500);
+        }
+      }
+      
+      championsSeqStep = 0;
+      musicChampionsInterval = setInterval(playStep, stepDuration * 1000);
+    } catch(e) {}
+  }
+
+  function detenerMusicaChampions() {
+    try {
+      if (musicChampionsInterval) {
+        clearInterval(musicChampionsInterval);
+        musicChampionsInterval = null;
+      }
+      activeChampionsOscs.forEach(osc => {
+        try { osc.stop(); } catch(e) {}
+      });
+      activeChampionsOscs = [];
     } catch(e) {}
   }
 
@@ -11697,8 +11900,8 @@
     // Desbloquear canal de voz de celular
     warmUpSpeechSynthesis();
     
-    // Iniciar melodía arcade retro
-    iniciarMusicaRetroArcade();
+    // Detener música retro para el partido (ambiente puro)
+    detenerMusicaRetroArcade();
     
     preloadRealSounds();
     try {
@@ -12665,6 +12868,10 @@
   window.volverASeleccionDesdeTorneo = function() {
     playSound('tap');
     triggerHaptic('medium');
+    
+    // Detener música de campeón si estuviera sonando
+    detenerMusicaChampions();
+    
     torneoPenales = null;
     document.getElementById('penales-fixture-overlay').style.display = 'none';
     document.getElementById('mundial-estadio').style.display = 'none';
@@ -12672,6 +12879,9 @@
     
     const navBar = document.getElementById('app-nav-bar');
     if (navBar) navBar.style.display = 'flex';
+    
+    // Volver a iniciar la música retro al salir del torneo
+    iniciarMusicaRetroArcade();
   };
 
   // ══════════════════════════════════════════════════════════════
@@ -12680,6 +12890,9 @@
   window.mostrarCeremoniaFinalCampeon = function() {
     triggerHaptic('success');
     document.getElementById('gameover-overlay').style.display = 'none';
+    
+    // Iniciar la música de campeón "We Are the Champions" en 8 bits
+    iniciarMusicaChampions();
     
     // Disparar la majestuosa cinemática de campeón en la pantalla inferior
     mostrarReaccionAnime('champion');
@@ -13482,6 +13695,9 @@
       physicsInterval = null;
     }
     
+    // Detener la música de campeón si estuviera sonando
+    detenerMusicaChampions();
+    
     // Resetear banderas de celebración
     isCelebrating = false;
     isCopaCelebracion = false;
@@ -13499,6 +13715,9 @@
     document.getElementById('mundial-estadio').style.display = 'none';
     document.getElementById('mundial-seleccion').style.display = 'block';
     loadRankingCasas();
+    
+    // Volver a iniciar la música retro al regresar al menú
+    iniciarMusicaRetroArcade();
   };
 
   function initCanvas() {
