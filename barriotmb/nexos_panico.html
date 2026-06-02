@@ -2973,6 +2973,55 @@
       text-shadow: 0 0 8px var(--ac);
     }
 
+    /* Responsive TV Scoreboard Header */
+    .tv-header-row {
+      display: grid;
+      grid-template-columns: 92px 1fr 92px;
+      align-items: center;
+      width: 100%;
+      gap: 8px;
+      box-sizing: border-box;
+    }
+    
+    @media (max-width: 600px) {
+      .estadio-header {
+        margin-left: 0 !important;
+        width: 100% !important;
+        gap: 8px !important;
+      }
+      .tv-header-row {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 6px !important;
+      }
+      .estadio-back-btn {
+        align-self: flex-start !important;
+        margin-left: 8px !important;
+        height: 32px !important;
+        padding: 6px 12px !important;
+        font-size: 10px !important;
+        width: auto !important;
+      }
+      #tv-scoreboard {
+        width: calc(100% - 16px) !important;
+        height: 38px !important;
+        padding: 0 8px !important;
+      }
+      #tv-logo-badge {
+        display: none !important;
+      }
+      .tv-header-spacer {
+        display: none !important;
+      }
+      #tv-penalty-dots-bar {
+        max-width: calc(100% - 16px) !important;
+      }
+      .onomatopeya-overlay {
+        max-width: calc(100% - 16px) !important;
+      }
+    }
+
     /* ── ONOMATOPEYA — barrita estilo ticker deportivo ABAJO del marcador ── */
     .onomatopeya-overlay {
       width: 100%;
@@ -5001,7 +5050,7 @@
     <div class="estadio-header" style="display: flex; flex-direction: column; width: 100%; gap: 6px; box-sizing: border-box; align-items: stretch; margin-bottom: 2px;">
       
       <!-- Fila Superior: Grilla balanceada de 3 columnas para centrar el Marcador matemáticamente -->
-      <div style="display: grid; grid-template-columns: 92px 1fr 92px; align-items: center; width: 100%; gap: 8px; box-sizing: border-box;">
+      <div class="tv-header-row">
         <!-- Col 1: Botón Salir -->
         <div style="display: flex; justify-content: flex-start;">
           <button class="estadio-back-btn" onclick="volverASeleccion()" style="display: flex; align-items: center; gap: 4px; padding: 10px 14px; border-radius: 14px; background: rgba(15,23,42,0.65); border: 1.5px solid rgba(255,255,255,0.08); color: #e4e4e7; cursor: pointer; transition: all 0.2s; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; height: 42px; box-sizing: border-box; width: 92px; justify-content: center;">
@@ -5015,7 +5064,7 @@
             
             <!-- Left: Logo & Tournament Badge -->
             <div style="display: flex; align-items: center; gap: 8px;">
-              <div style="background: linear-gradient(135deg, #a855f7, #7c3aed); color: white; font-size: 7px; font-weight: 950; letter-spacing: 1.2px; padding: 3px 6px; border-radius: 5px; text-transform: uppercase; text-shadow: 0 1px 2px rgba(0,0,0,0.5); box-shadow: 0 2px 6px rgba(124, 58, 237, 0.3);">
+              <div id="tv-logo-badge" style="background: linear-gradient(135deg, #a855f7, #7c3aed); color: white; font-size: 7px; font-weight: 950; letter-spacing: 1.2px; padding: 3px 6px; border-radius: 5px; text-transform: uppercase; text-shadow: 0 1px 2px rgba(0,0,0,0.5); box-shadow: 0 2px 6px rgba(124, 58, 237, 0.35);">
                 🏆 COPA NEXOS
               </div>
               <div id="tv-round-tag" style="font-size: 8px; font-weight: 900; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.8px;">
@@ -5064,7 +5113,7 @@
         </div>
 
         <!-- Col 3: Spacer balanceador de grilla -->
-        <div style="width: 92px; height: 1px;"></div>
+        <div class="tv-header-spacer" style="width: 92px; height: 1px;"></div>
       </div>
 
       <!-- Tanda de círculos de penales -->
@@ -17644,10 +17693,7 @@
           ctx.font = 'bold 12px system-ui, -apple-system, sans-serif';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.shadowColor = ad.accent;
-          ctx.shadowBlur = 5;
           ctx.fillText(ad.text, sx + slotW / 2, adY + adH / 2);
-          ctx.shadowBlur = 0;
         }
       }
 
@@ -18815,9 +18861,7 @@
       fireParticles.forEach(p => {
         ctx.globalAlpha = p.life * 0.90;
         if (p.type === 'spark') {
-          // Chispa de estrella neón brillante con glow
-          ctx.shadowColor = p.color;
-          ctx.shadowBlur = 8;
+          // Chispa de estrella neón brillante sin shadowBlur (glow natural mediante composición screen)
           ctx.fillStyle = '#ffffff';
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.r * 0.5, 0, Math.PI * 2);
@@ -18828,21 +18872,17 @@
           ctx.moveTo(p.x - p.r, p.y); ctx.lineTo(p.x + p.r, p.y);
           ctx.moveTo(p.x, p.y - p.r); ctx.lineTo(p.x, p.y + p.r);
           ctx.stroke();
-          ctx.shadowBlur = 0;
         } else {
-          // Llama con gradiente radial para mayor volumen
+          // Llama con gradiente radial (glow natural que va de blanco a transparente)
           const flameGrad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 1.5);
           flameGrad.addColorStop(0, '#ffffff');
           flameGrad.addColorStop(0.25, p.color === '#fde047' ? '#fef08a' : (p.color === '#ef4444' ? '#ff6060' : p.color));
           flameGrad.addColorStop(0.65, p.color);
           flameGrad.addColorStop(1, 'rgba(0,0,0,0)');
           ctx.fillStyle = flameGrad;
-          ctx.shadowColor = p.color;
-          ctx.shadowBlur = p.r * 2;
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.r * 1.5, 0, Math.PI * 2);
           ctx.fill();
-          ctx.shadowBlur = 0;
         }
       });
       ctx.restore();
