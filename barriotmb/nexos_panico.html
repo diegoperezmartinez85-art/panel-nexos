@@ -4435,7 +4435,6 @@
           <input type="range" id="slider-precision" min="50" max="99" value="90" style="-webkit-appearance: none; width: 100%; height: 4px; border-radius: 2px; background: #27272a; outline: none; margin: 4px 0;" oninput="actualizarSliderVal('precision')">
         </div>
       </div>
-
     </div>
 
     <!-- Footer Acciones -->
@@ -4872,25 +4871,72 @@
 
   <!-- ESTADIO DE JUEGO (CANVAS) -->
   <div class="mundial-container" id="mundial-estadio" style="display: none;">
-    <div class="estadio-header">
-      <button class="estadio-back-btn" onclick="volverASeleccion()">◀ Salir</button>
-      <div class="estadio-marcador-led">
-        <div class="marcador-item">
-          <span class="label">PUNTOS</span>
-          <span class="val" id="estadio-puntos">00</span>
+    <div class="estadio-header" style="display: flex; flex-direction: column; width: 100%; gap: 6px; box-sizing: border-box; align-items: stretch; margin-bottom: 2px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%;">
+        <!-- Botón Salir modernizado -->
+        <button class="estadio-back-btn" onclick="volverASeleccion()" style="display: flex; align-items: center; gap: 4px; padding: 10px 16px; border-radius: 14px; background: rgba(15,23,42,0.65); border: 1.5px solid rgba(255,255,255,0.08); color: #e4e4e7; cursor: pointer; transition: all 0.2s; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; height: 42px; box-sizing: border-box;">
+          <span style="font-size: 12px; margin-right: 2px;">🚪</span> SALIR
+        </button>
+
+        <!-- TV Broadcast Scoreboard Capsule (Glassmorphism, Neon Aura, Ultra-Modern FIFA/Qatar Style) -->
+        <div class="estadio-marcador-led" id="tv-scoreboard" style="flex: 1; height: 42px; background: linear-gradient(135deg, rgba(15,23,42,0.92), rgba(8,10,15,0.88)); border: 1.5px solid rgba(168, 85, 247, 0.4); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 15px rgba(168, 85, 247, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 0 14px; display: flex; align-items: center; justify-content: space-between; overflow: hidden; position: relative; font-family: 'Outfit', sans-serif; box-sizing: border-box;">
+          
+          <!-- Left: Logo & Tournament Badge -->
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="background: linear-gradient(135deg, #a855f7, #7c3aed); color: white; font-size: 7px; font-weight: 950; letter-spacing: 1.2px; padding: 3px 6px; border-radius: 5px; text-transform: uppercase; text-shadow: 0 1px 2px rgba(0,0,0,0.5); box-shadow: 0 2px 6px rgba(124, 58, 237, 0.3);">
+              🏆 COPA NEXOS
+            </div>
+            <div id="tv-round-tag" style="font-size: 8px; font-weight: 900; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.8px;">
+              ARCADE
+            </div>
+          </div>
+
+          <!-- Center: Core Score Container -->
+          <div id="tv-score-center" style="display: flex; align-items: center; gap: 8px;">
+            <!-- Home Team (Player) -->
+            <div style="display: flex; align-items: center; gap: 5px;">
+              <span id="tv-home-flag" style="font-size: 15px;">🇦🇷</span>
+              <span id="tv-home-name" style="font-size: 11px; font-weight: 950; color: white; letter-spacing: 0.5px; text-transform: uppercase;">ARG</span>
+            </div>
+
+            <!-- Score Digit Badges -->
+            <div style="display: flex; align-items: center; background: rgba(0,0,0,0.5); border: 1px solid rgba(168,85,247,0.25); border-radius: 6px; overflow: hidden; font-weight: 950; height: 24px;">
+              <div id="tv-score-home" style="width: 24px; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: white; background: rgba(255,255,255,0.03); font-family: monospace;">00</div>
+              <div style="width: 8px; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #a855f7;">-</div>
+              <div id="tv-score-away" style="width: 24px; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: white; background: rgba(255,255,255,0.03); font-family: monospace;">00</div>
+            </div>
+
+            <!-- Away Team (Rival CPU or "Record" in Arcade Mode) -->
+            <div style="display: flex; align-items: center; gap: 5px;">
+              <span id="tv-away-name" style="font-size: 11px; font-weight: 950; color: white; letter-spacing: 0.5px; text-transform: uppercase;">REC</span>
+              <span id="tv-away-flag" style="font-size: 15px;">🏆</span>
+            </div>
+          </div>
+
+          <!-- Right: Status (Coins 🪙 and dynamic indicators like Tiros left) -->
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 3px;">
+              <span style="font-size: 12px;">🪙</span>
+              <span id="estadio-monedas" style="font-size: 12px; font-weight: 950; color: #fbbf24; text-shadow: 0 0 6px rgba(251, 191, 36, 0.4); font-family: monospace;">00</span>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1;">
+              <span style="font-size: 6px; font-weight: 900; color: #52525b; letter-spacing: 0.5px; text-transform: uppercase;">TIROS</span>
+              <span id="estadio-tiros" style="font-size: 11px; font-weight: 950; color: #a855f7; font-family: monospace;">5/5</span>
+            </div>
+          </div>
+
+          <!-- Mantener los antiguos IDs ocultos para compatibilidad de scripts -->
+          <span id="estadio-puntos" style="display: none;">00</span>
+          <span id="estadio-record" style="display: none;">00</span>
+
         </div>
-        <div class="marcador-item">
-          <span class="label">TIROS</span>
-          <span class="val" id="estadio-tiros">5/5</span>
-        </div>
-        <div class="marcador-item">
-          <span class="label">MONEDAS 🪙</span>
-          <span class="val" id="estadio-monedas" style="color: #fbbf24; text-shadow: 0 0 6px #fbbf24;">00</span>
-        </div>
-        <div class="marcador-item">
-          <span class="label">RÉCORD</span>
-          <span class="val" id="estadio-record">00</span>
-        </div>
+      </div>
+
+      <!-- Penalty Shootout Circles Sequence (Fades in dynamically during tournament penales!) -->
+      <div id="tv-penalty-dots-bar" style="display: none; width: 100%; max-width: 290px; align-self: center; justify-content: space-between; align-items: center; background: rgba(8,10,15,0.85); border: 1.2px solid rgba(168, 85, 247, 0.3); border-top: none; border-radius: 0 0 12px 12px; padding: 4px 14px; box-sizing: border-box; font-family: 'Outfit', sans-serif; gap: 8px;">
+        <div style="display: flex; gap: 4px;" id="tv-dots-home"></div>
+        <div style="font-size: 7px; font-weight: 950; color: #a855f7; letter-spacing: 0.8px;">TANDA PENALES</div>
+        <div style="display: flex; gap: 4px;" id="tv-dots-away"></div>
       </div>
     </div>
 
@@ -8393,6 +8439,15 @@
   let penalesGolesContra = 0;
   let penalesHistorialFavor = [];
   let penalesHistorialContra = [];
+  // VARIABLES DE ZOOM DE TENSIÓN CINEMATOGRÁFICO Y CÁMARA LENTA (SLOW-MO)
+  let tensionActive = false;
+  let tensionLevel = 0.0; // 0.0 a 1.0
+  let timeDilation = 1.0; // 1.0 (normal) a 0.32 (cámara lenta)
+  let cameraZoom = 1.0;
+  let cameraFocusX = 200;
+  let cameraFocusY = 150;
+  let photographerFlashTimer = 0; // Temporizador para el flash del fotógrafo
+
   let penalesCPUPreparando = false;
   let penalesDibuDir = 0; // -1: izq, 0: centro, 1: der
   let penalesCPUShotTimer = 0;
@@ -9402,7 +9457,7 @@
   function speakRelato(text) {
     if (modoDiscreto) return;
 
-    // 1. Detener y reproducir el clip de audio de la multitud (CC0/Sin Copyright)
+    // Detener clip previo de multitud
     if (_relatoAudio) {
       try { _relatoAudio.pause(); _relatoAudio.currentTime = 0; } catch(e) {}
       _relatoAudio = null;
@@ -9421,28 +9476,6 @@
       clip.currentTime = 0;
       _relatoAudio = clip;
       clip.play().catch(() => {});
-    } catch(e) {}
-
-    // 2. ¡Relatar el gol, la atajada o el palo usando el sintetizador de voz humana en español!
-    try {
-      if ('speechSynthesis' in window) {
-        // Cancelar relatos o palabras previas que estén sonando
-        window.speechSynthesis.cancel();
-
-        const cleanText = preprocesarTexto(text);
-        const utterance = new SpeechSynthesisUtterance(cleanText);
-        
-        // Intentar buscar la mejor voz en español (preferentemente acento rioplatense o natural)
-        const voz = buscarVozMasculina();
-        if (voz) utterance.voice = voz;
-        
-        utterance.lang = 'es-AR'; // Acento rioplatense (Mariano Closs style!)
-        utterance.pitch = (tipo === 'gol') ? 1.15 : 1.0; // ¡Relato con más euforia y agudeza en los goles!
-        utterance.rate = (tipo === 'gol') ? 1.10 : 0.98; // Relato rápido en el gol, pausado dramático en fallas/palos
-        utterance.volume = 0.95;
-        
-        window.speechSynthesis.speak(utterance);
-      }
     } catch(e) {}
   }
 
@@ -13356,6 +13389,7 @@
 
   function playPostVoice() {
     playSound('palo'); // ¡Gong metálico en tiempo real!
+    photographerFlashTimer = 22; // ¡Disparar flash de cámara!
     let scorer = selectedPlayer;
     if (gameMode === 'penales' && penalesTurno === 'defensa') {
       scorer = cpuTirador || MUNDIAL_JUGADORES[0];
@@ -13723,9 +13757,143 @@
     }
   }
 
+  function actualizarTVMarcador() {
+    try {
+      const isPenales = (gameMode === 'penales');
+      const tvRound = document.getElementById('tv-round-tag');
+      const tvHomeFlag = document.getElementById('tv-home-flag');
+      const tvHomeName = document.getElementById('tv-home-name');
+      const tvAwayFlag = document.getElementById('tv-away-flag');
+      const tvAwayName = document.getElementById('tv-away-name');
+      const tvScoreHome = document.getElementById('tv-score-home');
+      const tvScoreAway = document.getElementById('tv-score-away');
+      const tvDotsBar = document.getElementById('tv-penalty-dots-bar');
+      
+      if (!tvRound || !tvHomeFlag || !tvHomeName || !tvAwayFlag || !tvAwayName || !tvScoreHome || !tvScoreAway || !tvDotsBar) {
+        return;
+      }
+      
+      if (isPenales) {
+        // 1. Mostrar ronda actual en el tag del marcador
+        let rondaStr = 'FASE DE GRUPOS';
+        if (torneoPenales) {
+          if (torneoPenales.fase === 'eliminatoria') {
+            if (torneoPenales.ronda === 1) rondaStr = 'CUARTOS DE FINAL';
+            else if (torneoPenales.ronda === 2) rondaStr = 'SEMIFINAL';
+            else if (torneoPenales.ronda === 3) rondaStr = 'GRAN FINAL';
+          } else {
+            rondaStr = `GRUPO - J${torneoPenales.jornada || 1}`;
+          }
+        }
+        tvRound.innerText = rondaStr;
+        tvRound.style.color = '#06b6d4';
+        tvRound.style.borderColor = '#06b6d4';
+        
+        // 2. Equipos vs (Pateador Local y Rival CPU)
+        if (selectedPlayer) {
+          tvHomeFlag.innerText = selectedPlayer.flag || '🇦🇷';
+          tvHomeName.innerText = selectedPlayer.id === 'custom_legend' 
+            ? (selectedPlayer.nombre || 'ARG').substring(0, 3).toUpperCase() 
+            : (selectedPlayer.pais || 'ARG').substring(0, 3).toUpperCase();
+        }
+        
+        if (cpuTirador) {
+          tvAwayFlag.innerText = cpuTirador.flag || '🤖';
+          tvAwayName.innerText = (cpuTirador.pais || 'CPU').substring(0, 3).toUpperCase();
+        } else {
+          tvAwayFlag.innerText = '🤖';
+          tvAwayName.innerText = 'CPU';
+        }
+        
+        // 3. Goles de Penales
+        tvScoreHome.innerText = penalesGolesFavor || 0;
+        tvScoreAway.innerText = penalesGolesContra || 0;
+        
+        // 4. Secuencia de círculos de tanda de penales
+        tvDotsBar.style.display = 'flex';
+        
+        const dotsHome = document.getElementById('tv-dots-home');
+        const dotsAway = document.getElementById('tv-dots-away');
+        
+        if (dotsHome && dotsAway) {
+          dotsHome.innerHTML = '';
+          dotsAway.innerHTML = '';
+          
+          const maxTiros = Math.max(5, (penalesHistorialFavor || []).length, (penalesHistorialContra || []).length);
+          
+          for (let i = 0; i < maxTiros; i++) {
+            // Círculo del jugador local (Home)
+            const dotH = document.createElement('div');
+            dotH.style.cssText = 'width: 8px; height: 8px; border-radius: 50%; border: 1.2px solid rgba(255,255,255,0.25); transition: all 0.3s; box-sizing: border-box;';
+            if (penalesHistorialFavor && i < penalesHistorialFavor.length) {
+              const result = penalesHistorialFavor[i];
+              if (result === 'gol') {
+                dotH.style.background = '#22c55e'; // Verde gol
+                dotH.style.boxShadow = '0 0 6px rgba(34, 197, 94, 0.6)';
+                dotH.style.borderColor = '#22c55e';
+              } else {
+                dotH.style.background = '#ef4444'; // Rojo errado
+                dotH.style.boxShadow = '0 0 6px rgba(239, 68, 68, 0.6)';
+                dotH.style.borderColor = '#ef4444';
+              }
+            } else {
+              dotH.style.background = 'rgba(255, 255, 255, 0.12)';
+            }
+            dotsHome.appendChild(dotH);
+            
+            // Círculo del rival CPU (Away)
+            const dotA = document.createElement('div');
+            dotA.style.cssText = 'width: 8px; height: 8px; border-radius: 50%; border: 1.2px solid rgba(255,255,255,0.25); transition: all 0.3s; box-sizing: border-box;';
+            if (penalesHistorialContra && i < penalesHistorialContra.length) {
+              const result = penalesHistorialContra[i];
+              if (result === 'gol') {
+                dotA.style.background = '#22c55e';
+                dotA.style.boxShadow = '0 0 6px rgba(34, 197, 94, 0.6)';
+                dotA.style.borderColor = '#22c55e';
+              } else {
+                dotA.style.background = '#ef4444';
+                dotA.style.boxShadow = '0 0 6px rgba(239, 68, 68, 0.6)';
+                dotA.style.borderColor = '#ef4444';
+              }
+            } else {
+              dotA.style.background = 'rgba(255, 255, 255, 0.12)';
+            }
+            dotsAway.appendChild(dotA);
+          }
+        }
+        
+      } else {
+        // MODO ARCADE
+        tvRound.innerText = 'ARCADE';
+        tvRound.style.color = '#c084fc';
+        tvRound.style.borderColor = 'rgba(168, 85, 247, 0.3)';
+        
+        if (selectedPlayer) {
+          tvHomeFlag.innerText = selectedPlayer.flag || '🇦🇷';
+          tvHomeName.innerText = (selectedPlayer.nombre || 'ARG').substring(0, 3).toUpperCase();
+        }
+        
+        tvAwayFlag.innerText = '🏆';
+        tvAwayName.innerText = 'REC';
+        
+        // Espejar texto de los antiguos elementos LED ocultos actualizados automáticamente por el motor
+        const puntosLed = document.getElementById('estadio-puntos');
+        const recordLed = document.getElementById('estadio-record');
+        
+        tvScoreHome.innerText = puntosLed ? puntosLed.innerText : '00';
+        tvScoreAway.innerText = recordLed ? recordLed.innerText : '00';
+        
+        tvDotsBar.style.display = 'none';
+      }
+    } catch (err) {
+      console.error("Error en actualizarTVMarcador:", err);
+    }
+  }
+
   function gameLoop() {
     updatePhysics();
     updateWeather();
+    actualizarTVMarcador();
     drawGame();
     physicsInterval = requestAnimationFrame(gameLoop);
   }
@@ -13735,6 +13903,31 @@
   }
 
   function updatePhysics() {
+    // ── EALUAR SI EL TIRO ENTRA EN LA ZONA DE TENSIÓN CINEMATOGRÁFICA ──
+    // Se activa si la pelota vuela en la zona caliente de peligro cerca del travesaño o arquero
+    if (pelota.isShot && !pelota.isSettled && pelota.y >= 54 && pelota.y <= 125 && pelota.x >= 95 && pelota.x <= 305) {
+      tensionActive = true;
+    } else {
+      tensionActive = false;
+    }
+
+    // Easing amortiguado (suave) para zoom y cámara lenta
+    if (tensionActive) {
+      tensionLevel += (1.0 - tensionLevel) * 0.14;
+      timeDilation = 1.0 - (0.64 * tensionLevel);  // Baja a 0.36x de velocidad
+      cameraZoom = 1.0 + (0.32 * tensionLevel);      // Zoom de hasta 1.32x
+      cameraFocusX += (pelota.x - cameraFocusX) * 0.14;
+      cameraFocusY += (pelota.y - cameraFocusY) * 0.14;
+    } else {
+      tensionLevel += (0.0 - tensionLevel) * 0.18;
+      timeDilation = 1.0 - (0.64 * tensionLevel);
+      cameraZoom = 1.0 + (0.32 * tensionLevel);
+      cameraFocusX += (200 - cameraFocusX) * 0.18;
+      cameraFocusY += (150 - cameraFocusY) * 0.18;
+    }
+
+    const dt = timeDilation;
+
     // Latidos del corazón en momentos decisivos antes del disparo
     if (isDecisiveShot && !pelota.isShot && !isCelebrating && document.getElementById('gameover-overlay').style.display !== 'flex') {
       heartbeatSoundTimer++;
@@ -13749,6 +13942,7 @@
     if (shakeIntensity > 0) shakeIntensity -= 0.6;
     if (shakeIntensity < 0) shakeIntensity = 0;
     if (netWaveTimer > 0) netWaveTimer--; // animar onda de red
+    if (photographerFlashTimer > 0) photographerFlashTimer--; // animar flash de cámara
 
     if (gameMode === 'penales' && penalesTurno === 'defensa' && penalesCPUPreparando && !isCelebrating && document.getElementById('gameover-overlay').style.display !== 'flex') {
       penalesCPUShotTimer--;
@@ -13886,27 +14080,27 @@
         replayFrames.push({ x: pelota.x, y: pelota.y, r: pelota.r });
       }
 
-      pelota.x += pelota.vx;
-      pelota.y += pelota.vy;
+      pelota.x += pelota.vx * dt;
+      pelota.y += pelota.vy * dt;
       
       // ── GRAVEDAD más realista (aumenta más rápido al inicio, se estabiliza) ──
-      pelota.vy += 0.26;
+      pelota.vy += 0.26 * dt;
 
       // ── RESISTENCIA DEL AIRE — frena la pelota de forma natural ──
       const speedNow = Math.sqrt(pelota.vx * pelota.vx + pelota.vy * pelota.vy);
       const airDrag = 0.0045 + speedNow * 0.00035; // más drag a más velocidad
-      pelota.vx *= (1 - airDrag);
-      pelota.vy *= (1 - airDrag * 0.7); // vertical un poco menos frenada
+      pelota.vx *= (1 - airDrag * dt);
+      pelota.vy *= (1 - airDrag * 0.7 * dt); // vertical un poco menos frenada
 
       // ── VIENTO: desvía la pelota en vuelo (más efecto cuanto más alto va) ──
       if (pelota.y < 245 && pelota.y > 50) {
         const altitudeFactor = Math.max(0, (245 - pelota.y) / 195); // más viento en altura
         // Viento sustancialmente más fuerte para que sople la pelota visiblemente
-        pelota.vx += vientoActual * (0.22 + altitudeFactor * 0.14);
+        pelota.vx += vientoActual * (0.22 + altitudeFactor * 0.14) * dt;
       }
 
       // ── SPIN ACUMULADO: hace girar la pelota visualmente ──
-      pelotaSpin += (pelota.vx * 0.04);
+      pelotaSpin += (pelota.vx * 0.04) * dt;
 
       // 1.5. Si vuela muy por arriba del travesaño ¡Es fuera! (Y menor a 48 = claramente sobre el arco)
       if (pelota.y < 48 && pelota.status === '') {
@@ -13931,9 +14125,9 @@
         const magnusMult = 0.85 + flightProgress * 0.65; // Crece hacia el arco
         const combaFuerza = (effComba / 100) * 0.125 * combaMult * magnusMult;
         if (pelota.vx > 0.4) {
-          pelota.vx += combaFuerza; // comba hacia la derecha
+          pelota.vx += combaFuerza * dt; // comba hacia la derecha
         } else if (pelota.vx < -0.4) {
-          pelota.vx -= combaFuerza; // comba hacia la izquierda
+          pelota.vx -= combaFuerza * dt; // comba hacia la izquierda
         }
       }
 
@@ -13947,9 +14141,9 @@
         }
         
         // Físicas de salto del defensor
-        def.y += def.vy;
+        def.y += def.vy * dt;
         if (def.y < def.targetY) {
-          def.vy += 0.25; // Gravedad del defensor
+          def.vy += 0.25 * dt; // Gravedad del defensor
         } else {
           def.y = def.targetY;
           def.vy = 0;
@@ -13967,6 +14161,7 @@
           pelota.vx = -pelota.vx * 0.35 + (Math.random() - 0.5) * 1.5;
           pelota.vy = -pelota.vy * 0.35 - 1.5;
           pelota.status = 'bloqueado';
+          photographerFlashTimer = 22; // ¡Disparar flash de cámara!
           bannerTxt = '¡BARRERA!';
           bannerTimer = 100;
           // ── RESETEAR RACHA ──
@@ -13979,7 +14174,7 @@
 
       // 3. Inteligencia y Movimiento del Arquero
       if (!(gameMode === 'penales' && penalesTurno === 'defensa')) {
-        arquero.x += arquero.vx;
+        arquero.x += arquero.vx * dt;
         if (arquero.x < 145 || arquero.x > 255) {
           arquero.vx = -arquero.vx;
         }
@@ -13987,7 +14182,7 @@
         let targetX = 200;
         if (penalesDibuDir === -1) targetX = 145;
         else if (penalesDibuDir === 1) targetX = 255;
-        arquero.x += (targetX - arquero.x) * 0.28;
+        arquero.x += (targetX - arquero.x) * 0.28 * dt;
       }
 
       // El arquero solo patrulla horizontalmente en su arco, ¡no persigue la pelota como un imán tramposo!
@@ -14000,6 +14195,7 @@
         pelota.vx = -pelota.vx * 0.4 + (Math.random() - 0.5) * 2;
         pelota.vy = -pelota.vy * 0.4 - 2;
         pelota.status = 'bloqueado';
+        photographerFlashTimer = 22; // ¡Disparar flash de cámara!
         if (gameMode === 'penales' && penalesTurno === 'defensa') {
           bannerTxt = '🧤 ¡¡¡ATAJASTE!!!';
         } else {
@@ -14089,6 +14285,7 @@
         const esPaloAdentro = pelota.hitPostThisShot; // si rebotó en el palo antes de entrar
         pelota.isSettled = true;
         pelota.status = 'gol';
+        photographerFlashTimer = 22; // ¡Disparar flash de cámara!
         // Activar onda de red en el punto de impacto
         netWaveTimer = 55;
         netWaveX = pelota.x;
@@ -15756,6 +15953,13 @@
       if (decisiveVignetteOpacity > 0.35) decisiveVignetteOpacity = 0.35;
     }
     
+    // ── APLICAR ZOOM DE TENSIÓN CINEMATOGRÁFICO ──
+    if (cameraZoom > 1.0) {
+      ctx.translate(cameraFocusX, cameraFocusY);
+      ctx.scale(cameraZoom, cameraZoom);
+      ctx.translate(-cameraFocusX, -cameraFocusY);
+    }
+    
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
     
     // ══════════════════════════════════════════════
@@ -15816,43 +16020,102 @@
       }
     }
 
-    for (let row = 0; row < 5; row++) {
-      const rowY = 5 + row * 8 + crowdJump;
-      const density = row === 0 ? 65 : (row === 1 ? 58 : (row === 2 ? 52 : (row === 3 ? 46 : 40)));
-      for (let i = 0; i < density; i++) {
-        const seed = (i * 7 + row * 13 + crowdSeed * (row % 2 === 0 ? 1 : -1)) % crowdColors.length;
-        const cx = 4 + (i / density) * 392 + (row % 2 === 0 ? 4 : -2);
-        const cr = 2.4 - row * 0.2;
-        
-        // Dibujar pequeñas banderas ondeantes de la selección del jugador durante los festejos
-        if (isCelebrating && row === 1 && i % 8 === 0) {
-          ctx.save();
-          const flagColor = (selectedPlayer.flagColors && selectedPlayer.flagColors[0]) ? selectedPlayer.flagColors[0] : '#fbbf24';
-          ctx.fillStyle = flagColor;
-          const flagWave = Math.sin(Date.now() * 0.022 + i) * 1.5;
-          ctx.fillRect(cx - 3, rowY - 5, 5 + flagWave, 3.2);
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = 0.55;
-          ctx.beginPath();
-          ctx.moveTo(cx - 3, rowY - 5);
-          ctx.lineTo(cx - 3, rowY + 1);
-          ctx.stroke();
-          ctx.restore();
+    if (isCelebrating) {
+      // ── DIBUJAR MOSAICO/TIFO GIGANTE DE LA HINCHADA EN LA TRIBUNA ──
+      ctx.save();
+      const tifoL = 8;
+      const tifoR = 392;
+      const tifoT = 4;
+      const tifoB = 40;
+      const tifoW = tifoR - tifoL;
+      const tifoH = tifoB - tifoT;
+      
+      // Contenedor principal del mosaico esmerilado
+      ctx.fillStyle = '#090a0f';
+      ctx.fillRect(tifoL, tifoT, tifoW, tifoH);
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 1.6;
+      ctx.strokeRect(tifoL, tifoT, tifoW, tifoH);
+      
+      // Determinar la bandera de la hinchada según el país de la leyenda
+      let flagColors = ['#a855f7', '#e9d5ff', '#7c3aed']; // Por defecto Violeta/Púrpura
+      if (selectedPlayer) {
+        const paisL = (selectedPlayer.pais || '').toLowerCase();
+        if (selectedPlayer.id === 'mesias' || paisL === 'argentina' || paisL === 'arg') {
+          flagColors = ['#56b4f7', '#ffffff', '#56b4f7']; // Celeste y Blanco
+        } else if (selectedPlayer.id === 'mbafest' || paisL === 'francia' || paisL === 'fra') {
+          flagColors = ['#1d4ed8', '#ffffff', '#dc2626']; // Azul, Blanco, Rojo
+        } else if (selectedPlayer.id === 'yamalisimo' || paisL === 'españa' || paisL === 'esp') {
+          flagColors = ['#e11d48', '#facc15', '#e11d48']; // España
+        } else if (selectedPlayer.id === 'kanyon' || paisL === 'inglaterra' || paisL === 'ing') {
+          flagColors = ['#ffffff', '#dc2626', '#ffffff']; // Cruz de San Jorge simplified
+        } else if (selectedPlayer.flagColors && selectedPlayer.flagColors.length >= 2) {
+          flagColors = selectedPlayer.flagColors;
         }
-
-        // Silueta de cabeza del hincha con brillo superior
-        const alpha = 0.60 + row * 0.06;
-        ctx.fillStyle = `rgba(${parseInt(crowdColors[Math.abs(seed)].slice(1,3),16)}, ${parseInt(crowdColors[Math.abs(seed)].slice(3,5),16)}, ${parseInt(crowdColors[Math.abs(seed)].slice(5,7),16)}, ${alpha})`;
-        ctx.beginPath();
-        ctx.arc(cx, rowY, cr, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Pequeño brillo en la cabeza del hincha
-        if (row < 3) {
-          ctx.fillStyle = `rgba(255,255,255,0.08)`;
+      }
+      
+      // Dibujar las franjas de cartulinas del mosaico
+      const stripeW = tifoW / 3;
+      for (let c = 0; c < 3; c++) {
+        ctx.fillStyle = flagColors[c] || '#7c3aed';
+        ctx.fillRect(tifoL + c * stripeW, tifoT + 1, stripeW, tifoH - 2);
+      }
+      
+      // Grid de cartulinas (simula miles de personas sosteniendo folletos de color)
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.16)';
+      for (let gx = tifoL; gx < tifoR; gx += 4) {
+        ctx.fillRect(gx, tifoT, 1.2, tifoH);
+      }
+      for (let gy = tifoT; gy < tifoB; gy += 4) {
+        ctx.fillRect(tifoL, gy, tifoW, 1.2);
+      }
+      
+      // Cartel central negro y dorado
+      ctx.fillStyle = 'rgba(10, 10, 15, 0.88)';
+      ctx.beginPath();
+      ctx.roundRect(200 - 82, tifoT + 5, 164, tifoH - 10, 6);
+      ctx.fill();
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(200 - 82, tifoT + 5, 164, tifoH - 10);
+      
+      // Texto con sombra de neón
+      ctx.fillStyle = '#fbbf24';
+      ctx.font = '900 8.5px "Outfit", system-ui, -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = '#d97706';
+      ctx.shadowBlur = 6;
+      
+      let nameStr = selectedPlayer ? selectedPlayer.nombre.toUpperCase() : 'LEYENDA';
+      ctx.fillText(`🏆 ¡¡CAMPEÓN ${nameStr}!! 🏆`, 200, tifoT + tifoH / 2);
+      ctx.shadowBlur = 0;
+      
+      ctx.restore();
+    } else {
+      // ── DIBUJAR CROWD DE HINCHAS DE PUNTOS NORMAL ──
+      for (let row = 0; row < 5; row++) {
+        const rowY = 5 + row * 8 + crowdJump;
+        const density = row === 0 ? 65 : (row === 1 ? 58 : (row === 2 ? 52 : (row === 3 ? 46 : 40)));
+        for (let i = 0; i < density; i++) {
+          const seed = (i * 7 + row * 13 + crowdSeed * (row % 2 === 0 ? 1 : -1)) % crowdColors.length;
+          const cx = 4 + (i / density) * 392 + (row % 2 === 0 ? 4 : -2);
+          const cr = 2.4 - row * 0.2;
+          
+          // Silueta de cabeza del hincha
+          const alpha = 0.60 + row * 0.06;
+          ctx.fillStyle = `rgba(${parseInt(crowdColors[Math.abs(seed)].slice(1,3),16)}, ${parseInt(crowdColors[Math.abs(seed)].slice(3,5),16)}, ${parseInt(crowdColors[Math.abs(seed)].slice(5,7),16)}, ${alpha})`;
           ctx.beginPath();
-          ctx.arc(cx - cr * 0.25, rowY - cr * 0.3, cr * 0.45, 0, Math.PI * 2);
+          ctx.arc(cx, rowY, cr, 0, Math.PI * 2);
           ctx.fill();
+          
+          // Pequeño brillo
+          if (row < 3) {
+            ctx.fillStyle = `rgba(255,255,255,0.08)`;
+            ctx.beginPath();
+            ctx.arc(cx - cr * 0.25, rowY - cr * 0.3, cr * 0.45, 0, Math.PI * 2);
+            ctx.fill();
+          }
         }
       }
     }
@@ -15933,19 +16196,18 @@
       ctx.fillRect(0, adY, adW, 1);
       ctx.fillRect(0, adY + adH - 1, adW, 1);
 
-      // Definir los carteles
+      // Definir los carteles (todas las 5 marcas)
       const ads = [
-        { text: '⚽ NEXOS WORLD CUP 26', bg: '#1a237e', fg: '#ffffff', accent: '#ffd600' },
-        { text: '🥤 COLALOCA',           bg: '#b71c1c', fg: '#ffffff', accent: '#ff8f00' },
-        { text: '🍔 MCRONALDS',          bg: '#e65100', fg: '#ffffff', accent: '#ffee58' },
-        { text: '⚽ NEXOS WORLD CUP 26', bg: '#1a237e', fg: '#ffffff', accent: '#ffd600' },
-        { text: '🥤 COLALOCA',           bg: '#b71c1c', fg: '#ffffff', accent: '#ff8f00' },
-        { text: '🍔 MCRONALDS',          bg: '#e65100', fg: '#ffffff', accent: '#ffee58' },
+        { text: '⚽ COPA NEXOS 26',  bg: '#1a237e', fg: '#ffffff', accent: '#ffd600' },
+        { text: '👟 ADIDES',          bg: '#0a0a0c', fg: '#ffffff', accent: '#00f0ff' }, // Adidas
+        { text: '🥤 COLALOCA',        bg: '#b71c1c', fg: '#ffffff', accent: '#ff8f00' }, // Coca-Cola
+        { text: '🍔 MCRONALDS',       bg: '#e65100', fg: '#ffffff', accent: '#ffee58' }, // McDonald's
+        { text: '📺 HISENSER',        bg: '#007575', fg: '#ffffff', accent: '#fbbf24' }  // Hisense
       ];
 
-      // Scroll continuo
+      // Scroll continuo para 5 carteles
       const slotW = 134;
-      const totalW = slotW * 3;
+      const totalW = slotW * 5;
       const offset = (Date.now() * 0.1) % totalW;
 
       ctx.save();
@@ -15954,7 +16216,7 @@
       ctx.clip();
 
       for (let cycle = -1; cycle <= 1; cycle++) {
-        for (let s = 0; s < 3; s++) {
+        for (let s = 0; s < 5; s++) {
           const ad = ads[s];
           const sx = cycle * totalW + s * slotW - offset;
 
@@ -16245,7 +16507,139 @@
       ctx.fillStyle = cg2; ctx.fillRect(GOAL_LEFT - 3, GOAL_Y - 3, GOAL_RIGHT - GOAL_LEFT + 6, 6);
 
       // DIBUJAR AL TIRADOR SELECCIONADO CELEBRANDO AL CENTRO
-      drawCabezon(ctx, 200, 220, selectedPlayer, false, false, true);
+      // ── DIBUJAR AL TIRADOR SELECCIONADO CON CELEBRACIONES INTERACTIVAS Y EMOTIVAS ──
+      ctx.save();
+      
+      const pId = selectedPlayer ? selectedPlayer.id : 'default';
+      if (pId === 'custom_legend') {
+        // ── CELEBRACIÓN DE LA LEYENDA: ¡EL SALTO DEL SIUUU! ──
+        const celebTime = (Date.now() / 200) % (Math.PI * 2); // bucle de animación elástico
+        let cellY = 220;
+        let cellScaleX = 1;
+        let isLanding = false;
+        
+        if (celebTime < Math.PI) {
+          // Fase 1: Salto parabólico en el aire
+          const jumpHeight = Math.sin(celebTime) * 34;
+          cellY = 220 - jumpHeight;
+          // Girar en la cima del salto
+          if (celebTime > Math.PI / 2) {
+            cellScaleX = -1;
+          }
+        } else {
+          // Fase 2: Aterrizaje firme con pose de brazos abiertos hacia abajo (de espaldas)
+          cellY = 220;
+          cellScaleX = -1;
+          isLanding = true;
+        }
+        
+        ctx.save();
+        ctx.translate(200, cellY);
+        ctx.scale(cellScaleX, 1);
+        drawCabezon(ctx, 0, 0, selectedPlayer, false, false, true);
+        ctx.restore();
+        
+        if (isLanding) {
+          // Destello y texto gigante "SIUUU" palpitante
+          ctx.save();
+          ctx.fillStyle = '#fb923c';
+          ctx.font = '950 16px "Outfit", system-ui, -apple-system, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.shadowColor = '#f97316';
+          ctx.shadowBlur = 12;
+          const textPulse = 1 + Math.sin(Date.now() * 0.02) * 0.06;
+          ctx.scale(textPulse, textPulse);
+          ctx.fillText('¡¡¡ S I U U U U !!! 🐐', 200 / textPulse, 252 / textPulse);
+          ctx.restore();
+        }
+        
+      } else if (pId === 'mesias') {
+        // ── CELEBRACIÓN DE MESÍAS: DEDOS AL CIELO Y AURA CELESTIAL ──
+        const headX = 200;
+        const headY = 220;
+        
+        // 1. Aura celestial brillante sobre su cabeza
+        const haloGrad = ctx.createRadialGradient(headX, headY - 26, 2, headX, headY - 26, 12);
+        haloGrad.addColorStop(0, 'rgba(253, 224, 71, 0.95)'); // Oro brillante
+        haloGrad.addColorStop(0.4, 'rgba(253, 224, 71, 0.55)');
+        haloGrad.addColorStop(1, 'rgba(253, 224, 71, 0)');
+        ctx.fillStyle = haloGrad;
+        ctx.beginPath();
+        ctx.arc(headX, headY - 26, 12, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Anillo del halo de neón
+        ctx.strokeStyle = '#fef08a';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.ellipse(headX, headY - 26, 8, 2.5, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // 2. Columnas de luz celestial que bajan a sus manos
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        const rayGradL = ctx.createLinearGradient(headX - 14, 0, headX - 14, headY);
+        rayGradL.addColorStop(0, 'rgba(56, 189, 248, 0)');
+        rayGradL.addColorStop(0.5, 'rgba(255, 255, 255, 0.12)');
+        rayGradL.addColorStop(1, 'rgba(253, 224, 71, 0.45)');
+        ctx.fillStyle = rayGradL;
+        ctx.fillRect(headX - 18, 0, 8, headY - 10);
+        
+        const rayGradR = ctx.createLinearGradient(headX + 14, 0, headX + 14, headY);
+        rayGradR.addColorStop(0, 'rgba(56, 189, 248, 0)');
+        rayGradR.addColorStop(0.5, 'rgba(255, 255, 255, 0.12)');
+        rayGradR.addColorStop(1, 'rgba(253, 224, 71, 0.45)');
+        ctx.fillStyle = rayGradR;
+        ctx.fillRect(headX + 10, 0, 8, headY - 10);
+        ctx.restore();
+        
+        // 3. Dibujar al Mesías levantando los brazos
+        drawCabezon(ctx, headX, headY, selectedPlayer, false, false, true);
+        
+      } else if (pId === 'mbafest') {
+        // ── CELEBRACIÓN DE MBAFEST: BRAZOS CRUZADOS Y DESTELLO EN OJO ──
+        const headX = 200;
+        const headY = 220;
+        
+        drawCabezon(ctx, headX, headY, selectedPlayer, false, false, true);
+        
+        // Dibujar brazos cruzados bajo las axilas (dos líneas curvadas)
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 2.4;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(headX - 6, headY - 4);
+        ctx.lineTo(headX + 6, headY - 4);
+        ctx.moveTo(headX - 5, headY - 7);
+        ctx.lineTo(headX + 5, headY - 7);
+        ctx.stroke();
+        
+        // Destello de guiño de estrella
+        const winkTime = Date.now() * 0.015;
+        const winkSize = 4.5 + Math.sin(winkTime) * 1.5;
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `bold ${winkSize}px Arial`;
+        ctx.fillText('✨', headX - 6, headY - 16);
+        
+      } else {
+        // ── CELEBRACIÓN ESTÁNDAR: Knee slide con chispas de pasto y tierra ──
+        const headX = 200;
+        const headY = 220;
+        
+        ctx.fillStyle = '#22c55e';
+        for (let s = 0; s < 8; s++) {
+          const sx = headX + (Math.random() - 0.5) * 26;
+          const sy = headY + 5 + Math.random() * 4;
+          const sr = 1 + Math.random() * 1.8;
+          ctx.beginPath();
+          ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        
+        drawCabezon(ctx, headX, headY, selectedPlayer, false, false, true);
+      }
+      ctx.restore();
 
       // CAÍDA DE LA COPA DEL MUNDO (🏆)
       if (trophyY < 152) {
@@ -16365,21 +16759,30 @@
     ctx.fillStyle = netGrassReflect;
     ctx.fillRect(GOAL_LEFT + 2 + netShakeX, GOAL_Y + 22 + netShakeY, GOAL_RIGHT - GOAL_LEFT - 4, 30);
 
-    // Líneas verticales de la red con deformación de onda y temblor general
+    // Líneas verticales de la red con deformación elástica tridimensional (Bulging Net Physics)
     ctx.lineWidth = 0.95;
-    const netLines = Math.ceil(netW / 5); // más densa: cada 5px
+    const netLines = Math.ceil(netW / 5); // densidad de malla cada 5px
     for (let i = 0; i <= netLines; i++) {
       const progress = i / netLines;
       const topX = GOAL_LEFT + progress * netW;
       const botX = GOAL_LEFT + 2 + (progress * netW) * 0.97; // perspectiva leve
       
-      // Calcular deformación en este hilo vertical
+      // Calcular deformación elástica de abombamiento vertical y lateral
       let waveOffsetX = 0, waveOffsetMid = 0;
       if (hasWave && waveStrength > 0) {
-        const distFromImpact = Math.abs(topX - netWaveX);
-        const wavePush = Math.max(0, waveRadius - distFromImpact) / (waveRadius + 1);
-        waveOffsetX = wavePush * waveStrength * 10 * Math.sin(waveAge * 0.48) * powerMult;
-        waveOffsetMid = wavePush * waveStrength * 17 * Math.sin(waveAge * 0.42 + 0.5) * powerMult;
+        const distX = topX - netWaveX;
+        const bulgeRadius = 70;
+        
+        if (Math.abs(distX) < bulgeRadius) {
+          // Curva de campana cosinusoidal suave
+          const factor = Math.cos((distX / bulgeRadius) * Math.PI / 2);
+          const bulgeDir = distX < 0 ? -1 : 1;
+          
+          // Desplazar hilos laterales hacia afuera (abombamiento lateral)
+          waveOffsetX = bulgeDir * factor * 14.5 * waveStrength * powerMult;
+          // Desplazar el medio del hilo hacia atrás/abajo de forma elástica
+          waveOffsetMid = factor * waveStrength * 20.0 * Math.sin(waveAge * 0.42) * powerMult;
+        }
       }
 
       const alpha = 0.38 - progress * 0.08;
@@ -16388,13 +16791,13 @@
       ctx.moveTo(topX + waveOffsetX + netShakeX, GOAL_Y);
       ctx.quadraticCurveTo(
         (topX + botX) / 2 + waveOffsetMid + netShakeX * 1.15, GOAL_Y + 26 + netShakeY,
-        botX + waveOffsetX * 0.4 + netShakeX * 0.75, GOAL_Y + 52 + netShakeY
+        botX + waveOffsetX * 0.45 + netShakeX * 0.75, GOAL_Y + 52 + netShakeY
       );
       ctx.stroke();
     }
 
-    // Líneas horizontales de la red con deformación y temblor general
-    const netRows = 11; // más filas
+    // Líneas horizontales de la red representadas como curvas catenarias elásticas deformables (Sagginess & Bulge)
+    const netRows = 11;
     for (let j = 0; j <= netRows; j++) {
       const t = j / netRows;
       const rowY = GOAL_Y + t * 52;
@@ -16402,20 +16805,34 @@
       const lx = GOAL_LEFT + perspFactor * 2.5;
       const rx = GOAL_RIGHT - perspFactor * 2.5;
 
-      // Onda horizontal
+      // Calcular comba/abombamiento hacia abajo y estiramiento por impacto del balón
       let waveRowOffset = 0;
       if (hasWave && waveStrength > 0) {
         const distFromImpactY = Math.abs(rowY - netWaveY);
-        const wavePushY = Math.max(0, waveRadius - distFromImpactY) / (waveRadius + 1);
-        waveRowOffset = wavePushY * waveStrength * 7.5 * Math.sin(waveAge * 0.35 + j * 0.4) * powerMult;
+        const verticalRange = 36;
+        
+        if (distFromImpactY < verticalRange) {
+          const factorY = Math.cos((distFromImpactY / verticalRange) * Math.PI / 2);
+          // La red se estira/sigue al balón hacia abajo por gravedad y empuje
+          waveRowOffset = factorY * waveStrength * 13.0 * Math.sin(waveAge * 0.35 + j * 0.15) * powerMult;
+        }
       }
 
       const rowAlpha = 0.28 - t * 0.06;
       ctx.strokeStyle = `rgba(235, 255, 235, ${Math.max(0.08, rowAlpha)})`;
       ctx.lineWidth = 0.75;
+      
       ctx.beginPath();
-      ctx.moveTo(lx + netShakeX, rowY + waveRowOffset + netShakeY);
-      ctx.lineTo(rx + netShakeX, rowY + waveRowOffset + netShakeY);
+      ctx.moveTo(lx + netShakeX, rowY + netShakeY);
+      
+      // Dibujar fila horizontal como curva parabólica que se comba hacia abajo en netWaveX
+      if (hasWave && waveStrength > 0) {
+        const ctrlX = netWaveX + netShakeX;
+        const ctrlY = rowY + waveRowOffset * 1.8 + netShakeY;
+        ctx.quadraticCurveTo(ctrlX, ctrlY, rx + netShakeX, rowY + netShakeY);
+      } else {
+        ctx.lineTo(rx + netShakeX, rowY + netShakeY);
+      }
       ctx.stroke();
     }
 
@@ -16491,6 +16908,48 @@
     goalLineGlow.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = goalLineGlow;
     ctx.fillRect(GOAL_LEFT - 8, GOAL_Y - 4, GOAL_RIGHT - GOAL_LEFT + 16, 12);
+
+    // ── DESTELLO DE FLASH DINÁMICO DE PRENSA EN EL ESTADIO ──
+    if (photographerFlashTimer > 0) {
+      ctx.save();
+      const flashX = 336; // Detrás de la valla publicitaria en el córner derecho
+      const flashY = 40;  // Altura del borde de la valla, emitiendo como flash de prensa profesional
+      const flashAlpha = Math.max(0, photographerFlashTimer / 22);
+      
+      // 1. Destello radial de emisión televisiva
+      const flashSize = 38 + (22 - photographerFlashTimer) * 5.5; // expande hacia afuera
+      const flashGrad = ctx.createRadialGradient(flashX, flashY, 0, flashX, flashY, flashSize);
+      flashGrad.addColorStop(0, `rgba(255, 255, 255, ${flashAlpha * 1.0})`);
+      flashGrad.addColorStop(0.2, `rgba(224, 242, 254, ${flashAlpha * 0.75})`); // Celeste neón
+      flashGrad.addColorStop(0.5, `rgba(186, 230, 253, ${flashAlpha * 0.35})`);
+      flashGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      
+      ctx.fillStyle = flashGrad;
+      ctx.beginPath();
+      ctx.arc(flashX, flashY, flashSize, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // 2. Destello de cruz de lente (Lens Flare)
+      ctx.strokeStyle = `rgba(255, 255, 255, ${flashAlpha * 0.95})`;
+      ctx.lineWidth = 2.0;
+      ctx.beginPath();
+      ctx.moveTo(flashX - flashSize * 0.6, flashY);
+      ctx.lineTo(flashX + flashSize * 0.6, flashY);
+      ctx.moveTo(flashX, flashY - flashSize * 0.6);
+      ctx.lineTo(flashX, flashY + flashSize * 0.6);
+      ctx.stroke();
+      
+      ctx.strokeStyle = `rgba(224, 242, 254, ${flashAlpha * 0.6})`;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(flashX - flashSize * 0.38, flashY - flashSize * 0.38);
+      ctx.lineTo(flashX + flashSize * 0.38, flashY + flashSize * 0.38);
+      ctx.moveTo(flashX - flashSize * 0.38, flashY + flashSize * 0.38);
+      ctx.lineTo(flashX + flashSize * 0.38, flashY - flashSize * 0.38);
+      ctx.stroke();
+      
+      ctx.restore();
+    }
 
     // ── LÍNEAS DEL ÁREA — dibujadas DESPUÉS del arco para quedar por encima ──
     // El arco ocupa desde GOAL_Y hasta GOAL_Y+56; las líneas del área arrancan desde la base del arco
@@ -17536,6 +17995,28 @@
       ctx.shadowColor = 'rgba(255, 0, 0, 0.8)';
       ctx.shadowBlur = 4;
       ctx.fillText('¡MOMENTO DECISIVO!', 200, 68);
+      ctx.restore();
+    }
+    
+    // Dibujar vignette cinematográfica durante la cámara lenta de tensión
+    if (tensionLevel > 0.05) {
+      ctx.save();
+      // Gradiente radial del centro (200, 150) al borde del canvas
+      const vignette = ctx.createRadialGradient(200, 150, 90, 200, 150, 260);
+      vignette.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      vignette.addColorStop(0.6, `rgba(168, 85, 247, ${tensionLevel * 0.15})`); // Toque violeta neón sutil
+      vignette.addColorStop(1, `rgba(0, 0, 0, ${tensionLevel * 0.72})`); // Borde oscuro dramático
+      ctx.fillStyle = vignette;
+      ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+      
+      // Letras cinematográficas estilo película
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = '900 italic 10px system-ui, -apple-system, sans-serif';
+      ctx.fillStyle = `rgba(255, 255, 255, ${tensionLevel * 0.95})`;
+      ctx.shadowColor = 'rgba(168, 85, 247, 0.8)';
+      ctx.shadowBlur = 6;
+      ctx.fillText('⚡ TENSIÓN AL MÁXIMO ⚡', 200, 18);
       ctx.restore();
     }
     
