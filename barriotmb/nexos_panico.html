@@ -2644,6 +2644,7 @@
       display: none;
     }
     #mundial-estadio {
+      position: relative; /* Ground for absolute bottom overlays like the narration box */
       flex: 1;
       min-height: 0;
       gap: 8px;
@@ -2972,21 +2973,22 @@
       text-shadow: 0 0 8px var(--ac);
     }
 
-    /* ── ONOMATOPEYA — barra compacta entre header y canvas ── */
+    /* ── ONOMATOPEYA — barra compacta abajo del canvas en teléfonos ── */
     .onomatopeya-overlay {
       position: absolute;
-      top: 82px;
+      bottom: calc(env(safe-area-inset-bottom, 12px) + 20px); /* ¡Perfectamente posicionada abajo en el espacio negro de teléfonos! */
       left: 50%;
-      transform: translate(-50%, -10px) scale(0.88);
+      transform: translate(-50%, 15px) scale(0.92);
       width: auto;
-      max-width: 90%;
+      max-width: 92%;
       z-index: 120;
       display: flex;
       align-items: center;
       justify-content: center;
       opacity: 0;
-      transition: all 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: all 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       pointer-events: none;
+      box-sizing: border-box;
     }
     .onomatopeya-overlay.show {
       opacity: 1;
@@ -4940,11 +4942,6 @@
       </div>
     </div>
 
-    <!-- Onomatopeya: ocupa el espacio negro entre header y canvas -->
-    <div id="estadio-onomatopeya-overlay" class="onomatopeya-overlay">
-      <div id="onomatopeya-text" class="onomatopeya-text"></div>
-    </div>
-
     <!-- El estadio Canvas -->
     <div class="canvas-wrapper">
       <canvas id="canvas-futbol"></canvas>
@@ -4967,6 +4964,11 @@
         <button class="gameover-btn" id="gameover-btn-primary" onclick="iniciarRondaJuego()">Jugar de Nuevo</button>
         <button class="gameover-btn secondary" id="gameover-btn-secondary" onclick="volverASeleccion()">Ver Ranking</button>
       </div>
+    </div>
+
+    <!-- Onomatopeya: ocupa el espacio negro abajo del canvas en teléfonos -->
+    <div id="estadio-onomatopeya-overlay" class="onomatopeya-overlay">
+      <div id="onomatopeya-text" class="onomatopeya-text"></div>
     </div>
   </div>
 </div>
@@ -13903,28 +13905,13 @@
   }
 
   function updatePhysics() {
-    // ── EALUAR SI EL TIRO ENTRA EN LA ZONA DE TENSIÓN CINEMATOGRÁFICA ──
-    // Se activa si la pelota vuela en la zona caliente de peligro cerca del travesaño o arquero
-    if (pelota.isShot && !pelota.isSettled && pelota.y >= 54 && pelota.y <= 125 && pelota.x >= 95 && pelota.x <= 305) {
-      tensionActive = true;
-    } else {
-      tensionActive = false;
-    }
-
-    // Easing amortiguado (suave) para zoom y cámara lenta
-    if (tensionActive) {
-      tensionLevel += (1.0 - tensionLevel) * 0.14;
-      timeDilation = 1.0 - (0.64 * tensionLevel);  // Baja a 0.36x de velocidad
-      cameraZoom = 1.0 + (0.32 * tensionLevel);      // Zoom de hasta 1.32x
-      cameraFocusX += (pelota.x - cameraFocusX) * 0.14;
-      cameraFocusY += (pelota.y - cameraFocusY) * 0.14;
-    } else {
-      tensionLevel += (0.0 - tensionLevel) * 0.18;
-      timeDilation = 1.0 - (0.64 * tensionLevel);
-      cameraZoom = 1.0 + (0.32 * tensionLevel);
-      cameraFocusX += (200 - cameraFocusX) * 0.18;
-      cameraFocusY += (150 - cameraFocusY) * 0.18;
-    }
+    // ── CAMARA Y TIEMPO REAL (SIN SLOW-MO NI EFECTO LENTO PARA ALTA DINÁMICA DE JUEGO) ──
+    tensionActive = false;
+    tensionLevel = 0;
+    timeDilation = 1.0;
+    cameraZoom = 1.0;
+    cameraFocusX = 200;
+    cameraFocusY = 150;
 
     const dt = timeDilation;
 
