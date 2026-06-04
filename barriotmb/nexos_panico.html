@@ -3075,7 +3075,6 @@
       position: relative;
       overflow: hidden;
       display: none;
-      margin-top: 4px;
       margin-bottom: -12px; /* Elimina el espacio negro inferior compensando el padding */
       margin-bottom: calc(-1 * env(safe-area-inset-bottom, 12px));
       padding-bottom: env(safe-area-inset-bottom, 12px);
@@ -3134,7 +3133,7 @@
       width: calc(100% + 24px);
       margin-left: -12px;
       margin-right: -12px;
-      aspect-ratio: 4 / 3;
+      aspect-ratio: 4 / 3.5;
       flex-shrink: 0;
       margin-top: 0;
       margin-bottom: 0;
@@ -9269,7 +9268,17 @@
       const binary = atob(AMBIENTE_MP3_B64);
       const bytes = new Uint8Array(binary.length);
       for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-      audioCtx.decodeAudioData(bytes.buffer, function(buf) { ambientAudioBuffer = buf; });
+      audioCtx.decodeAudioData(bytes.buffer, function(buf) { 
+        ambientAudioBuffer = buf; 
+        // Si el ambientador de estadio está marcado como en reproducción pero usando el fallback procedimental,
+        // hacemos la transición al audio real inmediatamente.
+        if (stadiumAmbientAudio && stadiumAmbientAudio.playing && stadiumAmbientAudio.useProcedural) {
+          console.log('ambient buffer ready! switching from procedural fallback to real audio');
+          stadiumAmbientAudio.useProcedural = false;
+          if (stadiumAmbientAudio.procedural) stadiumAmbientAudio.procedural.pause();
+          stadiumAmbientAudio.play();
+        }
+      });
     } catch(e) { console.warn('ambient decode error', e); }
   }
 
