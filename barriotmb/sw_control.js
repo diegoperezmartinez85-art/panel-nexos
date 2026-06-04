@@ -4,7 +4,7 @@
 //              Network-first para el GAS (API)
 // ══════════════════════════════════════════════════════════
 
-const CACHE_NAME  = 'nexos-control-v1.6';
+const CACHE_NAME  = 'nexos-control-v1.7';
 const OFFLINE_URL = './nexos_control.html';
 
 const PRECACHE_ASSETS = [
