@@ -3133,7 +3133,7 @@
       width: calc(100% + 24px);
       margin-left: -12px;
       margin-right: -12px;
-      aspect-ratio: 4 / 3.5;
+      aspect-ratio: 4 / 3.8;
       flex-shrink: 0;
       margin-top: 0;
       margin-bottom: 0;
@@ -9271,11 +9271,9 @@
       audioCtx.decodeAudioData(bytes.buffer, function(buf) { 
         ambientAudioBuffer = buf; 
         // Si el ambientador de estadio está marcado como en reproducción pero usando el fallback procedimental,
-        // hacemos la transición al audio real inmediatamente.
+        // iniciamos la transición al audio real.
         if (stadiumAmbientAudio && stadiumAmbientAudio.playing && stadiumAmbientAudio.useProcedural) {
-          console.log('ambient buffer ready! switching from procedural fallback to real audio');
-          stadiumAmbientAudio.useProcedural = false;
-          if (stadiumAmbientAudio.procedural) stadiumAmbientAudio.procedural.pause();
+          console.log('ambient buffer ready! triggering transition to real audio');
           stadiumAmbientAudio.play();
         }
       });
@@ -9398,15 +9396,21 @@
     play() {
       if (modoDiscreto) return Promise.resolve();
       if (this.playing) {
-        try {
-          if (audioCtx && audioCtx.state === 'suspended') {
-            audioCtx.resume();
-          }
-          if (this.useProcedural && this.procedural) {
-            this.procedural.play();
-          }
-        } catch(e) {}
-        return Promise.resolve();
+        if (this.useProcedural && ambientAudioBuffer) {
+          // Transición al audio real
+          this.useProcedural = false;
+          try { this.procedural.pause(); } catch(e) {}
+        } else {
+          try {
+            if (audioCtx && audioCtx.state === 'suspended') {
+              audioCtx.resume();
+            }
+            if (this.useProcedural && this.procedural) {
+              this.procedural.play();
+            }
+          } catch(e) {}
+          return Promise.resolve();
+        }
       }
       this.playing = true;
       
@@ -9420,8 +9424,15 @@
         loadAmbientAudio();
         
         if (ambientAudioBuffer) {
-          this.pause();
-          this.playing = true;
+          if (this.source) {
+            try { this.source.stop(); } catch(e) {}
+            try { this.source.disconnect(); } catch(e) {}
+            this.source = null;
+          }
+          if (this.gainNode) {
+            try { this.gainNode.disconnect(); } catch(e) {}
+            this.gainNode = null;
+          }
           
           this.source = audioCtx.createBufferSource();
           this.source.buffer = ambientAudioBuffer;
