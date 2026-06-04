@@ -2654,7 +2654,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-start; /* Subimos el marcador hacia arriba */
-      padding-top: calc(env(safe-area-inset-top, 12px) + 18px); /* Posicionamiento premium esquivando el botón cerrar */
+      padding-top: 2px; /* Alineación pegada a la cabecera principal sin duplicar el safe area padding */
     }
     .mundial-subtitle {
       font-size: 11px;
@@ -2922,11 +2922,24 @@
     .estadio-header {
       width: 100%;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-left: 38px; /* Offset del botón cerrar [X] fijo para evitar solapamientos en celulares y desktops */
-      width: calc(100% - 38px);
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+      margin-left: 0 !important;
+      width: 100% !important;
+      box-sizing: border-box;
+    }
+    /* Ocultar el botón salir duplicado y el espaciador en el marcador del estadio */
+    #mundial-estadio .estadio-header > div:first-child > div:first-child,
+    #mundial-estadio .estadio-header > div:first-child > div:last-child {
+      display: none !important;
+    }
+    /* Cambiar la grilla a un contenedor flexible centrado */
+    #mundial-estadio .estadio-header > div:first-child {
+      display: flex !important;
+      justify-content: center !important;
+      width: 100% !important;
+      box-sizing: border-box;
     }
     .estadio-back-btn {
       background: rgba(255, 255, 255, 0.05);
@@ -3051,18 +3064,21 @@
 
     /* ── SUPERCAMPEONES ANIME REACTION PANEL STYLES ── */
     .anime-panel {
-  width: calc(100% + 24px); /* Ocupa el 100% del ancho de pantalla anulando los mrgns */
-  margin-left: -12px;
-  margin-right: -12px;
-  flex: 1; /* Estira elsticamente para llenar TODO el alto negro inferior disponible */
-  min-height: 130px;
-  max-height: none !important;
+      width: calc(100% + 24px); /* Ocupa el 100% del ancho de pantalla anulando los mrgns */
+      margin-left: -12px;
+      margin-right: -12px;
+      flex: 1; /* Estira elásticamente para llenar TODO el alto negro inferior disponible */
+      min-height: 130px;
+      max-height: none !important;
       background: #010103;
       border-top: 3px solid #ffffff; /* Borde superior brillante de estilo gabinete arcade */
       position: relative;
       overflow: hidden;
       display: none;
-      margin-top: 10px;
+      margin-top: 4px;
+      margin-bottom: -12px; /* Elimina el espacio negro inferior compensando el padding */
+      margin-bottom: calc(-1 * env(safe-area-inset-bottom, 12px));
+      padding-bottom: env(safe-area-inset-bottom, 12px);
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.95), inset 0 2px 10px rgba(255,255,255,0.06);
       box-sizing: border-box;
       opacity: 0;
@@ -5091,6 +5107,11 @@
   <!-- Contenedor de Fixture de la Jornada -->
   <div id="mundial-fixture-container" style="display: none; width: 100%; max-width: 480px; flex-direction: column; gap: 10px; margin-bottom: 20px;">
      <!-- Partidos de la jornada actual -->
+  </div>
+
+  <!-- Contenedor de Goleadores / Bota de Oro -->
+  <div id="mundial-goleadores-container" style="display: none; width: 100%; max-width: 480px; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+     <!-- Goleadores de la copa -->
   </div>
 
   <!-- Bracket Slider Scroll Container (Fase Eliminatoria) -->
@@ -12307,6 +12328,116 @@ window.iniciarEstadioJuego = function() {
     }
   };
 
+  // --- GOLEADORES Y BOTA DE ORO DEL TORNEO ---
+  function obtenerGoleadoresTorneo() {
+    if (!torneoPenales) return [];
+    const golesMap = {};
+    
+    // Inicializar mapa de goleadores con todos los jugadores
+    MUNDIAL_JUGADORES.forEach(p => {
+      golesMap[p.id] = { player: p, goles: 0 };
+    });
+    
+    // Sumar goles fase de grupos
+    for (let j = 1; j <= 3; j++) {
+      const fixture = torneoPenales.fixtures[j];
+      if (fixture) {
+        fixture.forEach(match => {
+          if (match.played && match.score1 !== null && match.score2 !== null) {
+            if (golesMap[match.p1.id]) golesMap[match.p1.id].goles += match.score1;
+            if (golesMap[match.p2.id]) golesMap[match.p2.id].goles += match.score2;
+          }
+        });
+      }
+    }
+    
+    // Sumar goles fase eliminatoria
+    const llaves = torneoPenales.llaves;
+    if (llaves) {
+      if (llaves.cuartos) {
+        llaves.cuartos.forEach(match => {
+          if (match.score1 !== null && match.score2 !== null) {
+            if (golesMap[match.p1.id]) golesMap[match.p1.id].goles += match.score1;
+            if (golesMap[match.p2.id]) golesMap[match.p2.id].goles += match.score2;
+          }
+        });
+      }
+      if (llaves.semis) {
+        llaves.semis.forEach(match => {
+          if (match.score1 !== null && match.score2 !== null) {
+            if (golesMap[match.p1.id]) golesMap[match.p1.id].goles += match.score1;
+            if (golesMap[match.p2.id]) golesMap[match.p2.id].goles += match.score2;
+          }
+        });
+      }
+      if (llaves.final) {
+        const match = llaves.final;
+        if (match.score1 !== null && match.score2 !== null) {
+          if (golesMap[match.p1.id]) golesMap[match.p1.id].goles += match.score1;
+          if (golesMap[match.p2.id]) golesMap[match.p2.id].goles += match.score2;
+        }
+      }
+    }
+    
+    return Object.values(golesMap)
+      .filter(item => item.goles > 0)
+      .sort((a, b) => b.goles - a.goles);
+  }
+
+  window.renderGoleadoresTab = function() {
+    const goleadores = obtenerGoleadoresTorneo();
+    const cont = document.getElementById('mundial-goleadores-container');
+    if (!cont) return;
+    
+    if (goleadores.length === 0) {
+      cont.innerHTML = `
+        <div style="text-align:center; padding:50px 20px; color:#a1a1aa; font-weight:800; font-size:12.5px; background:rgba(255,255,255,0.02); border:1.5px solid rgba(255,255,255,0.05); border-radius:16px;">
+          ⚽ AÚN NO SE REGISTRARON GOLES EN EL TORNEO.<br>¡PATEÁ PENALES PARA ABRIR EL MARCADOR!
+        </div>
+      `;
+      return;
+    }
+    
+    let html = `
+      <div style="background:rgba(255,255,255,0.02); border:1.5px solid rgba(255,255,255,0.05); border-radius:18px; padding:12px; box-sizing:border-box;">
+        <table class="standing-table" style="width:100%; border-collapse:collapse; font-family:'Outfit',sans-serif;">
+          <thead>
+            <tr style="border-bottom:1.5px solid rgba(255,255,255,0.1); color:#a1a1aa; font-size:10px; font-weight:900; text-transform:uppercase;">
+              <th class="td-left" style="padding:8px 6px; text-align:left; letter-spacing:0.8px;">JUGADOR</th>
+              <th style="padding:8px 6px; text-align:center; letter-spacing:0.8px; width:65px;">GOLES</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+    
+    goleadores.forEach((item, idx) => {
+      const isPlayer = item.player.id === selectedPlayer.id;
+      const rowClass = isPlayer ? 'standing-row user-row' : 'standing-row';
+      const flag = buildFlagEmoji(item.player);
+      const medal = idx === 0 ? ' 🥾⚽' : '';
+      const posColor = idx === 0 ? '#fbbf24' : (idx === 1 ? '#cbd5e1' : (idx === 2 ? '#cd7f32' : '#a1a1aa'));
+      
+      html += `
+        <tr class="${rowClass}" style="border-bottom:1px solid rgba(255,255,255,0.05); font-size:11.5px; font-weight:800;">
+          <td class="td-left" style="padding:8px 6px; text-align:left; display:flex; align-items:center; gap:8px;">
+            <span style="color:${posColor}; font-weight:950; font-size:12px; width:16px; text-align:center;">${idx + 1}</span>
+            <span>${flag}</span>
+            <span style="color:${isPlayer ? '#22d3ee' : '#ffffff'};">${item.player.nombre.toUpperCase()}${medal}</span>
+          </td>
+          <td style="padding:8px 6px; text-align:center; font-weight:950; color:#fbbf24; font-size:13px;">${item.goles}</td>
+        </tr>
+      `;
+    });
+    
+    html += `
+          </tbody>
+        </table>
+      </div>
+    `;
+    
+    cont.innerHTML = html;
+  };
+
   window.switchMundialTab = function(tabName) {
     playSound('tap');
     triggerHaptic('soft');
@@ -12314,19 +12445,42 @@ window.iniciarEstadioJuego = function() {
     
     const tablasCont = document.getElementById('mundial-tablas-container');
     const fixtureCont = document.getElementById('mundial-fixture-container');
-    const tablasBtn = document.getElementById('tab-tablas-btn');
-    const fixtureBtn = document.getElementById('tab-fixture-btn');
+    const goleadoresCont = document.getElementById('mundial-goleadores-container');
+    const scrollCont = document.getElementById('bracket-scroll-container');
+    const dotsCont = document.getElementById('bracket-dots-container');
+    
+    // Quitar active de todos
+    document.querySelectorAll('.mundial-tab-btn').forEach(btn => btn.classList.remove('active'));
+    
+    // Ocultar todos
+    if (tablasCont) tablasCont.style.display = 'none';
+    if (fixtureCont) fixtureCont.style.display = 'none';
+    if (goleadoresCont) goleadoresCont.style.display = 'none';
+    if (scrollCont) scrollCont.style.display = 'none';
+    if (dotsCont) dotsCont.style.display = 'none';
     
     if (tabName === 'tablas') {
       if (tablasCont) tablasCont.style.display = 'grid';
-      if (fixtureCont) fixtureCont.style.display = 'none';
-      if (tablasBtn) tablasBtn.classList.add('active');
-      if (fixtureBtn) fixtureBtn.classList.remove('active');
-    } else {
-      if (tablasCont) tablasCont.style.display = 'none';
+      const btn = document.getElementById('tab-tablas-btn');
+      if (btn) btn.classList.add('active');
+    } else if (tabName === 'fixture') {
       if (fixtureCont) fixtureCont.style.display = 'flex';
-      if (tablasBtn) tablasBtn.classList.remove('active');
-      if (fixtureBtn) fixtureBtn.classList.add('active');
+      const btn = document.getElementById('tab-fixture-btn');
+      if (btn) btn.classList.add('active');
+    } else if (tabName === 'bracket') {
+      if (scrollCont) scrollCont.style.display = 'flex';
+      if (dotsCont) dotsCont.style.display = 'flex';
+      const btn = document.getElementById('tab-bracket-btn');
+      if (btn) btn.classList.add('active');
+      setTimeout(() => {
+        scrollToBracketColumn(torneoPenales.ronda - 1);
+        updateBracketDots();
+      }, 50);
+    } else if (tabName === 'goleadores') {
+      if (goleadoresCont) goleadoresCont.style.display = 'flex';
+      const btn = document.getElementById('tab-goleadores-btn');
+      if (btn) btn.classList.add('active');
+      renderGoleadoresTab();
     }
   };
 
@@ -12341,6 +12495,7 @@ window.iniciarEstadioJuego = function() {
     const tabsCont = document.getElementById('mundial-tabs-container');
     const tablasCont = document.getElementById('mundial-tablas-container');
     const fixtureCont = document.getElementById('mundial-fixture-container');
+    const goleadoresCont = document.getElementById('mundial-goleadores-container');
     const scrollCont = document.getElementById('bracket-scroll-container');
     const dotsCont = document.getElementById('bracket-dots-container');
     
@@ -12348,25 +12503,32 @@ window.iniciarEstadioJuego = function() {
     const tag = document.getElementById('torneo-ronda-tag');
     
     if (torneoPenales.fase === 'grupos') {
-      // Mostrar contenedores de grupos
+      // Configurar pestañas dinámicas de grupos
+      if (currentMundialTab === 'bracket') currentMundialTab = 'tablas';
+      tabsCont.innerHTML = `
+        <button class="mundial-tab-btn ${currentMundialTab === 'tablas' ? 'active' : ''}" id="tab-tablas-btn" onclick="switchMundialTab('tablas')">📊 TABLAS</button>
+        <button class="mundial-tab-btn ${currentMundialTab === 'fixture' ? 'active' : ''}" id="tab-fixture-btn" onclick="switchMundialTab('fixture')">📅 FIXTURE</button>
+        <button class="mundial-tab-btn ${currentMundialTab === 'goleadores' ? 'active' : ''}" id="tab-goleadores-btn" onclick="switchMundialTab('goleadores')">🥾 GOLEADORES</button>
+      `;
       tabsCont.style.display = 'flex';
       dotsCont.style.display = 'none';
       scrollCont.style.display = 'none';
       
-      // Sincronizar botones de tabs
-      const tablasBtn = document.getElementById('tab-tablas-btn');
-      const fixtureBtn = document.getElementById('tab-fixture-btn');
+      if (goleadoresCont) goleadoresCont.style.display = 'none';
       
       if (currentMundialTab === 'tablas') {
-        tablasCont.style.display = 'grid';
-        fixtureCont.style.display = 'none';
-        if (tablasBtn) tablasBtn.classList.add('active');
-        if (fixtureBtn) fixtureBtn.classList.remove('active');
+        if (tablasCont) tablasCont.style.display = 'grid';
+        if (fixtureCont) fixtureCont.style.display = 'none';
+      } else if (currentMundialTab === 'fixture') {
+        if (tablasCont) tablasCont.style.display = 'none';
+        if (fixtureCont) fixtureCont.style.display = 'flex';
       } else {
-        tablasCont.style.display = 'none';
-        fixtureCont.style.display = 'flex';
-        if (tablasBtn) tablasBtn.classList.remove('active');
-        if (fixtureBtn) fixtureBtn.classList.add('active');
+        if (tablasCont) tablasCont.style.display = 'none';
+        if (fixtureCont) fixtureCont.style.display = 'none';
+        if (goleadoresCont) {
+          goleadoresCont.style.display = 'flex';
+          renderGoleadoresTab();
+        }
       }
       
       // 1. Renderizar Tablas de Posiciones
@@ -12485,11 +12647,31 @@ window.iniciarEstadioJuego = function() {
       
     } else {
       // Fase eliminatoria directa (Cuartos, Semis, Final)
-      tabsCont.style.display = 'none';
+      if (currentMundialTab === 'tablas' || currentMundialTab === 'fixture') currentMundialTab = 'bracket';
+      tabsCont.innerHTML = `
+        <button class="mundial-tab-btn ${currentMundialTab === 'bracket' ? 'active' : ''}" id="tab-bracket-btn" onclick="switchMundialTab('bracket')">🏆 PLAYOFFS</button>
+        <button class="mundial-tab-btn ${currentMundialTab === 'goleadores' ? 'active' : ''}" id="tab-goleadores-btn" onclick="switchMundialTab('goleadores')">🥾 GOLEADORES</button>
+      `;
+      tabsCont.style.display = 'flex';
       tablasCont.style.display = 'none';
       fixtureCont.style.display = 'none';
-      scrollCont.style.display = 'flex';
-      dotsCont.style.display = 'flex';
+      
+      if (currentMundialTab === 'bracket') {
+        scrollCont.style.display = 'flex';
+        dotsCont.style.display = 'flex';
+        if (goleadoresCont) goleadoresCont.style.display = 'none';
+        setTimeout(() => {
+          scrollToBracketColumn(torneoPenales.ronda - 1);
+          updateBracketDots();
+        }, 50);
+      } else {
+        scrollCont.style.display = 'none';
+        dotsCont.style.display = 'none';
+        if (goleadoresCont) {
+          goleadoresCont.style.display = 'flex';
+          renderGoleadoresTab();
+        }
+      }
       
       const llaves = torneoPenales.llaves;
       
