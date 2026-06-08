@@ -3921,9 +3921,7 @@
       background-color: #09090b;
     }
     /* Standalone overrides: hide non-game elements */
-    #app-nav-bar, #settings-floating-btn, #futbol-floating-btn, #access-panel {
-      display: none !important;
-    }
+
   </style>
 </head>
 <body>
@@ -5855,10 +5853,7 @@
   }
 
   async function inicializar(){
-    // Standalone Football: Launch the football game directly
-    if (typeof window.abrirMundial === 'function') {
-      window.abrirMundial();
-    }
+    mostrarPantallaPanico();
   }
 
   function mostrarSetup(){
@@ -7282,31 +7277,13 @@
       document.removeEventListener('touchend', unlockAudio);
     };
     const unlockAudio = () => {
+      // Solo desbloquea el contexto de audio sin iniciar música automáticamente.
+      // La música arranca únicamente cuando el usuario toca la pelota ⚽ (abrirMundial).
       initAudio();
-      if (audioCtx) {
-        const playIntroIfOnSelection = () => {
-          const stadiumScreen = document.getElementById('mundial-estadio');
-          const isStadiumVisible = stadiumScreen && stadiumScreen.style.display === 'block';
-          if (!isStadiumVisible) {
-            iniciarMusicaRetroArcade();
-          }
-        };
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume().then(() => {
-            if (audioCtx.state === 'running') {
-              playIntroIfOnSelection();
-              removeUnlockListeners();
-            }
-          }).catch(() => {});
-        } else if (audioCtx.state === 'running') {
-          playIntroIfOnSelection();
-          removeUnlockListeners();
-        }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
       }
-      const hint = document.getElementById('sound-hint-subtitle');
-      if (hint) {
-        hint.innerHTML = 'SELECCIONÁ TU CABEZÓN';
-      }
+      removeUnlockListeners();
     };
     document.addEventListener('click', unlockAudio);
     document.addEventListener('touchend', unlockAudio);
@@ -8703,25 +8680,25 @@
 
   let MUNDIAL_JUGADORES = [
     { id: 'mesias', nombre: 'El Mesías', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 99, fuerza: 96, precision: 95, skin: '#fed7aa', hair: '#5c4033', beard: '#d97706', hairType: 'messi', jersey: ['#0ea5e9', '#ffffff'] },
-    { id: 'kanyon', nombre: 'Harry Kañón', pais: 'Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', flagColors: ['#ffffff'], flagType: 'cross', flagCross: '#cf111b', comba: 82, fuerza: 97, precision: 94, skin: '#ffedd5', hair: '#fef08a', beard: null, hairType: 'blonde', jersey: ['#ffffff', '#ffffff'] },
+    { id: 'kanyon', nombre: 'Harry Kañón', pais: 'Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', flagColors: ['#ffffff'], flagType: 'cross', flagCross: '#cf111b', comba: 82, fuerza: 97, precision: 94, skin: '#ffedd5', hair: '#fef08a', beard: null, hairType: 'blonde', eyeColor: '#7dd3fc', jersey: ['#ffffff', '#ffffff'] },
     { id: 'yamalisimo', nombre: 'Yamalísimo', pais: 'España 🇪🇸', flag: '🇪🇸', flagColors: ['#c60b1e','#ffc400','#c60b1e'], flagType: 'h3', comba: 92, fuerza: 94, precision: 93, skin: '#78350f', hair: '#eab308', beard: null, hairType: 'curly', jersey: ['#dc2626', '#dc2626'] },
     { id: 'mbafest', nombre: 'MbaFest', pais: 'Francia 🇫🇷', flag: '🇫🇷', flagColors: ['#002395','#ffffff','#ed2939'], flagType: 'v3', comba: 75, fuerza: 98, precision: 90, skin: '#78350f', hair: '#27272a', beard: null, hairType: 'buzz', jersey: ['#1e40af', '#1e40af'] },
-    { id: 'neymareado', nombre: 'Neymareado', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00'], flagType: 'br', comba: 98, fuerza: 95, precision: 88, skin: '#b45309', hair: '#fef08a', beard: null, hairType: 'mohawk', jersey: ['#fbbf24', '#fbbf24'] },
+    { id: 'neymareado', nombre: 'Neymareado', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00'], flagType: 'br', comba: 98, fuerza: 95, precision: 88, skin: '#b45309', hair: '#fef08a', beard: '#7c3a00', beardType: 'candado-chico', hairType: 'mohawk', eyeColor: '#16a34a', jersey: ['#fbbf24', '#fbbf24'] },
     { id: 'penaldo', nombre: 'Penaldo', pais: 'Portugal 🇵🇹', flag: '🇵🇹', flagColors: ['#006600','#ff0000'], flagType: 'v2', comba: 85, fuerza: 99, precision: 96, skin: '#fed7aa', hair: '#18181b', beard: null, hairType: 'penaldo', jersey: ['#dc2626', '#dc2626'] },
-    { id: 'hajalan', nombre: 'Hajalan', pais: 'Noruega 🇳🇴', flag: '🇳🇴', flagColors: ['#ef2b2d','#ffffff','#002868'], flagType: 'cross', flagCross: '#002868', comba: 78, fuerza: 99, precision: 95, skin: '#ffedd5', hair: '#fef08a', beard: null, hairType: 'long-rubio', jersey: ['#dc2626', '#1d4ed8'] },
-    { id: 'woltemadre', nombre: 'Woltemadre', pais: 'Alemania 🇩🇪', flag: '🇩🇪', flagColors: ['#000000','#dd0000','#ffcf00'], flagType: 'h3', comba: 82, fuerza: 96, precision: 93, skin: '#ffedd5', hair: '#fde047', beard: '#5c4033', beardType: 'bigote', hairType: 'rubio-ondulado-medio', jersey: ['#ffffff', '#ffffff'] },
+    { id: 'hajalan', nombre: 'Hajalan', pais: 'Noruega 🇳🇴', flag: '🇳🇴', flagColors: ['#ef2b2d','#ffffff','#002868'], flagType: 'cross', flagCross: '#002868', comba: 78, fuerza: 99, precision: 95, skin: '#ffedd5', hair: '#fef08a', beard: null, hairType: 'long-rubio', eyeColor: '#7dd3fc', jersey: ['#dc2626', '#1d4ed8'] },
+    { id: 'woltemadre', nombre: 'Woltemadre', pais: 'Alemania 🇩🇪', flag: '🇩🇪', flagColors: ['#000000','#dd0000','#ffcf00'], flagType: 'h3', comba: 82, fuerza: 96, precision: 93, skin: '#ffedd5', hair: '#fde047', beard: '#5c4033', beardType: 'bigote', hairType: 'rubio-ondulado-medio', eyeColor: '#7dd3fc', jersey: ['#ffffff', '#ffffff'] },
     { id: 'maradonuts', nombre: 'Maradonuts', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 99, fuerza: 95, precision: 97, skin: '#fed7aa', hair: '#18181b', beard: null, hairType: 'pelusa', jersey: ['#74acdf', '#ffffff'], locked: true, classic: true, unlockPrice: 80, unlockDesc: 'Racha 3 ⚽ o 80 🪙' },
     { id: 'zazu', nombre: 'Zazu', pais: 'Francia 🇫🇷', flag: '🇫🇷', flagColors: ['#002395','#ffffff','#ed2939'], flagType: 'v3', comba: 96, fuerza: 91, precision: 98, skin: '#ffedd5', hair: '#3f3f46', beard: null, hairType: 'calvo', jersey: ['#002395', '#002395'], locked: true, classic: true, unlockPrice: 60, unlockDesc: 'Racha 2 ⚡ o 60 🪙' },
     { id: 'orey', nombre: 'Orey', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00'], flagType: 'br', comba: 95, fuerza: 98, precision: 98, skin: '#653b1b', hair: '#18181b', beard: null, hairType: 'afro-short', jersey: ['#fbbf24', '#fbbf24'], locked: true, classic: true, unlockPrice: 80, unlockDesc: 'Récord 4 🏆 o 80 🪙' },
     { id: 'fenomeno', nombre: 'El Fenómeno', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00','#002277'], flagType: 'br', comba: 94, fuerza: 98, precision: 96, skin: '#b45309', hair: '#18181b', beard: null, hairType: 'calva-flequillo', jersey: ['#fbbf24', '#fbbf24'], locked: true, classic: true, unlockPrice: 50, unlockDesc: 'Racha 3 ⚽ o 50 🪙' },
-    { id: 'becan', nombre: 'Becan', pais: 'Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', flagColors: ['#ffffff'], flagType: 'cross', flagCross: '#cf111b', comba: 99, fuerza: 93, precision: 97, skin: '#ffedd5', hair: '#fef08a', beard: null, hairType: 'beckham-mohawk', jersey: ['#cf142b', '#cf142b'], locked: true, classic: true, unlockPrice: 60, unlockDesc: 'Récord 5 🏆 o 60 🪙' },
+    { id: 'becan', nombre: 'Becan', pais: 'Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', flagColors: ['#ffffff'], flagType: 'cross', flagCross: '#cf111b', comba: 99, fuerza: 93, precision: 97, skin: '#ffedd5', hair: '#fef08a', beard: null, hairType: 'beckham-mohawk', eyeColor: '#7dd3fc', jersey: ['#cf142b', '#cf142b'], locked: true, classic: true, unlockPrice: 60, unlockDesc: 'Récord 5 🏆 o 60 🪙' },
     { id: 'witch', nombre: 'The Witch', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 96, fuerza: 94, precision: 95, skin: '#fed7aa', hair: '#18181b', beard: '#18181b', beardType: 'candado-chico', hairType: 'calvo-total', jersey: ['#0ea5e9', '#ffffff'], locked: true, classic: true, unlockPrice: 40, unlockDesc: 'Racha 2 ⚡ o 40 🪙' },
     { id: 'david', nombre: 'David', pais: 'Países Bajos 🇳🇱', flag: '🇳🇱', flagColors: ['#ff4f00','#ffffff','#21468b'], flagType: 'h3', comba: 94, fuerza: 97, precision: 92, skin: '#5c4033', hair: '#1c1917', beard: null, hairType: 'rastas', jersey: ['#ff4f00', '#ff4f00'], locked: true, classic: true, unlockPrice: 40, unlockDesc: 'Récord 3 🏆 o 40 🪙' },
-    { id: 'kingsman', nombre: 'Kingsman', pais: 'Alemania 🇩🇪', flag: '🇩🇪', flagColors: ['#000000','#dd0000','#ffcf00'], flagType: 'h3', comba: 91, fuerza: 96, precision: 98, skin: '#ffedd5', hair: '#fde047', beard: null, hairType: 'long-rubio', jersey: ['#10b981', '#10b981'], locked: true, classic: true, unlockPrice: 50, unlockDesc: 'Récord 4 🏆 o 50 🪙' },
+    { id: 'kingsman', nombre: 'Kingsman', pais: 'Alemania 🇩🇪', flag: '🇩🇪', flagColors: ['#000000','#dd0000','#ffcf00'], flagType: 'h3', comba: 91, fuerza: 96, precision: 98, skin: '#ffedd5', hair: '#fde047', beard: null, hairType: 'long-rubio', eyeColor: '#7dd3fc', jersey: ['#10b981', '#10b981'], locked: true, classic: true, unlockPrice: 50, unlockDesc: 'Récord 4 🏆 o 50 🪙' },
     { id: 'pirgo', nombre: 'Pirgo', pais: 'Italia 🇮🇹', flag: '🇮🇹', flagColors: ['#009246','#ffffff','#ce2b37'], flagType: 'v3', comba: 98, fuerza: 88, precision: 99, skin: '#fed7aa', hair: '#451a03', beard: '#451a03', hairType: 'pirlo', jersey: ['#0087e0', '#0087e0'], locked: true, classic: true, unlockPrice: 50, unlockDesc: 'Racha 2 ⚡ o 50 🪙' },
     { id: 'totto', nombre: 'Totto', pais: 'Italia 🇮🇹', flag: '🇮🇹', flagColors: ['#009246','#ffffff','#ce2b37'], flagType: 'v3', comba: 95, fuerza: 96, precision: 95, skin: '#fed7aa', hair: '#ca8a04', beard: null, hairType: 'totti', jersey: ['#0087e0', '#0087e0'], locked: true, classic: true, unlockPrice: 50, unlockDesc: 'Récord 4 🏆 o 50 🪙' },
     { id: 'craft', nombre: 'Craft', pais: 'Países Bajos 🇳🇱', flag: '🇳🇱', flagColors: ['#ff4f00','#ffffff','#21468b'], flagType: 'h3', comba: 98, fuerza: 94, precision: 97, skin: '#ffedd5', hair: '#854d0e', beard: null, hairType: 'long-lasio', jersey: ['#ff4f00', '#ff4f00'], locked: true, classic: true, unlockPrice: 70, unlockDesc: 'Racha 4 🏆 o 70 🪙' },
-    { id: 'batifrutta', nombre: 'Batifrutta', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 88, fuerza: 99, precision: 96, skin: '#fed7aa', hair: '#5c4033', beard: '#5c4033', beardType: 'candado-chico', hairType: 'long-rubio', jersey: ['#74acdf', '#ffffff'], locked: true, classic: true, unlockPrice: 65, unlockDesc: 'Récord 6 🏆 o 65 🪙' },
+    { id: 'batifrutta', nombre: 'Batifrutta', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 88, fuerza: 99, precision: 96, skin: '#fed7aa', hair: '#5c4033', beard: '#5c4033', beardType: 'candado-chico', hairType: 'long-rubio', eyeColor: '#7dd3fc', jersey: ['#74acdf', '#ffffff'], locked: true, classic: true, unlockPrice: 65, unlockDesc: 'Récord 6 🏆 o 65 🪙' },
     { id: 'lakaka', nombre: 'Lakaka', pais: 'Bélgica 🇧🇪', flag: '🇧🇪', flagColors: ['#000000','#ffd700','#ff0000'], flagType: 'v3', comba: 68, fuerza: 98, precision: 75, skin: '#4a3319', hair: '#18181b', beard: null, hairType: 'rapado-oscuro', jersey: ['#800020', '#800020'] },
     { id: 'lucho', nombre: 'Lucho', pais: 'Uruguay 🇺🇾', flag: '🇺🇾', flagColors: ['#ffffff','#007fff','#ffffff'], flagType: 'uy', comba: 80, fuerza: 88, precision: 95, skin: '#fed7aa', hair: '#18181b', beard: null, hairType: 'corto-despeinado', jersey: ['#5ca2db', '#5ca2db'] }
   ];
@@ -9231,7 +9208,7 @@
     const arqueros = [
       { id: 'dibu', nombre: 'Dibu Martínez', pais: 'Argentina 🇦🇷', skin: '#ffedd5', hair: '#5c4033', beard: null, hairType: 'dibu', jersey: ['#22c55e', '#22c55e'] },
       { id: 'curpua', nombre: 'Curpua', pais: 'Bélgica 🇧🇪', skin: '#fdecda', hair: '#2b1a0a', beard: null, hairType: 'corto-oscuro', jersey: ['#fbbf24', '#fbbf24'] },
-      { id: 'neube', nombre: 'Neube', pais: 'Alemania 🇩🇪', skin: '#fee2e2', hair: '#eab308', beard: '#ca8a04', beardType: 'bigote', hairType: 'rubio-corto', jersey: ['#06b6d4', '#06b6d4'] },
+      { id: 'neube', nombre: 'Neube', pais: 'Alemania 🇩🇪', skin: '#fee2e2', hair: '#eab308', beard: '#ca8a04', beardType: 'bigote', hairType: 'rubio-corto', eyeColor: '#7dd3fc', jersey: ['#06b6d4', '#06b6d4'] },
       { id: 'malisson', nombre: 'Malisson', pais: 'Brasil 🇧🇷', skin: '#f5d0a9', hair: '#1a0f00', beard: '#1a0f00', beardType: 'beard', hairType: 'corto-oscuro', jersey: ['#1e293b', '#1e293b'] }
     ];
     return JSON.parse(JSON.stringify(arqueros[Math.floor(Math.random() * arqueros.length)]));
@@ -9248,7 +9225,7 @@
     }
     // Alemania
     if (id === 'woltemadre' || id === 'kingsman' || flag.includes('🇩🇪')) {
-      return { id: 'neube', nombre: 'Neube', pais: 'Alemania 🇩🇪', skin: '#fee2e2', hair: '#eab308', beard: '#ca8a04', beardType: 'bigote', hairType: 'rubio-corto', jersey: ['#06b6d4', '#06b6d4'] };
+      return { id: 'neube', nombre: 'Neube', pais: 'Alemania 🇩🇪', skin: '#fee2e2', hair: '#eab308', beard: '#ca8a04', beardType: 'bigote', hairType: 'rubio-corto', eyeColor: '#7dd3fc', jersey: ['#06b6d4', '#06b6d4'] };
     }
     // Argentina
     if (id === 'mesias' || id === 'maradonuts' || id === 'batifrutta' || id === 'witch' || flag.includes('🇦🇷')) {
@@ -10452,310 +10429,530 @@
       c.fill();
     }
 
+    // ── HELPER: sombra interna de volumen en el pelo ──
+    function _hairShade(c, color, alpha) {
+      c.save();
+      c.globalAlpha = alpha;
+      c.fillStyle = color;
+      c.fill();
+      c.restore();
+    }
+
     // Cabello
     c.fillStyle = player.hair;
     if (player.hairType === 'mohawk') {
-      c.beginPath();
-      c.moveTo(-5, -15);
-      c.quadraticCurveTo(0, -26, 5, -15);
-      c.lineTo(2, -14);
-      c.lineTo(0, -28);
-      c.lineTo(-2, -14);
-      c.closePath();
-      c.fill();
-    } else if (player.hairType === 'messi') {
-      c.beginPath();
-      c.arc(0, -7, 13, Math.PI, 0);
-      c.lineTo(14, -1);
-      c.lineTo(10, -18);
-      c.lineTo(-10, -16);
-      c.closePath();
-      c.fill();
-    } else if (player.hairType === 'blonde') {
-      c.beginPath();
-      c.arc(0, -6, 13, Math.PI, 0);
-      c.lineTo(14, -10);
-      c.lineTo(8, -21);
-      c.lineTo(0, -16);
-      c.lineTo(-8, -21);
-      c.lineTo(-14, -10);
-      c.closePath();
-      c.fill();
-    } else if (player.hairType === 'curly') {
-      // Rulos de Yamal — más compactos, solo en la parte superior
-      for (let angle = -0.1; angle < 1.1; angle += 0.22) {
-        const hx = Math.cos(angle * Math.PI - Math.PI) * 13;
-        const hy = Math.sin(angle * Math.PI - Math.PI) * 13;
-        c.beginPath();
-        c.arc(hx, hy - 2, 5, 0, Math.PI * 2);
-        c.fill();
-      }
-    } else if (player.hairType === 'buzz') {
-      c.strokeStyle = player.hair;
-      c.lineWidth = 3.5;
-      c.beginPath();
-      c.arc(0, 0, 16.5, 1.1 * Math.PI, 1.9 * Math.PI);
-      c.stroke();
-    } else if (player.hairType === 'penaldo') {
-      c.beginPath();
-      c.arc(0, -7, 13, Math.PI, 0);
-      c.lineTo(15, -4);
-      c.lineTo(12, -22); // jopo CR7
-      c.lineTo(-4, -20);
-      c.lineTo(-13, -8);
-      c.closePath();
-      c.fill();
-      
-      // Rayas rapadas
-      c.strokeStyle = player.skin;
-      c.lineWidth = 1.2;
-      c.beginPath();
-      c.moveTo(8, -12); c.lineTo(13, -15);
-      c.moveTo(9, -8); c.lineTo(14, -11);
-      c.stroke();
-    } else if (player.hairType === 'dibu') {
-      // Pelo marrón de Dibu con copete/jopo (perfeccionado para cubrir más la parte superior)
-      c.beginPath();
-      c.arc(0, -6, 12.5, Math.PI, 0);
-      c.lineTo(13.5, -9);
-      c.lineTo(6, -23);
-      c.lineTo(-6, -21);
-      c.lineTo(-13.5, -9);
-      c.closePath();
-      c.fill();
-      
-      // La bandera argentina Qatar 2022 pintada al costado del pelo!
+      // Mohawk vibrante con textura y borde definido
       c.save();
-      c.fillStyle = '#000000';
-      c.fillRect(-11.5, -9.5, 5, 6.4);
-      c.fillStyle = '#7dd3fc';
-      c.fillRect(-11, -9, 4, 1.8);
-      c.fillStyle = '#ffffff';
-      c.fillRect(-11, -7.2, 4, 1.8);
-      c.fillStyle = '#7dd3fc';
-      c.fillRect(-11, -5.4, 4, 1.8);
-      c.fillStyle = '#f59e0b';
-      c.beginPath(); c.arc(-9, -6.3, 0.7, 0, Math.PI * 2); c.fill();
-      c.restore();
-    } else if (player.hairType === 'long-rubio') {
-      // Pelo largo rubio suelto, cayendo lacio/ondulado a los costados
-      c.fillStyle = '#fde047';
+      // Cuerpo del mohawk
       c.beginPath();
-      c.arc(0, -5, 13.5, Math.PI, 0); // coronilla
-      c.fill();
-      
-      // Mechón izquierdo
-      c.beginPath();
-      c.moveTo(-13.5, -5);
-      c.bezierCurveTo(-17, 5, -16, 15, -13, 22);
-      c.bezierCurveTo(-10, 22, -10, 10, -10, 0);
+      c.moveTo(-5.5, -14);
+      c.bezierCurveTo(-6, -20, -3, -30, 0, -32);
+      c.bezierCurveTo(3, -30, 6, -20, 5.5, -14);
+      c.lineTo(2.5, -13);
+      c.bezierCurveTo(1, -22, 0, -28, 0, -34);
+      c.bezierCurveTo(0, -28, -1, -22, -2.5, -13);
       c.closePath();
-      c.fill();
-
-      // Mechón derecho
-      c.beginPath();
-      c.moveTo(13.5, -5);
-      c.bezierCurveTo(17, 5, 15, 15, 13, 22);
-      c.bezierCurveTo(10, 22, 10, 10, 10, 0);
-      c.closePath();
-      c.fill();
-
-      // Flequillo / partidura
-      c.fillStyle = '#ca8a04';
-      c.beginPath();
-      c.moveTo(-10, -10);
-      c.quadraticCurveTo(0, -14, 10, -10);
-      c.lineTo(8, -8);
-      c.quadraticCurveTo(0, -11, -8, -8);
-      c.closePath();
-      c.fill();
-    } else if (player.hairType === 'long-lasio') {
-      // Pelo largo lacio marrón/cualquier color (estilo Craft) cayendo a los lados de la cabeza de forma elegante
-      c.fillStyle = player.hair || '#854d0e';
-      c.beginPath();
-      c.arc(0, -5, 13.5, Math.PI, 0); // coronilla
-      c.fill();
-      
-      // Mechón izquierdo
-      c.beginPath();
-      c.moveTo(-13.5, -5);
-      c.bezierCurveTo(-18, 6, -17, 18, -14, 25);
-      c.bezierCurveTo(-10.5, 25, -10, 12, -10, 0);
-      c.closePath();
-      c.fill();
-
-      // Mechón derecho
-      c.beginPath();
-      c.moveTo(13.5, -5);
-      c.bezierCurveTo(18, 6, 17, 18, 14, 25);
-      c.bezierCurveTo(10.5, 25, 10, 12, 10, 0);
-      c.closePath();
-      c.fill();
-
-      // Sombras/Brillo de flequillo
-      c.fillStyle = 'rgba(0, 0, 0, 0.18)';
-      c.beginPath();
-      c.moveTo(-10, -10);
-      c.quadraticCurveTo(0, -14, 10, -10);
-      c.lineTo(8, -8);
-      c.quadraticCurveTo(0, -11, -8, -8);
-      c.closePath();
-      c.fill();
-    } else if (player.hairType === 'rubio-ondulado-medio') {
-      // Woltemade: Pelo rubio ondulado medio-largo
       c.fillStyle = player.hair;
-      
-      // Coronilla superior base
-      c.beginPath();
-      c.arc(0, -6, 13, Math.PI, 0);
       c.fill();
-      
-      // Ondas/rulos abundantes cayendo a los lados de la cabeza (mediano-largo)
-      const ondas = [
-        {x: -12, y: -8, r: 6}, {x: -14, y: -3, r: 6.5}, {x: -13, y: 3, r: 6}, {x: -14, y: 9, r: 5.5}, {x: -11, y: 13, r: 5},
-        {x: 12, y: -8, r: 6}, {x: 14, y: -3, r: 6.5}, {x: 13, y: 3, r: 6}, {x: 14, y: 9, r: 5.5}, {x: 11, y: 13, r: 5},
-        // Flequillo ondulado en la frente
-        {x: -6, y: -11, r: 5.5}, {x: 0, y: -12, r: 6}, {x: 6, y: -11, r: 5.5}
-      ];
-      ondas.forEach(ond => {
-        c.beginPath();
-        c.arc(ond.x, ond.y, ond.r, 0, Math.PI * 2);
-        c.fill();
-      });
-    } else if (player.hairType === 'pelusa') {
-      // Rulos abundantes estilo Pelusa (Maradona '86)
-      c.fillStyle = player.hair;
-      const rulos = [
-        {x: -12, y: -10, r: 6.5}, {x: -14, y: -4, r: 7}, {x: -12, y: 3, r: 6.5},
-        {x: 12, y: -10, r: 6.5}, {x: 14, y: -4, r: 7}, {x: 12, y: 3, r: 6.5},
-        {x: -9, y: -14, r: 7}, {x: 9, y: -14, r: 7},
-        {x: -4, y: -17, r: 7.5}, {x: 4, y: -17, r: 7.5}, {x: 0, y: -19, r: 8}
-      ];
-      rulos.forEach(ru => {
-        c.beginPath();
-        c.arc(ru.x, ru.y, ru.r, 0, Math.PI * 2);
-        c.fill();
-      });
-    } else if (player.hairType === 'calvo') {
-      // Zidane: Corona calva. Rapado en coronilla, pelo en costados y nuca.
-      c.fillStyle = player.hair;
+      // Brillo central
+      c.strokeStyle = 'rgba(255,255,255,0.28)';
+      c.lineWidth = 1;
       c.beginPath();
-      c.arc(0, 0, 16.5, 0.05 * Math.PI, 0.95 * Math.PI); // Nuca
-      c.lineWidth = 4.5;
-      c.strokeStyle = player.hair;
+      c.moveTo(0, -15);
+      c.bezierCurveTo(0.5, -22, 0.3, -28, 0, -32);
       c.stroke();
-      
+      // Sombra lateral
+      c.fillStyle = 'rgba(0,0,0,0.15)';
       c.beginPath();
-      c.arc(-13, -3, 4, 0, Math.PI * 2);
-      c.arc(13, -3, 4, 0, Math.PI * 2);
-      c.fill();
-    } else if (player.hairType === 'afro-short') {
-      // Pelé: Afro corto texturado
+      c.moveTo(-5.5, -14); c.bezierCurveTo(-6, -20, -3, -30, 0, -32);
+      c.lineTo(-1, -15); c.closePath(); c.fill();
+      c.restore();
+    } else if (player.hairType === 'messi') {
+      // Pelo oscuro corto-medio de Messi con volumen y brillo
+      c.save();
       c.fillStyle = player.hair;
+      // Base coronilla
       c.beginPath();
-      c.arc(0, -5, 13.5, Math.PI * 1.05, Math.PI * 1.95);
+      c.arc(0, -8, 14, Math.PI, 0);
+      c.lineTo(14, -2);
+      c.lineTo(11, -20);
+      c.bezierCurveTo(4, -22, -4, -22, -11, -20);
       c.closePath();
       c.fill();
-      
-      for (let angle = 1.05; angle <= 1.95; angle += 0.15) {
-        const hx = Math.cos(angle * Math.PI) * 14.5;
-        const hy = Math.sin(angle * Math.PI) * 14.5 - 2;
-        c.beginPath();
-        c.arc(hx, hy, 4, 0, Math.PI * 2);
-        c.fill();
-      }
-    } else if (player.hairType === 'curly') {
-      // Rulos de Yamal — más compactos, solo en la parte superior
-      c.fillStyle = player.hair;
-      for (let angle = -0.1; angle < 1.1; angle += 0.22) {
-        const hx = Math.cos(angle * Math.PI - Math.PI) * 13;
-        const hy = Math.sin(angle * Math.PI - Math.PI) * 13;
-        c.beginPath();
-        c.arc(hx, hy - 2, 5, 0, Math.PI * 2);
-        c.fill();
-      }
-    } else if (player.hairType === 'calva-flequillo') {
-      c.fillStyle = player.hair;
+      // Flequillo hacia un lado (estilo Messi)
       c.beginPath();
-      c.moveTo(-5, -11);
-      c.lineTo(5, -11);
-      c.lineTo(0, -17);
+      c.moveTo(-11, -9);
+      c.bezierCurveTo(-8, -17, 0, -18, 8, -13);
+      c.bezierCurveTo(3, -15, -3, -14, -8, -9);
+      c.closePath();
+      c.fillStyle = 'rgba(0,0,0,0.18)';
+      c.fill();
+      // Brillo suave
+      c.fillStyle = 'rgba(255,255,255,0.12)';
+      c.beginPath();
+      c.ellipse(4, -14, 5, 3, -0.4, 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+    } else if (player.hairType === 'blonde') {
+      // Pelo rubio con volumen y mechones naturales (Kane)
+      c.save();
+      c.fillStyle = player.hair;
+      // Cabello base
+      c.beginPath();
+      c.arc(0, -7, 14, Math.PI, 0);
+      c.lineTo(14, -11);
+      c.bezierCurveTo(10, -23, 4, -24, 0, -22);
+      c.bezierCurveTo(-4, -24, -10, -23, -14, -11);
       c.closePath();
       c.fill();
-    } else if (player.hairType === 'beckham-mohawk') {
-      c.fillStyle = player.hair;
-      c.beginPath();
-      c.moveTo(-3, -15);
-      c.quadraticCurveTo(0, -28, 3, -15);
-      c.lineTo(1.5, -14);
-      c.lineTo(0, -30);
-      c.lineTo(-1.5, -14);
-      c.closePath();
-      c.fill();
-      
-      c.strokeStyle = 'rgba(0,0,0,0.1)';
+      // Detalles de mechones claros
+      c.strokeStyle = 'rgba(255,255,200,0.35)';
       c.lineWidth = 1.5;
       c.beginPath();
-      c.arc(-13, -8, 2, 0, Math.PI*2);
-      c.arc(13, -8, 2, 0, Math.PI*2);
+      c.moveTo(-5, -20); c.quadraticCurveTo(-2, -15, 0, -13);
+      c.moveTo(5, -20); c.quadraticCurveTo(3, -15, 1, -13);
       c.stroke();
-    } else if (player.hairType === 'rastas') {
+      // Sombra lateral
+      c.fillStyle = 'rgba(0,0,0,0.1)';
+      c.beginPath(); c.arc(-14, -10, 5, 0, Math.PI*2); c.fill();
+      c.beginPath(); c.arc(14, -10, 5, 0, Math.PI*2); c.fill();
+      c.restore();
+    } else if (player.hairType === 'curly') {
+      // Rulos abundantes de Yamal con textura y volumen
+      c.save();
       c.fillStyle = player.hair;
+      // Base sólida coronilla
       c.beginPath();
-      c.arc(0, -6, 13.5, Math.PI, 0);
+      c.arc(0, -8, 13, Math.PI * 1.0, Math.PI * 2.0);
       c.fill();
-      
-      const rastasX = [-13, -10, -7, 7, 10, 13];
+      // Rulos individuales con sombra
+      const curls = [
+        {x:-13, y:-5, r:5.5}, {x:-8, y:-13, r:5}, {x:0, y:-15, r:5.5},
+        {x:8, y:-13, r:5}, {x:13, y:-5, r:5.5},
+        {x:-5, y:-10, r:4.5}, {x:5, y:-10, r:4.5}
+      ];
+      curls.forEach(cu => {
+        c.beginPath(); c.arc(cu.x, cu.y, cu.r, 0, Math.PI*2); c.fillStyle = player.hair; c.fill();
+        // Brillo en cada rulo
+        c.fillStyle = 'rgba(255,255,255,0.18)';
+        c.beginPath(); c.arc(cu.x - cu.r*0.3, cu.y - cu.r*0.3, cu.r*0.38, 0, Math.PI*2); c.fill();
+      });
+      c.restore();
+    } else if (player.hairType === 'buzz') {
+      // Corte buzz/rapado con textura de pelo muy corto (Mbappé)
+      c.save();
+      c.strokeStyle = player.hair;
+      c.lineWidth = 5;
+      c.lineCap = 'round';
+      c.beginPath();
+      c.arc(0, 0, 16.5, 1.08 * Math.PI, 1.92 * Math.PI);
+      c.stroke();
+      // Textura de rapado (líneas muy finas)
+      c.lineWidth = 1.5;
+      c.strokeStyle = 'rgba(0,0,0,0.2)';
+      for (let a = 1.1; a < 1.9; a += 0.12) {
+        const sx = Math.cos(a * Math.PI) * 15;
+        const sy = Math.sin(a * Math.PI) * 15;
+        const ex = Math.cos(a * Math.PI) * 13;
+        const ey = Math.sin(a * Math.PI) * 13;
+        c.beginPath(); c.moveTo(sx, sy); c.lineTo(ex, ey); c.stroke();
+      }
+      c.restore();
+    } else if (player.hairType === 'penaldo') {
+      // Jopo icónico de CR7 con rayas rapadas y brillo
+      c.save();
+      c.fillStyle = player.hair;
+      // Base del cabello
+      c.beginPath();
+      c.arc(0, -8, 13.5, Math.PI, 0);
+      c.lineTo(15, -5);
+      c.bezierCurveTo(14, -18, 8, -25, 4, -26);
+      c.lineTo(-5, -23);
+      c.lineTo(-13, -9);
+      c.closePath();
+      c.fill();
+      // Jopo/copete pronunciado hacia arriba-derecha
+      c.beginPath();
+      c.moveTo(-2, -18);
+      c.bezierCurveTo(2, -24, 9, -28, 13, -25);
+      c.bezierCurveTo(10, -26, 5, -23, 3, -17);
+      c.closePath();
+      c.fill();
+      // Rayas rapadas laterales
+      c.strokeStyle = player.skin;
+      c.lineWidth = 1.5;
+      c.lineCap = 'round';
+      c.beginPath();
+      c.moveTo(9, -10); c.lineTo(14, -13);
+      c.moveTo(10, -6); c.lineTo(15, -9);
+      c.stroke();
+      // Brillo en el jopo
+      c.strokeStyle = 'rgba(255,255,255,0.25)';
+      c.lineWidth = 1;
+      c.beginPath();
+      c.moveTo(0, -20); c.bezierCurveTo(4, -24, 9, -26, 12, -24);
+      c.stroke();
+      c.restore();
+    } else if (player.hairType === 'dibu') {
+      // Pelo de Dibu con copete y bandera argentina
+      c.save();
+      c.fillStyle = player.hair;
+      // Base del pelo
+      c.beginPath();
+      c.arc(0, -7, 13, Math.PI, 0);
+      c.lineTo(14, -10);
+      c.bezierCurveTo(10, -22, 3, -26, 0, -26);
+      c.bezierCurveTo(-3, -26, -10, -22, -14, -10);
+      c.closePath();
+      c.fill();
+      // Copete/jopo más definido con volumen
+      c.beginPath();
+      c.moveTo(-7, -18);
+      c.bezierCurveTo(-4, -25, 4, -26, 8, -20);
+      c.bezierCurveTo(4, -22, -2, -22, -5, -17);
+      c.closePath();
+      c.fillStyle = 'rgba(0,0,0,0.12)';
+      c.fill();
+      // Brillo del cabello
+      c.fillStyle = 'rgba(255,255,255,0.15)';
+      c.beginPath();
+      c.ellipse(3, -18, 5, 2.5, -0.3, 0, Math.PI * 2);
+      c.fill();
+      // Bandera argentina Qatar 2022 pintada al costado
+      c.fillStyle = '#000000';
+      c.fillRect(-12, -10, 5.5, 7);
+      c.fillStyle = '#7dd3fc';
+      c.fillRect(-11.5, -9.5, 4.5, 2);
+      c.fillStyle = '#ffffff';
+      c.fillRect(-11.5, -7.5, 4.5, 2);
+      c.fillStyle = '#7dd3fc';
+      c.fillRect(-11.5, -5.5, 4.5, 2);
+      c.fillStyle = '#f59e0b';
+      c.beginPath(); c.arc(-9.2, -6.5, 0.85, 0, Math.PI * 2); c.fill();
+      c.restore();
+    } else if (player.hairType === 'long-rubio') {
+      // Pelo largo rubio con mechones fluidos y brillo dorado
+      c.save();
+      c.fillStyle = player.hair;
+      // Coronilla base
+      c.beginPath();
+      c.arc(0, -6, 14, Math.PI, 0);
+      c.fill();
+      // Mechón izquierdo fluido
+      c.beginPath();
+      c.moveTo(-14, -6);
+      c.bezierCurveTo(-19, 2, -18, 14, -15, 24);
+      c.bezierCurveTo(-13, 26, -11, 24, -10, 18);
+      c.bezierCurveTo(-11, 8, -11, -2, -10, -6);
+      c.closePath();
+      c.fill();
+      // Mechón derecho fluido
+      c.beginPath();
+      c.moveTo(14, -6);
+      c.bezierCurveTo(19, 2, 18, 14, 15, 24);
+      c.bezierCurveTo(13, 26, 11, 24, 10, 18);
+      c.bezierCurveTo(11, 8, 11, -2, 10, -6);
+      c.closePath();
+      c.fill();
+      // Flequillo con línea de partidura
+      const darkerBlonde = '#b45309';
+      c.fillStyle = darkerBlonde;
+      c.beginPath();
+      c.moveTo(-11, -11);
+      c.bezierCurveTo(-4, -16, 4, -16, 11, -11);
+      c.lineTo(9, -9);
+      c.bezierCurveTo(3, -13, -3, -13, -9, -9);
+      c.closePath();
+      c.fill();
+      // Brillos mechos
+      c.strokeStyle = 'rgba(255,255,200,0.4)';
+      c.lineWidth = 1.2;
+      c.beginPath();
+      c.moveTo(-13, 0); c.bezierCurveTo(-15, 8, -14, 16, -13, 20);
+      c.moveTo(13, 0); c.bezierCurveTo(15, 8, 14, 16, 13, 20);
+      c.stroke();
+      c.restore();
+    } else if (player.hairType === 'long-lasio') {
+      // Pelo largo lacio oscuro con caída elegante y brillo (Cruyff/Craft)
+      c.save();
+      c.fillStyle = player.hair || '#854d0e';
+      // Coronilla base
+      c.beginPath();
+      c.arc(0, -6, 14, Math.PI, 0);
+      c.fill();
+      // Mechón izquierdo largo
+      c.beginPath();
+      c.moveTo(-14, -6);
+      c.bezierCurveTo(-20, 5, -19, 20, -15, 28);
+      c.bezierCurveTo(-12, 30, -10, 26, -10, 18);
+      c.bezierCurveTo(-10, 8, -10, -2, -10, -6);
+      c.closePath();
+      c.fill();
+      // Mechón derecho largo
+      c.beginPath();
+      c.moveTo(14, -6);
+      c.bezierCurveTo(20, 5, 19, 20, 15, 28);
+      c.bezierCurveTo(12, 30, 10, 26, 10, 18);
+      c.bezierCurveTo(10, 8, 10, -2, 10, -6);
+      c.closePath();
+      c.fill();
+      // Flequillo y líneas de cabello
+      c.fillStyle = 'rgba(0,0,0,0.16)';
+      c.beginPath();
+      c.moveTo(-11, -10); c.bezierCurveTo(-4, -15, 4, -15, 11, -10);
+      c.lineTo(9, -8); c.bezierCurveTo(3, -12, -3, -12, -9, -8); c.closePath(); c.fill();
+      // Brillo del cabello lacio
+      c.strokeStyle = 'rgba(255,255,255,0.2)';
+      c.lineWidth = 1;
+      c.beginPath();
+      c.moveTo(-11, 2); c.bezierCurveTo(-14, 10, -14, 20, -12, 24);
+      c.moveTo(11, 2); c.bezierCurveTo(14, 10, 14, 20, 12, 24);
+      c.stroke();
+      c.restore();
+    } else if (player.hairType === 'rubio-ondulado-medio') {
+      // Woltemade: Pelo rubio ondulado mediano con volumen y definición
+      c.save();
+      c.fillStyle = player.hair;
+      // Coronilla base
+      c.beginPath();
+      c.arc(0, -7, 13.5, Math.PI, 0);
+      c.fill();
+      // Ondas laterales con curvas realistas
+      const ondas = [
+        {x:-13, y:-9, r:6.5}, {x:-15, y:-3, r:7}, {x:-14, y:4, r:6.5},
+        {x:-13, y:10, r:6}, {x:-10, y:15, r:5.5},
+        {x:13, y:-9, r:6.5}, {x:15, y:-3, r:7}, {x:14, y:4, r:6.5},
+        {x:13, y:10, r:6}, {x:10, y:15, r:5.5},
+        {x:-7, y:-13, r:6}, {x:0, y:-14, r:6.5}, {x:7, y:-13, r:6}
+      ];
+      ondas.forEach(ond => {
+        c.beginPath(); c.arc(ond.x, ond.y, ond.r, 0, Math.PI * 2);
+        c.fillStyle = player.hair; c.fill();
+        // Brillo en cada onda
+        c.fillStyle = 'rgba(255,255,200,0.2)';
+        c.beginPath(); c.arc(ond.x - 1.5, ond.y - 1.5, ond.r*0.35, 0, Math.PI*2); c.fill();
+      });
+      c.restore();
+    } else if (player.hairType === 'pelusa') {
+      // Rulos abundantes estilo Pelusa (Maradona '86) con volumen 3D
+      c.save();
+      c.fillStyle = player.hair;
+      const rulos = [
+        {x:-13, y:-10, r:7}, {x:-15, y:-3, r:7.5}, {x:-13, y:4, r:7},
+        {x:13, y:-10, r:7}, {x:15, y:-3, r:7.5}, {x:13, y:4, r:7},
+        {x:-9, y:-15, r:7.5}, {x:9, y:-15, r:7.5},
+        {x:-4, y:-18, r:8}, {x:4, y:-18, r:8}, {x:0, y:-20, r:8.5},
+        // Rulos extra para más densidad
+        {x:-6, y:-7, r:5.5}, {x:6, y:-7, r:5.5}
+      ];
+      rulos.forEach(ru => {
+        c.beginPath(); c.arc(ru.x, ru.y, ru.r, 0, Math.PI * 2);
+        c.fillStyle = player.hair; c.fill();
+        // Brillo en cada rulo
+        c.fillStyle = 'rgba(255,255,255,0.14)';
+        c.beginPath(); c.arc(ru.x - ru.r*0.35, ru.y - ru.r*0.35, ru.r*0.4, 0, Math.PI*2); c.fill();
+        // Sombra del rulo
+        c.fillStyle = 'rgba(0,0,0,0.12)';
+        c.beginPath(); c.arc(ru.x + ru.r*0.2, ru.y + ru.r*0.2, ru.r*0.35, 0, Math.PI*2); c.fill();
+      });
+      c.restore();
+    } else if (player.hairType === 'calvo') {
+      // Zidane: Corona calva con pelo denso en nuca y costados
+      c.save();
+      c.fillStyle = player.hair;
+      // Nuca (banda de pelo)
+      c.lineWidth = 6;
+      c.strokeStyle = player.hair;
+      c.lineCap = 'round';
+      c.beginPath();
+      c.arc(0, 0, 16.5, 0.08 * Math.PI, 0.92 * Math.PI);
+      c.stroke();
+      // Masa de pelo lateral izquierda
+      c.beginPath();
+      c.arc(-14, -2, 5, 0, Math.PI * 2);
+      c.fill();
+      // Masa de pelo lateral derecha
+      c.beginPath();
+      c.arc(14, -2, 5, 0, Math.PI * 2);
+      c.fill();
+      // Textura sutil de pelo corto en nuca
+      c.strokeStyle = 'rgba(0,0,0,0.1)';
+      c.lineWidth = 0.8;
+      for (let a = 0.1; a < 0.9; a += 0.12) {
+        const bx = Math.cos(a * Math.PI) * 16;
+        const by = Math.sin(a * Math.PI) * 16;
+        c.beginPath(); c.moveTo(bx, by); c.lineTo(bx * 0.88, by * 0.88); c.stroke();
+      }
+      c.restore();
+    } else if (player.hairType === 'afro-short') {
+      // Pelé: Afro corto texturado con volumen y profundidad
+      c.save();
+      c.fillStyle = player.hair;
+      // Base afro
+      c.beginPath();
+      c.arc(0, -6, 14, Math.PI * 1.02, Math.PI * 1.98);
+      c.closePath();
+      c.fill();
+      // Pompones perimetrales del afro
+      for (let angle = 1.02; angle <= 1.98; angle += 0.12) {
+        const hx = Math.cos(angle * Math.PI) * 15;
+        const hy = Math.sin(angle * Math.PI) * 15 - 2;
+        c.beginPath(); c.arc(hx, hy, 4.5, 0, Math.PI * 2);
+        c.fillStyle = player.hair; c.fill();
+        // Brillo en cada pompón
+        c.fillStyle = 'rgba(255,255,255,0.16)';
+        c.beginPath(); c.arc(hx - 1, hy - 1, 1.8, 0, Math.PI*2); c.fill();
+      }
+      c.restore();
+    } else if (player.hairType === 'calva-flequillo') {
+      // Fenómeno (Ronaldo R9): Calva con el flequillo icónico triangular
+      c.save();
+      c.fillStyle = player.hair;
+      // Flequillo triangular grande e icónico — arranca desde la línea del cabello (y=-12)
+      c.beginPath();
+      c.moveTo(-7, -12);
+      c.bezierCurveTo(-7, -17, -2, -21, 0, -21);
+      c.bezierCurveTo(2, -21, 7, -17, 7, -12);
+      c.bezierCurveTo(4, -14, -4, -14, -7, -12);
+      c.closePath();
+      c.fill();
+      // Brillo en el flequillo
+      c.fillStyle = 'rgba(255,255,255,0.2)';
+      c.beginPath();
+      c.ellipse(0, -17, 3, 2, 0, 0, Math.PI * 2);
+      c.fill();
+      // Borde inferior del flequillo
+      c.strokeStyle = 'rgba(0,0,0,0.15)';
+      c.lineWidth = 0.8;
+      c.beginPath();
+      c.moveTo(-7, -12); c.bezierCurveTo(-3, -13, 3, -13, 7, -12);
+      c.stroke();
+      c.restore();
+    } else if (player.hairType === 'beckham-mohawk') {
+      // Mohawk fino de Beckham con capas y volumen
+      c.save();
+      c.fillStyle = player.hair;
+      // Cresta principal
+      c.beginPath();
+      c.moveTo(-3.5, -14);
+      c.bezierCurveTo(-4, -22, -1, -32, 0, -34);
+      c.bezierCurveTo(1, -32, 4, -22, 3.5, -14);
+      c.lineTo(1.5, -13);
+      c.bezierCurveTo(0.5, -24, 0, -30, 0, -36);
+      c.bezierCurveTo(0, -30, -0.5, -24, -1.5, -13);
+      c.closePath();
+      c.fill();
+      // Brillo central de la cresta
+      c.strokeStyle = 'rgba(255,255,255,0.3)';
+      c.lineWidth = 0.8;
+      c.beginPath();
+      c.moveTo(0, -15); c.bezierCurveTo(0.3, -23, 0.2, -30, 0, -33);
+      c.stroke();
+      // Laterales rapados con textura
+      c.strokeStyle = 'rgba(0,0,0,0.12)';
+      c.lineWidth = 1.2;
+      for (let i = 0; i < 4; i++) {
+        const yOff = -10 + i * 2.5;
+        c.beginPath(); c.moveTo(-16, yOff); c.lineTo(-13, yOff - 1); c.stroke();
+        c.beginPath(); c.moveTo(16, yOff); c.lineTo(13, yOff - 1); c.stroke();
+      }
+      c.restore();
+    } else if (player.hairType === 'rastas') {
+      // Rastas voluminosas y realistas (David Gullit)
+      c.save();
+      c.fillStyle = player.hair;
+      // Base de cabello en coronilla
+      c.beginPath();
+      c.arc(0, -7, 14, Math.PI, 0);
+      c.fill();
+      // Rastas individuales onduladas y gruesas
+      const rastasX = [-14, -10, -6, 0, 6, 10, 14];
       rastasX.forEach((rx, idx) => {
-        const length = 12 + (idx % 2) * 4;
+        const length = 14 + (idx % 3) * 5;
+        c.fillStyle = player.hair;
         c.beginPath();
-        for (let dy = -4; dy <= length; dy += 3) {
-          const osc = Math.sin(dy * 0.25 + idx) * 1.2;
-          c.arc(rx + osc, dy, 2.2, 0, Math.PI * 2);
+        for (let dy = -5; dy <= length; dy += 4) {
+          const osc = Math.sin(dy * 0.3 + idx * 1.1) * 1.8;
+          c.arc(rx + osc, dy, 2.8, 0, Math.PI * 2);
         }
         c.fill();
+        // Brillo en cada rasta
+        c.fillStyle = 'rgba(255,255,255,0.12)';
+        c.beginPath(); c.arc(rx - 0.8, -2, 1.2, 0, Math.PI*2); c.fill();
       });
+      c.restore();
     } else if (player.hairType === 'pirlo') {
-      // Cabello castaño ondulado y elegante de Andrea Pirlo cayendo a los lados
+      // Pirlo: Cabello oscuro ondulado elegante cayendo a los lados
+      c.save();
       c.fillStyle = player.hair;
+      // Coronilla base
       c.beginPath();
-      c.arc(0, -5, 13.5, Math.PI, 0); // coronilla
+      c.arc(0, -6, 14, Math.PI, 0);
       c.fill();
-      
-      // Mechones ondulados a los lados
-      const ladosX = [-13.5, 13.5];
-      ladosX.forEach((lx, idx) => {
-        c.beginPath();
-        c.moveTo(lx, -5);
-        c.bezierCurveTo(lx + (idx === 0 ? -3 : 3), 4, lx + (idx === 0 ? -2 : 2), 10, lx + (idx === 0 ? 1.5 : -1.5), 14);
-        c.bezierCurveTo(lx + (idx === 0 ? 3.5 : -3.5), 10, lx + (idx === 0 ? 3.5 : -3.5), 2, lx + (idx === 0 ? 3.5 : -3.5), -5);
-        c.closePath();
-        c.fill();
-      });
-    } else if (player.hairType === 'totti') {
-      // Cabello rubio medio de Francesco Totti con vincha/headband negra
-      c.fillStyle = player.hair;
+      // Mechones ondulados izquierdo
       c.beginPath();
-      c.arc(0, -6, 13, Math.PI, 0); // corona base
-      c.fill();
-      
-      // Patillas y volumen lateral
-      c.beginPath();
-      c.moveTo(-13, -6); c.lineTo(-13, 1); c.lineTo(-9, -2); c.lineTo(-9, -6);
+      c.moveTo(-14, -6);
+      c.bezierCurveTo(-18, 2, -17, 10, -14, 17);
+      c.bezierCurveTo(-12, 19, -10, 17, -10, 12);
+      c.bezierCurveTo(-10, 4, -10, -3, -10, -6);
       c.closePath();
       c.fill();
-      
+      // Mechón derecho
       c.beginPath();
-      c.moveTo(13, -6); c.lineTo(13, 1); c.lineTo(9, -2); c.lineTo(9, -6);
+      c.moveTo(14, -6);
+      c.bezierCurveTo(18, 2, 17, 10, 14, 17);
+      c.bezierCurveTo(12, 19, 10, 17, 10, 12);
+      c.bezierCurveTo(10, 4, 10, -3, 10, -6);
       c.closePath();
       c.fill();
-      
-      // Vincha fina negra cruzando la frente/coronilla
-      c.strokeStyle = '#18181b';
-      c.lineWidth = 1.35;
+      // Líneas de ondulación del cabello
+      c.strokeStyle = 'rgba(255,255,255,0.18)';
+      c.lineWidth = 1;
+      c.lineCap = 'round';
       c.beginPath();
-      c.arc(0, -6, 13.6, Math.PI * 1.05, Math.PI * 1.95);
+      c.moveTo(-12, 0); c.bezierCurveTo(-14, 5, -13, 10, -12, 14);
+      c.moveTo(12, 0); c.bezierCurveTo(14, 5, 13, 10, 12, 14);
       c.stroke();
+      // Flequillo con volumen
+      c.fillStyle = 'rgba(0,0,0,0.14)';
+      c.beginPath();
+      c.moveTo(-10, -10); c.bezierCurveTo(-4,-14, 4,-14, 10,-10);
+      c.lineTo(8,-8); c.bezierCurveTo(3,-11,-3,-11,-8,-8);
+      c.closePath(); c.fill();
+      c.restore();
+    } else if (player.hairType === 'totti') {
+      // Totti: Cabello rubio con vincha y volumen lateral
+      c.save();
+      c.fillStyle = player.hair;
+      // Corona base
+      c.beginPath();
+      c.arc(0, -7, 13.5, Math.PI, 0);
+      c.fill();
+      // Volumen lateral izquierdo
+      c.beginPath();
+      c.moveTo(-13.5, -7); c.lineTo(-13.5, 3); c.bezierCurveTo(-11, 2, -9, 0, -9, -7);
+      c.closePath(); c.fill();
+      // Volumen lateral derecho
+      c.beginPath();
+      c.moveTo(13.5, -7); c.lineTo(13.5, 3); c.bezierCurveTo(11, 2, 9, 0, 9, -7);
+      c.closePath(); c.fill();
+      // Brillo del cabello
+      c.fillStyle = 'rgba(255,255,200,0.25)';
+      c.beginPath(); c.ellipse(2, -12, 6, 2.5, -0.2, 0, Math.PI*2); c.fill();
+      // Vincha negra con grosor
+      c.strokeStyle = '#111111';
+      c.lineWidth = 2;
+      c.lineCap = 'round';
+      c.beginPath();
+      c.arc(0, -7, 14, Math.PI * 1.05, Math.PI * 1.95);
+      c.stroke();
+      // Brillo en la vincha
+      c.strokeStyle = 'rgba(255,255,255,0.2)';
+      c.lineWidth = 0.7;
+      c.beginPath();
+      c.arc(0, -7, 14.4, Math.PI * 1.1, Math.PI * 1.6);
+      c.stroke();
+      c.restore();
     }
 
     // Ojos
@@ -11845,7 +12042,8 @@
         cCtx.save();
         cCtx.translate(mX, H * 0.52);
         cCtx.scale(1.85, 1.85);
-        drawCabezon(cCtx, 0, 0, currentLeft, false, (currentLeft.id === 'dibu'), false);
+        const _isGoalieLeft = ['dibu','curpua','neube','malisson'].includes(currentLeft.id);
+        drawCabezon(cCtx, 0, 0, currentLeft, false, _isGoalieLeft, false);
         cCtx.restore();
         
         cCtx.fillStyle = '#ffffff';
@@ -11909,7 +12107,8 @@
         cCtx.save();
         cCtx.translate(pX, H * 0.52);
         cCtx.scale(1.85, 1.85);
-        drawCabezon(cCtx, 0, 0, currentRight, false, (currentRight.id === 'dibu'), false);
+        const _isGoalieRight = ['dibu','curpua','neube','malisson'].includes(currentRight.id);
+        drawCabezon(cCtx, 0, 0, currentRight, false, _isGoalieRight, false);
         cCtx.restore();
         
         cCtx.fillStyle = '#ffffff';
@@ -12123,15 +12322,16 @@ window.iniciarEstadioJuego = function() {
     }
     
     if (navigator.app && navigator.app.exitApp) {
+      // Solo en apps nativas Cordova: cerrar app
       navigator.app.exitApp();
-    } else if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+    } else if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
       window.Capacitor.Plugins.App.exitApp();
     } else {
-      // En navegador standard, redirigimos a una página en blanco para salir limpiamente
-      window.close();
-      setTimeout(function() {
-        window.location.href = "about:blank";
-      }, 100);
+      // En navegador o PWA: volver a la pantalla de pánico normalmente
+      const mundialEl = document.getElementById('pantalla-mundial');
+      if (mundialEl) mundialEl.classList.remove('visible');
+      const panicoEl = document.getElementById('pantalla-panico');
+      if (panicoEl) panicoEl.classList.add('visible');
     }
   };
 
@@ -14475,12 +14675,13 @@ window.iniciarEstadioJuego = function() {
         </div>
       `;
     } else if (tipo === 'save') {
+      const nombreArqueroOverlay = (arqueroJugador && arqueroJugador.nombre) ? arqueroJugador.nombre.toUpperCase() : 'EL ARQUERO';
       overlayHtml = `
         <div style="font-family:'Outfit', sans-serif; font-size:clamp(15px, 4.5vw, 22px); font-weight:950; color:#22d3ee; text-shadow:0 0 10px #0891b2; text-transform:uppercase; transform:skewX(-8deg); animation: pulseText 0.3s infinite alternate; letter-spacing:0.5px; margin-bottom: 2px;">
           ¡¡ATAJADÓN!!
         </div>
         <div style="font-family:'Outfit', sans-serif; font-size:clamp(8px, 2.2vw, 10px); font-weight:900; color:#ffffff; letter-spacing:0.6px; text-transform:uppercase; text-shadow:0 1px 4px #000; text-align:center; width: 90%; line-height: 1.25;">
-          ¡EL DIBU VUELA COMO UN GIGANTE Y SALVA EL ARCO!
+          ¡${nombreArqueroOverlay} VUELA COMO UN GIGANTE Y SALVA EL ARCO!
         </div>
       `;
     } else if (tipo === 'palo') {
@@ -14592,7 +14793,7 @@ window.iniciarEstadioJuego = function() {
         ctx.translate(canvas.width * 0.78, canvas.height * 0.56 - faceBounce);
         ctx.scale(2.1, 2.1);
         // Dibujar el arquero concentrado
-        drawCabezon(ctx, 0, 0, arqueroJugador, true, false, false); // Espejado
+        drawCabezon(ctx, 0, 0, arqueroJugador, false, true, false);
         ctx.restore();
         
         // ── ESCANER/RADAR TÁCTICO CYAN DE TRANSICIÓN ──
@@ -15358,13 +15559,13 @@ window.iniciarEstadioJuego = function() {
           } else if (torneoPenales.jornada === 1) {
             penalesArqueroCpu = { id: 'malisson', nombre: 'Malisson', pais: 'Brasil 🇧🇷', skin: '#f5d0a9', hair: '#1a0f00', beard: '#1a0f00', beardType: 'beard', hairType: 'corto-oscuro', jersey: ['#1e293b', '#1e293b'] };
           } else {
-            penalesArqueroCpu = { id: 'neube', nombre: 'Neube', pais: 'Alemania 🇩🇪', skin: '#fee2e2', hair: '#eab308', beard: '#ca8a04', beardType: 'bigote', hairType: 'rubio-corto', jersey: ['#06b6d4', '#06b6d4'] };
+            penalesArqueroCpu = { id: 'neube', nombre: 'Neube', pais: 'Alemania 🇩🇪', skin: '#fee2e2', hair: '#eab308', beard: '#ca8a04', beardType: 'bigote', hairType: 'rubio-corto', eyeColor: '#7dd3fc', jersey: ['#06b6d4', '#06b6d4'] };
           }
         } else {
           if (torneoPenales.ronda === 1) {
             penalesArqueroCpu = { id: 'malisson', nombre: 'Malisson', pais: 'Brasil 🇧🇷', skin: '#f5d0a9', hair: '#1a0f00', beard: '#1a0f00', beardType: 'beard', hairType: 'corto-oscuro', jersey: ['#1e293b', '#1e293b'] };
           } else if (torneoPenales.ronda === 2) {
-            penalesArqueroCpu = { id: 'neube', nombre: 'Neube', pais: 'Alemania 🇩🇪', skin: '#fee2e2', hair: '#eab308', beard: '#ca8a04', beardType: 'bigote', hairType: 'rubio-corto', jersey: ['#06b6d4', '#06b6d4'] };
+            penalesArqueroCpu = { id: 'neube', nombre: 'Neube', pais: 'Alemania 🇩🇪', skin: '#fee2e2', hair: '#eab308', beard: '#ca8a04', beardType: 'bigote', hairType: 'rubio-corto', eyeColor: '#7dd3fc', jersey: ['#06b6d4', '#06b6d4'] };
           } else {
             if (penalesArqueroUser && penalesArqueroUser.id === 'dibu') {
               penalesArqueroCpu = { id: 'neube', nombre: 'Neube Supremo', pais: 'Alemania 🇩🇪', skin: '#fee2e2', hair: '#eab308', beard: '#ca8a04', beardType: 'bigote', hairType: 'rubio-corto', jersey: ['#a855f7', '#a855f7'] };
@@ -16824,7 +17025,7 @@ window.iniciarEstadioJuego = function() {
     ctx.translate(x, y);
     
     // ¡El icónico baile festivo/burla del Dibu Martínez moviendo las caderas!
-    if (isGoalie && pelota.isSettled && (pelota.status === 'bloqueado' || pelota.status === 'afuera' || pelota.status === 'palo')) {
+    if (isGoalie && typeof pelota !== 'undefined' && pelota && pelota.isSettled && (pelota.status === 'bloqueado' || pelota.status === 'afuera' || pelota.status === 'palo')) {
       const danceOffset = Math.sin(Date.now() * 0.025) * 8.5;
       const hipRotation = Math.sin(Date.now() * 0.02) * 0.28;
       ctx.translate(danceOffset, Math.abs(Math.sin(Date.now() * 0.035)) * -4.5);
@@ -16860,14 +17061,16 @@ window.iniciarEstadioJuego = function() {
     }
     
     // Mirroring horizontal para perfil zurdo de El Mesías, Yamalísimo, Maradonuts, Hajalan y Lakaka
+    // También para los arqueros (excepto Dibu) para que miren hacia el pateador
     const isLeftFooted = !isGoalie && ['mesias', 'yamalisimo', 'maradonuts', 'hajalan', 'lakaka'].includes(player.id);
-    if (isLeftFooted) {
+    const shouldMirror = isLeftFooted || (isGoalie && player.id !== 'dibu');
+    if (shouldMirror) {
       ctx.scale(-1, 1);
     }
     
     // Animación de patada inclinando el cuerpo
-    if (isKicking) {
-      ctx.rotate(isGoalie ? 0.15 : -0.2);
+    if (isKicking && !isGoalie) {
+      ctx.rotate(-0.2);
     }
     
     // ── PEDESTAL DE COLECCIÓN (Se dibuja abajo del todo, antes que el muñeco) ──
@@ -17008,18 +17211,18 @@ window.iniciarEstadioJuego = function() {
       ctx.save();
       ctx.rotate(angleElbow);
 
-      // Brazo superior con forma cónica (más ancho en el hombro)
-      const armGrad = ctx.createLinearGradient(isLeft ? -3 : 3, 0, isLeft ? 1.5 : -1.5, 8);
+      // Brazo superior — más largo para el arquero (10px vs 7px normal)
+      const upperArmLen = isGoalie ? 10 : 7;
+      const armGrad = ctx.createLinearGradient(isLeft ? -3 : 3, 0, isLeft ? 1.5 : -1.5, upperArmLen);
       armGrad.addColorStop(0, player.jersey[0]);
       armGrad.addColorStop(1, player.jersey[0] + 'cc');
       ctx.fillStyle = armGrad;
       ctx.strokeStyle = 'rgba(0,0,0,0.35)';
       ctx.lineWidth = 0.8;
       ctx.beginPath();
-      // Forma cónica: más ancho arriba (hombro) que abajo (codo)
       ctx.moveTo(-3, 0);
-      ctx.lineTo(-2, 7);
-      ctx.lineTo(2, 7);
+      ctx.lineTo(-2, upperArmLen);
+      ctx.lineTo(2, upperArmLen);
       ctx.lineTo(3, 0);
       ctx.closePath();
       ctx.fill();
@@ -17028,14 +17231,14 @@ window.iniciarEstadioJuego = function() {
       // Codo articulado redondeado
       ctx.fillStyle = player.skin;
       ctx.beginPath();
-      ctx.arc(0, 7, 2.2, 0, Math.PI * 2);
+      ctx.arc(0, upperArmLen, 2.2, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = 'rgba(0,0,0,0.25)';
       ctx.lineWidth = 0.7;
       ctx.stroke();
 
       // Antebrazo con forma más natural
-      ctx.translate(0, 7);
+      ctx.translate(0, upperArmLen);
       ctx.rotate(angleHand);
 
       // Antebrazo cónico (estrecho en el codo, más grueso hacia la muñeca si es arquero)
@@ -17058,98 +17261,21 @@ window.iniciarEstadioJuego = function() {
       ctx.fill();
       ctx.stroke();
 
-      if (isGoalie) {
-        // Guante de arquero realista y detallado
-        ctx.translate(0, 6);
-        const gloveColor = player.id === 'dibu' ? '#ea580c' : (player.id === 'neube' ? '#16a34a' : '#2563eb');
-        const gloveHighlight = player.id === 'dibu' ? '#fb923c' : (player.id === 'neube' ? '#4ade80' : '#60a5fa');
-
-        // Muñequera/velcro del guante (más realista)
-        const velcroGrad = ctx.createLinearGradient(-4, -3, 4, 0);
-        velcroGrad.addColorStop(0, '#0f172a');
-        velcroGrad.addColorStop(0.5, '#1e293b');
-        velcroGrad.addColorStop(1, '#0f172a');
-        ctx.fillStyle = velcroGrad;
-        ctx.beginPath();
-        ctx.roundRect(-4, -3.5, 8, 3, 1.5);
-        ctx.fill();
-        // Cierre velcro
-        ctx.fillStyle = '#334155';
-        ctx.fillRect(-3, -3, 6, 1);
-        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-        ctx.lineWidth = 0.5;
-        for (let v = -2.5; v < 2.5; v += 1) {
-          ctx.beginPath();
-          ctx.moveTo(v, -3); ctx.lineTo(v, -2);
-          ctx.stroke();
-        }
-
-        // Cuerpo del guante con degradado 3D
-        const gloveGrad = ctx.createRadialGradient(isLeft ? -1 : 1, 0, 1, 0, 1.5, 5.5);
-        gloveGrad.addColorStop(0, gloveHighlight);
-        gloveGrad.addColorStop(0.5, gloveColor);
-        gloveGrad.addColorStop(1, gloveColor + '99');
-        ctx.fillStyle = gloveGrad;
-        ctx.strokeStyle = 'rgba(0,0,0,0.5)';
-        ctx.lineWidth = 0.9;
-        ctx.beginPath();
-        // Forma de guante más realista (no solo círculo)
-        ctx.moveTo(-4.5, 0);
-        ctx.bezierCurveTo(-5, 0.5, -5, 4, -3, 5.5);
-        ctx.bezierCurveTo(-1, 6.5, 1, 6.5, 3, 5.5);
-        ctx.bezierCurveTo(5, 4, 5, 0.5, 4.5, 0);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-
-        // Palma antideslizante con textura
-        ctx.fillStyle = 'rgba(255,255,255,0.85)';
-        ctx.beginPath();
-        ctx.ellipse(isLeft ? 0.5 : -0.5, 2.5, 2.8, 2.2, 0, 0, Math.PI * 2);
-        ctx.fill();
-        // Textura de agarre (líneas cruzadas)
-        ctx.strokeStyle = gloveColor + 'aa';
-        ctx.lineWidth = 0.5;
-        for (let g = -2; g <= 2; g++) {
-          ctx.beginPath();
-          ctx.moveTo(isLeft ? 0.5 + g * 0.7 : -0.5 + g * 0.7, 1);
-          ctx.lineTo(isLeft ? 0.5 + g * 0.7 : -0.5 + g * 0.7, 4);
-          ctx.stroke();
-        }
-
-        // Divisiones de dedos en la parte superior del guante
-        ctx.strokeStyle = 'rgba(0,0,0,0.4)';
-        ctx.lineWidth = 0.7;
-        for (let d = -1; d <= 1; d++) {
-          ctx.beginPath();
-          ctx.moveTo(d * 1.4, 0);
-          ctx.quadraticCurveTo(d * 1.6, -1.5, d * 1.3, -2.5);
-          ctx.stroke();
-        }
-
-        // Brillo superior del guante
-        ctx.fillStyle = 'rgba(255,255,255,0.3)';
-        ctx.beginPath();
-        ctx.ellipse(isLeft ? -1.5 : 1.5, 0.5, 1.5, 0.8, isLeft ? -0.5 : 0.5, 0, Math.PI * 2);
-        ctx.fill();
-
-      } else {
-        // Mano normal mejorada con dedos
-        ctx.translate(0, 6);
-        ctx.fillStyle = player.skin;
-        ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-        ctx.lineWidth = 0.7;
-        ctx.beginPath();
-        ctx.ellipse(0, 1.5, 2.5, 2, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-        // Línea de nudillos
-        ctx.strokeStyle = 'rgba(0,0,0,0.15)';
-        ctx.lineWidth = 0.5;
-        ctx.beginPath();
-        ctx.moveTo(-1.5, 1); ctx.lineTo(1.5, 1);
-        ctx.stroke();
-      }
+      // Mano / guante — mismo tamaño para los dos
+      ctx.translate(0, 6);
+      const gloveColor = player.id === 'dibu' ? '#ea580c' : (player.id === 'neube' ? '#16a34a' : '#2563eb');
+      ctx.fillStyle = isGoalie ? gloveColor : player.skin;
+      ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+      ctx.lineWidth = 0.7;
+      ctx.beginPath();
+      ctx.ellipse(0, 1.5, 2.5, 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(-1.5, 1); ctx.lineTo(1.5, 1);
+      ctx.stroke();
 
       ctx.restore();
       ctx.restore();
@@ -17164,23 +17290,22 @@ window.iniciarEstadioJuego = function() {
     const t_now = Date.now();
 
     if (isGoalie) {
-      // Arquero: pose dinámica reactiva (brazos extendidos, levemente arqueados, vibrando anticipación)
-      // Los guantes se mueven sutilmente para dar sensación de estar "listo"
-      const readyPulse = Math.sin(t_now * 0.018) * 0.07; // micro-movimiento de anticipación
-      const lateralDrift = Math.sin(t_now * 0.009) * 0.04;
-      // Brazos bien extendidos hacia los costados — ángulos grandes para apertura horizontal máxima
-      leftElbowAngle = -Math.PI * 0.75 + readyPulse + lateralDrift;
-      leftHandAngle = Math.PI * 0.05 - readyPulse * 0.5;
-      rightElbowAngle = Math.PI * 0.75 - readyPulse + lateralDrift;
-      rightHandAngle = -Math.PI * 0.05 + readyPulse * 0.5;
+      // Arquero: brazos completamente extendidos hacia los costados con oscilación suave
+      // Oscilación base: los brazos se balancean suavemente de arriba a abajo
+      const armSwing = Math.sin(t_now * 0.018) * 0.18;
+      leftElbowAngle  =  Math.PI * 0.5 - armSwing;
+      leftHandAngle   =  armSwing * 0.4;
+      rightElbowAngle = -Math.PI * 0.5 + armSwing;
+      rightHandAngle  = -armSwing * 0.4;
 
       // Si está en pose de baile (tapada celebrada), brazos más expresivos
-      if (pelota && pelota.isSettled && (pelota.status === 'bloqueado' || pelota.status === 'afuera')) {
+      const _p = (typeof pelota !== 'undefined') ? pelota : null;
+      if (_p && _p.isSettled && (_p.status === 'bloqueado' || _p.status === 'afuera')) {
         const dance = Math.sin(t_now * 0.025) * 0.25;
-        leftElbowAngle = -Math.PI * 0.65 + dance;
-        leftHandAngle = -Math.PI * 0.3 + dance * 0.5;
-        rightElbowAngle = Math.PI * 0.38 - dance;
-        rightHandAngle = Math.PI * 0.1;
+        leftElbowAngle  = -Math.PI * 0.65 + dance;
+        leftHandAngle   = -Math.PI * 0.4 + dance * 0.5;
+        rightElbowAngle =  Math.PI * 0.38 - dance;
+        rightHandAngle  =  Math.PI * 0.15;
       }
     } else if (isJoyful) {
       // Celebración: Brazos arriba en V agitándose
@@ -17531,11 +17656,18 @@ window.iniciarEstadioJuego = function() {
       }
     } else if (player.hairType === 'calva-flequillo') {
       ctx.fillStyle = player.hair;
+      // Flequillo triangular icónico del Fenómeno — arranca desde la línea del cabello (y=-13)
       ctx.beginPath();
-      ctx.moveTo(-5, -11);
-      ctx.lineTo(5, -11);
-      ctx.lineTo(0, -17);
+      ctx.moveTo(-6, -13);
+      ctx.bezierCurveTo(-6, -18, -2, -22, 0, -22);
+      ctx.bezierCurveTo(2, -22, 6, -18, 6, -13);
+      ctx.bezierCurveTo(3, -15, -3, -15, -6, -13);
       ctx.closePath();
+      ctx.fill();
+      // Brillo suave
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.beginPath();
+      ctx.ellipse(0, -18, 2.5, 1.8, 0, 0, Math.PI * 2);
       ctx.fill();
     } else if (player.hairType === 'beckham-mohawk') {
       ctx.fillStyle = player.hair;
@@ -17615,64 +17747,80 @@ window.iniciarEstadioJuego = function() {
       ctx.arc(0, -6, 13.6, Math.PI * 1.05, Math.PI * 1.95);
       ctx.stroke();
     } else if (player.hairType === 'corto-oscuro') {
-      // Pelo corto oscuro (estilo Curpua, Malisson): casquete bajo y prolijo
-      ctx.fillStyle = player.hair;
       ctx.beginPath();
-      ctx.arc(0, -7, 12.5, Math.PI, 0);
-      ctx.lineTo(13, -2);
-      ctx.lineTo(-13, -2);
+      ctx.arc(0, -6, 12.5, Math.PI, 0);
+      ctx.lineTo(13.5, -9);
+      ctx.lineTo(6, -22);
+      ctx.lineTo(-6, -20);
+      ctx.lineTo(-13.5, -9);
       ctx.closePath();
-      ctx.fill();
-      // Entradas naturales en la frente
-      ctx.fillStyle = player.skin;
-      ctx.beginPath();
-      ctx.arc(-10, -7, 4, Math.PI * 0.9, Math.PI * 1.3);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(10, -7, 4, Math.PI * 1.7, Math.PI * 2.1);
       ctx.fill();
     } else if (player.hairType === 'rubio-corto') {
-      // Pelo rubio corto (Neube): casquete bajo con textura
-      ctx.fillStyle = player.hair;
       ctx.beginPath();
-      ctx.arc(0, -7, 12.5, Math.PI, 0);
-      ctx.lineTo(13, -2);
-      ctx.lineTo(-13, -2);
+      ctx.arc(0, -6, 12.5, Math.PI, 0);
+      ctx.lineTo(13.5, -9);
+      ctx.lineTo(6, -22);
+      ctx.lineTo(-6, -20);
+      ctx.lineTo(-13.5, -9);
       ctx.closePath();
       ctx.fill();
-      // Highlights rubios
-      ctx.strokeStyle = 'rgba(255,255,200,0.4)';
-      ctx.lineWidth = 1.5;
+      // Brillo dorado en coronilla
+      ctx.fillStyle = 'rgba(255,255,200,0.3)';
       ctx.beginPath();
-      ctx.arc(0, -10, 10, Math.PI * 1.1, Math.PI * 1.9);
-      ctx.stroke();
+      ctx.ellipse(0, -17, 4, 2.5, 0, 0, Math.PI * 2);
+      ctx.fill();
     } else if (player.hairType === 'corto-despeinado') {
       // Pelo corto despeinado (Lucho): mechones cortos en varias direcciones
+      ctx.save();
       ctx.fillStyle = player.hair;
+      // Base
       ctx.beginPath();
-      ctx.arc(0, -7, 12, Math.PI, 0);
-      ctx.lineTo(13, -2);
-      ctx.lineTo(-13, -2);
+      ctx.arc(0, -8, 12.5, Math.PI, 0);
+      ctx.lineTo(13, -3);
+      ctx.bezierCurveTo(8, -5, -8, -5, -13, -3);
       ctx.closePath();
       ctx.fill();
-      // Mechones despeinados
-      const mechones = [[-8,-14,3],[0,-17,3],[8,-14,3],[-4,-15,2.5],[4,-15,2.5]];
-      mechones.forEach(([mx, my, mr]) => {
+      // Mechones despeinados en distintas direcciones
+      const mechones = [
+        [-9,-14,3.5,-0.2], [0,-17,3.5,0], [9,-14,3.5,0.2],
+        [-5,-16,2.8,-0.1], [5,-16,2.8,0.1], [-2,-15,2.5,0.05]
+      ];
+      mechones.forEach(([mx, my, mr, rot]) => {
+        ctx.save();
+        ctx.translate(mx, my);
+        ctx.rotate(rot);
         ctx.beginPath();
-        ctx.arc(mx, my, mr, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.ellipse(0, 0, mr, mr * 0.75, 0, 0, Math.PI * 2);
+        ctx.fillStyle = player.hair; ctx.fill();
+        ctx.restore();
       });
+      // Brillo caótico
+      ctx.fillStyle = 'rgba(255,255,255,0.14)';
+      ctx.beginPath(); ctx.arc(-2, -14, 2, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
     } else if (player.hairType === 'rapado-oscuro') {
-      // Pelo rapado muy corto (Lakaka): sombra suave en la coronilla
+      // Pelo rapado muy corto (Lakaka): sombra suave y textura de rapado
+      ctx.save();
       ctx.fillStyle = player.hair;
-      ctx.globalAlpha = 0.55;
+      ctx.globalAlpha = 0.6;
       ctx.beginPath();
-      ctx.arc(0, -6, 13, Math.PI, 0);
-      ctx.lineTo(13, -1);
-      ctx.lineTo(-13, -1);
+      ctx.arc(0, -7, 13.5, Math.PI, 0);
+      ctx.lineTo(13.5, -2);
+      ctx.lineTo(-13.5, -2);
       ctx.closePath();
       ctx.fill();
       ctx.globalAlpha = 1.0;
+      // Textura de rapado (puntos/líneas muy cortas)
+      ctx.strokeStyle = player.hair;
+      ctx.lineWidth = 0.8;
+      ctx.globalAlpha = 0.5;
+      for (let a = 1.05; a < 1.95; a += 0.1) {
+        const bx = Math.cos(a * Math.PI) * 13;
+        const by = Math.sin(a * Math.PI) * 13 - 1;
+        ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx * 0.86, by * 0.9 + 0.5); ctx.stroke();
+      }
+      ctx.globalAlpha = 1.0;
+      ctx.restore();
     }
 
     // 5. OJOS TÁCTICOS Y CEJAS FOCALIZADAS
@@ -17729,7 +17877,7 @@ window.iniciarEstadioJuego = function() {
       ctx.fill();
       
       // Pupilas mirando a la pelota
-      ctx.fillStyle = '#000000';
+      ctx.fillStyle = player.eyeColor || '#000000';
       ctx.beginPath();
       ctx.arc(isGoalie ? -5 : -3.5, -2, 1.5, 0, Math.PI * 2);
       ctx.arc(isGoalie ? 5 : 6.5, -2, 1.5, 0, Math.PI * 2);
