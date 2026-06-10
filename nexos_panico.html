@@ -7476,17 +7476,25 @@ async function verificarTokenValidadoServidor() {
         useAbort = false;
       }
       
+      const params = new URLSearchParams({
+        accion: 'registrar_oleaje',
+        loteReportante: payload.loteReportante,
+        infractor: payload.infractor,
+        tipoEmbarcacion: payload.tipoEmbarcacion,
+        gravedad: payload.gravedad,
+        canal: payload.canal,
+        comentarios: payload.comentarios,
+        t: Date.now()
+      });
+      
       const fetchOptions = {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        method: 'GET'
       };
       if (useAbort && controller) {
         fetchOptions.signal = controller.signal;
       }
       
-      fetch(url, fetchOptions)
+      fetch(url + '?' + params.toString(), fetchOptions)
       .then(() => {
         if (timeoutId) clearTimeout(timeoutId);
         showToast('🌊 REPORTE ENVIADO A LA GUARDIA OK');
