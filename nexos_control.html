@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -43,10 +43,10 @@
       padding: 0;
     }
     :root {
-      --bg: #070709;
-      --bg-gradient: radial-gradient(circle at center, #1e1e24 0%, #070709 100%);
-      --bg2: rgba(20, 20, 25, 0.65);
-      --bg3: rgba(30, 30, 38, 0.5);
+      --bg: #03080f;
+      --bg-gradient: radial-gradient(circle at center, #0a1829 0%, #03080f 100%);
+      --bg2: rgba(10, 24, 41, 0.65);
+      --bg3: rgba(15, 35, 60, 0.5);
       --border: rgba(255, 255, 255, 0.08);
       --text: #f4f4f5;
       --text-muted: #a1a1aa;
@@ -553,51 +553,137 @@
 
     /* ── SEARCH & PRIMARY ACTIONS ── */
     .search-box {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 16px;
+      background: linear-gradient(160deg, rgba(6,182,212,0.05), rgba(14,26,43,0.95));
+      border: 1.5px solid rgba(6,182,212,0.2);
+      border-radius: 22px;
+      padding: 14px 14px 16px;
       margin-bottom: 12px;
-      backdrop-filter: blur(10px);
-      box-shadow: var(--glass-shadow);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(6,182,212,0.08);
+    }
+    /* Etiqueta náutica sobre el input */
+    .search-label {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 2.5px;
+      color: rgba(6,182,212,0.5);
+      text-transform: uppercase;
+      margin-bottom: 7px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .search-input {
       width: 100%;
-      background: rgba(9, 9, 11, 0.6);
-      border: 2px solid var(--border);
+      background: rgba(4,12,22,0.75);
+      border: 1.5px solid rgba(6,182,212,0.25);
       border-radius: 14px;
-      padding: 16px;
-      color: white;
-      font-size: 24px;
+      padding: 14px 16px;
+      color: #06b6d4;
+      font-size: 22px;
       font-weight: 800;
-      margin-bottom: 14px;
+      margin-bottom: 0;
       outline: none;
       text-align: center;
       transition: all 0.25s;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.5), 0 0 0 0 rgba(6,182,212,0);
+      letter-spacing: 3px;
+      font-family: 'Courier New', monospace;
     }
-    .search-input:focus { border-color: var(--cyan); box-shadow: 0 0 12px rgba(6,182,212,0.25), inset 0 2px 4px rgba(0,0,0,0.5); }
-    
-    .action-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .search-input::placeholder { color: rgba(6,182,212,0.25); font-size:16px; letter-spacing:2px; }
+    .search-input:focus {
+      border-color: #06b6d4;
+      color: #fff;
+      box-shadow: 0 0 16px rgba(6,182,212,0.2), inset 0 2px 6px rgba(0,0,0,0.5);
+    }
+    /* Separador con olas */
+    .search-divider {
+      display: flex; align-items: center; gap: 8px;
+      margin: 12px 0 10px;
+    }
+    .search-divider::before, .search-divider::after {
+      content: ''; flex:1; height:1px; background:linear-gradient(90deg, transparent, rgba(6,182,212,0.2), transparent);
+    }
+    .search-divider span { font-size:10px; color:rgba(6,182,212,0.3); letter-spacing:2px; white-space:nowrap; }
+
+    .action-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .btn-main {
-      border-radius: 18px;
-      padding: 18px 10px;
+      border-radius: 16px;
+      padding: 15px 10px;
       font-weight: 900;
-      font-size: 15px;
-      border: 1px solid transparent;
+      font-size: 13px;
+      border: 1.5px solid transparent;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       cursor: pointer;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       touch-action: manipulation;
+      letter-spacing: 0.5px;
     }
+    .btn-main .btn-icon { font-size: 20px; line-height: 1; }
     .btn-main:active { transform: scale(0.95); }
-    .ingreso { background: rgba(16, 185, 129, 0.1); border-color: rgba(16,185,129,0.3); color: var(--green); }
-    .ingreso:active { background: rgba(16, 185, 129, 0.2); }
-    .salida { background: rgba(239, 68, 68, 0.1); border-color: rgba(239,68,68,0.3); color: var(--red); }
-    .salida:active { background: rgba(239, 68, 68, 0.2); }
+    .ingreso {
+      background: linear-gradient(145deg, rgba(16,185,129,0.12), rgba(5,150,105,0.06));
+      border-color: rgba(16,185,129,0.35);
+      color: #10b981;
+      box-shadow: 0 4px 16px rgba(16,185,129,0.08), inset 0 1px 0 rgba(16,185,129,0.1);
+    }
+    .ingreso:active { background: rgba(16,185,129,0.22); box-shadow: 0 0 20px rgba(16,185,129,0.2); }
+    .salida {
+      background: linear-gradient(145deg, rgba(239,68,68,0.12), rgba(185,28,28,0.06));
+      border-color: rgba(239,68,68,0.35);
+      color: #ef4444;
+      box-shadow: 0 4px 16px rgba(239,68,68,0.08), inset 0 1px 0 rgba(239,68,68,0.1);
+    }
+    .salida:active { background: rgba(239,68,68,0.22); box-shadow: 0 0 20px rgba(239,68,68,0.2); }
+    /* Botón TOKEN náutico */
+    .btn-token-nautico {
+      grid-column: 1 / -1;
+      border-radius: 16px;
+      padding: 13px 10px;
+      font-weight: 900;
+      font-size: 13px;
+      border: 1.5px solid rgba(6,182,212,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+      touch-action: manipulation;
+      background: linear-gradient(135deg, rgba(6,182,212,0.1), rgba(14,165,233,0.06));
+      color: #06b6d4;
+      box-shadow: 0 0 20px rgba(6,182,212,0.06), inset 0 1px 0 rgba(6,182,212,0.1);
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-token-nautico:active { transform: scale(0.97); background: rgba(6,182,212,0.18); }
+    .btn-token-nautico .token-pulse {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #06b6d4;
+      box-shadow: 0 0 0 0 rgba(6,182,212,0.5);
+      animation: tokenDotPulse 2s infinite;
+    }
+    @keyframes tokenDotPulse {
+      0%   { box-shadow: 0 0 0 0 rgba(6,182,212,0.5); }
+      70%  { box-shadow: 0 0 0 6px rgba(6,182,212,0); }
+      100% { box-shadow: 0 0 0 0 rgba(6,182,212,0); }
+    }
+    #tokens-activos-count {
+      background: rgba(6,182,212,0.2);
+      border: 1px solid rgba(6,182,212,0.4);
+      border-radius: 20px;
+      padding: 1px 8px;
+      font-size: 11px;
+      font-weight: 900;
+      color: #06b6d4;
+      display: none;
+    }
 
     /* ── FLOATING GLASS NAVIGATION BAR ── */
     .bottom-nav {
@@ -767,7 +853,7 @@
     .panel.active { display: block; }
     .section { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 16px; margin-bottom: 12px; backdrop-filter: blur(10px); }
     
-    input.giant {
+    input.giant, select.giant {
       width: 100%;
       padding: 14px;
       margin-bottom: 10px;
@@ -781,7 +867,7 @@
       outline: none;
       transition: border-color 0.2s;
     }
-    input.giant:focus { border-color: var(--cyan); }
+    input.giant:focus, select.giant:focus { border-color: var(--cyan); }
     
     .btn-save {
       width: 100%;
@@ -845,6 +931,43 @@
       animation: titilarCd 1s ease-in-out infinite alternate;
     }
     @keyframes titilarCd { from { opacity: 1; } to { opacity: 0.5; } }
+
+    /* ── INTERACTIVE DOCK MAP SYSTEM ── */
+    .map-dock {
+      flex: 1;
+      text-align: center;
+      padding: 10px 0;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 11px;
+      font-weight: 800;
+      font-family: monospace;
+      color: #555;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-sizing: border-box;
+    }
+    .map-dock.ocupado-visita {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: #10b981;
+      color: #10b981;
+    }
+    .map-dock.ocupado-servicio {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: #f59e0b;
+      color: #f59e0b;
+    }
+    .map-dock.ocupado-alerta {
+      background: rgba(239, 68, 68, 0.25);
+      border-color: #ef4444;
+      color: #ef4444;
+      animation: blink-dock 1s infinite alternate;
+    }
+    @keyframes blink-dock {
+      from { box-shadow: 0 0 2px rgba(239,68,68,0.2); }
+      to { box-shadow: 0 0 10px rgba(239,68,68,0.6); }
+    }
 
     /* ── INTER-GUARD CHAT SYSTEM ── */
     .chat-backdrop { display: none; position: fixed; inset: 0; z-index: 9400; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
@@ -1979,7 +2102,8 @@
       <div id="tab-matricula" style="font-size:16px; font-weight:900; font-family:monospace; letter-spacing:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
       <div id="tab-detalle" style="font-size:11px; color:#aaa; margin-top:1px;"></div>
     </div>
-    <button onclick="abrirValidarTokenDesdeAlerta()" style="background:rgba(6,182,212,0.2); border:1.5px solid #06b6d4; border-radius:10px; color:#06b6d4; font-size:12px; font-weight:900; padding:8px 12px; cursor:pointer; white-space:nowrap;">VER →</button>
+    <button onclick="confirmarIngresoDirecto()" style="background:rgba(16,185,129,0.25); border:1.5px solid #10b981; border-radius:10px; color:#10b981; font-size:12px; font-weight:900; padding:8px 12px; cursor:pointer; white-space:nowrap;">OK ✅</button>
+    <button onclick="abrirValidarTokenDesdeAlerta()" style="background:rgba(6,182,212,0.2); border:1.5px solid #06b6d4; border-radius:10px; color:#06b6d4; font-size:12px; font-weight:900; padding:8px 12px; cursor:pointer; white-space:nowrap; margin-left:4px;">VER →</button>
     <button onclick="cerrarTokenBanner()" style="background:transparent; border:none; color:#555; font-size:18px; cursor:pointer; padding:4px 6px;">✕</button>
   </div>
 </div>
@@ -2094,6 +2218,38 @@ function confirmarIngresoToken() {
   setTimeout(() => cerrarValidarToken(), 1800);
 }
 
+function confirmarIngresoDirecto() {
+  if (!_tokenPendienteData) return;
+  const d = _tokenPendienteData;
+
+  const item = {
+    id:   Date.now(),
+    pat:  d.matricula || 'S/M',
+    dni:  '',
+    mza:  d.mza  || '',
+    casa: d.lote  || d.casa || '',
+    tipo: 'TOKEN_NAUTICO',
+    hE:   horaActual(),
+    hS:   '',
+    tsE:  Date.now(),
+    vig:  sessionStorage.getItem('nx_vigilador') || '',
+    muelle: d.muelle || '',
+    nombre: d.nombre || '',
+    token:  d.token  || ''
+  };
+
+  if (typeof DB !== 'undefined') {
+    DB.push(item);
+    if (typeof lsSet === 'function') lsSet('nx_db', JSON.stringify(DB));
+    if (typeof render === 'function') render();
+    if (typeof enviar === 'function') enviar(item);
+  }
+
+  showToast('⚓ INGRESO NÁUTICO: ' + (d.matricula || d.token) + ' — OK');
+  _tokenPendienteData = null;
+  cerrarTokenBanner();
+}
+
 // ── POLLING + BANNER DE ALERTA ──────────────────────────────
 async function cargarTokensRecientes() {
   const url = localStorage.getItem('nx_url');
@@ -2119,6 +2275,20 @@ async function cargarTokensRecientes() {
     });
 
     if (badge) badge.innerText = activos.length ? activos.length + ' activo(s)' : '';
+
+    // Actualizar badge del botón principal en el search-box
+    const countEl = document.getElementById('tokens-activos-count');
+    const pulseEl = document.getElementById('token-pulse-dot');
+    if (countEl) {
+      if (activos.length > 0) {
+        countEl.innerText = activos.length;
+        countEl.style.display = 'inline';
+        if (pulseEl) pulseEl.style.display = 'block';
+      } else {
+        countEl.style.display = 'none';
+        if (pulseEl) pulseEl.style.display = 'none';
+      }
+    }
 
     if (!cont) return;
     if (!activos.length) {
@@ -2268,10 +2438,80 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="modal-overlay" id="modal-vehiculos"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-vehiculos')">✕</button><div class="modal-title">⚓ EMBARCACIONES EN EL BARRIO</div><div id="vehiculos-contenido"></div></div></div>
 <div class="modal-overlay" id="modal-busqueda"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-busqueda')">✕</button><div class="modal-title">📋 HISTORIAL DEL DÍA</div><input class="modal-search" id="busqueda-input" placeholder="Filtrar por matrícula o DNI..." oninput="this.value=this.value.toUpperCase();filtrarHistorialDia()"><div id="busqueda-status" style="font-size:11px;color:#888;text-align:center;margin-bottom:8px;min-height:14px;"></div><div id="busqueda-resultados"></div></div></div>
 <div class="modal-overlay" id="modal-alertas"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-alertas')">✕</button><div class="modal-title">🚨 ALERTAS DE HOY</div><div id="alertas-contenido"></div></div></div>
-<div class="modal-overlay" id="modal-turno"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-turno')">✕</button><div class="modal-title">🔐 CIERRE DE TURNO</div><div id="turno-resumen"></div><button class="btn-modal-action btn-gold no-print" style="margin-top:12px;" onclick="imprimirTurno()">🖨 IMPRIMIR / GUARDAR PDF</button><div class="pdf-report" id="pdf-report"></div></div></div>
-<div class="modal-overlay" id="modal-delivery-activos"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-delivery-activos')">✕</button><div class="modal-title">🛵 DELIVERY ACTIVOS</div><div id="delivery-activos-contenido"></div></div></div>
+<!-- MODAL MAPA DE AMARRES -->
+<div class="modal-overlay" id="modal-mapa-amarres" onclick="cerrarModal('modal-mapa-amarres')">
+  <div class="modal-box" style="max-width: 600px; background: #03080f; border-color: var(--cyan);" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="cerrarModal('modal-mapa-amarres')">✕</button>
+    <div class="modal-title">🗺️ CANALES Y DÁRSENAS ACTIVAS</div>
+    
+    <div style="background: rgba(10,24,41,0.6); border: 1.5px solid rgba(6,182,212,0.15); border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 15px; overflow-x: auto;">
+      <div style="font-size: 11px; color: #888; margin-bottom: 12px; letter-spacing: 1px;">SECTOR NORTE - BAHÍA PRINCIPAL</div>
+      
+      <div style="display: flex; flex-direction: column; gap: 15px; min-width: 450px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="font-size: 11px; font-weight: 800; color: var(--cyan); width: 70px; text-align: left;">CANAL A</div>
+          <div style="display: flex; gap: 6px; flex: 1;">
+            <div class="map-dock" data-dock="A-1">A-1</div>
+            <div class="map-dock" data-dock="A-2">A-2</div>
+            <div class="map-dock" data-dock="A-3">A-3</div>
+            <div class="map-dock" data-dock="A-4">A-4</div>
+            <div class="map-dock" data-dock="A-5">A-5</div>
+          </div>
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="font-size: 11px; font-weight: 800; color: var(--cyan); width: 70px; text-align: left;">CANAL B</div>
+          <div style="display: flex; gap: 6px; flex: 1;">
+            <div class="map-dock" data-dock="B-1">B-1</div>
+            <div class="map-dock" data-dock="B-2">B-2</div>
+            <div class="map-dock" data-dock="B-3">B-3</div>
+            <div class="map-dock" data-dock="B-4">B-4</div>
+            <div class="map-dock" data-dock="B-5">B-5</div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="font-size: 11px; font-weight: 800; color: var(--gold); width: 70px; text-align: left;">DÁRSENA D</div>
+          <div style="display: flex; gap: 6px; flex: 1;">
+            <div class="map-dock" data-dock="D-12">D-12</div>
+            <div class="map-dock" data-dock="D-13">D-13</div>
+            <div class="map-dock" data-dock="D-14">D-14</div>
+            <div class="map-dock" data-dock="D-15">D-15</div>
+            <div class="map-dock" data-dock="D-16">D-16</div>
+          </div>
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="font-size: 11px; font-weight: 800; color: var(--green); width: 70px; text-align: left;">MUELLE M</div>
+          <div style="display: flex; gap: 6px; flex: 1;">
+            <div class="map-dock" data-dock="M-1">M-1</div>
+            <div class="map-dock" data-dock="M-2">M-2</div>
+            <div class="map-dock" data-dock="M-3">M-3</div>
+            <div class="map-dock" data-dock="M-4">M-4</div>
+            <div class="map-dock" data-dock="M-5">M-5</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div style="display: flex; justify-content: space-around; font-size: 11px; color: #aaa; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 4px;"><span style="display: inline-block; width: 12px; height: 12px; border-radius: 4px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);"></span> Libre</div>
+      <div style="display: flex; align-items: center; gap: 4px;"><span style="display: inline-block; width: 12px; height: 12px; border-radius: 4px; background: rgba(16,185,129,0.15); border: 1px solid #10b981;"></span> Activo</div>
+      <div style="display: flex; align-items: center; gap: 4px;"><span style="display: inline-block; width: 12px; height: 12px; border-radius: 4px; background: rgba(245,158,11,0.20); border: 1px solid #f59e0b;"></span> Servicio</div>
+      <div style="display: flex; align-items: center; gap: 4px;"><span style="display: inline-block; width: 12px; height: 12px; border-radius: 4px; background: rgba(239,68,68,0.25); border: 1px solid #ef4444;"></span> +15min</div>
+    </div>
+    
+    <div id="mapa-dock-detalle" style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; font-size: 12px; color: #fff; text-align: center; min-height: 45px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.05);">
+      Tocá un muelle activo para ver la lancha / capitán asignado.
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-turno"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-turno')">✕</button><div class="modal-title">🔐 CIERRE DE TURNO</div><div id="turno-resumen"></div><button class="btn-modal-action btn-gold no-print" style="margin-top:12px;" onclick="imprimirTurno()">🖨 IMPRIMIR / GUARDAR PDF</button>
+      <button class="btn-modal-action btn-green no-print" style="margin-top:8px; background:#25d366; color:white; border:none; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="compartirTurnoWhatsApp()">💬 ENVIAR POR WHATSAPP</button><div class="pdf-report" id="pdf-report"></div></div></div>
+<div class="modal-overlay" id="modal-delivery-activos"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-delivery-activos')">✕</button><div class="modal-title">⛵ SERVICIOS ACTIVOS</div><div id="delivery-activos-contenido"></div></div></div>
 <div class="modal-overlay" id="modal-visitas-activas"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-visitas-activas')">✕</button><div class="modal-title">⛵ EMBARCACIONES ACTIVAS</div><div id="visitas-activas-contenido"></div></div></div>
-<div class="modal-overlay" id="modal-delivery-alertas"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-delivery-alertas')">✕</button><div class="modal-title">⚠ DELIVERY +15 MIN</div><div id="delivery-alertas-contenido"></div></div></div>
+<div class="modal-overlay" id="modal-delivery-alertas"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-delivery-alertas')">✕</button><div class="modal-title">⚠ SERVICIOS +15 MIN</div><div id="delivery-alertas-contenido"></div></div></div>
 <div class="modal-overlay" id="modal-sos"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-sos')">✕</button><div class="modal-title">🆘 DIRECTORIO SOS</div><div id="sos-contenido"></div></div></div>
 
 <!-- ══════════════════════════════════════════════════════════
@@ -2942,15 +3182,40 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 
   <div class="search-box">
-    <div style="display:flex; gap:10px; align-items:center; margin-bottom:14px; width:100%;">
-      <input class="search-input" id="buscador" placeholder="PATENTE O DNI..." oninput="autoformatearPatente(this)" inputmode="text" autocomplete="off" spellcheck="false" style="margin-bottom:0; flex:1;">
+    <!-- Etiqueta -->
+    <div class="search-label">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 17h18M3 17l3-8h12l3 8M12 9V5M9 5h6"/></svg>
+      REGISTRO DE EMBARCACIONES
+    </div>
+
+    <!-- Input + scanner -->
+    <div style="display:flex; gap:8px; align-items:center;">
+      <input class="search-input" id="buscador" placeholder="MATRÍCULA O DNI..." oninput="autoformatearPatente(this)" inputmode="text" autocomplete="off" spellcheck="false" style="flex:1;">
       <button class="search-scan-btn" onclick="abrirEscanerQRDirectoLPR()" title="Escanear Matrícula LPR">
-        📷
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="17" y="2" width="5" height="5" rx="1"/><rect x="2" y="17" width="5" height="5" rx="1"/><path d="M17 17h5v5"/><path d="M17 17v5"/><path d="M9 2v3M9 9v3M2 9h3M9 17v5M17 9h5M14 9h1"/></svg>
       </button>
     </div>
+
+    <!-- Divisor -->
+    <div class="search-divider"><span>⚓ ACCIÓN RÁPIDA</span></div>
+
+    <!-- Botones de acción -->
     <div class="action-btns">
-      <div class="btn-main ingreso" onclick="registrarRapido('ingreso')">📥 INGRESO</div>
-      <div class="btn-main salida" onclick="registrarRapido('salida')">📤 SALIDA</div>
+      <div class="btn-main ingreso" onclick="registrarRapido('ingreso')">
+        <span class="btn-icon">🟢</span>
+        INGRESO
+      </div>
+      <div class="btn-main salida" onclick="registrarRapido('salida')">
+        <span class="btn-icon">🔴</span>
+        SALIDA
+      </div>
+      <!-- Botón TOKEN ocupa fila completa -->
+      <div class="btn-token-nautico" onclick="cerrarMenu(); abrirValidarToken()">
+        <span style="font-size:18px;">⚓</span>
+        <span>VALIDAR TOKEN DE EMBARQUE</span>
+        <span id="tokens-activos-count">0</span>
+        <div class="token-pulse" id="token-pulse-dot" style="display:none;"></div>
+      </div>
     </div>
   </div>
 
@@ -2961,23 +3226,98 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="scroll-inner">
   <div id="p-lista" class="panel active">
     <div class="sync-status" id="sync-status"></div>
-    <button class="btn-sync" onclick="sincronizar(true)">🔄 SINCRONIZAR CON LA NUBE</button>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:12px; padding:0 15px;">
+      <button class="btn-sync" style="margin:0; width:100%;" onclick="sincronizar(true)">🔄 SINCRONIZAR</button>
+      <button class="btn-sync" style="margin:0; width:100%; background:linear-gradient(135deg, #0a2342, #0d5c75); border:1.5px solid var(--cyan); color:white;" onclick="abrirMapaAmarres()">🗺️ MAPA DE DÁRSENAS</button>
+    </div>
     <div class="section" id="cont-lista"></div>
   </div>
   <div id="p-manual" class="panel">
     <div class="section">
-      <div class="campo-label">MATRÍCULA / EMBARCACIÓN</div><input id="m-pat" class="giant" placeholder="MATRÍCULA" maxlength="10" oninput="autoformatearPatente(this)" autocomplete="off" spellcheck="false">
-      <div class="campo-label">DNI (opcional)</div><input id="m-dni" class="giant" placeholder="DNI" inputmode="numeric" maxlength="9">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><input id="m-mza" class="giant" placeholder="MZA" maxlength="4"><input id="m-casa" class="giant" placeholder="AMARRE" maxlength="4"></div>
+      <div class="campo-label">MATRÍCULA / EMBARCACIÓN *</div>
+      <input id="m-pat" class="giant" placeholder="MATRÍCULA (ej: RE-1234)" maxlength="10" oninput="autoformatearPatente(this)" autocomplete="off" spellcheck="false">
+      
+      <div class="campo-label">NOMBRE DE LA EMBARCACIÓN</div>
+      <input id="m-nombre-emb" class="giant" placeholder="Nombre (ej: GAVIOTA)" maxlength="30" autocomplete="off" spellcheck="false">
+      
+      <div class="campo-label">DNI DEL TIMONEL (opcional)</div>
+      <input id="m-dni" class="giant" placeholder="DNI" inputmode="numeric" maxlength="9">
+
+      <div class="campo-label">NOMBRE DEL TIMONEL / CAPITÁN</div>
+      <input id="m-timonel" class="giant" placeholder="Nombre del Timonel" maxlength="40" autocomplete="off" spellcheck="false">
+      
+      <div class="campo-label">TIPO DE EMBARCACIÓN</div>
+      <select id="m-tipo-emb" class="giant" style="cursor:pointer; text-align-last: center; -webkit-appearance: none; -moz-appearance: none; appearance: none;">
+        <option value="LANCHA">🚤 LANCHA</option>
+        <option value="VELERO">⛵ VELERO</option>
+        <option value="CRUCERO">🛥️ CRUCERO</option>
+        <option value="MOTO_AGUA">🌊 MOTO DE AGUA</option>
+        <option value="SEMIRRIGIDO">⚓ SEMIRRÍGIDO</option>
+        <option value="OTRO">🧭 OTRO / YATE</option>
+      </select>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div>
+          <div class="campo-label">MANZANA</div>
+          <input id="m-mza" class="giant" placeholder="MANZANA" maxlength="4">
+        </div>
+        <div>
+          <div class="campo-label">AMARRE</div>
+          <input id="m-casa" class="giant" placeholder="AMARRE" maxlength="4">
+        </div>
+      </div>
+      <div class="campo-label">FOTO DE REGISTRO (OPCIONAL)</div>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px; width:100%;">
+        <button class="btn-save" style="margin:0; flex:1; background:#1e293b; color:#cbd5e1; border:1px solid rgba(255,255,255,0.15);" onclick="document.getElementById('m-foto-input').click()">📷 TOMAR FOTO / SUBIR</button>
+        <input type="file" id="m-foto-input" accept="image/*" style="display:none;" onchange="manualSeleccionarFoto(this, 'm')">
+        <img id="m-foto-preview" style="display:none; width:54px; height:54px; border-radius:10px; object-fit:cover; border:1.5px solid var(--cyan); cursor:pointer;" onclick="manualQuitarFoto('m')">
+      </div>
+
       <button class="btn-save" onclick="guardarForm('manual')">⚓ REGISTRAR INGRESO</button>
     </div>
   </div>
   <div id="p-delivery" class="panel">
     <div class="section">
-      <div class="campo-label">MATRÍCULA / LANCHA SERVICIO</div><input id="d-pat" class="giant" placeholder="MATRÍCULA" maxlength="10" oninput="autoformatearPatente(this)" autocomplete="off" spellcheck="false">
-      <div class="campo-label">DNI (opcional)</div><input id="d-dni" class="giant" placeholder="DNI" inputmode="numeric" maxlength="9">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><input id="d-mza" class="giant" placeholder="MZA" maxlength="4"><input id="d-casa" class="giant" placeholder="AMARRE" maxlength="4"></div>
-      <button class="btn-save" style="background:var(--gold);color:black;" onclick="guardarForm('delivery')">⛵ SERVICIO</button>
+      <div class="campo-label">MATRÍCULA / LANCHA SERVICIO *</div>
+      <input id="d-pat" class="giant" placeholder="MATRÍCULA" maxlength="10" oninput="autoformatearPatente(this)" autocomplete="off" spellcheck="false">
+      
+      <div class="campo-label">EMPRESA / PRESTADOR</div>
+      <input id="d-empresa" class="giant" placeholder="Empresa (ej: Astillero Nordalta)" maxlength="40" autocomplete="off" spellcheck="false">
+      
+      <div class="campo-label">DNI DEL CONDUCTOR (opcional)</div>
+      <input id="d-dni" class="giant" placeholder="DNI" inputmode="numeric" maxlength="9">
+
+      <div class="campo-label">NOMBRE DEL CONDUCTOR / TIMONEL</div>
+      <input id="d-timonel" class="giant" placeholder="Nombre del Conductor" maxlength="40" autocomplete="off" spellcheck="false">
+      
+      <div class="campo-label">TIPO DE SERVICIO</div>
+      <select id="d-tipo-servicio" class="giant" style="cursor:pointer; text-align-last: center; -webkit-appearance: none; -moz-appearance: none; appearance: none;">
+        <option value="MANTENIMIENTO">🛠️ MANTENIMIENTO / AUXILIO</option>
+        <option value="CONSTRUCCION">🏗️ OBRA / CONSTRUCCIÓN</option>
+        <option value="JARDINERIA">🌿 JARDINERÍA / LIMPIEZA</option>
+        <option value="DELIVERY">🥡 DELIVERY COMIDA</option>
+        <option value="PREFECTURA">🛡️ PREFECTURA / SEGURIDAD</option>
+        <option value="OTRO">🧭 OTRO</option>
+      </select>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div>
+          <div class="campo-label">MANZANA</div>
+          <input id="d-mza" class="giant" placeholder="MANZANA" maxlength="4">
+        </div>
+        <div>
+          <div class="campo-label">MUELLE / DÁRSENA</div>
+          <input id="d-casa" class="giant" placeholder="MUELLE / DÁRSENA" maxlength="15">
+        </div>
+      </div>
+      <div class="campo-label">FOTO DE REGISTRO (OPCIONAL)</div>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px; width:100%;">
+        <button class="btn-save" style="margin:0; flex:1; background:#1e293b; color:#cbd5e1; border:1px solid rgba(255,255,255,0.15);" onclick="document.getElementById('d-foto-input').click()">📷 TOMAR FOTO / SUBIR</button>
+        <input type="file" id="d-foto-input" accept="image/*" style="display:none;" onchange="manualSeleccionarFoto(this, 'd')">
+        <img id="d-foto-preview" style="display:none; width:54px; height:54px; border-radius:10px; object-fit:cover; border:1.5px solid var(--cyan); cursor:pointer;" onclick="manualQuitarFoto('d')">
+      </div>
+
+      <button class="btn-save" style="background:var(--gold);color:black;" onclick="guardarForm('delivery')">⛵ REGISTRAR SERVICIO</button>
     </div>
   </div>
   <div id="p-config" class="panel">
@@ -3874,7 +4214,11 @@ function mostrarPanico(alertas){
     const info = obtenerInfoTipo(a.tipo);
     const badgeHtml = `<div class="panico-tipo-badge" style="display:inline-flex; align-items:center; gap:6px; background:${info.glow}; border:1px solid ${info.color}; color:${info.color}; font-size:11px; font-weight:800; padding:4px 10px; border-radius:20px; margin-bottom:10px; text-transform:uppercase;">${info.icono} ${info.texto}</div>`;
     
-    return`<div class="panico-item" style="border-left:5px solid ${info.color};">${badgeHtml}<div class="panico-hora">${escHtml(a.fecha||'')}</div><div class="panico-loc">🏠 Mza <strong>${escHtml(a.mza)}</strong> — Casa <strong>${escHtml(a.casa)}</strong></div>${mapsHtml}</div>`;
+    let extraInfo = '';
+    if (a.muelle) extraInfo += `<br>⚓ Muelle: <strong>${escHtml(a.muelle)}</strong>`;
+    if (a.matricula) extraInfo += `<br>⛵ Embarcación: <strong>${escHtml(a.matricula)}</strong>`;
+    
+    return`<div class="panico-item" style="border-left:5px solid ${info.color};">${badgeHtml}<div class="panico-hora">${escHtml(a.fecha||'')}</div><div class="panico-loc">🏠 Lote: <strong>${escHtml(a.mza)}</strong> — Propietario: <strong>${escHtml(a.casa)}</strong>${extraInfo}</div>${mapsHtml}</div>`;
   }).join('');
   
   if(alertas&&alertas.length>0){
@@ -3926,8 +4270,12 @@ function mostrarPanico(alertas){
     else if (tKey === 'incendio') tipoVoz = "emergencia de incendio";
     else if (tKey === 'otra') tipoVoz = "alerta de seguridad";
     
+    let extraVoz = "";
+    if (ultimo.muelle) extraVoz += `, en el muelle ${ultimo.muelle}`;
+    if (ultimo.matricula) extraVoz += `, lancha matrícula ${ultimo.matricula}`;
+    
     setTimeout(()=>{
-      emitirAlertaVoz(`¡Atención! ${tipoVoz} en manzana ${ultimo.mza}, casa ${ultimo.casa}. Repito, ${tipoVoz} en manzana ${ultimo.mza}, casa ${ultimo.casa}.`);
+      emitirAlertaVoz(`¡Atención! Alerta de ${tipoVoz} de la ${ultimo.casa} en el lote ${ultimo.mza}${extraVoz}. Repito, ${tipoVoz} de la ${ultimo.casa} en el lote ${ultimo.mza}${extraVoz}.`);
     },400);
   }
   
@@ -4944,64 +5292,25 @@ cerrarSesion = function() {
   _cerrarSesionOrig();
 };
 
-// ── AUTOFORMATEO DE PATENTE ────────────────────────────────
-// Formato viejo (pre-2016): ABC 123  → 3 letras + espacio + 3 dígitos
-// Formato nuevo (Mercosur): AB 123 CD → 2 letras + espacio + 3 dígitos + espacio + 2 letras
+// ── AUTOFORMATEO DE MATRÍCULA NÁUTICA ────────────────────────
+// Formato libre para lanchas/veleros (ej: RE-1234, REY-5678, A-1234, etc.)
+// Convierte a mayúsculas y permite sólo caracteres alfanuméricos, espacios y guiones
 function autoformatearPatente(input) {
-  const pos = input.selectionStart;        // guardar posición del cursor
+  const pos = input.selectionStart;
   const prevLen = input.value.length;
 
-  // Separar solo letras y números (sin espacios ni guiones)
-  const raw = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  // Limpiar caracteres permitiendo letras, números, espacios y guiones
+  const raw = input.value.toUpperCase().replace(/[^A-Z0-9\s-]/g, '');
+  input.value = raw;
 
-  let formatted = raw;
-  let tipo = null;
-
-  if (raw.length === 0) {
-    formatted = '';
-  } else {
-    // Detectar formato en base a los primeros caracteres ya ingresados:
-    // Si los 2 primeros son letras y el 3er carácter (si existe) también es letra → formato VIEJO (ABC...)
-    // Si los 2 primeros son letras y el 3er carácter (si existe) es número → formato NUEVO (AB...)
-    const startsWithTwoLetters = /^[A-Z]{2}/.test(raw);
-    const thirdIsLetter = raw.length >= 3 && /[A-Z]/.test(raw[2]);
-    const thirdIsDigit  = raw.length >= 3 && /[0-9]/.test(raw[2]);
-
-    if (startsWithTwoLetters && thirdIsLetter) {
-      // Formato VIEJO: ABC 123
-      tipo = 'viejo';
-      const letras  = raw.slice(0, 3);
-      const numeros = raw.slice(3, 6);
-      formatted = numeros.length > 0 ? letras + ' ' + numeros : letras;
-    } else if (startsWithTwoLetters && (thirdIsDigit || (!thirdIsLetter && raw.length >= 3))) {
-      // Formato NUEVO: AB 123 CD
-      tipo = 'nuevo';
-      const let1 = raw.slice(0, 2);
-      const nums = raw.slice(2, 5);
-      const let2 = raw.slice(5, 7);
-      if (nums.length > 0 && let2.length > 0) {
-        formatted = let1 + ' ' + nums + ' ' + let2;
-      } else if (nums.length > 0) {
-        formatted = let1 + ' ' + nums;
-      } else {
-        formatted = let1;
-      }
-    } else {
-      // Todavía no hay suficientes chars para determinar — mostrar raw sin espacios
-      formatted = raw.slice(0, 7);
-    }
-  }
-
-  input.value = formatted;
-
-  // Restaurar posición del cursor compensando caracteres agregados (espacios)
-  const diff = formatted.length - prevLen;
+  // Restaurar posición del cursor
+  const diff = raw.length - prevLen;
   const newPos = Math.max(0, pos + diff);
   try { input.setSelectionRange(newPos, newPos); } catch(e) {}
 
   // ── DETECTAR PROPIETARIO EN FORMULARIOS MANUALES ──
   if (input.id === 'm-pat' || input.id === 'd-pat') {
-    const prop = verificarPropietario(formatted);
+    const prop = verificarPropietario(raw);
     if (prop) {
       const pre = input.id === 'm-pat' ? 'm-' : 'd-';
       const mzaEl = document.getElementById(pre + 'mza');
@@ -5073,10 +5382,43 @@ function guardarForm(modo){
   _guardandoForm=true;setTimeout(()=>_guardandoForm=false,1500);
   const d=document.getElementById(pre+'dni').value.trim();
   verificarListaNegra(p,d);
-  const item={id:Date.now(),pat:p,dni:d,mza:document.getElementById(pre+'mza').value.trim(),casa:document.getElementById(pre+'casa').value.trim(),tipo:modo==='manual'?'MANUAL':'DELIVERY',hE:horaActual(),hS:'',tsE:Date.now(),vig:sessionStorage.getItem('nx_vigilador')||''};
+  
+  const item={
+    id:Date.now(),
+    pat:p,
+    dni:d,
+    mza:document.getElementById(pre+'mza').value.trim(),
+    casa:document.getElementById(pre+'casa').value.trim(),
+    tipo:modo==='manual'?'MANUAL':'DELIVERY',
+    hE:horaActual(),
+    hS:'',
+    tsE:Date.now(),
+    vig:sessionStorage.getItem('nx_vigilador')||'',
+    foto:_manualFotoData[modo==='manual'?'m':'d'] || null
+  };
+
+  if (modo === 'manual') {
+    item.nombre_emb = document.getElementById('m-nombre-emb').value.trim();
+    item.timonel = document.getElementById('m-timonel').value.trim();
+    item.tipo_emb = document.getElementById('m-tipo-emb').value;
+  } else {
+    item.timonel = document.getElementById('d-timonel').value.trim();
+    item.empresa = document.getElementById('d-empresa').value.trim();
+    item.tipo_servicio = document.getElementById('d-tipo-servicio').value;
+  }
+
   DB.push(item);lsSet('nx_db',JSON.stringify(DB));
-  ['pat','dni','mza','casa'].forEach(f=>{const el=document.getElementById(pre+f);if(el)el.value='';});
+
+  const campos = ['pat','dni','mza','casa'];
+  if (modo === 'manual') {
+    campos.push('nombre-emb', 'timonel');
+  } else {
+    campos.push('timonel', 'empresa');
+  }
+  campos.forEach(f=>{const el=document.getElementById(pre+f);if(el)el.value='';});
+
   showToast("✅ REGISTRADO");ver('lista');render();enviar(item);
+  manualQuitarFoto(modo==='manual'?'m':'d');
 }
 // ── CONFIRMACIÓN SALIDA ────────────────────────────────────
 let _salidaPendienteId=null, _salidaRapidaPendiente=false;
@@ -5232,7 +5574,10 @@ function render(){
         emitirAlertaVoz(`Aviso. Delivery demorado en manzana ${r.mza}, casa ${r.casa}.`);
       },200);
     }
-    return`<div class="reg-item ${cls}" data-id="${r.id}" style="${animStyle}"><div style="flex:1;min-width:0;">${lnBadge}<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;flex-wrap:wrap;"><span style="font-size:18px;line-height:1;">${tipoIcon}</span><strong style="font-size:15px;">${escHtml(r.pat)}</strong><span style="background:${timeBg};color:${timeColor};font-size:10px;font-weight:900;padding:2px 7px;border-radius:20px;margin-left:2px;">${timeTxt}${isA?' ⚠':''}</span>${countdownHtml}</div><small style="color:#666;">Mza: ${escHtml(r.mza||'-')} · Lote: ${escHtml(r.casa||'-')}${dniInfo}<br>${escHtml(r.tipo)} · ${hE}${vigInfo}</small></div><button onclick="darSalida(${r.id})" style="background:var(--red);color:white;border:none;padding:10px 15px;border-radius:10px;font-weight:800;cursor:pointer;flex-shrink:0;">SALIDA</button></div>`;
+    
+    const fotoThumbHtml = r.foto ? `<img src="${r.foto}" style="width:34px; height:34px; border-radius:8px; object-fit:cover; margin-right:8px; border:1px solid rgba(255,255,255,0.15); cursor:pointer;" onclick="verFotoFullscreenDirecta('${r.id}')">` : '';
+    
+    return`<div class="reg-item ${cls}" data-id="${r.id}" style="${animStyle}"><div style="display:flex;align-items:center;width:100%;"><div style="display:flex;align-items:center;flex:1;min-width:0;">${fotoThumbHtml}<div style="flex:1;min-width:0;">${lnBadge}<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;flex-wrap:wrap;"><span style="font-size:18px;line-height:1;">${tipoIcon}</span><strong style="font-size:15px;">${escHtml(r.pat)}</strong><span style="background:${timeBg};color:${timeColor};font-size:10px;font-weight:900;padding:2px 7px;border-radius:20px;margin-left:2px;">${timeTxt}${isA?' ⚠':''}</span>${countdownHtml}</div><small style="color:#666;">Mza: ${escHtml(r.mza||'-')} · Lote: ${escHtml(r.casa||'-')}${dniInfo}<br>${escHtml(r.tipo)} · ${hE}${vigInfo}</small></div></div><button onclick="darSalida(${r.id})" style="background:var(--red);color:white;border:none;padding:10px 15px;border-radius:10px;font-weight:800;cursor:pointer;flex-shrink:0;margin-left:8px;">SALIDA</button></div></div>`;
   }).join('')||'<p style="opacity:0.3;text-align:center;padding:20px;">SIN ACTIVIDAD</p>';
   cont.innerHTML=html;
   document.getElementById('mon-d').innerText=d;
@@ -5272,7 +5617,7 @@ function abrirResumen(){
   }
   const chartSvg=`<div style="margin-top:12px;margin-bottom:2px;"><div style="font-size:10px;color:#555;font-weight:700;letter-spacing:1px;margin-bottom:6px;">INGRESOS POR HORA</div><svg width="${totalW}" height="${chartH+14}" viewBox="0 0 ${totalW} ${chartH+14}" style="width:100%;max-width:${totalW}px;display:block;overflow:visible;">${bars}<text x="0" y="${chartH+13}" fill="#444" font-size="7">0h</text><text x="${6*(barW+gap)}" y="${chartH+13}" fill="#444" font-size="7">6h</text><text x="${12*(barW+gap)}" y="${chartH+13}" fill="#444" font-size="7">12h</text><text x="${18*(barW+gap)}" y="${chartH+13}" fill="#444" font-size="7">18h</text><text x="${23*(barW+gap)+2}" y="${chartH+13}" fill="#444" font-size="7">23h</text></svg></div>`;
   document.getElementById('resumen-contenido').innerHTML=
-    `<div class="modal-stat"><span class="modal-stat-label">🛵 Delivery activos</span><span class="modal-stat-val" style="color:var(--gold)">${del}</span></div>`+
+    `<div class="modal-stat"><span class="modal-stat-label">⛵ Servicios activos</span><span class="modal-stat-val" style="color:var(--gold)">${del}</span></div>`+
     `<div class="modal-stat"><span class="modal-stat-label">⛵ Embarcaciones activas</span><span class="modal-stat-val" style="color:var(--green)">${vis}</span></div>`+
     `<div class="modal-stat"><span class="modal-stat-label">⚠ Alertas +15min</span><span class="modal-stat-val" style="color:var(--red)">${ale}</span></div>`+
     `<div class="modal-stat"><span class="modal-stat-label">📤 Con salida</span><span class="modal-stat-val" style="color:#888">${sal}</span></div>`+
@@ -5350,9 +5695,9 @@ function abrirAlertas(){
 function abrirTurno(){const ahora=new Date(),hoyStr=ahora.toLocaleDateString('es-AR'),horaStr=ahora.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});const vigNombre=sessionStorage.getItem('nx_vigilador')||'—';let del=0,vis=0,sal=0,sinSal=[];const deDia=DB.filter(r=>new Date(r.tsE||0).toLocaleDateString('es-AR')===hoyStr);deDia.forEach(r=>{if(r.tipo==='DELIVERY')del++;else vis++;if(r.hS)sal++;else sinSal.push(r);});document.getElementById('turno-resumen').innerHTML=`<div class="modal-stat"><span class="modal-stat-label">👤 Vigilador</span><span style="font-weight:800;color:var(--purple)">${escHtml(vigNombre)}</span></div><div class="modal-stat"><span class="modal-stat-label">📅 Fecha</span><span style="font-weight:700;color:#fff">${hoyStr}</span></div><div class="modal-stat"><span class="modal-stat-label">🕐 Hora de cierre</span><span style="font-weight:700;color:#fff">${horaStr}</span></div>` +
     (()=>{const ini=localStorage.getItem('nx_turno_inicio');if(!ini)return'';const diff=Math.floor((Date.now()-new Date(ini).getTime())/60000);const h=Math.floor(diff/60),m=diff%60;const dur=h>0?`${h}h ${String(m).padStart(2,'0')}min`:`${m}min`;return`<div class="modal-stat"><span class="modal-stat-label">⏱ Duración del turno</span><span style="font-weight:800;color:var(--purple)">${dur}</span></div>`;})() + `<div class="modal-stat"><span class="modal-stat-label">📋 Total ingresos</span><span class="modal-stat-val" style="color:var(--cyan)">${deDia.length}</span></div><div class="modal-stat"><span class="modal-stat-label">📤 Con salida</span><span class="modal-stat-val" style="color:var(--green)">${sal}</span></div><div class="modal-stat"><span class="modal-stat-label">🚨 Sin salida</span><span class="modal-stat-val" style="color:${sinSal.length>0?'var(--red)':'#888'}">${sinSal.length}</span></div>${sinSal.map(r=>`<div class="modal-row" style="border-left:3px solid var(--red)"><strong>${escHtml(r.pat)}</strong> · Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')}</div>`).join('')}`;document.getElementById('pdf-report').innerHTML=`<h2>NEXOS — Cierre de Turno</h2><p>${hoyStr} | ${horaStr} | Vigilador: ${escHtml(vigNombre)}</p><table><tr><th>Matrícula</th><th>DNI</th><th>Destino</th><th>Tipo</th><th>Entrada</th><th>Salida</th></tr>${deDia.map(r=>`<tr><td>${escHtml(r.pat)}</td><td>${escHtml(r.dni||'-')}</td><td>Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')}</td><td>${escHtml(r.tipo)}</td><td>${escHtml(limpiarHora(r.hE))}</td><td style="color:${r.hS?'#27ae60':'#e74c3c'}">${r.hS?escHtml(limpiarHora(r.hS)):'SIN SALIDA'}</td></tr>`).join('')}</table>`;abrirModal('modal-turno');}
 function imprimirTurno(){document.getElementById('pdf-report').style.display='block';setTimeout(()=>{window.print();setTimeout(()=>{document.getElementById('pdf-report').style.display='none';localStorage.removeItem('nx_turno_inicio');localStorage.removeItem('nx_turno_vigilador');},1000);},100);}
-function abrirDeliveryActivos(){const ahora=Date.now();const activos=DB.filter(r=>r.tipo==='DELIVERY'&&!r.hS&&(ahora-(r.tsE||0)<=900000)).sort((a,b)=>(a.tsE||0)-(b.tsE||0));let html=activos.length?activos.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);return`<div class="modal-row" style="border-left:4px solid var(--gold)"><strong style="color:var(--gold);font-size:16px;">🛵 ${escHtml(r.pat)}</strong><span style="float:right;background:var(--gold);color:black;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">${mins} min</span><br><span style="font-size:12px;color:#aaa;">Mza ${escHtml(r.mza||'-')} — Casa ${escHtml(r.casa||'-')}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-delivery-activos');" style="margin-top:8px;background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;}).join(''):'<div class="empty-msg">Sin delivery activos 🟢</div>';document.getElementById('delivery-activos-contenido').innerHTML=html;abrirModal('modal-delivery-activos');}
-function abrirVisitasActivas(){const ahora=Date.now();const visitas=DB.filter(r=>r.tipo!=='DELIVERY'&&!r.hS).sort((a,b)=>(a.tsE||0)-(b.tsE||0));let html=visitas.length?visitas.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);return`<div class="modal-row" style="border-left:4px solid var(--green)"><strong style="color:var(--green);font-size:16px;">${getVehiculoIcon(r.pat, r.tipo)} ${escHtml(r.pat)}</strong><span style="float:right;background:var(--green);color:black;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">${mins} min</span><br><span style="font-size:12px;color:#aaa;">Mza ${escHtml(r.mza||'-')} — Casa ${escHtml(r.casa||'-')}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-visitas-activas');" style="margin-top:8px;background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;}).join(''):'<div class="empty-msg">Sin visitas activas 🟢</div>';document.getElementById('visitas-activas-contenido').innerHTML=html;abrirModal('modal-visitas-activas');}
-function abrirDeliveryAlertas(){const ahora=Date.now();const enAlerta=DB.filter(r=>r.tipo==='DELIVERY'&&!r.hS&&(ahora-(r.tsE||0)>900000)).sort((a,b)=>(a.tsE||0)-(b.tsE||0));let html=enAlerta.length?enAlerta.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);return`<div class="modal-row" style="border-left:4px solid var(--red);background:rgba(231,76,60,0.08)"><strong style="color:var(--red);font-size:16px;">🛵 ${escHtml(r.pat)}</strong><span style="float:right;background:var(--red);color:white;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">+${mins} min</span><br><span style="font-size:12px;color:#aaa;">Mza ${escHtml(r.mza||'-')} — Casa ${escHtml(r.casa||'-')}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-delivery-alertas');" style="margin-top:8px;background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;}).join(''):'<div class="empty-msg">Sin alertas 🟢</div>';document.getElementById('delivery-alertas-contenido').innerHTML=html;abrirModal('modal-delivery-alertas');}
+function abrirDeliveryActivos(){const ahora=Date.now();const activos=DB.filter(r=>r.tipo==='DELIVERY'&&!r.hS&&(ahora-(r.tsE||0)<=900000)).sort((a,b)=>(a.tsE||0)-(b.tsE||0));let html=activos.length?activos.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);return`<div class="modal-row" style="border-left:4px solid var(--gold)"><strong style="color:var(--gold);font-size:16px;">⛵ ${escHtml(r.pat)}</strong><span style="float:right;background:var(--gold);color:black;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">${mins} min</span><br><span style="font-size:12px;color:#aaa;">Manzana ${escHtml(r.mza||'-')} — Muelle/Dársena ${escHtml(r.casa||'-')}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-delivery-activos');" style="margin-top:8px;background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;}).join(''):'<div class="empty-msg">Sin servicios activos 🟢</div>';document.getElementById('delivery-activos-contenido').innerHTML=html;abrirModal('modal-delivery-activos');}
+function abrirVisitasActivas(){const ahora=Date.now();const visitas=DB.filter(r=>r.tipo!=='DELIVERY'&&!r.hS).sort((a,b)=>(a.tsE||0)-(b.tsE||0));let html=visitas.length?visitas.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);return`<div class="modal-row" style="border-left:4px solid var(--green)"><strong style="color:var(--green);font-size:16px;">${getVehiculoIcon(r.pat, r.tipo)} ${escHtml(r.pat)}</strong><span style="float:right;background:var(--green);color:black;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">${mins} min</span><br><span style="font-size:12px;color:#aaa;">Manzana ${escHtml(r.mza||'-')} — Muelle/Dársena ${escHtml(r.casa||'-')}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-visitas-activas');" style="margin-top:8px;background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;}).join(''):'<div class="empty-msg">Sin visitas activas 🟢</div>';document.getElementById('visitas-activas-contenido').innerHTML=html;abrirModal('modal-visitas-activas');}
+function abrirDeliveryAlertas(){const ahora=Date.now();const enAlerta=DB.filter(r=>r.tipo==='DELIVERY'&&!r.hS&&(ahora-(r.tsE||0)>900000)).sort((a,b)=>(a.tsE||0)-(b.tsE||0));let html=enAlerta.length?enAlerta.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);return`<div class="modal-row" style="border-left:4px solid var(--red);background:rgba(231,76,60,0.08)"><strong style="color:var(--red);font-size:16px;">⛵ ${escHtml(r.pat)}</strong><span style="float:right;background:var(--red);color:white;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">+${mins} min</span><br><span style="font-size:12px;color:#aaa;">Manzana ${escHtml(r.mza||'-')} — Muelle/Dársena ${escHtml(r.casa||'-')}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-delivery-alertas');" style="margin-top:8px;background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;}).join(''):'<div class="empty-msg">Sin alertas 🟢</div>';document.getElementById('delivery-alertas-contenido').innerHTML=html;abrirModal('modal-delivery-alertas');}
 const SOS_NUMEROS=[{icon:'🚔',nombre:'Policía',desc:'Emergencias policiales',num:'911'},{icon:'🔥',nombre:'Bomberos',desc:'Incendios y rescates',num:'100'},{icon:'🚑',nombre:'Emergencia Médica',desc:'SAME / Ambulancias',num:'107'},{icon:'🛡',nombre:'Defensa Civil',desc:'Inundaciones, desastres',num:'103'},{icon:'⚡',nombre:'Edesur / Edenor',desc:'Corte de luz',num:'0800-333-3787'},{icon:'💧',nombre:'AySA',desc:'Agua y cloacas',num:'0800-321-2482'},{icon:'🚨',nombre:'Violencia de Gén.',desc:'Línea gratuita 24h',num:'144'},{icon:'👶',nombre:'Niñez y Adolesc.',desc:'Vulneración de derechos',num:'102'}];
 function abrirSOS(){document.getElementById('sos-contenido').innerHTML='<div class="sos-header">Tocá el número para llamar</div>'+SOS_NUMEROS.map(s=>`<a class="sos-item" href="tel:${s.num}"><div class="sos-item-left"><span class="sos-item-icon">${s.icon}</span><div><div class="sos-item-nombre">${s.nombre}</div><div class="sos-item-desc">${s.desc}</div></div></div><span class="sos-item-num">${s.num}</span></a>`).join('');abrirModal('modal-sos');}
 
@@ -7398,11 +7743,11 @@ function renderDashboard() {
       </div>
       <div class="dash-kpi" style="border-color:rgba(245,200,66,0.4);">
         <span class="dash-kpi-val" style="color:var(--gold)">${delivery}</span>
-        <span class="dash-kpi-label">DELIVERY</span>
+        <span class="dash-kpi-label">SERVICIOS</span>
       </div>
       <div class="dash-kpi" style="border-color:${alertas > 0 ? 'rgba(231,76,60,0.5)' : 'var(--border)'};">
         <span class="dash-kpi-val" style="color:${alertas > 0 ? 'var(--red)' : '#888'}">${alertas}</span>
-        <span class="dash-kpi-label">ALERTAS +15MIN</span>
+        <span class="dash-kpi-label">ALERTA SERVICIOS</span>
       </div>
     </div>
     ${promMin > 0 ? `<div style="margin-top:12px;background:var(--bg3);border-radius:12px;padding:12px;text-align:center;"><span style="font-size:11px;color:#666;font-weight:700;">⏱ PERMANENCIA PROMEDIO</span><br><span style="font-size:22px;font-weight:900;color:var(--purple)">${promStr}</span></div>` : ''}
@@ -8068,9 +8413,12 @@ function pushTestLocal() {
 // Se llaman desde sincronizar() cuando llegan pánico/alertas
 function pushNotifPanico(alerta) {
   const info = obtenerInfoTipo(alerta.tipo);
+  let extraText = '';
+  if (alerta.muelle) extraText += ` — Muelle ${alerta.muelle}`;
+  if (alerta.matricula) extraText += ` — Lancha ${alerta.matricula}`;
   pushNotifLocal(
     `${info.icono} ${info.texto} — NEXOS`,
-    `Pánico: Mza ${alerta.mza} — Casa ${alerta.casa}`,
+    `Pánico: Lote ${alerta.mza} — Propietario ${alerta.casa}${extraText}`,
     'nexos-panico'
   );
 }
@@ -8340,6 +8688,172 @@ if (sessionStorage.getItem('nx_auth') === '1') {
  * ══════════════════════════════════════════════════════════════════
  */
 
+
+  // ── PREMIUM NAUTICAL ADDITIONS ──
+  let _manualFotoData = { m: null, d: null };
+
+  function manualSeleccionarFoto(input, pre) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 600;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        
+        _manualFotoData[pre] = canvas.toDataURL('image/jpeg', 0.75);
+        const prev = document.getElementById(pre + '-foto-preview');
+        prev.src = _manualFotoData[pre];
+        prev.style.display = 'block';
+        prev.title = 'Hacé clic para quitar la foto';
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function manualQuitarFoto(pre) {
+    _manualFotoData[pre] = null;
+    const prev = document.getElementById(pre + '-foto-preview');
+    if(prev) {
+      prev.style.display = 'none';
+      prev.src = '';
+    }
+    const inp = document.getElementById(pre + '-foto-input');
+    if(inp) inp.value = '';
+  }
+
+  function verFotoFullscreenDirecta(id) {
+    const item = DB.find(r => r.id == id);
+    if (!item || !item.foto) return;
+    document.getElementById('foto-overlay-img').src = item.foto;
+    document.getElementById('foto-overlay').classList.add('visible');
+  }
+
+  function compartirTurnoWhatsApp() {
+    const ahora = new Date();
+    const hoyStr = ahora.toLocaleDateString('es-AR');
+    const horaStr = ahora.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'});
+    const vigNombre = sessionStorage.getItem('nx_vigilador') || '—';
+    
+    let del = 0, vis = 0, sal = 0, sinSal = [];
+    const deDia = DB.filter(r => new Date(r.tsE||0).toLocaleDateString('es-AR') === hoyStr);
+    deDia.forEach(r => {
+      if (r.tipo === 'DELIVERY') del++;
+      else vis++;
+      if (r.hS) sal++;
+      else sinSal.push(r);
+    });
+    
+    let txt = `*NEXOS - Cierre de Turno*\n`;
+    txt += `📅 *Fecha:* ${hoyStr}\n`;
+    txt += `🕒 *Hora:* ${horaStr}\n`;
+    txt += `👮 *Vigilador:* ${vigNombre}\n`;
+    txt += `-----------------------------------\n`;
+    txt += `📊 *Total Ingresos:* ${deDia.length}\n`;
+    txt += `⛵ *Servicios:* ${del}\n`;
+    txt += `🛥️ *Visitas:* ${vis}\n`;
+    txt += `📤 *Con Salida:* ${sal}\n`;
+    txt += `🚨 *Sin Salida (Adentro):* ${sinSal.length}\n`;
+    
+    if (sinSal.length > 0) {
+      txt += `\n⚠️ *Embarcaciones Adentro:*\n`;
+      sinSal.forEach(r => {
+        txt += `• *${r.pat}* - Mza ${r.mza} Casa ${r.casa} (${r.tipo})\n`;
+      });
+    }
+    
+    const url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(txt);
+    window.open(url, '_blank');
+  }
+
+  let _mapaBarcoAsignado = {};
+
+  function abrirMapaAmarres() {
+    document.querySelectorAll('.map-dock').forEach(el => {
+      el.className = 'map-dock';
+      el.onclick = null;
+    });
+    
+    _mapaBarcoAsignado = {};
+    const ahora = Date.now();
+    const adentro = DB.filter(r => !r.hS);
+    
+    adentro.forEach(r => {
+      const d1 = String(r.casa || '').trim().toUpperCase();
+      const d2 = String(r.muelle || '').trim().toUpperCase();
+      
+      let dockEl = null;
+      let targetDock = '';
+      
+      document.querySelectorAll('.map-dock').forEach(el => {
+        const dockVal = el.dataset.dock;
+        if (dockVal === d1 || dockVal === d2 || ('L-' + dockVal) === d1 || ('Mza ' + dockVal) === d1) {
+          dockEl = el;
+          targetDock = dockVal;
+        }
+      });
+      
+      if (dockEl) {
+        const mins = Math.floor((ahora - (r.tsE || ahora)) / 60000);
+        const isAlerta = r.tipo === 'DELIVERY' && mins >= 15;
+        
+        if (isAlerta) {
+          dockEl.className = 'map-dock ocupado-alerta';
+        } else if (r.tipo === 'DELIVERY') {
+          dockEl.className = 'map-dock ocupado-servicio';
+        } else {
+          dockEl.className = 'map-dock ocupado-visita';
+        }
+        
+        _mapaBarcoAsignado[targetDock] = {
+          pat: r.pat,
+          tipo: r.tipo,
+          timonel: r.timonel || 'No especificado',
+          nombre_emb: r.nombre_emb || 'S/D',
+          tipo_emb: r.tipo_emb || 'Lancha',
+          entrada: r.hE,
+          tiempo: mins + ' min'
+        };
+        
+        dockEl.onclick = () => {
+          mostrarDetalleDock(targetDock);
+        };
+      }
+    });
+    
+    document.querySelectorAll('.map-dock').forEach(el => {
+      if (!el.onclick) {
+        el.onclick = () => {
+          document.getElementById('mapa-dock-detalle').innerHTML = `Muelle <strong>${el.dataset.dock}</strong> está libre.`;
+        };
+      }
+    });
+    
+    document.getElementById('mapa-dock-detalle').innerHTML = 'Tocá un muelle activo para ver la lancha / capitán asignado.';
+    abrirModal('modal-mapa-amarres');
+  }
+
+  function mostrarDetalleDock(dock) {
+    const b = _mapaBarcoAsignado[dock];
+    if (!b) return;
+    const icon = b.tipo === 'DELIVERY' ? '⛵' : '🛥️';
+    document.getElementById('mapa-dock-detalle').innerHTML = `
+      <div style="text-align:left; width:100%;">
+        ${icon} <strong>${b.pat}</strong> (${b.tipo_emb}) - Muelle: <strong>${dock}</strong><br>
+        Timonel: <strong>${escHtml(b.timonel)}</strong> ${b.nombre_emb !== 'S/D' ? `· Nombre: <strong>${escHtml(b.nombre_emb)}</strong>` : ''}<br>
+        Entrada: <strong>${b.entrada}</strong> · Permanencia: <strong style="color:var(--cyan);">${b.tiempo}</strong>
+      </div>
+    `;
+  }
 </script>
 </body>
 </html>

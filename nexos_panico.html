@@ -3934,6 +3934,17 @@
       <div style="font-size:11px; font-weight:800; letter-spacing:3px; color:#06b6d4; margin-top:4px;">DATOS DE EMBARQUE</div>
     </div>
 
+    <!-- Accesos Frecuentes -->
+    <div style="margin-bottom:12px;">
+      <div style="font-size:10px; font-weight:800; color:#555; letter-spacing:1.5px; margin-bottom:5px;">
+        ACCESOS FRECUENTES ⭐
+        <span onclick="guardarFrecuenteActual()" style="float:right; color:#06b6d4; cursor:pointer; font-size:10px; font-weight:800; letter-spacing:1px; margin-top:2px;">⭐ GUARDAR ACTUAL</span>
+      </div>
+      <div id="tk-frecuentes-lista" style="display:flex; gap:6px; overflow-x:auto; padding:4px 0; scrollbar-width:none; width: 100%;">
+        <!-- Se generará dinámicamente -->
+      </div>
+    </div>
+
     <!-- Matrícula -->
     <div style="margin-bottom:12px;">
       <div style="font-size:10px; font-weight:800; color:#555; letter-spacing:1.5px; margin-bottom:5px;">MATRÍCULA EMBARCACIÓN *</div>
@@ -4018,11 +4029,130 @@
 // ── TOKEN NÁUTICO COMPLETO ──────────────────────────────────
 let _tokenInterval = null;
 
+// Visitas Adentro
+async function syncMisVisitas() {
+  const url = localStorage.getItem('nx_url') || PANIC_URL;
+  const mza = localStorage.getItem('nx_manzana') || localStorage.getItem('nx_mza') || '0';
+  const casa = localStorage.getItem('nx_casa') || '0';
+  
+  if (!url || mza === '0' || casa === '0') return;
+  
+  const listEl = document.getElementById('visitas-adentro-lista');
+  if (!listEl) return;
+  
+  try {
+    const params = new URLSearchParams({
+      accion: 'get_mis_visitas',
+      mza: mza,
+      casa: casa,
+      t: Date.now()
+    });
+    const r = await fetch(url + '?' + params.toString());
+    if (r.ok) {
+      const d = await r.json();
+      if (d.ok && Array.isArray(d.visitas)) {
+        if (d.visitas.length === 0) {
+          listEl.innerHTML = `<div style="font-size:12px; color:#666; text-align:center; padding:10px 0;">No hay visitas o servicios activos en tu lote.</div>`;
+        } else {
+          listEl.innerHTML = d.visitas.map(v => {
+            const hE = v.hE || '--:--';
+            const icon = v.tipo === 'DELIVERY' ? '⛵' : '🛥️';
+            const label = v.tipo === 'DELIVERY' ? 'Servicio' : 'Visita';
+            const elapsedMins = Math.floor((Date.now() - (v.tsE || Date.now())) / 60000);
+            
+            let badgeStyle = `background:rgba(16,185,129,0.15); color:#10b981; border:1.5px solid rgba(16,185,129,0.3);`;
+            if (v.tipo === 'DELIVERY') {
+              if (elapsedMins >= 15) {
+                badgeStyle = `background:rgba(239,68,68,0.15); color:#ef4444; border:1.5px solid rgba(239,68,68,0.3); font-weight:800;`;
+              } else {
+                badgeStyle = `background:rgba(245,158,11,0.15); color:#f59e0b; border:1.5px solid rgba(245,158,11,0.3);`;
+              }
+            }
+            
+            return `
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px;">
+                <div>
+                  <div style="font-size:14px; font-weight:800; color:#fff; font-family:monospace; letter-spacing:1px;">${icon} ${v.pat}</div>
+                  <div style="font-size:11px; color:#888; margin-top:2px;">${label} • Entrada: ${hE}</div>
+                </div>
+                <div style="padding:4px 8px; border-radius:20px; font-size:11px; ${badgeStyle}">
+                  ${elapsedMins} min
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("Fallo al actualizar visitas en tiempo real:", e);
+  }
+}
+
+// Accesos Frecuentes
+function renderFrecuentes() {
+  const cont = document.getElementById('tk-frecuentes-lista');
+  if (!cont) return;
+  let list = [];
+  try {
+    list = JSON.parse(localStorage.getItem('nx_frecuentes') || '[]');
+  } catch(e) {}
+  
+  if (list.length === 0) {
+    list = [
+      { alias: '⛵ Jardinero', mat: 'REY-1234', nom: 'Marcos Pérez', mue: 'D-12', lot: 'A-5' },
+      { alias: '🛥️ Piletero', mat: 'P-9876', nom: 'Lucas Silva', mue: 'D-15', lot: 'A-5' },
+      { alias: '🚤 Familia', mat: 'REY-552', nom: 'Tomás Gómez', mue: 'M-4', lot: 'A-5' }
+    ];
+    localStorage.setItem('nx_frecuentes', JSON.stringify(list));
+  }
+  
+  cont.innerHTML = list.map(item => `
+    <button type="button" onclick="seleccionarFrecuente(${JSON.stringify(item).replace(/"/g, '&quot;')})" 
+      style="flex-shrink:0; background:rgba(255,255,255,0.06); border:1px solid rgba(6,182,212,0.25); border-radius:18px; padding:6px 12px; color:#fff; font-size:11px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px; transition:all 0.2s;"
+      onmouseover="this.style.background='rgba(6,182,212,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+      ${item.alias}
+    </button>
+  `).join('');
+}
+
+function seleccionarFrecuente(item) {
+  document.getElementById('tk-matricula').value = item.mat || '';
+  document.getElementById('tk-nombre').value = item.nom || '';
+  document.getElementById('tk-muelle').value = item.mue || '';
+  document.getElementById('tk-lote').value = item.lot || '';
+  if (typeof triggerHaptic === 'function') triggerHaptic('soft');
+}
+
+function guardarFrecuenteActual() {
+  const mat = document.getElementById('tk-matricula').value.trim().toUpperCase();
+  if (!mat) return;
+  const nom = document.getElementById('tk-nombre').value.trim();
+  const mue = document.getElementById('tk-muelle').value.trim().toUpperCase();
+  const lot = document.getElementById('tk-lote').value.trim().toUpperCase();
+  
+  const alias = prompt('Ingresá un nombre corto para este favorito (ej. Jardinero ⛵):', mat);
+  if (!alias) return;
+  
+  let list = [];
+  try {
+    list = JSON.parse(localStorage.getItem('nx_frecuentes') || '[]');
+  } catch(e) {}
+  
+  list.push({ alias, mat, nom, mue, lot });
+  localStorage.setItem('nx_frecuentes', JSON.stringify(list));
+  renderFrecuentes();
+  alert('¡Guardado en favoritos! ⭐');
+}
+
 // Abre el formulario de datos previo al token
 function generarToken() {
-  // Limpiar campos
-  const campos = ['tk-matricula','tk-nombre','tk-muelle','tk-lote'];
-  campos.forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  renderFrecuentes();
+  // Pre-llenar campos desde la configuración del vecino
+  document.getElementById('tk-matricula').value = localStorage.getItem('nx_matricula') || '';
+  document.getElementById('tk-nombre').value = localStorage.getItem('nx_casa') || '';
+  document.getElementById('tk-muelle').value = localStorage.getItem('nx_muelle') || '';
+  document.getElementById('tk-lote').value = localStorage.getItem('nx_manzana') || '';
   document.getElementById('tk-autocomplete-badge').style.display = 'none';
 
   // Intentar autocompletar desde propietarios guardados en localStorage
@@ -4097,7 +4227,7 @@ function tkConfirmarYGenerarToken() {
   document.getElementById('modal-token').style.display = 'flex';
 
   // Enviar al GAS
-  const url = localStorage.getItem('nx_url');
+  const url = localStorage.getItem('nx_url') || PANIC_URL;
   const mza = localStorage.getItem('nx_manzana') || localStorage.getItem('nx_mza') || '0';
   const casa = localStorage.getItem('nx_casa') || '0';
   if (url) {
@@ -4260,19 +4390,30 @@ function cerrarModalToken() {
 </div>
 
 <!-- SETUP -->
-<div class="pantalla" id="pantalla-setup">
-  <div class="nexos-logo-top" style="margin-bottom:16px;">
+<div class="pantalla" id="pantalla-setup" style="overflow-y: auto; padding: 20px 0;">
+  <div class="nexos-logo-top" style="margin-bottom:12px;">
     <img id="setup-logo-img" src="" alt="NEXOS">
   </div>
-  <div class="logo">NEXOS · VECINOS</div>
-  <div class="form-box">
-    <div class="setup-title">⚙️ CONFIGURACIÓN</div>
-    <div class="setup-subtitle">Ingresá tu ubicación una sola vez</div>
-    <input class="campo" id="setup-mza"  type="number" placeholder="N° Manzana" inputmode="numeric">
-    <input class="campo" id="setup-casa" type="number" placeholder="N° Casa"    inputmode="numeric">
+  <div class="logo" style="margin-bottom:15px;">NEXOS · VECINOS</div>
+  <div class="form-box" style="margin-top: 10px; max-width: 320px; width: 92%; box-sizing: border-box; padding: 20px;">
+    <div class="setup-title" style="font-size:18px;">⚓ REGISTRO PROPIETARIO</div>
+    <div class="setup-subtitle" style="font-size:11px; margin-bottom:15px;">Completá los datos de tu lote náutico</div>
+    
+    <div style="text-align: left; font-size: 10px; font-weight: 800; color: #71717a; letter-spacing: 1.5px; margin-bottom: 5px;">PROPIETARIO / FAMILIA *</div>
+    <input class="campo" id="setup-casa" type="text" placeholder="Ej: Familia Gómez" style="margin-bottom: 12px; font-size: 14px; text-transform: capitalize;">
+    
+    <div style="text-align: left; font-size: 10px; font-weight: 800; color: #71717a; letter-spacing: 1.5px; margin-bottom: 5px;">LOTE / CASA *</div>
+    <input class="campo" id="setup-mza" type="text" placeholder="Ej: L-45 o Mza 12 Lote 5" style="margin-bottom: 12px; font-size: 14px; text-transform: uppercase;">
+    
+    <div style="text-align: left; font-size: 10px; font-weight: 800; color: #71717a; letter-spacing: 1.5px; margin-bottom: 5px;">MUELLE / AMARRE (OPCIONAL)</div>
+    <input class="campo" id="setup-muelle" type="text" placeholder="Ej: D-12" style="margin-bottom: 12px; font-size: 14px; text-transform: uppercase;">
+    
+    <div style="text-align: left; font-size: 10px; font-weight: 800; color: #71717a; letter-spacing: 1.5px; margin-bottom: 5px;">MATRÍCULA DE EMBARCACIÓN (OPCIONAL)</div>
+    <input class="campo" id="setup-matricula" type="text" placeholder="Ej: REY-4321" style="margin-bottom: 10px; font-size: 14px; text-transform: uppercase;">
+    
     <div class="error-msg" id="setup-error"></div>
   </div>
-  <button class="btn-setup shimmer-effect" onclick="guardarSetup()">✅&nbsp;&nbsp;CONFIRMAR</button>
+  <button class="btn-setup shimmer-effect" style="margin-top: 15px; margin-bottom: 20px;" onclick="guardarSetup()">✅&nbsp;&nbsp;CONFIRMAR</button>
 </div>
 
 <!-- PANTALLA BANEADO -->
@@ -4362,6 +4503,18 @@ function cerrarModalToken() {
       Podés volver a enviar en <span id="cooldown-restante">15:00</span>
     </div>
   </div>
+
+  <!-- Visitas Adentro -->
+  <div id="visitas-adentro-section" style="width:100%; max-width:360px; margin-top:20px; text-align:left; background:rgba(0,0,0,0.5); border:1.5px solid rgba(255,255,255,0.1); border-radius:20px; padding:16px; box-shadow:0 10px 30px rgba(0,0,0,0.4); backdrop-filter:blur(10px); box-sizing:border-box;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <span style="font-size:12px; font-weight:800; color:var(--ac); letter-spacing:1px; display:inline-flex; align-items:center; gap:4px;">📍 VISITAS EN EL BARRIO</span>
+      <span onclick="syncMisVisitas()" style="cursor:pointer; font-size:14px;" title="Actualizar">🔄</span>
+    </div>
+    <div id="visitas-adentro-lista" style="display:flex; flex-direction:column; gap:8px;">
+      <div style="font-size:12px; color:#666; text-align:center; padding:10px 0;">No hay visitas o servicios activos en tu lote.</div>
+    </div>
+  </div>
+
   <!-- Grupo secundario: configuración y social -->
   <div class="btn-group-secondary">
     <button class="btn-cfg-main shimmer-effect" onclick="pedirPinParaCambiar()">
@@ -4551,13 +4704,24 @@ function cerrarModalToken() {
 
 <!-- CAMBIAR UBICACIÓN -->
 <div class="cfg-panel" id="cfg-panel">
-  <div class="cfg-content">
-    <div class="cfg-title">📍 CAMBIAR UBICACIÓN</div>
-    <div class="cfg-sub">Ingresá los nuevos datos de tu casa</div>
-    <input class="cfg-campo" id="cfg-mza"  type="number" placeholder="N° Manzana" inputmode="numeric">
-    <input class="cfg-campo" id="cfg-casa" type="number" placeholder="N° Casa"    inputmode="numeric">
+  <div class="cfg-content" style="max-height: 90vh; overflow-y: auto; padding: 24px 20px;">
+    <div class="cfg-title">⚙️ AJUSTES PROPIETARIO</div>
+    <div class="cfg-sub" style="margin-bottom: 15px;">Editá los datos de tu lote náutico</div>
+    
+    <div style="text-align: left; font-size: 10px; font-weight: 800; color: #888; letter-spacing: 1.5px; margin-bottom: 4px;">PROPIETARIO / FAMILIA *</div>
+    <input class="cfg-campo" id="cfg-casa" type="text" placeholder="Ej: Familia Gómez" style="margin-bottom: 10px; text-transform: capitalize;">
+    
+    <div style="text-align: left; font-size: 10px; font-weight: 800; color: #888; letter-spacing: 1.5px; margin-bottom: 4px;">LOTE / CASA *</div>
+    <input class="cfg-campo" id="cfg-mza" type="text" placeholder="Ej: L-45 o Mza 12 Lote 5" style="margin-bottom: 10px; text-transform: uppercase;">
+    
+    <div style="text-align: left; font-size: 10px; font-weight: 800; color: #888; letter-spacing: 1.5px; margin-bottom: 4px;">MUELLE / AMARRE (OPCIONAL)</div>
+    <input class="cfg-campo" id="cfg-muelle" type="text" placeholder="Ej: D-12" style="margin-bottom: 10px; text-transform: uppercase;">
+    
+    <div style="text-align: left; font-size: 10px; font-weight: 800; color: #888; letter-spacing: 1.5px; margin-bottom: 4px;">MATRÍCULA DE EMBARCACIÓN (OPCIONAL)</div>
+    <input class="cfg-campo" id="cfg-matricula" type="text" placeholder="Ej: REY-4321" style="margin-bottom: 15px; text-transform: uppercase;">
+    
     <div class="error-msg" id="cfg-error"></div>
-    <button class="cfg-btn shimmer-effect" onclick="guardarCfg()">✅ GUARDAR</button>
+    <button class="cfg-btn shimmer-effect" onclick="guardarCfg()">⚙️ GUARDAR</button>
     <div class="cfg-cerrar" onclick="cerrarCfg()">Cancelar</div>
   </div>
 </div>
@@ -4790,8 +4954,8 @@ function cerrarModalToken() {
     <div class="tipo-titulo">¿Qué tipo de emergencia?</div>
     <div class="tipo-grid">
       <button class="tipo-btn" id="tipo-robo"     style="--tc:#e74c3c;--tcr:231,76,60"   onclick="selTipo('robo')"    >
-        <span class="tipo-btn-emoji">🔒</span>
-        <span class="tipo-btn-label">ROBO / INTRUSO</span>
+        <span class="tipo-btn-emoji">🚨</span>
+        <span class="tipo-btn-label">ROBO / SEGURIDAD</span>
       </button>
       <button class="tipo-btn" id="tipo-medica"   style="--tc:#3498db;--tcr:52,152,219"  onclick="selTipo('medica')"  >
         <span class="tipo-btn-emoji">🩺</span>
@@ -4799,11 +4963,11 @@ function cerrarModalToken() {
       </button>
       <button class="tipo-btn" id="tipo-incendio" style="--tc:#e67e22;--tcr:230,126,34"  onclick="selTipo('incendio')">
         <span class="tipo-btn-emoji">🔥</span>
-        <span class="tipo-btn-label">INCENDIO</span>
+        <span class="tipo-btn-label">SINIESTRO / AGUA</span>
       </button>
       <button class="tipo-btn" id="tipo-otra"     style="--tc:#f39c12;--tcr:243,156,18"  onclick="selTipo('otra')"    >
-        <span class="tipo-btn-emoji">⚠️</span>
-        <span class="tipo-btn-label">OTRA</span>
+        <span class="tipo-btn-emoji">⚓</span>
+        <span class="tipo-btn-label">DERIVA / MECÁNICA</span>
       </button>
     </div>
     <button class="tipo-confirmar" id="tipo-confirmar">
@@ -5974,7 +6138,7 @@ function cerrarModalToken() {
     try { sessionStorage.setItem('nx_lp_s', tsStr); } catch(e) {}
   }
 
-  const PANIC_URL = 'https://script.google.com/macros/s/AKfycbwJ36NLQSDyW7mSouJKMzhRy1LH9D4iaAXqPj1CE28qYsGH4j2J9oQvi16iKewJDNjDXA/exec';
+  const PANIC_URL = 'https://script.google.com/macros/s/AKfycbyvml-Uai1pnL3Rh8-apCVo5TV3snGC_CNUxg8MXKUkDdmhgaRGoGT2yXbkPSc5P6nJmg/exec';
 
 
   function actualizarOffline(){
@@ -6102,7 +6266,7 @@ function cerrarModalToken() {
     const mza  = localStorage.getItem('nx_manzana') || '';
     const casa = localStorage.getItem('nx_casa') || '';
     const displayEl = document.getElementById('config-display');
-    displayEl.innerText = `Mz. ${mza} Casa ${casa}`;
+    displayEl.innerText = `${mza} • ${casa}`;
     
     // Portal Secreto de Actualización (5 toques rápidos en el texto Mz/Casa)
     
@@ -6122,22 +6286,24 @@ function cerrarModalToken() {
   function guardarSetup(){
     const mza  = document.getElementById('setup-mza').value.trim();
     const casa = document.getElementById('setup-casa').value.trim();
+    const muelle = document.getElementById('setup-muelle').value.trim().toUpperCase();
+    const matricula = document.getElementById('setup-matricula').value.trim().toUpperCase();
     const err  = document.getElementById('setup-error');
     err.innerText = '';
-    if (!mza || !casa){ err.innerText='Completá manzana y casa'; return; }
+    if (!mza || !casa){ err.innerText='Completá lote y propietario'; return; }
+    
+    localStorage.setItem('nx_manzana', mza);
+    localStorage.setItem('nx_casa', casa);
+    localStorage.setItem('nx_muelle', muelle);
+    localStorage.setItem('nx_matricula', matricula);
     
     // Registrar vinculación en el servidor de inmediato durante la configuración
     fetch(`${PANIC_URL}?accion=vincular&deviceId=${encodeURIComponent(DEVICE_ID)}&mza=${encodeURIComponent(mza)}&casa=${encodeURIComponent(casa)}&t=${Date.now()}`)
       .then(r => r.json())
       .then(d => {
         console.log('Vinculación registrada:', d);
-      })
-      .catch(e => {
-        console.error('Error al registrar vinculación:', e);
-      });
-
-    localStorage.setItem('nx_manzana', mza);
-    localStorage.setItem('nx_casa', casa);
+      }).catch(e => {});
+      
     inicializar();
   }
 
@@ -6610,6 +6776,8 @@ function cerrarModalToken() {
 
     const mza  = localStorage.getItem('nx_manzana');
     const casa = localStorage.getItem('nx_casa');
+    const muelle = localStorage.getItem('nx_muelle') || '';
+    const matricula = localStorage.getItem('nx_matricula') || '';
 
     const tsEnvio = obtenerHoraCalibrada();
     guardarTimestampCooldown(tsEnvio);
@@ -6621,6 +6789,7 @@ function cerrarModalToken() {
     const payload = {
       accion: 'panico',
       mza, casa,
+      muelle, matricula,
       tipo: tipoFinal,
       deviceId: DEVICE_ID,
       ts: tsEnvio,
@@ -6731,6 +6900,8 @@ function cerrarModalToken() {
   function abrirCfg(){
     document.getElementById('cfg-mza').value  = localStorage.getItem('nx_manzana') || '';
     document.getElementById('cfg-casa').value = localStorage.getItem('nx_casa')    || '';
+    document.getElementById('cfg-muelle').value = localStorage.getItem('nx_muelle') || '';
+    document.getElementById('cfg-matricula').value = localStorage.getItem('nx_matricula') || '';
     document.getElementById('cfg-error').innerText = '';
     document.getElementById('cfg-panel').classList.add('visible');
   }
@@ -6738,11 +6909,15 @@ function cerrarModalToken() {
   function guardarCfg(){
     const mza  = document.getElementById('cfg-mza').value.trim();
     const casa = document.getElementById('cfg-casa').value.trim();
+    const muelle = document.getElementById('cfg-muelle').value.trim().toUpperCase();
+    const matricula = document.getElementById('cfg-matricula').value.trim().toUpperCase();
     const err  = document.getElementById('cfg-error');
     err.innerText = '';
-    if (!mza || !casa){ err.innerText='Completá manzana y casa'; return; }
+    if (!mza || !casa){ err.innerText='Completá lote y propietario'; return; }
     localStorage.setItem('nx_manzana', mza);
     localStorage.setItem('nx_casa', casa);
+    localStorage.setItem('nx_muelle', muelle);
+    localStorage.setItem('nx_matricula', matricula);
     cerrarCfg();
     inicializar();
   }
@@ -20762,6 +20937,8 @@ window.iniciarEstadioJuego = function() {
   document.addEventListener('DOMContentLoaded', () => {
     setTimeout(marquesinaInit, 800);
     setTimeout(inicializarAdMob, 1500); // Dar un breve retraso para que Capacitor esté listo
+    setTimeout(syncMisVisitas, 2000);
+    setInterval(syncMisVisitas, 15000);
   });
 
 
