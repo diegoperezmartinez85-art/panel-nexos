@@ -2023,69 +2023,69 @@
 
 <!-- ══ MODAL VALIDAR TOKEN NÁUTICO ══ -->
 <div id="modal-admin-token" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:9999; align-items:center; justify-content:center; color:white; font-family:sans-serif; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);">
-  <div style="background:linear-gradient(145deg,#0e1a2b,#0a1520); padding:28px 24px; border-radius:24px; text-align:center; width:92%; max-width:340px; border:1.5px solid #06b6d4; box-shadow:0 0 60px rgba(6,182,212,0.2); box-sizing:border-box; max-height:90vh; overflow-y:auto;">
+  <div style="background:linear-gradient(145deg,#0e1a2b,#0a1520); padding:16px 20px; border-radius:20px; text-align:center; width:92%; max-width:330px; border:1.5px solid #06b6d4; box-shadow:0 0 60px rgba(6,182,212,0.2); box-sizing:border-box; max-height:92vh; overflow-y:auto;">
 
-    <div style="font-size:26px; margin-bottom:4px;">⚓</div>
-    <div style="font-size:10px; font-weight:800; letter-spacing:3px; color:#06b6d4; margin-bottom:18px;">VALIDAR TOKEN DE EMBARQUE</div>
+    <div style="font-size:22px; margin-bottom:2px;">⚓</div>
+    <div style="font-size:9px; font-weight:800; letter-spacing:2px; color:#06b6d4; margin-bottom:10px;">VALIDAR TOKEN DE EMBARQUE</div>
 
     <!-- Input manual -->
-    <div style="display:flex; gap:8px; margin-bottom:14px;">
+    <div style="display:flex; gap:6px; margin-bottom:8px;">
       <input type="text" id="in-token" maxlength="4" placeholder="XXXX"
-        style="flex:1; padding:14px; font-size:32px; text-align:center; border-radius:12px; background:rgba(255,255,255,0.06); color:white; text-transform:uppercase; border:1.5px solid rgba(6,182,212,0.4); letter-spacing:8px; font-weight:900; outline:none; font-family:monospace; box-sizing:border-box;"
+        style="flex:1; padding:10px; font-size:24px; text-align:center; border-radius:10px; background:rgba(255,255,255,0.06); color:white; text-transform:uppercase; border:1.5px solid rgba(6,182,212,0.4); letter-spacing:8px; font-weight:900; outline:none; font-family:monospace; box-sizing:border-box;"
         oninput="this.value=this.value.toUpperCase()"
         onkeydown="if(event.key==='Enter') validarToken()">
-      <button onclick="validarToken()" style="padding:14px 16px; background:linear-gradient(135deg,#06b6d4,#0ea5e9); border:none; border-radius:12px; font-weight:900; font-size:13px; cursor:pointer; color:#000; white-space:nowrap;">🔍 VER</button>
+      <button onclick="validarToken()" style="padding:10px 14px; background:linear-gradient(135deg,#06b6d4,#0ea5e9); border:none; border-radius:10px; font-weight:900; font-size:12px; cursor:pointer; color:#000; white-space:nowrap;">🔍 VER</button>
     </div>
 
     <!-- Resultado de la validación manual -->
-    <div id="res-token" style="min-height:20px; font-size:14px; font-weight:800; margin-bottom:14px;"></div>
+    <div id="res-token" style="min-height:16px; font-size:13px; font-weight:800; margin-bottom:8px;"></div>
 
     <!-- Tarjeta de datos del token validado (aparece al confirmar) -->
-    <div id="token-data-card" style="display:none; background:rgba(16,185,129,0.06); border:1.5px solid rgba(16,185,129,0.3); border-radius:16px; padding:16px; margin-bottom:14px; text-align:left;">
-      <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
-        <span style="font-size:20px;">🛥️</span>
+    <div id="token-data-card" style="display:none; background:rgba(16,185,129,0.06); border:1.5px solid rgba(16,185,129,0.3); border-radius:12px; padding:12px; margin-bottom:8px; text-align:left;">
+      <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+        <span style="font-size:18px;">🛥️</span>
         <div>
-          <div id="tdc-matricula" style="font-size:18px; font-weight:900; color:#06b6d4; font-family:monospace; letter-spacing:2px;"></div>
-          <div id="tdc-nombre" style="font-size:12px; color:#aaa; margin-top:1px;"></div>
+          <div id="tdc-matricula" style="font-size:15px; font-weight:900; color:#06b6d4; font-family:monospace; letter-spacing:2px;"></div>
+          <div id="tdc-nombre" style="font-size:11px; color:#aaa; margin-top:1px;"></div>
         </div>
       </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
-        <div style="background:rgba(255,255,255,0.04); border-radius:10px; padding:8px 10px;">
-          <div style="font-size:9px; color:#555; font-weight:800; letter-spacing:1px; margin-bottom:3px;">MZA / AMARRE</div>
-          <div id="tdc-mza-casa" style="font-size:14px; font-weight:800; color:#fff;"></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px;">
+        <div style="background:rgba(255,255,255,0.04); border-radius:8px; padding:4px 6px;">
+          <div style="font-size:8px; color:#555; font-weight:800; letter-spacing:1px; margin-bottom:1px;">MZA / AMARRE</div>
+          <div id="tdc-mza-casa" style="font-size:12px; font-weight:800; color:#fff;"></div>
         </div>
-        <div style="background:rgba(255,255,255,0.04); border-radius:10px; padding:8px 10px;">
-          <div style="font-size:9px; color:#555; font-weight:800; letter-spacing:1px; margin-bottom:3px;">MUELLE / DÁRSENA</div>
-          <div id="tdc-muelle" style="font-size:14px; font-weight:800; color:#06b6d4;"></div>
+        <div style="background:rgba(255,255,255,0.04); border-radius:8px; padding:4px 6px;">
+          <div style="font-size:8px; color:#555; font-weight:800; letter-spacing:1px; margin-bottom:1px;">MUELLE / DÁRSENA</div>
+          <div id="tdc-muelle" style="font-size:12px; font-weight:800; color:#06b6d4;"></div>
         </div>
-        <div style="background:rgba(255,255,255,0.04); border-radius:10px; padding:8px 10px;">
-          <div style="font-size:9px; color:#555; font-weight:800; letter-spacing:1px; margin-bottom:3px;">LOTE</div>
-          <div id="tdc-lote" style="font-size:14px; font-weight:800; color:#10b981;"></div>
+        <div style="background:rgba(255,255,255,0.04); border-radius:8px; padding:4px 6px;">
+          <div style="font-size:8px; color:#555; font-weight:800; letter-spacing:1px; margin-bottom:1px;">LOTE</div>
+          <div id="tdc-lote" style="font-size:12px; font-weight:800; color:#10b981;"></div>
         </div>
-        <div style="background:rgba(255,255,255,0.04); border-radius:10px; padding:8px 10px;">
-          <div style="font-size:9px; color:#555; font-weight:800; letter-spacing:1px; margin-bottom:3px;">TOKEN</div>
-          <div id="tdc-token" style="font-size:14px; font-weight:900; color:#f59e0b; font-family:monospace; letter-spacing:3px;"></div>
+        <div style="background:rgba(255,255,255,0.04); border-radius:8px; padding:4px 6px;">
+          <div style="font-size:8px; color:#555; font-weight:800; letter-spacing:1px; margin-bottom:1px;">TOKEN</div>
+          <div id="tdc-token" style="font-size:12px; font-weight:900; color:#f59e0b; font-family:monospace; letter-spacing:3px;"></div>
         </div>
       </div>
       <!-- Botón confirmar ingreso -->
       <button id="btn-confirmar-ingreso" onclick="confirmarIngresoToken()"
-        style="width:100%; padding:14px; background:linear-gradient(135deg,#10b981,#059669); border:none; border-radius:12px; color:#fff; font-size:15px; font-weight:900; cursor:pointer; letter-spacing:0.5px;">
+        style="width:100%; padding:10px; background:linear-gradient(135deg,#10b981,#059669); border:none; border-radius:8px; color:#fff; font-size:13px; font-weight:900; cursor:pointer; letter-spacing:0.5px;">
         ✅ CONFIRMAR INGRESO
       </button>
     </div>
 
     <!-- Separador + tokens activos en tiempo real -->
-    <div style="border-top:1px solid rgba(255,255,255,0.06); padding-top:14px;">
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
-        <div style="font-size:10px; letter-spacing:2px; color:#444; text-transform:uppercase;">Tokens activos</div>
-        <div id="tokens-badge" style="font-size:10px; font-weight:800; color:#06b6d4;"></div>
+    <div style="border-top:1px solid rgba(255,255,255,0.06); padding-top:8px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+        <div style="font-size:9px; letter-spacing:2px; color:#444; text-transform:uppercase;">Tokens activos</div>
+        <div id="tokens-badge" style="font-size:9px; font-weight:800; color:#06b6d4;"></div>
       </div>
-      <div id="tokens-recientes-lista" style="max-height:200px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;">
-        <div style="color:#333; font-size:12px; text-align:center; padding:10px;">Cargando...</div>
+      <div id="tokens-recientes-lista" style="max-height:100px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;">
+        <div style="color:#333; font-size:11px; text-align:center; padding:6px;">Cargando...</div>
       </div>
     </div>
 
-    <button onclick="cerrarValidarToken()" style="margin-top:16px; background:transparent; border:none; color:#444; font-size:13px; cursor:pointer; width:100%;">✕ Cerrar</button>
+    <button onclick="cerrarValidarToken()" style="margin-top:8px; background:transparent; border:none; color:#444; font-size:12px; cursor:pointer; width:100%;">✕ Cerrar</button>
   </div>
 </div>
 
@@ -2138,6 +2138,7 @@ function abrirValidarTokenDesdeAlerta() {
 function cerrarValidarToken() {
   if (_tokenPollingInterval) { clearInterval(_tokenPollingInterval); _tokenPollingInterval = null; }
   document.getElementById('modal-admin-token').style.display = 'none';
+  cargarTokensRecientes();
 }
 
 async function validarToken() {
@@ -2152,7 +2153,7 @@ async function validarToken() {
     const d = await r.json();
     if (d.valido) {
       res.innerHTML = '<span style="color:#10b981; font-size:13px;">✅ TOKEN VÁLIDO</span>';
-      mostrarTarjetaToken(d);
+      mostrarTarjetaToken(d, tVal);
     } else {
       res.innerHTML = '<span style="color:#ef4444;">❌ ' + (d.error || 'INVÁLIDO') + '</span>';
       document.getElementById('token-data-card').style.display = 'none';
@@ -2162,14 +2163,15 @@ async function validarToken() {
   }
 }
 
-function mostrarTarjetaToken(d) {
+function mostrarTarjetaToken(d, tokenCode) {
   _tokenPendienteData = d;
+  if (tokenCode) _tokenPendienteData.token = tokenCode;
   document.getElementById('tdc-matricula').innerText = d.matricula || '— Sin matrícula';
   document.getElementById('tdc-nombre').innerText    = d.nombre   || 'Propietario no especificado';
   document.getElementById('tdc-mza-casa').innerText  = 'Mza ' + (d.mza||'—') + ' · A-' + (d.casa||'—');
   document.getElementById('tdc-muelle').innerText    = d.muelle   || '—';
   document.getElementById('tdc-lote').innerText      = d.lote     || '—';
-  document.getElementById('tdc-token').innerText     = d.token    || d.token;
+  document.getElementById('tdc-token').innerText     = tokenCode  || d.token || '—';
   document.getElementById('token-data-card').style.display = 'block';
   // Scroll a la tarjeta
   setTimeout(() => document.getElementById('token-data-card').scrollIntoView({behavior:'smooth', block:'nearest'}), 100);
@@ -2248,6 +2250,7 @@ function confirmarIngresoDirecto() {
   showToast('⚓ INGRESO NÁUTICO: ' + (d.matricula || d.token) + ' — OK');
   _tokenPendienteData = null;
   cerrarTokenBanner();
+  cargarTokensRecientes();
 }
 
 // ── POLLING + BANNER DE ALERTA ──────────────────────────────
@@ -2264,7 +2267,10 @@ async function cargarTokensRecientes() {
     const d = await r.json();
     const tokens = d.tokens || [];
     const ahora = Date.now();
-    const activos = tokens.filter(t => (ahora - (t.ts || 0)) <= 450000);
+    
+    // Filtrar los tokens que ya fueron confirmados/validados localmente en DB
+    const validados = new Set((typeof DB !== 'undefined' ? DB : []).filter(x => x.token).map(x => String(x.token).toUpperCase()));
+    const activos = tokens.filter(t => ((ahora - (t.ts || 0)) <= 450000) && !validados.has(String(t.token).toUpperCase()));
 
     // Detectar tokens nuevos y mostrar banner
     activos.forEach(t => {
@@ -2335,7 +2341,8 @@ function iniciarPollingTokens() {
         const r = await fetch(url + '?accion=get_tokens_activos&t=' + Date.now());
         const d = await r.json();
         const ahora = Date.now();
-        (d.tokens || []).filter(t => (ahora - t.ts) <= 450000).forEach(t => {
+        const validados = new Set((typeof DB !== 'undefined' ? DB : []).filter(x => x.token).map(x => String(x.token).toUpperCase()));
+        (d.tokens || []).filter(t => ((ahora - t.ts) <= 450000) && !validados.has(String(t.token).toUpperCase())).forEach(t => {
           if (!_tokenAlertaVista.has(t.token)) {
             _tokenAlertaVista.add(t.token);
             mostrarTokenBanner(t);
@@ -2489,6 +2496,15 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="map-dock" data-dock="M-3">M-3</div>
             <div class="map-dock" data-dock="M-4">M-4</div>
             <div class="map-dock" data-dock="M-5">M-5</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="font-size: 11px; font-weight: 800; color: var(--gold); width: 70px; text-align: left;">CORTESÍA</div>
+          <div style="display: flex; gap: 6px; flex: 1;">
+            <div class="map-dock" data-dock="AMARRA 1">AMARRA 1</div>
+            <div class="map-dock" data-dock="AMARRA 2">AMARRA 2</div>
+            <div class="map-dock" data-dock="AMARRA 3">AMARRA 3</div>
+            <div class="map-dock" data-dock="AMARRA 4">AMARRA 4</div>
           </div>
         </div>
       </div>
@@ -2873,12 +2889,12 @@ document.addEventListener('DOMContentLoaded', () => {
       <span id="ia-key-status" style="font-size:14px;min-width:18px;"></span>
     </div>
     <div class="ia-sugerencias">
-      <div class="ia-sug" onclick="iaSugerencia(this)">¿Quién está adentro ahora?</div>
+      <div class="ia-sug" onclick="iaSugerencia(this)">¿Quién navega adentro ahora?</div>
       <div class="ia-sug" onclick="iaSugerencia(this)">¿Delivery en alerta +15min?</div>
-      <div class="ia-sug" onclick="iaSugerencia(this)">Resumen completo del día</div>
-      <div class="ia-sug" onclick="iaSugerencia(this)">¿Quién fue el último en entrar?</div>
-      <div class="ia-sug" onclick="iaSugerencia(this)">¿Cuántas embarcaciones hay adentro?</div>
-      <div class="ia-sug" onclick="iaSugerencia(this)">¿Hay algo sospechoso hoy?</div>
+      <div class="ia-sug" onclick="iaSugerencia(this)">Resumen fluvial del día</div>
+      <div class="ia-sug" onclick="iaSugerencia(this)">¿Hay reportes de exceso de velocidad u oleaje?</div>
+      <div class="ia-sug" onclick="iaSugerencia(this)">¿Qué amarras de cortesía están ocupadas hoy?</div>
+      <div class="ia-sug" onclick="iaSugerencia(this)">¿Cómo está la altura del río y viento ahora?</div>
       <div class="ia-sug" onclick="iaSugerencia(this)">Mostrame la lista negra</div>
       <div class="ia-sug" onclick="iaSugerencia(this)">¿Algún vecino baneado?</div>
     </div>
@@ -3017,6 +3033,10 @@ document.addEventListener('DOMContentLoaded', () => {
       <button id="btn-admin-futbol" onclick="seleccionarAmenityAdmin('futbol')">
         <span style="font-size:16px;">⚽</span>
         <span>Fútbol</span>
+      </button>
+      <button id="btn-admin-amarras" onclick="seleccionarAmenityAdmin('Amarras de Cortesía')">
+        <span style="font-size:16px;">🌊</span>
+        <span>Amarras</span>
       </button>
     </div>
 
@@ -3230,6 +3250,24 @@ document.addEventListener('DOMContentLoaded', () => {
       <button class="btn-sync" style="margin:0; width:100%;" onclick="sincronizar(true)">🔄 SINCRONIZAR</button>
       <button class="btn-sync" style="margin:0; width:100%; background:linear-gradient(135deg, #0a2342, #0d5c75); border:1.5px solid var(--cyan); color:white;" onclick="abrirMapaAmarres()">🗺️ MAPA DE DÁRSENAS</button>
     </div>
+    <!-- CONTENEDOR DE ALERTAS DE OLEAJE -->
+    <div id="oleaje-alertas-container" style="display:none; padding: 0 15px; margin-bottom: 12px; box-sizing: border-box;">
+      <div style="background: rgba(239, 68, 68, 0.12); border: 1.5px dashed #ef4444; border-radius: 14px; padding: 12px 16px; box-shadow: 0 0 15px rgba(239,68,68,0.2);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <div style="color: #f87171; font-weight: 800; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 16px; animation: pulse-oleaje 1s infinite alternate;">🌊</span> ALERTA DE EXCESO DE VELOCIDAD / OLEAJE
+          </div>
+          <button onclick="sonarBocinaPatrulla()" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 2px 6px; font-size: 10px; color: #fff; cursor: pointer; font-weight: 700;">📢 Bocina</button>
+        </div>
+        <div id="oleaje-lista" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      </div>
+    </div>
+    <style>
+      @keyframes pulse-oleaje {
+        from { transform: scale(1); opacity: 1; }
+        to { transform: scale(1.2); opacity: 0.8; }
+      }
+    </style>
     <div class="section" id="cont-lista"></div>
   </div>
   <div id="p-manual" class="panel">
@@ -3339,6 +3377,42 @@ document.addEventListener('DOMContentLoaded', () => {
       
       <button class="btn-save" onclick="guardarConfig()" style="margin-top:16px;">GUARDAR CONFIGURACIÓN</button>
       <button class="btn-save" onclick="comprobarActualizacionControl()" style="margin-top:10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: #fff;">🔄 COMPROBAR ACTUALIZACIÓN</button>
+    </div>
+    <!-- SECCIÓN CLIMA NÁUTICO -->
+    <div class="section" style="border-color:var(--border);">
+      <div style="font-size:13px;font-weight:900;color:#fff;margin-bottom:12px;letter-spacing:0.5px;">🌊 MONITOREO DE CLIMA Y MAREA</div>
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom:12px;">
+        <div>
+          <div class="campo-label" style="margin-top:0;">Altura Río (m)</div>
+          <input id="cfg-clima-altura" type="number" step="0.01" class="giant" placeholder="Ej. 1.20" style="text-align: center;">
+        </div>
+        <div>
+          <div class="campo-label" style="margin-top:0;">Viento (nudos)</div>
+          <input id="cfg-clima-viento" type="number" class="giant" placeholder="Ej. 15" style="text-align: center;">
+        </div>
+        <div>
+          <div class="campo-label" style="margin-top:0;">Dirección</div>
+          <select id="cfg-clima-direccion" class="giant" style="text-align: center; background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.15); color: #fff; width: 100%; height: 44px; border-radius: 10px; font-weight: 800; font-size: 14px; outline: none; -webkit-appearance: none;">
+            <option value="N" style="background: #03080f; color: #fff;">N</option>
+            <option value="NNE" style="background: #03080f; color: #fff;">NNE</option>
+            <option value="NE" style="background: #03080f; color: #fff;">NE</option>
+            <option value="ENE" style="background: #03080f; color: #fff;">ENE</option>
+            <option value="E" style="background: #03080f; color: #fff;">E</option>
+            <option value="ESE" style="background: #03080f; color: #fff;">ESE</option>
+            <option value="SE" style="background: #03080f; color: #fff;">SE</option>
+            <option value="SSE" style="background: #03080f; color: #fff;">SSE</option>
+            <option value="S" style="background: #03080f; color: #fff;">S</option>
+            <option value="SSW" style="background: #03080f; color: #fff;">SSW</option>
+            <option value="SW" style="background: #03080f; color: #fff;">SW</option>
+            <option value="WSW" style="background: #03080f; color: #fff;">WSW</option>
+            <option value="W" style="background: #03080f; color: #fff;">W</option>
+            <option value="WNW" style="background: #03080f; color: #fff;">WNW</option>
+            <option value="NW" style="background: #03080f; color: #fff;">NW</option>
+            <option value="NNW" style="background: #03080f; color: #fff;">NNW</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-save" onclick="guardarClimaNautico()" style="background: var(--cyan); color: black; font-weight: 900; width: 100%;">💾 ACTUALIZAR CLIMA</button>
     </div>
     <!-- SECCIÓN AUDIO Y VOCAL -->
     <div class="section" style="border-color:var(--border);">
@@ -4193,10 +4267,10 @@ function obtenerInfoTipo(tipo) {
   const tKey = String(tipo || 'emergencia').trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   const MAPA_TIPOS = {
     'emergencia': { texto: 'EMERGENCIA GENERAL', icono: '🚨', color: '#ef4444', glow: 'rgba(239, 68, 68, 0.25)' },
-    'robo': { texto: 'ROBO / INTRUSO', icono: '🔒', color: '#ef4444', glow: 'rgba(239, 68, 68, 0.28)' },
+    'robo': { texto: 'ROBO / SEGURIDAD', icono: '🚨', color: '#ef4444', glow: 'rgba(239, 68, 68, 0.28)' },
     'medica': { texto: 'EMERGENCIA MÉDICA', icono: '🩺', color: '#06b6d4', glow: 'rgba(6, 182, 212, 0.25)' },
-    'incendio': { texto: 'INCENDIO DETECTADO', icono: '🔥', color: '#f97316', glow: 'rgba(249, 115, 22, 0.25)' },
-    'otra': { texto: 'ALERTA GENERAL', icono: '⚠', color: '#f59e0b', glow: 'rgba(245, 158, 11, 0.22)' }
+    'incendio': { texto: 'SINIESTRO / INCENDIO / AGUA', icono: '🔥', color: '#f97316', glow: 'rgba(249, 115, 22, 0.25)' },
+    'otra': { texto: 'DERIVA / MECÁNICA', icono: '⚓', color: '#f59e0b', glow: 'rgba(245, 158, 11, 0.22)' }
   };
   return MAPA_TIPOS[tKey] || MAPA_TIPOS['emergencia'];
 }
@@ -5019,10 +5093,50 @@ async function sincronizar(manual=false){
     const salidosDedup=salidosHoyLocal.filter(r=>!pendIds.has(String(r.id)));
     DB=[...cloudData,...pend,...salidosDedup];lsSet('nx_db',JSON.stringify(DB));render();
     setSyncStatus('✔ Sincronizado '+horaActual(),'sync-ok');
+    
+    // Sincronizar Clima Náutico
+    if (data.clima) {
+      localStorage.setItem('nx_clima_local', JSON.stringify(data.clima));
+      if (document.getElementById('cfg-clima-altura') && document.activeElement !== document.getElementById('cfg-clima-altura')) {
+        document.getElementById('cfg-clima-altura').value = data.clima.altura;
+      }
+      if (document.getElementById('cfg-clima-viento') && document.activeElement !== document.getElementById('cfg-clima-viento')) {
+        document.getElementById('cfg-clima-viento').value = data.clima.viento;
+      }
+      if (document.getElementById('cfg-clima-direccion') && document.activeElement !== document.getElementById('cfg-clima-direccion')) {
+        document.getElementById('cfg-clima-direccion').value = data.clima.direccion;
+      }
+    }
+    
+    // Sincronizar Reportes de Oleaje
+    const reportesOleaje = data.oleaje || data.reportes || [];
+    localStorage.setItem('nx_sim_oleaje', JSON.stringify(reportesOleaje));
+    actualizarReportesOleaje(reportesOleaje);
+    
     if(panico.length>0){const ids=new Set(panicosPendientes.map(x=>String(x.panicoId)));const nuevas=panico.filter(a=>!ids.has(String(a.panicoId)));if(nuevas.length>0){panicosPendientes=panico;mostrarPanico(panico);}else panicosPendientes=panico;}
   }catch(e){
     clearTimeout(timeoutId);
     setSyncStatus('⚠ Sin conexión','sync-err');
+    
+    // Cargar clima y oleaje offline/simulados
+    try {
+      const cachedClima = localStorage.getItem('nx_clima_local');
+      if (cachedClima) {
+        const clima = JSON.parse(cachedClima);
+        if (document.getElementById('cfg-clima-altura') && document.activeElement !== document.getElementById('cfg-clima-altura')) {
+          document.getElementById('cfg-clima-altura').value = clima.altura;
+        }
+        if (document.getElementById('cfg-clima-viento') && document.activeElement !== document.getElementById('cfg-clima-viento')) {
+          document.getElementById('cfg-clima-viento').value = clima.viento;
+        }
+        if (document.getElementById('cfg-clima-direccion') && document.activeElement !== document.getElementById('cfg-clima-direccion')) {
+          document.getElementById('cfg-clima-direccion').value = clima.direccion;
+        }
+      }
+      const localOleajes = JSON.parse(localStorage.getItem('nx_sim_oleaje') || '[]');
+      actualizarReportesOleaje(localOleajes);
+    } catch(err) {}
+    
     if(manual)showToast("⚠ Error al sincronizar");
   }
   finally{sincronizando=false;_lastSyncTs=Date.now();}
@@ -6419,10 +6533,10 @@ function abrirReservasAdmin() {
 function seleccionarAmenityAdmin(amenity) {
   adminSelectedAmenity = amenity;
   
-  ['SUM', 'Tenis', 'Quincho', 'Paddle', 'futbol'].forEach(a => {
+  ['SUM', 'Tenis', 'Quincho', 'Paddle', 'futbol', 'amarras'].forEach(a => {
     const el = document.getElementById('btn-admin-' + a.toLowerCase());
     if (el) {
-      el.className = a.toLowerCase() === amenity.toLowerCase() ? 'active-amenity' : '';
+      el.className = amenity.toLowerCase().includes(a.toLowerCase()) ? 'active-amenity' : '';
     }
   });
   
@@ -6512,6 +6626,9 @@ async function cargarReservasAdmin() {
 
 function obtenerTurnosParaAmenity(amenity) {
   const am = String(amenity).toLowerCase();
+  if (am.includes('amarra')) {
+    return ['Amarra 1', 'Amarra 2', 'Amarra 3', 'Amarra 4'];
+  }
   if (am === 'tenis' || am === 'paddle' || am === 'futbol') {
     return [
       '08:00 - 09:00',
@@ -7190,14 +7307,13 @@ async function iaEnviar() {
   const contexto = iaObtenerContexto();
   try {
     const historial = iaMsgs.slice(-12).map(m => ({ role: m.role, parts: m.parts }));
-    const sysText = `Sos el asistente inteligente de NEXOS, sistema de control de acceso de un barrio cerrado en Argentina.
+    const sysText = `Sos el asistente inteligente de NEXOS, sistema de control de acceso y seguridad de un BARRIO CERRADO NÁUTICO en Argentina.
 Respondé siempre en español rioplatense, de manera clara, útil y amigable.
-Podés responder CUALQUIER pregunta: sobre los datos del barrio, consultas generales, consejos de seguridad, preguntas de cultura general, etc.
-Para preguntas sobre el barrio, usá los datos reales provistos. No inventes datos del barrio.
-Para preguntas generales (noticias, clima, cocina, historia, etc.) respondé con tu conocimiento general.
-Si preguntan si alguien está adentro, buscá por patente, DNI, manzana o casa en la lista de activos.
-Si hay alertas de delivery (+15min sin salir), resaltarlas como urgente.
-Si la lista de activos está vacía, decir que no hay embarcaciones adentro.
+Podés responder CUALQUIER pregunta: sobre el tráfico de embarcaciones, reservas de amarras de cortesía, reportes de exceso de velocidad/oleaje, estado del clima y marea, consultas generales, consejos de seguridad náutica, etc.
+Para preguntas sobre el barrio o la marea, usá los datos reales provistos. No inventes datos del barrio.
+Si te preguntan por embarcaciones adentro, buscá por matrícula, timonel o lote en el listado de embarcaciones activas.
+Si hay alertas de lanchas/servicios demorados (+15min en muelle sin salir), o reportes de oleaje grave en estado PENDIENTE, resaltalos como prioridad urgente.
+Si hay bajante crítica (altura del río <= 0.80m) o sudestada (altura del río >= 2.40m), advertir sobre riesgos de navegación y amarras.
 Cuando uses listas, usá guiones. Sé conciso pero completo.
 
 ${contexto}`;
@@ -7319,6 +7435,17 @@ function iniciarApp(){
   const vozHabilitada = localStorage.getItem('nx_voz_alertas') !== 'false';
   const inputVoz = document.getElementById('cfg-voz-alertas');
   if (inputVoz) inputVoz.checked = vozHabilitada;
+  
+  // Prefill Clima Náutico
+  let climaLocal = { altura: 1.20, viento: 15, direccion: 'SE' };
+  try {
+    const cached = localStorage.getItem('nx_clima_local');
+    if (cached) climaLocal = JSON.parse(cached);
+  } catch (e) {}
+  if (document.getElementById('cfg-clima-altura')) document.getElementById('cfg-clima-altura').value = climaLocal.altura;
+  if (document.getElementById('cfg-clima-viento')) document.getElementById('cfg-clima-viento').value = climaLocal.viento;
+  if (document.getElementById('cfg-clima-direccion')) document.getElementById('cfg-clima-direccion').value = climaLocal.direccion;
+  
   actualizarContadorIncidentes();
   render();sincronizar();
   // NOTA: el auto-sync periódico lo maneja iniciarHeartbeat() — no duplicar aquí
@@ -8777,7 +8904,10 @@ if (sessionStorage.getItem('nx_auth') === '1') {
 
   let _mapaBarcoAsignado = {};
 
-  function abrirMapaAmarres() {
+  let _seenOleajeIds = new Set();
+  let _audioCtx = null;
+
+  async function abrirMapaAmarres() {
     document.querySelectorAll('.map-dock').forEach(el => {
       el.className = 'map-dock';
       el.onclick = null;
@@ -8829,6 +8959,49 @@ if (sessionStorage.getItem('nx_auth') === '1') {
         };
       }
     });
+
+    // ── GESTIÓN DE AMARRAS DE CORTESÍA EN EL MAPA ──
+    const hoy = new Date();
+    const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
+    const url = localStorage.getItem('nx_url') || lsGet('nx_url');
+    let ocupados = [];
+    if (url) {
+      try {
+        const res = await fetch(`${url}?accion=get_reservas&fecha=${hoyStr}&amenity=Amarras de Cortesía&t=${Date.now()}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.ocupados)) {
+            ocupados = data.ocupados;
+          }
+        }
+      } catch (e) {
+        console.warn("Error loading courtesy berths on map, using simulation:", e);
+        ocupados = generateSimulatedReservasAdmin(hoyStr, 'Amarras de Cortesía');
+      }
+    } else {
+      ocupados = generateSimulatedReservasAdmin(hoyStr, 'Amarras de Cortesía');
+    }
+
+    ocupados.forEach(o => {
+      document.querySelectorAll('.map-dock').forEach(el => {
+        const dockVal = el.dataset.dock;
+        if (dockVal && String(dockVal).replace(/[-\s]/g, '').toUpperCase() === String(o.horario).replace(/[-\s]/g, '').toUpperCase()) {
+          el.className = 'map-dock ocupado-servicio';
+          _mapaBarcoAsignado[dockVal] = {
+            pat: 'RESERVA',
+            tipo: 'AMARRA',
+            timonel: o.nombre || 'Reservado por Vecino',
+            nombre_emb: 'Amarra de Cortesía',
+            tipo_emb: o.lote || 'Reserva',
+            entrada: 'Hoy',
+            tiempo: o.contacto || 'Sin contacto'
+          };
+          el.onclick = () => {
+            mostrarDetalleDock(dockVal);
+          };
+        }
+      });
+    });
     
     document.querySelectorAll('.map-dock').forEach(el => {
       if (!el.onclick) {
@@ -8838,13 +9011,23 @@ if (sessionStorage.getItem('nx_auth') === '1') {
       }
     });
     
-    document.getElementById('mapa-dock-detalle').innerHTML = 'Tocá un muelle activo para ver la lancha / capitán asignado.';
+    document.getElementById('mapa-dock-detalle').innerHTML = 'Tocá un muelle activo para ver la lancha / capitán asignado o reserva activa.';
     abrirModal('modal-mapa-amarres');
   }
 
   function mostrarDetalleDock(dock) {
     const b = _mapaBarcoAsignado[dock];
     if (!b) return;
+    if (b.tipo === 'AMARRA') {
+      document.getElementById('mapa-dock-detalle').innerHTML = `
+        <div style="text-align:left; width:100%;">
+          🌊 <strong>${escHtml(b.pat)}</strong> - Muelle: <strong>${dock}</strong><br>
+          Residente: <strong>${escHtml(b.tipo_emb)}</strong> · Vecino: <strong>${escHtml(b.timonel)}</strong><br>
+          Contacto: <strong style="color:var(--gold);">${escHtml(b.tiempo)}</strong>
+        </div>
+      `;
+      return;
+    }
     const icon = b.tipo === 'DELIVERY' ? '⛵' : '🛥️';
     document.getElementById('mapa-dock-detalle').innerHTML = `
       <div style="text-align:left; width:100%;">
@@ -8853,6 +9036,219 @@ if (sessionStorage.getItem('nx_auth') === '1') {
         Entrada: <strong>${b.entrada}</strong> · Permanencia: <strong style="color:var(--cyan);">${b.tiempo}</strong>
       </div>
     `;
+  }
+
+  function sonarBocinaPatrulla() {
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      if (!_audioCtx) {
+        _audioCtx = new AudioContext();
+      }
+      const now = _audioCtx.currentTime;
+      const osc1 = _audioCtx.createOscillator();
+      const osc2 = _audioCtx.createOscillator();
+      const osc3 = _audioCtx.createOscillator();
+      const gainNode = _audioCtx.createGain();
+      const filter = _audioCtx.createBiquadFilter();
+      
+      osc1.type = 'sawtooth';
+      osc1.frequency.setValueAtTime(150, now);
+      
+      osc2.type = 'square';
+      osc2.frequency.setValueAtTime(155, now);
+      
+      osc3.type = 'sawtooth';
+      osc3.frequency.setValueAtTime(75, now);
+      
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(600, now);
+      
+      gainNode.gain.setValueAtTime(0, now);
+      gainNode.gain.linearRampToValueAtTime(0.7, now + 0.1);
+      gainNode.gain.setValueAtTime(0.7, now + 0.9);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+      
+      osc1.connect(filter);
+      osc2.connect(filter);
+      osc3.connect(filter);
+      filter.connect(gainNode);
+      gainNode.connect(_audioCtx.destination);
+      
+      osc1.start(now);
+      osc2.start(now);
+      osc3.start(now);
+      
+      osc1.stop(now + 1.5);
+      osc2.stop(now + 1.5);
+      osc3.stop(now + 1.5);
+    } catch (e) {
+      console.warn("Could not play synthesized boat horn:", e);
+    }
+  }
+
+  function actualizarReportesOleaje(reportes) {
+    const container = document.getElementById('oleaje-alertas-container');
+    const listEl = document.getElementById('oleaje-lista');
+    if (!container || !listEl) return;
+    
+    if (!Array.isArray(reportes) || reportes.length === 0) {
+      container.style.display = 'none';
+      listEl.innerHTML = '';
+      return;
+    }
+    
+    let playHorn = false;
+    reportes.forEach(r => {
+      if (!_seenOleajeIds.has(r.id)) {
+        _seenOleajeIds.add(r.id);
+        if (r.estado === 'PENDIENTE') {
+          playHorn = true;
+        }
+      }
+    });
+    
+    if (playHorn) {
+      sonarBocinaPatrulla();
+      const textToSay = "Alerta de oleaje en el canal. Revisar consola.";
+      if (localStorage.getItem('nx_voz_alertas') !== 'false' && 'speechSynthesis' in window) {
+        try {
+          const utterance = new SpeechSynthesisUtterance(textToSay);
+          utterance.lang = 'es-AR';
+          window.speechSynthesis.speak(utterance);
+        } catch (ttsErr) {
+          console.warn("TTS error:", ttsErr);
+        }
+      }
+    }
+    
+    container.style.display = 'block';
+    
+    let html = '';
+    reportes.forEach(r => {
+      let gravColor = '#10b981';
+      let gravBg = 'rgba(16,185,129,0.1)';
+      if (r.gravedad === 'Moderado') {
+        gravColor = '#f59e0b';
+        gravBg = 'rgba(245,158,11,0.12)';
+      } else if (r.gravedad === 'Grave') {
+        gravColor = '#ef4444';
+        gravBg = 'rgba(239,68,68,0.15)';
+      }
+      
+      const isPendiente = r.estado === 'PENDIENTE';
+      
+      html += `
+        <div style="background: rgba(255,255,255,0.03); border: 1.5px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 11px; font-weight: 800; background: \${gravBg}; border: 1px solid \${gravColor}; color: \${gravColor}; padding: 1px 6px; border-radius: 12px; text-transform: uppercase;">
+                \${escHtml(r.gravedad)}
+              </span>
+              <span style="font-size: 11px; font-weight: 800; color: #fff;">📍 \${escHtml(r.canal)}</span>
+            </div>
+            <span style="font-size: 10px; color: var(--text-muted); font-family: monospace;">\${escHtml(r.fecha)}</span>
+          </div>
+          
+          <div style="font-size: 12px; color: #e4e4e7;">
+            Infractor: <strong style="color: var(--cyan);">\${escHtml(r.infractor)}</strong> (\${escHtml(r.tipoEmbarcacion)}) · Reportado por: <strong>\${escHtml(r.loteReportante)}</strong>
+          </div>
+          
+          \${r.comentarios ? \`<div style="font-size: 11px; font-style: italic; color: #a1a1aa; background: rgba(0,0,0,0.2); padding: 6px 8px; border-radius: 6px; border-left: 2px solid \${gravColor};">\${escHtml(r.comentarios)}</div>\` : ''}
+          
+          <div style="display: flex; gap: 8px; margin-top: 4px;">
+            \${isPendiente ? \`
+              <button onclick="cambiarEstadoReporteOleaje('\${r.id}', 'DESPACHADO')" style="flex: 1; background: #22c55e; color: #000; border: none; border-radius: 6px; padding: 6px; font-size: 11px; font-weight: 900; cursor: pointer; transition: opacity 0.2s;">
+                🚓 DESPACHAR PATRULLA
+              </button>
+              <button onclick="cambiarEstadoReporteOleaje('\${r.id}', 'VISTO')" style="background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 12px; font-size: 11px; color: #fff; cursor: pointer; transition: background 0.2s;">
+                VISTO
+              </button>
+            \` : \`
+              <div style="flex: 1; font-size: 11px; font-weight: 800; color: #22c55e; display: flex; align-items: center; gap: 4px; padding-left: 4px;">
+                🚓 Patrulla Despachada
+              </div>
+              <button onclick="cambiarEstadoReporteOleaje('\${r.id}', 'VISTO')" style="background: #3b82f6; color: #fff; border: none; border-radius: 6px; padding: 6px 16px; font-size: 11px; font-weight: 900; cursor: pointer; transition: opacity 0.2s;">
+                ✔️ COMPLETADO
+              </button>
+            \`}
+          </div>
+        </div>
+      `;
+    });
+    listEl.innerHTML = html;
+  }
+
+  async function cambiarEstadoReporteOleaje(id, estado) {
+    if (typeof playSynthClick === 'function') playSynthClick();
+    const url = localStorage.getItem('nx_url') || lsGet('nx_url');
+    if (!url) {
+      try {
+        let localOleajes = JSON.parse(localStorage.getItem('nx_sim_oleaje') || '[]');
+        if (estado === 'VISTO') {
+          localOleajes = localOleajes.filter(o => o.id !== id);
+        } else {
+          const item = localOleajes.find(o => o.id === id);
+          if (item) item.estado = estado;
+        }
+        localStorage.setItem('nx_sim_oleaje', JSON.stringify(localOleajes));
+        showToast("🌊 Estado actualizado localmente");
+        actualizarReportesOleaje(localOleajes);
+      } catch(e) {}
+      return;
+    }
+    try {
+      await fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accion: 'actualizar_estado_oleaje',
+          id: id,
+          estado: estado
+        })
+      });
+      showToast("🌊 Estado del reporte actualizado");
+      sincronizar();
+    } catch(e) {
+      console.error(e);
+      showToast("❌ Error al actualizar reporte");
+    }
+  }
+
+  async function guardarClimaNautico() {
+    const altura = parseFloat(document.getElementById('cfg-clima-altura').value || '1.20');
+    const viento = parseInt(document.getElementById('cfg-clima-viento').value || '15');
+    const direccion = document.getElementById('cfg-clima-direccion').value;
+    if (isNaN(altura) || isNaN(viento)) {
+      showToast("⚠ Ingrese valores válidos");
+      return;
+    }
+    if (typeof playSynthClick === 'function') playSynthClick();
+    const url = localStorage.getItem('nx_url') || lsGet('nx_url');
+    if (!url) {
+      localStorage.setItem('nx_clima_local', JSON.stringify({ altura, viento, direccion }));
+      showToast("🌊 Clima simulado guardado");
+      return;
+    }
+    try {
+      await fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accion: 'set_datos_clima',
+          altura: altura,
+          viento: viento,
+          direccion: direccion
+        })
+      });
+      localStorage.setItem('nx_clima_local', JSON.stringify({ altura, viento, direccion }));
+      showToast("🌊 Clima transmitido correctamente");
+    } catch(e) {
+      console.error(e);
+      showToast("❌ Error al transmitir clima");
+    }
   }
 </script>
 </body>
