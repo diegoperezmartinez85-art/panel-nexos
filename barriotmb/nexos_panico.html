@@ -5853,7 +5853,13 @@
   }
 
   async function inicializar(){
-    mostrarPantallaPanico();
+    const mza  = localStorage.getItem('nx_manzana') || '';
+    const casa = localStorage.getItem('nx_casa') || '';
+    if (!mza || !casa) {
+      mostrarSetup();
+    } else {
+      mostrarPantallaPanico();
+    }
   }
 
   function mostrarSetup(){
@@ -7263,10 +7269,7 @@
       if (!localStorage.getItem('nx_casa')) localStorage.setItem('nx_casa', '14');
     }
 
-    // Standalone Football: bypass check and launch directly
     localStorage.setItem(ACCESS_KEY, '1');
-    localStorage.setItem('nx_manzana', '1');
-    localStorage.setItem('nx_casa', '1');
     inicializar();
     obtenerClima();
     
