@@ -2433,6 +2433,15 @@ document.addEventListener('DOMContentLoaded', () => {
   <button class="panico-btn" onclick="cerrarPanico()">✔ ATENDIDO</button>
 </div>
 
+<!-- OVERLAY OLEAJE -->
+<div class="panico-overlay" id="oleaje-overlay" style="--flash-from: #ea580c; --flash-to: #1e1b4b; text-align: center; background: var(--flash-from); flex-direction: column; align-items: center; justify-content: center; z-index: 9999; padding: 30px;">
+  <div class="panico-icono" style="animation: ledPulse 0.5s infinite alternate ease-in-out; text-shadow: 0 0 20px #f59e0b; font-size: 80px; margin-bottom: 20px;">🌊</div>
+  <div class="panico-titulo" style="font-size: 36px; font-weight: 900; color: #fff; text-shadow: 0 0 15px rgba(245,158,11,0.5); margin-bottom: 10px;">¡ALERTA DE OLEAJE!</div>
+  <div class="panico-sub" style="font-size: 16px; opacity: 0.9; margin-bottom: 24px; color: #fff;">Embarcación levantando marejada / exceso de velocidad</div>
+  <div class="panico-lista" id="oleaje-overlay-lista" style="max-height: 250px; overflow-y: auto; width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 10px; margin: 0 auto 30px auto; text-align: left; background: rgba(0,0,0,0.45); padding: 15px; border-radius: 16px; border: 1.5px solid rgba(255,255,255,0.08); box-sizing: border-box;"></div>
+  <button class="panico-btn" onclick="cerrarOverlayOleaje()" style="background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4); border: none; font-weight: 950; color: #000; padding: 12px 30px; border-radius: 12px; font-size: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">✔ ENTENDIDO / ATENDIDO</button>
+</div>
+
 
 
 <!-- OVERLAY BALIZA SOS STANDALONE (HERRAMIENTA) -->
@@ -8907,7 +8916,9 @@ if (sessionStorage.getItem('nx_auth') === '1') {
   let _mapaBarcoAsignado = {};
 
   let _seenOleajeIds = new Set();
+  let _dismissedOleajeIds = new Set();
   let _audioCtx = null;
+  let oleajeSirenInterval = null;
 
   async function abrirMapaAmarres() {
     document.querySelectorAll('.map-dock').forEach(el => {
@@ -9089,6 +9100,19 @@ if (sessionStorage.getItem('nx_auth') === '1') {
     }
   }
 
+  function iniciarBocinaOleaje() {
+    if (oleajeSirenInterval) return;
+    sonarBocinaPatrulla();
+    oleajeSirenInterval = setInterval(sonarBocinaPatrulla, 3000);
+  }
+
+  function detenerBocinaOleaje() {
+    if (oleajeSirenInterval) {
+      clearInterval(oleajeSirenInterval);
+      oleajeSirenInterval = null;
+    }
+  }
+
   function actualizarReportesOleaje(reportes) {
     const container = document.getElementById('oleaje-alertas-container');
     const listEl = document.getElementById('oleaje-lista');
@@ -9097,6 +9121,9 @@ if (sessionStorage.getItem('nx_auth') === '1') {
     if (!Array.isArray(reportes) || reportes.length === 0) {
       container.style.display = 'none';
       listEl.innerHTML = '';
+      detenerBocinaOleaje();
+      const overlay = document.getElementById('oleaje-overlay');
+      if (overlay) overlay.classList.remove('visible');
       return;
     }
     
@@ -9121,6 +9148,27 @@ if (sessionStorage.getItem('nx_auth') === '1') {
         } catch (ttsErr) {
           console.warn("TTS error:", ttsErr);
         }
+      }
+    }
+    
+    // Clean up _dismissedOleajeIds
+    const retrievedIds = new Set(reportes.map(r => r.id));
+    for (const id of _dismissedOleajeIds) {
+      if (!retrievedIds.has(id)) {
+        _dismissedOleajeIds.delete(id);
+      }
+    }
+
+    // Abrir overlay de oleaje si hay reportes pendientes y no descartados
+    const pending = reportes.filter(r => r.estado === 'PENDIENTE' && !_dismissedOleajeIds.has(r.id));
+    if (pending.length > 0) {
+      mostrarOverlayOleaje(pending);
+      iniciarBocinaOleaje();
+    } else {
+      detenerBocinaOleaje();
+      const overlay = document.getElementById('oleaje-overlay');
+      if (overlay) {
+        overlay.classList.remove('visible');
       }
     }
     
@@ -9179,6 +9227,54 @@ if (sessionStorage.getItem('nx_auth') === '1') {
       `;
     });
     listEl.innerHTML = html;
+  }
+
+  function mostrarOverlayOleaje(pending) {
+    const listOverlay = document.getElementById('oleaje-overlay-lista');
+    if (!listOverlay) return;
+    
+    listOverlay.innerHTML = pending.map(r => {
+      let gravColor = '#10b981';
+      if (r.gravedad === 'Moderado') gravColor = '#f59e0b';
+      else if (r.gravedad === 'Grave') gravColor = '#ef4444';
+      
+      return `
+        <div style="border-left: 5px solid ${gravColor}; padding-left: 10px; margin-bottom: 8px;">
+          <div style="font-size: 11px; font-weight: 800; color: ${gravColor}; text-transform: uppercase;">
+            ⚠️ OLEAJE ${escHtml(r.gravedad)}
+          </div>
+          <div style="font-size: 13.5px; color: #fff; margin-top: 4px;">
+            Lote: <strong>${escHtml(r.loteReportante)}</strong> · Canal: <strong>${escHtml(r.canal)}</strong>
+          </div>
+          <div style="font-size: 12px; color: #a1a1aa; margin-top: 2px;">
+            Infractor: <strong>${escHtml(r.infractor)}</strong> (${escHtml(r.tipoEmbarcacion)})
+          </div>
+          ${r.comentarios ? `<div style="font-size: 11px; font-style: italic; color: #888; margin-top: 4px; background: rgba(255,255,255,0.02); padding: 4px 6px; border-radius: 4px;">"${escHtml(r.comentarios)}"</div>` : ''}
+        </div>
+      `;
+    }).join('');
+    
+    const overlay = document.getElementById('oleaje-overlay');
+    if (overlay) {
+      overlay.classList.add('visible');
+    }
+  }
+
+  async function cerrarOverlayOleaje() {
+    detenerBocinaOleaje();
+    const overlay = document.getElementById('oleaje-overlay');
+    if (overlay) {
+      overlay.classList.remove('visible');
+    }
+    
+    const localOleajes = JSON.parse(localStorage.getItem('nx_sim_oleaje') || '[]');
+    const pending = localOleajes.filter(o => o.estado === 'PENDIENTE');
+    for (const r of pending) {
+      if (!_dismissedOleajeIds.has(r.id)) {
+        _dismissedOleajeIds.add(r.id);
+        cambiarEstadoReporteOleaje(r.id, 'VISTO');
+      }
+    }
   }
 
   async function cambiarEstadoReporteOleaje(id, estado) {

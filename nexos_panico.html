@@ -3227,23 +3227,31 @@
         box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
       }
     }
+    @keyframes pulse-green-text {
+      0% { text-shadow: 0 0 10px rgba(16,185,129,0.4), 0 0 2px rgba(16,185,129,0.2); }
+      100% { text-shadow: 0 0 25px rgba(16,185,129,0.95), 0 0 8px rgba(16,185,129,0.6); }
+    }
+    @keyframes card-glow {
+      0% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.35); }
+      100% { box-shadow: 0 0 60px rgba(16, 185, 129, 0.7); }
+    }
   </style>
 </head>
 <body>
 
 <!-- ══ POPUP DE INGRESO VALIDADO ══ -->
-<div id="modal-ingreso-validado" style="display: none; position: fixed; inset: 0; background: rgba(9, 9, 12, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 10000; align-items: center; justify-content: center; padding: 24px;">
-  <div style="background: rgba(14, 14, 18, 0.9); border: 2px solid #10b981; box-shadow: 0 0 35px rgba(16, 185, 129, 0.25); border-radius: 24px; padding: 28px; width: 100%; max-width: 340px; text-align: center; box-sizing: border-box; position: relative;">
-    <div style="width: 72px; height: 72px; background: rgba(16, 185, 129, 0.12); border: 2px solid #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 20px auto; animation: pulse-green 2.5s infinite; color: #10b981;">
+<div id="modal-ingreso-validado" style="display: none; position: fixed; inset: 0; background: rgba(5, 20, 15, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 10000; align-items: center; justify-content: center; padding: 24px;">
+  <div style="background: rgba(10, 10, 14, 0.98); border: 3px solid #10b981; box-shadow: 0 0 50px rgba(16, 185, 129, 0.6); border-radius: 28px; padding: 35px 24px; width: 100%; max-width: 350px; text-align: center; box-sizing: border-box; position: relative; animation: card-glow 2s infinite alternate;">
+    <div style="width: 84px; height: 84px; background: rgba(16, 185, 129, 0.15); border: 3px solid #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 38px; margin: 0 auto 24px auto; animation: pulse-green 2s infinite; color: #10b981; text-shadow: 0 0 10px rgba(16,185,129,0.5);">
       ✓
     </div>
-    <div style="font-size: 19px; font-weight: 900; color: #10b981; margin-bottom: 8px; letter-spacing: 0.5px; text-transform: uppercase;">INGRESO VALIDADO</div>
-    <div style="font-size: 14px; color: #fff; font-weight: 700; margin-bottom: 14px; font-family: monospace; letter-spacing: 1px;" id="val-matricula-text">🛥️ —</div>
-    <div style="font-size: 13px; color: #d4d4d8; line-height: 1.6; margin-bottom: 24px;">
-      La guardia ha confirmado tu ingreso.<br>
-      <strong>¡Ya podés ingresar al barrio náutico!</strong>
+    <div style="font-size: 26px; font-weight: 955; color: #10b981; margin-bottom: 12px; letter-spacing: 2px; text-shadow: 0 0 25px rgba(16,185,129,0.8); text-transform: uppercase; animation: pulse-green-text 1.5s infinite alternate;">🟢 INGRESO OK</div>
+    <div style="font-size: 15px; color: #fff; font-weight: 800; margin-bottom: 16px; font-family: monospace; letter-spacing: 1.5px; background: rgba(16,185,129,0.08); padding: 6px 12px; border-radius: 8px; display: inline-block;" id="val-matricula-text">🛥️ —</div>
+    <div style="font-size: 13.5px; color: #e4e4e7; line-height: 1.6; margin-bottom: 28px;">
+      La guardia ha confirmado la autorización.<br>
+      <strong style="color: #fff; font-size: 14px;">¡Ya podés ingresar al barrio náutico!</strong>
     </div>
-    <button onclick="cerrarModalIngresoValidado()" style="width: 100%; padding: 12px; border-radius: 14px; border: none; background: linear-gradient(135deg, #10b981, #059669); color: white; font-weight: 800; font-size: 13px; cursor: pointer; box-shadow: 0 4px 15px rgba(16,185,129,0.25);">
+    <button onclick="cerrarModalIngresoValidado()" style="width: 100%; padding: 14px; border-radius: 16px; border: none; background: linear-gradient(135deg, #10b981, #059669); color: white; font-weight: 900; font-size: 14px; cursor: pointer; box-shadow: 0 4px 20px rgba(16,185,129,0.35); transition: transform 0.15s;">
       ENTENDIDO
     </button>
   </div>
@@ -3391,6 +3399,7 @@ async function syncMisVisitas() {
           mostrarPopupIngresoValidado(matchingEntry.pat);
         }
       }
+      actualizarEstadoBotonToken(); // Sincronizar el botón
       
       if (d.ok && Array.isArray(d.visitas)) {
         if (listEl) {
@@ -3491,6 +3500,15 @@ function guardarFrecuenteActual() {
 
 // Abre el formulario de datos previo al token
 function generarToken() {
+  const ultValidado = localStorage.getItem('nx_ultimo_token_validado');
+  const ultTs = parseInt(localStorage.getItem('nx_ultimo_token_ts') || '0');
+  const ahora = Date.now();
+  
+  if (ultValidado === 'false' && (ahora - ultTs) < 420000) {
+    mostrarTokenActivoExistente();
+    return;
+  }
+
   renderFrecuentes();
   // Pre-llenar campos desde la configuración del vecino
   document.getElementById('tk-matricula').value = localStorage.getItem('nx_matricula') || '';
@@ -3560,6 +3578,11 @@ function tkConfirmarYGenerarToken() {
   localStorage.setItem('nx_ultimo_token_matricula', matricula);
   localStorage.setItem('nx_ultimo_token_ts', String(Date.now()));
   localStorage.setItem('nx_ultimo_token_validado', 'false');
+  localStorage.setItem('nx_ultimo_token_nombre', nombre);
+  localStorage.setItem('nx_ultimo_token_muelle', muelle);
+  localStorage.setItem('nx_ultimo_token_lote', lote);
+
+  actualizarEstadoBotonToken(); // Actualizar el botón al generar el token
 
   // Poblar modal token
   document.getElementById('token-val').innerText = t;
@@ -3608,6 +3631,8 @@ function tkConfirmarYGenerarToken() {
 
     if (tr <= 0) {
       clearInterval(_tokenInterval); _tokenInterval = null;
+      localStorage.setItem('nx_ultimo_token_validado', 'true');
+      actualizarEstadoBotonToken();
       document.getElementById('reloj-token').innerText = 'EXPIRADO';
       document.getElementById('reloj-token').style.color = '#ef4444';
       document.getElementById('token-barra').style.width = '0%';
@@ -3624,6 +3649,7 @@ function cerrarModalToken() {
 
 function cerrarModalIngresoValidado() {
   document.getElementById('modal-ingreso-validado').style.display = 'none';
+  actualizarEstadoBotonToken(); // Forzar actualización de botón
 }
 
 function mostrarPopupIngresoValidado(matricula) {
@@ -3631,6 +3657,7 @@ function mostrarPopupIngresoValidado(matricula) {
   try { if (typeof triggerHaptic === 'function') triggerHaptic('success'); } catch(e) {}
   
   cerrarModalToken();
+  actualizarEstadoBotonToken();
   
   const matEl = document.getElementById('val-matricula-text');
   if (matEl) {
@@ -3676,6 +3703,150 @@ async function verificarTokenValidadoServidor() {
   } catch (e) {
     console.warn("Error checking token validation status:", e);
   }
+}
+
+function actualizarEstadoBotonToken() {
+  const btn = document.getElementById('btn-visita-trigger');
+  if (!btn) return;
+  
+  const ultValidado = localStorage.getItem('nx_ultimo_token_validado');
+  const ultTs = parseInt(localStorage.getItem('nx_ultimo_token_ts') || '0');
+  const ahora = Date.now();
+  
+  if (ultValidado === 'false' && (ahora - ultTs) < 420000) {
+    const t = localStorage.getItem('nx_ultimo_token_generado') || 'PEND';
+    btn.innerHTML = `
+      <svg class="btn-icon-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2a3 3 0 0 1 3 3v1h2a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2V5a3 3 0 0 1 3-3z"/>
+        <circle cx="12" cy="14" r="2"/>
+        <line x1="12" y1="16" x2="12" y2="19"/>
+      </svg>
+      🛥️ VER TOKEN ACTIVO (${t})
+    `;
+    btn.style.borderColor = '#06b6d4';
+    btn.style.background = 'rgba(6,182,212,0.08)';
+  } else {
+    btn.innerHTML = `
+      <svg class="btn-icon-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2a3 3 0 0 1 3 3v1h2a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2V5a3 3 0 0 1 3-3z"/>
+        <circle cx="12" cy="14" r="2"/>
+        <line x1="12" y1="16" x2="12" y2="19"/>
+      </svg>
+      🛥️ TOKEN DE EMBARQUE
+    `;
+    btn.style.borderColor = '';
+    btn.style.background = '';
+  }
+}
+
+function mostrarTokenActivoExistente() {
+  const t = localStorage.getItem('nx_ultimo_token_generado');
+  const matricula = localStorage.getItem('nx_ultimo_token_matricula');
+  const ultTs = parseInt(localStorage.getItem('nx_ultimo_token_ts') || '0');
+  const ahora = Date.now();
+  const tr = Math.max(0, Math.floor((420000 - (ahora - ultTs)) / 1000));
+  
+  if (tr <= 0) {
+    localStorage.setItem('nx_ultimo_token_validado', 'true');
+    actualizarEstadoBotonToken();
+    generarToken();
+    return;
+  }
+
+  if (_tokenInterval) { clearInterval(_tokenInterval); _tokenInterval = null; }
+  
+  document.getElementById('token-val').innerText = t;
+  document.getElementById('token-val').style.opacity = '1';
+  document.getElementById('token-barra').style.width = '100%';
+  
+  document.getElementById('tk-info-matricula').innerText = '🛥️ ' + (localStorage.getItem('nx_ultimo_token_matricula') || '—');
+  document.getElementById('tk-info-nombre').innerText    = localStorage.getItem('nx_ultimo_token_nombre')    || '—';
+  document.getElementById('tk-info-muelle').innerText   = localStorage.getItem('nx_ultimo_token_muelle')   ? '⚓ ' + localStorage.getItem('nx_ultimo_token_muelle') : '⚓ —';
+  document.getElementById('tk-info-lote').innerText     = localStorage.getItem('nx_ultimo_token_lote')     ? '🏝 ' + localStorage.getItem('nx_ultimo_token_lote') : '🏝 —';
+
+  document.getElementById('modal-token').style.display = 'flex';
+
+  const TOTAL = 420;
+  let timeLeft = tr;
+  _tokenInterval = setInterval(() => {
+    timeLeft--;
+    const m = Math.floor(timeLeft/60).toString().padStart(2,'0');
+    const s = (timeLeft%60).toString().padStart(2,'0');
+    document.getElementById('reloj-token').innerText = m+':'+s;
+    document.getElementById('token-barra').style.width = ((timeLeft/TOTAL)*100)+'%';
+    if (timeLeft <= 60) document.getElementById('reloj-token').style.color = '#ef4444';
+    
+    if (timeLeft % 4 === 0) {
+      verificarTokenValidadoServidor();
+    }
+
+    if (timeLeft <= 0) {
+      clearInterval(_tokenInterval); _tokenInterval = null;
+      localStorage.setItem('nx_ultimo_token_validado', 'true');
+      actualizarEstadoBotonToken();
+      document.getElementById('reloj-token').innerText = 'EXPIRADO';
+      document.getElementById('reloj-token').style.color = '#ef4444';
+      document.getElementById('token-barra').style.width = '0%';
+      document.getElementById('token-val').style.opacity = '0.3';
+    }
+  }, 1000);
+}
+
+let _olPressTimeout = null;
+let _olPressInterval = null;
+
+function initBtnOleajeLongPress() {
+  const btn = document.getElementById('btn-enviar-oleaje');
+  if (!btn) return;
+  
+  btn.removeAttribute('onclick');
+  
+  const prg = document.getElementById('btn-enviar-oleaje-progress');
+  const txt = document.getElementById('btn-enviar-oleaje-text');
+  
+  let progress = 0;
+  
+  const startPress = (e) => {
+    e.preventDefault();
+    if (btn.disabled) return;
+    
+    progress = 0;
+    if (prg) prg.style.width = '0%';
+    if (txt) txt.innerText = '⏳ MANTENÉ PRESIONADO...';
+    
+    _olPressTimeout = setTimeout(() => {
+      clearInterval(_olPressInterval);
+      if (prg) prg.style.width = '100%';
+      if (txt) txt.innerText = '🚀 ENVIANDO...';
+      enviarReporteOleaje();
+    }, 1500);
+    
+    const step = 100;
+    _olPressInterval = setInterval(() => {
+      progress += (step / 1500) * 100;
+      if (prg) prg.style.width = Math.min(100, progress) + '%';
+    }, step);
+  };
+  
+  const endPress = () => {
+    if (_olPressTimeout) { clearTimeout(_olPressTimeout); _olPressTimeout = null; }
+    if (_olPressInterval) { clearInterval(_olPressInterval); _olPressInterval = null; }
+    
+    if (!btn.disabled) {
+      if (prg) prg.style.width = '0%';
+      if (txt) txt.innerText = '🚨 MANTENÉ PRESIONADO PARA ENVIAR (1.5s)';
+    }
+  };
+  
+  const cleanBtn = btn.cloneNode(true);
+  btn.parentNode.replaceChild(cleanBtn, btn);
+  
+  cleanBtn.addEventListener('mousedown', startPress);
+  cleanBtn.addEventListener('touchstart', startPress);
+  
+  cleanBtn.addEventListener('mouseup', endPress);
+  cleanBtn.addEventListener('mouseleave', endPress);
+  cleanBtn.addEventListener('touchend', endPress);
 }
 </script>
 
@@ -4225,8 +4396,9 @@ async function verificarTokenValidadoServidor() {
 
     </div>
 
-    <button class="access-btn shimmer-effect" id="btn-enviar-oleaje" onclick="enviarReporteOleaje()" style="width: 100%; margin-top: 20px; background: linear-gradient(135deg, #ef4444, #dc2626); border: none; box-shadow: 0 4px 15px rgba(239,68,68,0.3); font-weight:900; color:white; padding:10px; border-radius:12px; cursor:pointer;">
-      🚨 ENVIAR DENUNCIA A GUARDIA
+    <button class="access-btn" id="btn-enviar-oleaje" style="width: 100%; margin-top: 20px; background: linear-gradient(135deg, #ef4444, #dc2626); border: none; box-shadow: 0 4px 15px rgba(239,68,68,0.3); font-weight:900; color:white; padding:12px; border-radius:12px; cursor:pointer; position: relative; overflow: hidden; user-select: none; -webkit-user-select: none;">
+      <span id="btn-enviar-oleaje-progress" style="position: absolute; top: 0; left: 0; bottom: 0; width: 0%; background: rgba(255, 255, 255, 0.25); transition: width 0.1s linear;"></span>
+      <span id="btn-enviar-oleaje-text" style="position: relative; z-index: 1;">🚨 MANTENÉ PRESIONADO PARA ENVIAR (1.5s)</span>
     </button>
   </div>
 </div>
@@ -5298,10 +5470,11 @@ async function verificarTokenValidadoServidor() {
   }
 
   async function enviarColaOffline(){
+    const url = localStorage.getItem('nx_url') || PANIC_URL;
     const cola = JSON.parse(localStorage.getItem('nx_offline_queue') || '[]');
     if (!cola.length || !navigator.onLine) return;
     for (const item of cola){
-      try{ await fetch(PANIC_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(item.payload)}); }
+      try{ await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(item.payload)}); }
       catch(e){ return; }
     }
     localStorage.removeItem('nx_offline_queue');
@@ -7348,6 +7521,8 @@ async function verificarTokenValidadoServidor() {
     setTimeout(marquesinaInit, 800);
     setTimeout(syncMisVisitas, 2000);
     setInterval(syncMisVisitas, 15000);
+    actualizarEstadoBotonToken();
+    if (typeof initBtnOleajeLongPress === 'function') initBtnOleajeLongPress();
   });
 
 
@@ -7388,9 +7563,13 @@ async function verificarTokenValidadoServidor() {
     const btn = document.getElementById('btn-enviar-oleaje');
     if (btn) {
       btn.disabled = false;
-      btn.innerText = '🚨 ENVIAR DENUNCIA A GUARDIA';
+      const txt = document.getElementById('btn-enviar-oleaje-text');
+      const prg = document.getElementById('btn-enviar-oleaje-progress');
+      if (txt) txt.innerText = '🚨 MANTENÉ PRESIONADO PARA ENVIAR (1.5s)';
+      if (prg) prg.style.width = '0%';
     }
     document.getElementById('modal-reportar-oleaje').style.display = 'flex';
+    if (typeof initBtnOleajeLongPress === 'function') initBtnOleajeLongPress();
   }
 
   function cerrarModalOleaje() {
@@ -7439,10 +7618,9 @@ async function verificarTokenValidadoServidor() {
       }
       
       const btn = document.getElementById('btn-enviar-oleaje');
-      if (btn) {
-        btn.disabled = true;
-        btn.innerText = '⏳ ENVIANDO REPORTE...';
-      }
+      const txt = document.getElementById('btn-enviar-oleaje-text');
+      if (btn) btn.disabled = true;
+      if (txt) txt.innerText = '⏳ ENVIANDO REPORTE...';
       
       const payload = {
         accion: 'registrar_oleaje',
@@ -7488,7 +7666,8 @@ async function verificarTokenValidadoServidor() {
       });
       
       const fetchOptions = {
-        method: 'GET'
+        method: 'GET',
+        mode: 'no-cors'
       };
       if (useAbort && controller) {
         fetchOptions.signal = controller.signal;
