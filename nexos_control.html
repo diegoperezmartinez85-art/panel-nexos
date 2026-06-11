@@ -2747,10 +2747,10 @@ document.addEventListener('DOMContentLoaded', () => {
         <button id="btn-ban-tipo-device" class="btn-modal-action" style="margin:0;background:var(--border);color:#888;flex:1;font-size:12px;padding:8px 0;height:auto;" onclick="setBanTipoForm('device')">Por Dispositivo</button>
       </div>
 
-      <!-- Campos para Baneo por Casa -->
+      <!-- Campos para Baneo por Lote -->
       <div id="form-ban-casa-fields">
         <div class="campo-label">MANZANA *</div><input class="modal-search" id="ban-mza" placeholder="Ej: 5" inputmode="numeric">
-        <div class="campo-label">CASA *</div><input class="modal-search" id="ban-casa" placeholder="Ej: 12" inputmode="numeric">
+        <div class="campo-label">LOTE *</div><input class="modal-search" id="ban-casa" placeholder="Ej: 12 o L-12" inputmode="numeric">
         <div class="campo-label">ID RESIDENTE (opcional)</div><input class="modal-search" id="ban-id" placeholder="DNI, nombre u otro ID">
       </div>
 
@@ -5888,7 +5888,7 @@ function renderBaneados(){
     items.push({
       tipo: 'casa',
       key: `casa-${idx}`,
-      title: `Mza ${escHtml(String(b.mza))} — Casa ${escHtml(String(b.casa))}`,
+      title: `Mza ${escHtml(String(b.mza))} — Lote ${escHtml(String(b.casa))}`,
       subtitle: b.id ? `ID: ${escHtml(b.id)}` : '',
       motivo: b.motivo || '',
       ts: b.ts || 0,
@@ -6022,18 +6022,18 @@ function confirmarBaneo(){
     const id = document.getElementById('ban-id').value.trim();
     
     if(!mza || !casa){
-      if(errEl)errEl.innerText = 'Manzana y Casa son obligatorios';
+      if(errEl)errEl.innerText = 'Manzana y Lote son obligatorios';
       return;
     }
     if(esBaneado(mza,casa)){
-      if(errEl)errEl.innerText = 'Esta casa ya está baneada';
+      if(errEl)errEl.innerText = 'Este lote ya está baneado';
       return;
     }
     
     BANEADOS.push({mza,casa,id,motivo,ts:Date.now()});
     guardarBaneados();
     enviarBaneo({accion:'banear',mza,casa,id,motivo});
-    showToast(`🚷 Mza ${mza} Casa ${casa} baneada`);
+    showToast(`🚷 Mza ${mza} Lote ${casa} baneado`);
   } else {
     const devId = document.getElementById('ban-device-id-input').value.trim();
     if(!devId){
@@ -7300,8 +7300,8 @@ ${hoy.length===0?'  (sin registros hoy)':hoy.slice(-20).map(fmtHoy).join('\n')}
 LISTA NEGRA (${LISTA_NEGRA.length} registros):
 ${LISTA_NEGRA.length===0?'  (vacia)':LISTA_NEGRA.map(r=>`  - Pat:${r.pat||'-'} DNI:${r.dni||'-'} Motivo:${r.motivo||'sin motivo'}`).join('\n')}
 
-VECINOS/CASAS BANEADAS (${BANEADOS.length}):
-${BANEADOS.length===0?'  (ninguno)':BANEADOS.map(b=>`  - Mza:${b.mza} Casa:${b.casa} ID:${b.id||'-'} Motivo:${b.motivo||'-'}`).join('\n')}`;
+VECINOS/LOTES BANEADOS (${BANEADOS.length}):
+${BANEADOS.length===0?'  (ninguno)':BANEADOS.map(b=>`  - Mza:${b.mza} Lote:${b.casa} ID:${b.id||'-'} Motivo:${b.motivo||'-'}`).join('\n')}`;
 }
 
 async function iaEnviar() {

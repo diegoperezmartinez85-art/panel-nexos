@@ -3796,13 +3796,16 @@ let _olPressTimeout = null;
 let _olPressInterval = null;
 
 function initBtnOleajeLongPress() {
-  const btn = document.getElementById('btn-enviar-oleaje');
-  if (!btn) return;
+  const oldBtn = document.getElementById('btn-enviar-oleaje');
+  if (!oldBtn) return;
+  
+  const btn = oldBtn.cloneNode(true);
+  oldBtn.parentNode.replaceChild(btn, oldBtn);
   
   btn.removeAttribute('onclick');
   
-  const prg = document.getElementById('btn-enviar-oleaje-progress');
-  const txt = document.getElementById('btn-enviar-oleaje-text');
+  const prg = btn.querySelector('#btn-enviar-oleaje-progress');
+  const txt = btn.querySelector('#btn-enviar-oleaje-text');
   
   let progress = 0;
   
@@ -3838,15 +3841,12 @@ function initBtnOleajeLongPress() {
     }
   };
   
-  const cleanBtn = btn.cloneNode(true);
-  btn.parentNode.replaceChild(cleanBtn, btn);
+  btn.addEventListener('mousedown', startPress);
+  btn.addEventListener('touchstart', startPress);
   
-  cleanBtn.addEventListener('mousedown', startPress);
-  cleanBtn.addEventListener('touchstart', startPress);
-  
-  cleanBtn.addEventListener('mouseup', endPress);
-  cleanBtn.addEventListener('mouseleave', endPress);
-  cleanBtn.addEventListener('touchend', endPress);
+  btn.addEventListener('mouseup', endPress);
+  btn.addEventListener('mouseleave', endPress);
+  btn.addEventListener('touchend', endPress);
 }
 </script>
 
@@ -4735,7 +4735,7 @@ function initBtnOleajeLongPress() {
     try { sessionStorage.setItem('nx_lp_s', tsStr); } catch(e) {}
   }
 
-  const PANIC_URL = 'https://script.google.com/macros/s/AKfycbyvml-Uai1pnL3Rh8-apCVo5TV3snGC_CNUxg8MXKUkDdmhgaRGoGT2yXbkPSc5P6nJmg/exec';
+  const PANIC_URL = 'https://script.google.com/macros/s/AKfycbwS4ve8zBvRmQLTGlTZWSY4e1xvQ-BSae71nLvlLghCoAtWl-aCXkz4gza_NhrRIsGNYQ/exec';
 
 
   function actualizarOffline(){
