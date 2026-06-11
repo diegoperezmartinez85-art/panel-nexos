@@ -3325,12 +3325,12 @@
 
 <!-- ══ PASO 2: MODAL TOKEN GENERADO ══ -->
 <div id="modal-token" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:9999; flex-direction:column; align-items:center; justify-content:center; color:white; font-family:sans-serif; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);">
-  <div style="text-align:center; padding:32px 28px; background:linear-gradient(145deg,#0e1a2b,#0a1520); border:1.5px solid #06b6d4; border-radius:28px; box-shadow:0 0 60px rgba(6,182,212,0.25); max-width:310px; width:92%; box-sizing:border-box;">
-    <div style="font-size:32px; margin-bottom:4px;">⚓</div>
-    <div style="font-size:10px; font-weight:800; letter-spacing:3px; color:#06b6d4; margin-bottom:16px;">TOKEN DE EMBARQUE</div>
+  <div id="token-card-box" style="text-align:center; padding:32px 28px; background:linear-gradient(145deg,#0e1a2b,#0a1520); border:1.5px solid #06b6d4; border-radius:28px; box-shadow:0 0 60px rgba(6,182,212,0.25); max-width:310px; width:92%; box-sizing:border-box; transition: all 0.5s ease;">
+    <div id="token-card-icon" style="font-size:32px; margin-bottom:4px;">⚓</div>
+    <div id="token-card-title" style="font-size:10px; font-weight:800; letter-spacing:3px; color:#06b6d4; margin-bottom:16px; transition: color 0.5s ease;">TOKEN DE EMBARQUE</div>
 
     <!-- Token code -->
-    <div id="token-val" style="font-size:60px; font-weight:900; margin:8px 0; letter-spacing:12px; color:#ffffff; font-family:monospace; text-shadow:0 0 30px rgba(6,182,212,0.6);">----</div>
+    <div id="token-val" style="font-size:60px; font-weight:900; margin:8px 0; letter-spacing:12px; color:#ffffff; font-family:monospace; text-shadow:0 0 30px rgba(6,182,212,0.6); transition: all 0.5s ease;">----</div>
 
     <!-- Info del embarque -->
     <div id="tk-info-display" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:10px 14px; margin:12px 0; text-align:left;">
@@ -3342,17 +3342,21 @@
       </div>
     </div>
 
-    <div style="font-size:10px; color:#444; margin-bottom:8px; letter-spacing:1px;">MOSTRÁ ESTE CÓDIGO AL VIGILADOR</div>
+    <!-- Banner de ingreso aprobado (oculto por defecto) -->
+    <div id="token-card-ok-status" style="display:none; font-size:18px; font-weight:900; color:#10b981; text-transform:uppercase; letter-spacing:1.5px; margin: 15px 0 10px 0; animation: pulse-green-text 1.5s infinite alternate;">🟢 INGRESO OK</div>
+    <div id="token-card-ok-msg" style="display:none; font-size:12.5px; color:#e4e4e7; line-height:1.5; margin-bottom:18px;">La guardia ha confirmado tu ingreso.<br><strong>¡Ya podés ingresar al barrio!</strong></div>
+
+    <div id="token-card-instruction" style="font-size:10px; color:#444; margin-bottom:8px; letter-spacing:1px;">MOSTRÁ ESTE CÓDIGO AL VIGILADOR</div>
 
     <!-- Barra de progreso + reloj -->
-    <div style="display:flex; align-items:center; gap:8px; margin-bottom:18px;">
+    <div id="token-card-progress-area" style="display:flex; align-items:center; gap:8px; margin-bottom:18px;">
       <div style="flex:1; height:4px; background:#1a1a1a; border-radius:4px; overflow:hidden;">
         <div id="token-barra" style="height:100%; width:100%; background:linear-gradient(90deg,#06b6d4,#0ea5e9); transition:width 1s linear; border-radius:4px;"></div>
       </div>
       <div id="reloj-token" style="font-size:15px; font-weight:800; color:#f59e0b; min-width:46px; text-align:right;">07:00</div>
     </div>
 
-    <button onclick="cerrarModalToken()" style="padding:12px; width:100%; border-radius:12px; border:none; background:rgba(255,255,255,0.06); color:#666; font-size:13px; font-weight:700; cursor:pointer;">✕ Cerrar</button>
+    <button id="token-card-close-btn" onclick="cerrarModalToken()" style="padding:12px; width:100%; border-radius:12px; border:none; background:rgba(255,255,255,0.06); color:#666; font-size:13px; font-weight:700; cursor:pointer; transition: all 0.3s ease;">✕ Cerrar</button>
   </div>
 </div>
 
@@ -3390,10 +3394,11 @@ async function syncMisVisitas() {
       const ultMatricula = localStorage.getItem('nx_ultimo_token_matricula');
       const ultValidado = localStorage.getItem('nx_ultimo_token_validado');
       if (ultMatricula && ultValidado === 'false' && d.ok && Array.isArray(d.visitas)) {
-        const matchingEntry = d.visitas.find(v => 
-          v.tipo === 'TOKEN_NAUTICO' && 
-          String(v.pat).trim().toUpperCase() === ultMatricula.toUpperCase()
-        );
+        const matchingEntry = d.visitas.find(v => {
+          const vPat = String(v.pat || '').replace(/[^A-Z0-9]/g, '').toUpperCase();
+          const tPat = String(ultMatricula || '').replace(/[^A-Z0-9]/g, '').toUpperCase();
+          return vPat === tPat;
+        });
         if (matchingEntry) {
           localStorage.setItem('nx_ultimo_token_validado', 'true');
           mostrarPopupIngresoValidado(matchingEntry.pat);
@@ -3553,6 +3558,7 @@ function tkAutocompletar(val) {
 
 // Confirmar datos y mostrar el token
 function tkConfirmarYGenerarToken() {
+  resetTokenCardState();
   const matricula = document.getElementById('tk-matricula').value.trim().toUpperCase();
   if (!matricula) {
     document.getElementById('tk-matricula').style.borderColor = '#ef4444';
@@ -3641,10 +3647,71 @@ function tkConfirmarYGenerarToken() {
   }, 1000);
 }
 
+function resetTokenCardState() {
+  const box = document.getElementById('token-card-box');
+  const icon = document.getElementById('token-card-icon');
+  const title = document.getElementById('token-card-title');
+  const instr = document.getElementById('token-card-instruction');
+  const prog = document.getElementById('token-card-progress-area');
+  const closeBtn = document.getElementById('token-card-close-btn');
+  const statusOk = document.getElementById('token-card-ok-status');
+  const msgOk = document.getElementById('token-card-ok-msg');
+  
+  if (box) {
+    box.style.border = '1.5px solid #06b6d4';
+    box.style.boxShadow = '0 0 60px rgba(6,182,212,0.25)';
+  }
+  if (icon) icon.innerText = '⚓';
+  if (title) {
+    title.innerText = 'TOKEN DE EMBARQUE';
+    title.style.color = '#06b6d4';
+  }
+  if (instr) instr.style.display = 'block';
+  if (prog) prog.style.display = 'flex';
+  if (statusOk) statusOk.style.display = 'none';
+  if (msgOk) msgOk.style.display = 'none';
+  if (closeBtn) {
+    closeBtn.innerText = '✕ Cerrar';
+    closeBtn.style.background = 'rgba(255,255,255,0.06)';
+    closeBtn.style.color = '#666';
+  }
+}
+
+function transformTokenCardToSuccess() {
+  const box = document.getElementById('token-card-box');
+  const icon = document.getElementById('token-card-icon');
+  const title = document.getElementById('token-card-title');
+  const instr = document.getElementById('token-card-instruction');
+  const prog = document.getElementById('token-card-progress-area');
+  const closeBtn = document.getElementById('token-card-close-btn');
+  const statusOk = document.getElementById('token-card-ok-status');
+  const msgOk = document.getElementById('token-card-ok-msg');
+  
+  if (box) {
+    box.style.border = '3px solid #10b981';
+    box.style.boxShadow = '0 0 60px rgba(16,185,129,0.5)';
+  }
+  if (icon) icon.innerText = '✅';
+  if (title) {
+    title.innerText = 'INGRESO AUTORIZADO';
+    title.style.color = '#10b981';
+  }
+  if (instr) instr.style.display = 'none';
+  if (prog) prog.style.display = 'none';
+  if (statusOk) statusOk.style.display = 'block';
+  if (msgOk) msgOk.style.display = 'block';
+  if (closeBtn) {
+    closeBtn.innerText = 'ENTENDIDO';
+    closeBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+    closeBtn.style.color = '#fff';
+  }
+}
+
 function cerrarModalToken() {
   if (_tokenInterval) { clearInterval(_tokenInterval); _tokenInterval = null; }
   document.getElementById('modal-token').style.display = 'none';
   document.getElementById('token-val').style.opacity = '1';
+  resetTokenCardState();
 }
 
 function cerrarModalIngresoValidado() {
@@ -3656,17 +3723,22 @@ function mostrarPopupIngresoValidado(matricula) {
   try { playSound('success'); } catch(e) {}
   try { if (typeof triggerHaptic === 'function') triggerHaptic('success'); } catch(e) {}
   
-  cerrarModalToken();
+  if (_tokenInterval) { clearInterval(_tokenInterval); _tokenInterval = null; }
   actualizarEstadoBotonToken();
   
-  const matEl = document.getElementById('val-matricula-text');
-  if (matEl) {
-    matEl.innerText = '🛥️ ' + (matricula || 'EMBARCACIÓN');
-  }
-  
-  const pop = document.getElementById('modal-ingreso-validado');
-  if (pop) {
-    pop.style.display = 'flex';
+  const tokenModal = document.getElementById('modal-token');
+  if (tokenModal && tokenModal.style.display === 'flex') {
+    transformTokenCardToSuccess();
+  } else {
+    const matEl = document.getElementById('val-matricula-text');
+    if (matEl) {
+      matEl.innerText = '🛥️ ' + (matricula || 'EMBARCACIÓN');
+    }
+    
+    const pop = document.getElementById('modal-ingreso-validado');
+    if (pop) {
+      pop.style.display = 'flex';
+    }
   }
 }
 
@@ -3690,10 +3762,11 @@ async function verificarTokenValidadoServidor() {
     if (r.ok) {
       const d = await r.json();
       if (d.ok && Array.isArray(d.visitas)) {
-        const matchingEntry = d.visitas.find(v => 
-          v.tipo === 'TOKEN_NAUTICO' && 
-          String(v.pat).trim().toUpperCase() === ultMatricula.toUpperCase()
-        );
+        const matchingEntry = d.visitas.find(v => {
+          const vPat = String(v.pat || '').replace(/[^A-Z0-9]/g, '').toUpperCase();
+          const tPat = String(ultMatricula || '').replace(/[^A-Z0-9]/g, '').toUpperCase();
+          return vPat === tPat;
+        });
         if (matchingEntry) {
           localStorage.setItem('nx_ultimo_token_validado', 'true');
           mostrarPopupIngresoValidado(matchingEntry.pat);
@@ -3740,6 +3813,7 @@ function actualizarEstadoBotonToken() {
 }
 
 function mostrarTokenActivoExistente() {
+  resetTokenCardState();
   const t = localStorage.getItem('nx_ultimo_token_generado');
   const matricula = localStorage.getItem('nx_ultimo_token_matricula');
   const ultTs = parseInt(localStorage.getItem('nx_ultimo_token_ts') || '0');
@@ -6022,8 +6096,15 @@ function initBtnOleajeLongPress() {
     }
   };
 
-  // ── DOMContentLoaded ──────────────────────────────────
   window.addEventListener('DOMContentLoaded', () => {
+    // Migrar cualquier URL de Apps Script vieja a la nueva URL activa
+    const newUrl = 'https://script.google.com/macros/s/AKfycbwS4ve8zBvRmQLTGlTZWSY4e1xvQ-BSae71nLvlLghCoAtWl-aCXkz4gza_NhrRIsGNYQ/exec';
+    const currentUrl = localStorage.getItem('nx_url');
+    if (currentUrl && currentUrl.includes('script.google.com') && currentUrl !== newUrl) {
+      localStorage.setItem('nx_url', newUrl);
+      console.log('Migrated stored nx_url to active URL:', newUrl);
+    }
+
     // Cargar ajustes guardados
     const savedTheme = localStorage.getItem('nx_theme_name') || 'cyan';
     const savedColor = localStorage.getItem('nx_theme_color') || '#06b6d4';
@@ -7503,17 +7584,16 @@ function initBtnOleajeLongPress() {
 
     // Velocidad en px/s
     const pxPerSecond = _marquesinaMode === 1 ? 65 : (_marquesinaMode === 2 ? 65 : 38);
-
-    // Doble rAF: primer frame pinta el DOM, segundo frame ya tiene dimensiones reales
-    requestAnimationFrame(() => {
+      // Doble rAF: primer frame pinta el DOM, segundo frame ya tiene dimensiones reales
       requestAnimationFrame(() => {
-        const halfWidth = ticker.scrollWidth / 2; // mitad porque el contenido esta duplicado
-        const duration = Math.max(5, halfWidth / pxPerSecond);
-        // Usar variable CSS para que el keyframe conozca la distancia exacta
-        ticker.style.setProperty('--ticker-dist', `-${halfWidth}px`);
-        ticker.style.animation = `marquee-scroll ${duration.toFixed(1)}s linear infinite`;
+        requestAnimationFrame(() => {
+          const halfWidth = ticker.scrollWidth / 2; // mitad porque el contenido esta duplicado
+          const duration = Math.max(5, halfWidth / pxPerSecond);
+          // Usar variable CSS para que el keyframe conozca la distancia exacta
+          ticker.style.setProperty('--ticker-dist', `-${halfWidth}px`);
+          ticker.style.animation = `marquee-scroll ${duration.toFixed(1)}s linear infinite`;
+        });
       });
-    });
   }
 
   // Inicializar marquesina cuando se cargue la pantalla principal
@@ -7555,7 +7635,20 @@ function initBtnOleajeLongPress() {
   }
 
   function abrirModalOleaje() {
-    triggerHaptic('soft');
+    const lastOleajeTs = parseInt(localStorage.getItem('nx_last_oleaje_ts') || '0');
+    const ahora = Date.now();
+    const diff = ahora - lastOleajeTs;
+    if (diff < 300000) {
+      const remainingSecs = Math.ceil((300000 - diff) / 1000);
+      const mins = Math.floor(remainingSecs / 60);
+      const secs = remainingSecs % 60;
+      const timeStr = (mins > 0 ? mins + 'm ' : '') + secs + 's';
+      if (typeof triggerHaptic === 'function') triggerHaptic('error');
+      showToast(`⏳ ESPERÁ ${timeStr} PARA VOLVER A REPORTAR`);
+      return;
+    }
+
+    if (typeof triggerHaptic === 'function') triggerHaptic('soft');
     playSound('pop');
     document.getElementById('ol-infractor').value = '';
     document.getElementById('ol-comentarios').value = '';
@@ -7605,11 +7698,33 @@ function initBtnOleajeLongPress() {
   }
 
   async function enviarReporteOleaje() {
+    const lastOleajeTs = parseInt(localStorage.getItem('nx_last_oleaje_ts') || '0');
+    const ahora = Date.now();
+    const diff = ahora - lastOleajeTs;
+    if (diff < 300000) {
+      const remainingSecs = Math.ceil((300000 - diff) / 1000);
+      const mins = Math.floor(remainingSecs / 60);
+      const secs = remainingSecs % 60;
+      const timeStr = (mins > 0 ? mins + 'm ' : '') + secs + 's';
+      showToast(`⏳ ESPERÁ ${timeStr} PARA VOLVER A REPORTAR`);
+      cerrarModalOleaje();
+      return;
+    }
+
+    // Registrar cooldown inmediatamente para evitar envíos repetitivos/spam
+    localStorage.setItem('nx_last_oleaje_ts', String(ahora));
+
     try {
-      const canal = document.getElementById('ol-canal').value;
-      const infractor = document.getElementById('ol-infractor').value.trim().toUpperCase();
-      const tipo = document.getElementById('ol-tipo').value;
-      const comentarios = document.getElementById('ol-comentarios').value.trim();
+      const canalEl = document.getElementById('ol-canal');
+      const infractorEl = document.getElementById('ol-infractor');
+      const tipoEl = document.getElementById('ol-tipo');
+      const comentariosEl = document.getElementById('ol-comentarios');
+      
+      const canal = canalEl ? canalEl.value : 'Canal A';
+      const infractor = infractorEl ? infractorEl.value.trim().toUpperCase() : '';
+      const tipo = tipoEl ? tipoEl.value : 'Lancha';
+      const comentarios = comentariosEl ? comentariosEl.value.trim() : '';
+      
       const url = localStorage.getItem('nx_url') || PANIC_URL;
       
       if (!url) {
@@ -7627,7 +7742,7 @@ function initBtnOleajeLongPress() {
         loteReportante: 'Lote ' + (localStorage.getItem('nx_manzana') || '?') + ' (Propietario: ' + (localStorage.getItem('nx_casa') || '?') + ')',
         infractor: infractor,
         tipoEmbarcacion: tipo,
-        gravedad: _olGravedad,
+        gravedad: typeof _olGravedad !== 'undefined' ? _olGravedad : 'Moderado',
         canal: canal,
         comentarios: comentarios
       };
@@ -7665,10 +7780,7 @@ function initBtnOleajeLongPress() {
         t: Date.now()
       });
       
-      const fetchOptions = {
-        method: 'GET',
-        mode: 'no-cors'
-      };
+      const fetchOptions = {};
       if (useAbort && controller) {
         fetchOptions.signal = controller.signal;
       }
@@ -7686,7 +7798,6 @@ function initBtnOleajeLongPress() {
         } catch(err) {}
         showToast('🌊 REPORTE REGISTRADO (MODO COLA/OFFLINE)');
       });
-      
     } catch (e) {
       console.error("Critical error in enviarReporteOleaje:", e);
       showToast('⚠️ ERROR AL PROCESAR REPORTE');

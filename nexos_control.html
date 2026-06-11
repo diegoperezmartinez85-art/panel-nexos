@@ -7439,6 +7439,17 @@ function ajustarScrollTop(){
 window.addEventListener('resize',ajustarScrollTop);
 
 function iniciarApp(){
+  // Migrar cualquier URL de Apps Script vieja a la nueva URL activa
+  const newUrl = 'https://script.google.com/macros/s/AKfycbwS4ve8zBvRmQLTGlTZWSY4e1xvQ-BSae71nLvlLghCoAtWl-aCXkz4gza_NhrRIsGNYQ/exec';
+  const currentUrl = localStorage.getItem('nx_url');
+  if (currentUrl && currentUrl.includes('script.google.com') && currentUrl !== newUrl) {
+    localStorage.setItem('nx_url', newUrl);
+    console.log('Migrated stored nx_url to active URL:', newUrl);
+  } else if (!currentUrl) {
+    localStorage.setItem('nx_url', newUrl);
+    console.log('Initialized empty nx_url to active URL:', newUrl);
+  }
+
   document.getElementById('cfg-url').value=localStorage.getItem('nx_url')||'';
   document.getElementById('cfg-lpr-token').value=localStorage.getItem('nx_lpr_token')||'';
   document.getElementById('cfg-github-vecino').value=localStorage.getItem('nx_github_raw_vecino')||'';
