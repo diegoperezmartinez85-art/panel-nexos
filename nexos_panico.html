@@ -3631,7 +3631,7 @@ function tkConfirmarYGenerarToken() {
     if (tr <= 60) document.getElementById('reloj-token').style.color = '#ef4444';
     
     // Cada 4 segundos, verificar si el token fue validado en el servidor
-    if (tr % 4 === 0) {
+    if (tr % 2 === 0) {
       verificarTokenValidadoServidor();
     }
 
@@ -3850,7 +3850,7 @@ function mostrarTokenActivoExistente() {
     document.getElementById('token-barra').style.width = ((timeLeft/TOTAL)*100)+'%';
     if (timeLeft <= 60) document.getElementById('reloj-token').style.color = '#ef4444';
     
-    if (timeLeft % 4 === 0) {
+    if (timeLeft % 2 === 0) {
       verificarTokenValidadoServidor();
     }
 
@@ -4165,22 +4165,7 @@ function initBtnOleajeLongPress() {
     </div>
   </div>
 
-
-  <!-- Reporte de Oleaje -->
-  <div id="oleaje-report-section" style="width:100%; max-width:360px; margin-top:14px; text-align:left; background:rgba(239,68,68,0.04); border:1.5px solid rgba(239,68,68,0.25); border-radius:20px; padding:16px; box-shadow:0 10px 30px rgba(0,0,0,0.3); backdrop-filter:blur(10px); box-sizing:border-box;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <span style="font-size:12px; font-weight:800; color:#ef4444; letter-spacing:1px; display:inline-flex; align-items:center; gap:6px;">🌊 REPORTE DE OLEAJE (CANALES)</span>
-      <span style="font-size:12px;">🚤</span>
-    </div>
-    <div style="font-size:11px; color:#aaa; line-height:1.4; margin-bottom:12px;">
-      Si avistaste una lancha a exceso de velocidad levantando olas molestas, denúncialo a la guardia aquí.
-    </div>
-    <button class="btn-visita-trigger shimmer-effect" onclick="abrirModalOleaje()" style="width:100%; margin-top:0; background:linear-gradient(135deg,#ef4444,#dc2626); border:none; box-shadow:0 4px 15px rgba(239,68,68,0.3); color:white; padding:10px; border-radius:12px; font-weight:800; cursor:pointer;">
-      🚨 CREAR DENUNCIA DE OLEAJE
-    </button>
-  </div>
-
-  <!-- Grupo secundario: configuración y social -->
+  <!-- Grupo secundario: configuracion y social -->
   <div class="btn-group-secondary">
     <button class="btn-cfg-main shimmer-effect" onclick="pedirPinParaCambiar()">
       <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -4209,6 +4194,9 @@ function initBtnOleajeLongPress() {
     <!-- Cargados por JS -->
   </div>
 </div>
+
+
+  
 
 <!-- DIRECTORIO TELEFÓNICO DE EMERGENCIAS -->
 <div class="pantalla-directorio" id="pantalla-directorio">
@@ -4421,66 +4409,9 @@ function initBtnOleajeLongPress() {
   </div>
 </div>
 
-<!-- MODAL REPORTE DE OLEAJE -->
-<div class="modal-overlay" id="modal-reportar-oleaje" onclick="cerrarModalOleaje()" style="display: none; position: fixed; inset: 0; background: rgba(9, 9, 12, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 9500; align-items: center; justify-content: center; padding: 20px; cursor: pointer;">
-  <div class="modal-box" onclick="event.stopPropagation()" style="background: rgba(14, 14, 18, 0.85); backdrop-filter: blur(30px); border-radius: 24px; border: 1.5px solid rgba(239, 68, 68, 0.35); padding: 22px; width: 100%; max-width: 380px; box-shadow: 0 10px 45px rgba(0, 0, 0, 0.7); box-sizing: border-box; text-align: center; position: relative; cursor: default;">
-    <button class="modal-close" onclick="cerrarModalOleaje()" style="position: absolute; top: 16px; right: 16px; background: none; border: none; color: #a1a1aa; font-size: 20px; cursor: pointer;">✕</button>
-    <div class="modal-title" style="color: #ef4444; font-size: 17px; font-weight: 900; margin-bottom: 12px; letter-spacing: 0.5px;">🌊 DENUNCIAR OLEAJE / VELOCIDAD</div>
-    
-    <div style="text-align: left; font-size: 11px; color: #d4d4d8; display: flex; flex-direction: column; gap: 12px;">
+
+
       
-      <!-- Ubicación -->
-      <div>
-        <label style="font-weight: 800; color: #a1a1aa; letter-spacing: 1px; font-size: 10px; text-transform: uppercase;">📍 Canal / Ubicación *</label>
-        <select id="ol-canal" style="width:100%; padding:10px; margin-top:4px; background:rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.15); border-radius:10px; color:white; font-size:13px; outline:none;">
-          <option value="Canal A" style="background:#141418;">Canal A (Norte)</option>
-          <option value="Canal B" style="background:#141418;">Canal B (Sur)</option>
-          <option value="Dársena Central" style="background:#141418;">Dársena Central</option>
-          <option value="Muelle Principal" style="background:#141418;">Muelle Principal (Amenities)</option>
-        </select>
-      </div>
-
-      <!-- Gravedad -->
-      <div>
-        <label style="font-weight: 800; color: #a1a1aa; letter-spacing: 1px; font-size: 10px; text-transform: uppercase;">⚠️ Gravedad del Oleaje *</label>
-        <div style="display: flex; gap: 6px; margin-top: 4px;">
-          <button id="btn-ol-leve" onclick="setOlGravedad('Leve')" style="flex:1; padding:8px; border-radius:8px; border:1px solid #71717a; background:transparent; color:#71717a; font-weight:800; font-size:11px; cursor:pointer;">Leve</button>
-          <button id="btn-ol-moderado" onclick="setOlGravedad('Moderado')" style="flex:1; padding:8px; border-radius:8px; border:1.5px solid #f59e0b; background:rgba(245,158,11,0.15); color:#f59e0b; font-weight:800; font-size:11px; cursor:pointer;">Moderado</button>
-          <button id="btn-ol-grave" onclick="setOlGravedad('Grave')" style="flex:1; padding:8px; border-radius:8px; border:1px solid #71717a; background:transparent; color:#71717a; font-weight:800; font-size:11px; cursor:pointer;">Grave 🚨</button>
-        </div>
-      </div>
-
-      <!-- Embarcación Infractora -->
-      <div>
-        <label style="font-weight: 800; color: #a1a1aa; letter-spacing: 1px; font-size: 10px; text-transform: uppercase;">⛵ Matrícula / Lote Infractor (Opcional)</label>
-        <input id="ol-infractor" type="text" placeholder="Ej: REY-999 o L-15" style="width:100%; padding:10px; margin-top:4px; background:rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.15); border-radius:10px; color:white; font-size:13px; outline:none; text-transform:uppercase; box-sizing:border-box;">
-      </div>
-
-      <!-- Tipo de Embarcación -->
-      <div>
-        <label style="font-weight: 800; color: #a1a1aa; letter-spacing: 1px; font-size: 10px; text-transform: uppercase;">🛥️ Tipo de Embarcación *</label>
-        <select id="ol-tipo" style="width:100%; padding:10px; margin-top:4px; background:rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.15); border-radius:10px; color:white; font-size:13px; outline:none;">
-          <option value="Lancha" style="background:#141418;">Lancha</option>
-          <option value="Yate" style="background:#141418;">Yate / Crucero</option>
-          <option value="Moto de agua" style="background:#141418;">Moto de agua</option>
-          <option value="Semirrígido" style="background:#141418;">Semirrígido / Gomón</option>
-        </select>
-      </div>
-
-      <!-- Comentarios -->
-      <div>
-        <label style="font-weight: 800; color: #a1a1aa; letter-spacing: 1px; font-size: 10px; text-transform: uppercase;">💬 Comentarios / Descripción</label>
-        <textarea id="ol-comentarios" placeholder="Ej: Pasó muy rápido levantando una ola que golpeó los barcos amarrados." rows="2" style="width:100%; padding:10px; margin-top:4px; background:rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.15); border-radius:10px; color:white; font-size:13px; outline:none; font-family:sans-serif; resize:none; box-sizing:border-box;"></textarea>
-      </div>
-
-    </div>
-
-    <button class="access-btn" id="btn-enviar-oleaje" style="width: 100%; margin-top: 20px; background: linear-gradient(135deg, #ef4444, #dc2626); border: none; box-shadow: 0 4px 15px rgba(239,68,68,0.3); font-weight:900; color:white; padding:12px; border-radius:12px; cursor:pointer; position: relative; overflow: hidden; user-select: none; -webkit-user-select: none;">
-      <span id="btn-enviar-oleaje-progress" style="position: absolute; top: 0; left: 0; bottom: 0; width: 0%; background: rgba(255, 255, 255, 0.25); transition: width 0.1s linear;"></span>
-      <span id="btn-enviar-oleaje-text" style="position: relative; z-index: 1;">🚨 MANTENÉ PRESIONADO PARA ENVIAR (1.5s)</span>
-    </button>
-  </div>
-</div>
 
 <!-- MODAL DE NOVEDADES DEL ECO-SISTEMA VECINO -->
 <div class="modal-overlay" id="modal-novedades-sistema-panico" onclick="cerrarModal('modal-novedades-sistema-panico')" style="display: none; position: fixed; inset: 0; background: rgba(9, 9, 12, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 9500; align-items: center; justify-content: center; padding: 20px; cursor: pointer;">
@@ -4814,7 +4745,7 @@ function initBtnOleajeLongPress() {
     try { sessionStorage.setItem('nx_lp_s', tsStr); } catch(e) {}
   }
 
-  const PANIC_URL = 'https://script.google.com/macros/s/AKfycbwS4ve8zBvRmQLTGlTZWSY4e1xvQ-BSae71nLvlLghCoAtWl-aCXkz4gza_NhrRIsGNYQ/exec';
+  const PANIC_URL = 'https://script.google.com/macros/s/AKfycbz7aGvirGs-D3kLN3YgyGuqPuwScjoIxd1NSeuZI7BRu152afCL458pljW2M_IUGEdeVQ/exec';
 
 
   function actualizarOffline(){
@@ -4966,6 +4897,7 @@ function initBtnOleajeLongPress() {
     localStorage.setItem('nx_casa', casa);
     localStorage.setItem('nx_muelle', muelle);
     localStorage.setItem('nx_matricula', matricula);
+    localStorage.setItem('nx_setup_completed', 'true');
     
     // Registrar vinculación en el servidor de inmediato durante la configuración
     fetch(`${PANIC_URL}?accion=vincular&deviceId=${encodeURIComponent(DEVICE_ID)}&mza=${encodeURIComponent(mza)}&casa=${encodeURIComponent(casa)}&t=${Date.now()}`)
@@ -5591,6 +5523,7 @@ function initBtnOleajeLongPress() {
     localStorage.setItem('nx_casa', casa);
     localStorage.setItem('nx_muelle', muelle);
     localStorage.setItem('nx_matricula', matricula);
+    localStorage.setItem('nx_setup_completed', 'true');
     if (urlVal) {
       localStorage.setItem('nx_url', urlVal);
     } else {
@@ -5601,7 +5534,7 @@ function initBtnOleajeLongPress() {
   }
 
   // ══════════════════════════════════════════════════════
-  // PIN DE ADMINISTRADOR — XOR ofuscado (key 0x4E)
+  // PIN DE ADMINISTRADOR — XOR ofuscada (key 0x4E)
   // El valor real nunca aparece en texto plano en el código
   // ══════════════════════════════════════════════════════
   const _pc = '7f7d7a7c';
@@ -6102,12 +6035,12 @@ function initBtnOleajeLongPress() {
   };
 
   window.addEventListener('DOMContentLoaded', () => {
-    // Migrar cualquier URL de Apps Script vieja a la nueva URL activa
-    const newUrl = 'https://script.google.com/macros/s/AKfycbwS4ve8zBvRmQLTGlTZWSY4e1xvQ-BSae71nLvlLghCoAtWl-aCXkz4gza_NhrRIsGNYQ/exec';
+    // Migrar cualquier URL de Apps Script vieja o vacía a la nueva URL activa
+    const newUrl = 'https://script.google.com/macros/s/AKfycbz7aGvirGs-D3kLN3YgyGuqPuwScjoIxd1NSeuZI7BRu152afCL458pljW2M_IUGEdeVQ/exec';
     const currentUrl = localStorage.getItem('nx_url');
-    if (currentUrl && currentUrl.includes('script.google.com') && currentUrl !== newUrl) {
+    if (!currentUrl || (currentUrl.includes('script.google.com') && currentUrl !== newUrl)) {
       localStorage.setItem('nx_url', newUrl);
-      console.log('Migrated stored nx_url to active URL:', newUrl);
+      console.log('Migrated/Initialized stored nx_url to active URL:', newUrl);
     }
 
     // Cargar ajustes guardados
@@ -6156,11 +6089,17 @@ function initBtnOleajeLongPress() {
       if (!localStorage.getItem('nx_casa')) localStorage.setItem('nx_casa', '14');
     }
 
-    // Standalone Football: bypass check and launch directly
+    // Validación de lote/casa por única vez (Onboarding)
     localStorage.setItem(ACCESS_KEY, '1');
-    localStorage.setItem('nx_manzana', '1');
-    localStorage.setItem('nx_casa', '1');
-    inicializar();
+    const setupCompleted = localStorage.getItem('nx_setup_completed');
+    if (setupCompleted === 'true') {
+      inicializar();
+    } else {
+      // Limpiar posibles residuos de pruebas anteriores para exigir configuración
+      localStorage.removeItem('nx_manzana');
+      localStorage.removeItem('nx_casa');
+      mostrarSetup();
+    }
     obtenerClima();
     
     // Desbloqueo de Audio por interacción
@@ -7605,16 +7544,21 @@ function initBtnOleajeLongPress() {
   document.addEventListener('DOMContentLoaded', () => {
     setTimeout(marquesinaInit, 800);
     setTimeout(syncMisVisitas, 2000);
-    setInterval(syncMisVisitas, 15000);
+    setInterval(syncMisVisitas, 5000);
     actualizarEstadoBotonToken();
-    if (typeof initBtnOleajeLongPress === 'function') initBtnOleajeLongPress();
+    
+    
+    // Inicializar cooldown de oleaje y procesar cola offline
+    
+    
+    setTimeout(enviarColaOffline, 3000);
   });
 
 
 
   // ── NUEVOS CAMPOS Y FUNCIONES NÁUTICAS ──
   let _datosClimaNautico = { altura: 1.20, viento: 15, direccion: 'SE' };
-  let _olGravedad = 'Moderado';
+  
 
   function actualizarPildoraClimaNautico(clima) {
     if (!clima) return;
@@ -7636,179 +7580,6 @@ function initBtnOleajeLongPress() {
           parent.style.background = '';
         }
       }
-    }
-  }
-
-  function abrirModalOleaje() {
-    const lastOleajeTs = parseInt(localStorage.getItem('nx_last_oleaje_ts') || '0');
-    const ahora = Date.now();
-    const diff = ahora - lastOleajeTs;
-    if (diff < 300000) {
-      const remainingSecs = Math.ceil((300000 - diff) / 1000);
-      const mins = Math.floor(remainingSecs / 60);
-      const secs = remainingSecs % 60;
-      const timeStr = (mins > 0 ? mins + 'm ' : '') + secs + 's';
-      if (typeof triggerHaptic === 'function') triggerHaptic('error');
-      showToast(`⏳ ESPERÁ ${timeStr} PARA VOLVER A REPORTAR`);
-      return;
-    }
-
-    if (typeof triggerHaptic === 'function') triggerHaptic('soft');
-    playSound('pop');
-    document.getElementById('ol-infractor').value = '';
-    document.getElementById('ol-comentarios').value = '';
-    setOlGravedad('Moderado');
-    const btn = document.getElementById('btn-enviar-oleaje');
-    if (btn) {
-      btn.disabled = false;
-      const txt = document.getElementById('btn-enviar-oleaje-text');
-      const prg = document.getElementById('btn-enviar-oleaje-progress');
-      if (txt) txt.innerText = '🚨 MANTENÉ PRESIONADO PARA ENVIAR (1.5s)';
-      if (prg) prg.style.width = '0%';
-    }
-    document.getElementById('modal-reportar-oleaje').style.display = 'flex';
-    if (typeof initBtnOleajeLongPress === 'function') initBtnOleajeLongPress();
-  }
-
-  function cerrarModalOleaje() {
-    document.getElementById('modal-reportar-oleaje').style.display = 'none';
-  }
-
-  function setOlGravedad(g) {
-    _olGravedad = g;
-    const btnLeve = document.getElementById('btn-ol-leve');
-    const btnMod = document.getElementById('btn-ol-moderado');
-    const btnGrave = document.getElementById('btn-ol-grave');
-    if (!btnLeve || !btnMod || !btnGrave) return;
-    
-    [btnLeve, btnMod, btnGrave].forEach(b => {
-      b.style.border = '1px solid #71717a';
-      b.style.background = 'transparent';
-      b.style.color = '#71717a';
-    });
-    
-    if (g === 'Leve') {
-      btnLeve.style.border = '1.5px solid #10b981';
-      btnLeve.style.background = 'rgba(16,185,129,0.15)';
-      btnLeve.style.color = '#10b981';
-    } else if (g === 'Moderado') {
-      btnMod.style.border = '1.5px solid #f59e0b';
-      btnMod.style.background = 'rgba(245,158,11,0.15)';
-      btnMod.style.color = '#f59e0b';
-    } else if (g === 'Grave') {
-      btnGrave.style.border = '1.5px solid #ef4444';
-      btnGrave.style.background = 'rgba(239,68,68,0.15)';
-      btnGrave.style.color = '#ef4444';
-    }
-  }
-
-  async function enviarReporteOleaje() {
-    const lastOleajeTs = parseInt(localStorage.getItem('nx_last_oleaje_ts') || '0');
-    const ahora = Date.now();
-    const diff = ahora - lastOleajeTs;
-    if (diff < 300000) {
-      const remainingSecs = Math.ceil((300000 - diff) / 1000);
-      const mins = Math.floor(remainingSecs / 60);
-      const secs = remainingSecs % 60;
-      const timeStr = (mins > 0 ? mins + 'm ' : '') + secs + 's';
-      showToast(`⏳ ESPERÁ ${timeStr} PARA VOLVER A REPORTAR`);
-      cerrarModalOleaje();
-      return;
-    }
-
-    // Registrar cooldown inmediatamente para evitar envíos repetitivos/spam
-    localStorage.setItem('nx_last_oleaje_ts', String(ahora));
-
-    try {
-      const canalEl = document.getElementById('ol-canal');
-      const infractorEl = document.getElementById('ol-infractor');
-      const tipoEl = document.getElementById('ol-tipo');
-      const comentariosEl = document.getElementById('ol-comentarios');
-      
-      const canal = canalEl ? canalEl.value : 'Canal A';
-      const infractor = infractorEl ? infractorEl.value.trim().toUpperCase() : '';
-      const tipo = tipoEl ? tipoEl.value : 'Lancha';
-      const comentarios = comentariosEl ? comentariosEl.value.trim() : '';
-      
-      const url = localStorage.getItem('nx_url') || PANIC_URL;
-      
-      if (!url) {
-        alert('Error: URL del servidor no configurada');
-        return;
-      }
-      
-      const btn = document.getElementById('btn-enviar-oleaje');
-      const txt = document.getElementById('btn-enviar-oleaje-text');
-      if (btn) btn.disabled = true;
-      if (txt) txt.innerText = '⏳ ENVIANDO REPORTE...';
-      
-      const payload = {
-        accion: 'registrar_oleaje',
-        loteReportante: 'Lote ' + (localStorage.getItem('nx_manzana') || '?') + ' (Propietario: ' + (localStorage.getItem('nx_casa') || '?') + ')',
-        infractor: infractor,
-        tipoEmbarcacion: tipo,
-        gravedad: typeof _olGravedad !== 'undefined' ? _olGravedad : 'Moderado',
-        canal: canal,
-        comentarios: comentarios
-      };
-      
-      // Cerrar el modal y sonar/vibrar de inmediato para feedback instantáneo sin esperas
-      cerrarModalOleaje();
-      if (typeof triggerHaptic === 'function') triggerHaptic('medium');
-      showToast('🌊 Enviando reporte de oleaje...');
-      
-      // Enviar en segundo plano de manera segura
-      let useAbort = true;
-      let controller;
-      let timeoutId;
-      try {
-        if (typeof AbortController !== 'undefined') {
-          controller = new AbortController();
-          timeoutId = setTimeout(() => {
-            try { controller.abort(); } catch(ae) {}
-          }, 6000);
-        } else {
-          useAbort = false;
-        }
-      } catch(e) {
-        useAbort = false;
-      }
-      
-      const params = new URLSearchParams({
-        accion: 'registrar_oleaje',
-        loteReportante: payload.loteReportante,
-        infractor: payload.infractor,
-        tipoEmbarcacion: payload.tipoEmbarcacion,
-        gravedad: payload.gravedad,
-        canal: payload.canal,
-        comentarios: payload.comentarios,
-        t: Date.now()
-      });
-      
-      const fetchOptions = {};
-      if (useAbort && controller) {
-        fetchOptions.signal = controller.signal;
-      }
-      
-      fetch(url + '?' + params.toString(), fetchOptions)
-      .then(() => {
-        if (timeoutId) clearTimeout(timeoutId);
-        showToast('🌊 REPORTE ENVIADO A LA GUARDIA OK');
-      })
-      .catch((e) => {
-        if (timeoutId) clearTimeout(timeoutId);
-        console.warn("Error background sending wave report, caching offline:", e);
-        try {
-          guardarOffline(payload);
-        } catch(err) {}
-        showToast('🌊 REPORTE REGISTRADO (MODO COLA/OFFLINE)');
-      });
-    } catch (e) {
-      console.error("Critical error in enviarReporteOleaje:", e);
-      showToast('⚠️ ERROR AL PROCESAR REPORTE');
-      try {
-        cerrarModalOleaje();
-      } catch(err) {}
     }
   }
 </script>

@@ -2124,7 +2124,7 @@ function abrirValidarToken() {
   _tokenPendienteData = null;
   cargarTokensRecientes();
   if (_tokenPollingInterval) clearInterval(_tokenPollingInterval);
-  _tokenPollingInterval = setInterval(cargarTokensRecientes, 8000);
+  _tokenPollingInterval = setInterval(cargarTokensRecientes, 3000);
 }
 
 function abrirValidarTokenDesdeAlerta() {
@@ -2179,19 +2179,49 @@ function mostrarTarjetaToken(d, tokenCode) {
   setTimeout(() => document.getElementById('token-data-card').scrollIntoView({behavior:'smooth', block:'nearest'}), 100);
 }
 
-function confirmarIngresoToken() {
+async function confirmarIngresoToken() {
   if (!_tokenPendienteData) return;
   const d = _tokenPendienteData;
   const btn = document.getElementById('btn-confirmar-ingreso');
   btn.disabled = true;
   btn.innerText = '⏳ Registrando...';
 
+  // CONTROL DE DUPLICADO
+  if (d.token) {
+    const localDupe = (typeof DB !== 'undefined' ? DB : []).some(x => x.token && String(x.token).toUpperCase() === String(d.token).toUpperCase());
+    if (localDupe) {
+      showToast('⚠️ ERROR: Token ya validado localmente');
+      btn.disabled = false;
+      btn.innerText = 'Confirmar Ingreso';
+      setTimeout(() => cerrarValidarToken(), 1500);
+      return;
+    }
+    try {
+      const url = localStorage.getItem('nx_url');
+      if (url) {
+        const r = await fetch(url + '?accion=validar_token&token=' + d.token + '&t=' + Date.now());
+        if (r.ok) {
+          const resData = await r.json();
+          if (!resData.valido) {
+            showToast('⚠️ ERROR: ' + (resData.error || 'Token ya utilizado por otro vigilador'));
+            btn.disabled = false;
+            btn.innerText = 'Confirmar Ingreso';
+            setTimeout(() => cerrarValidarToken(), 1800);
+            return;
+          }
+        }
+      }
+    } catch(e) {
+      console.warn("Fallo verificación de red, se procede:", e);
+    }
+  }
+
   const item = {
     id:   Date.now(),
     pat:  d.matricula || 'S/M',
     dni:  '',
     mza:  d.mza  || '',
-    casa: d.lote  || d.casa || '',
+    casa: d.casa || d.lote || '',
     tipo: 'TOKEN_NAUTICO',
     hE:   horaActual(),
     hS:   '',
@@ -2222,16 +2252,44 @@ function confirmarIngresoToken() {
   setTimeout(() => cerrarValidarToken(), 1800);
 }
 
-function confirmarIngresoDirecto() {
+async function confirmarIngresoDirecto() {
   if (!_tokenPendienteData) return;
   const d = _tokenPendienteData;
+
+  // CONTROL DE DUPLICADO
+  if (d.token) {
+    const localDupe = (typeof DB !== 'undefined' ? DB : []).some(x => x.token && String(x.token).toUpperCase() === String(d.token).toUpperCase());
+    if (localDupe) {
+      showToast('⚠️ ERROR: Token ya validado localmente');
+      cerrarTokenBanner();
+      cargarTokensRecientes();
+      return;
+    }
+    try {
+      const url = localStorage.getItem('nx_url');
+      if (url) {
+        const r = await fetch(url + '?accion=validar_token&token=' + d.token + '&t=' + Date.now());
+        if (r.ok) {
+          const resData = await r.json();
+          if (!resData.valido) {
+            showToast('⚠️ ERROR: ' + (resData.error || 'Token ya utilizado por otro vigilador'));
+            cerrarTokenBanner();
+            cargarTokensRecientes();
+            return;
+          }
+        }
+      }
+    } catch(e) {
+      console.warn("Fallo verificación de red, se procede:", e);
+    }
+  }
 
   const item = {
     id:   Date.now(),
     pat:  d.matricula || 'S/M',
     dni:  '',
     mza:  d.mza  || '',
-    casa: d.lote  || d.casa || '',
+    casa: d.casa || d.lote || '',
     tipo: 'TOKEN_NAUTICO',
     hE:   horaActual(),
     hS:   '',
@@ -2354,7 +2412,7 @@ function iniciarPollingTokens() {
     } else {
       cargarTokensRecientes();
     }
-  }, 10000);
+  }, 3000);
 }
 
 let _bannerTimeout = null;
@@ -7440,7 +7498,7 @@ window.addEventListener('resize',ajustarScrollTop);
 
 function iniciarApp(){
   // Migrar cualquier URL de Apps Script vieja a la nueva URL activa
-  const newUrl = 'https://script.google.com/macros/s/AKfycbwS4ve8zBvRmQLTGlTZWSY4e1xvQ-BSae71nLvlLghCoAtWl-aCXkz4gza_NhrRIsGNYQ/exec';
+  const newUrl = 'https://script.google.com/macros/s/AKfycbz7aGvirGs-D3kLN3YgyGuqPuwScjoIxd1NSeuZI7BRu152afCL458pljW2M_IUGEdeVQ/exec';
   const currentUrl = localStorage.getItem('nx_url');
   if (currentUrl && currentUrl.includes('script.google.com') && currentUrl !== newUrl) {
     localStorage.setItem('nx_url', newUrl);
