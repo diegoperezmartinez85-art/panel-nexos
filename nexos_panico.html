@@ -3887,12 +3887,17 @@ function initBtnOleajeLongPress() {
     e.preventDefault();
     if (btn.disabled) return;
     
+    // Evitar múltiples temporizadores si se disparan eventos touchstart y mousedown en simultáneo
+    if (_olPressTimeout) { clearTimeout(_olPressTimeout); _olPressTimeout = null; }
+    if (_olPressInterval) { clearInterval(_olPressInterval); _olPressInterval = null; }
+    
     progress = 0;
     if (prg) prg.style.width = '0%';
     if (txt) txt.innerText = '⏳ MANTENÉ PRESIONADO...';
     
     _olPressTimeout = setTimeout(() => {
-      clearInterval(_olPressInterval);
+      if (_olPressInterval) { clearInterval(_olPressInterval); _olPressInterval = null; }
+      if (btn) btn.disabled = true;
       if (prg) prg.style.width = '100%';
       if (txt) txt.innerText = '🚀 ENVIANDO...';
       enviarReporteOleaje();
