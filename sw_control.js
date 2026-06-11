@@ -5,7 +5,7 @@
 //  v2.0: Push notifications mejoradas con acciones
 // ══════════════════════════════════════════════════════════
 
-const CACHE_NAME  = 'nexos-control-v2.6';
+const CACHE_NAME  = 'nexos-control-v2.7';
 const OFFLINE_URL = './nexos_control.html';
 
 const PRECACHE_ASSETS = [
