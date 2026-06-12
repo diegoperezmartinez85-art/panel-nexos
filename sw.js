@@ -1,6 +1,6 @@
 // ── NEXOS SERVICE WORKER ─────────────────────────────────
 // Versión: cambiar este número para forzar actualización
-const CACHE_NAME = 'nexos-v1.9';
+const CACHE_NAME = 'nexos-v1.10';
 
 // Archivos que se guardan offline
 const ARCHIVOS = [
