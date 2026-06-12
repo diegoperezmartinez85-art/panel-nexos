@@ -3235,9 +3235,27 @@
       0% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.35); }
       100% { box-shadow: 0 0 60px rgba(16, 185, 129, 0.7); }
     }
+    @keyframes banner-slide-down {
+      from { transform: translate(-50%, -100px); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
+    @keyframes marea-icon-shake {
+      0% { transform: rotate(-8deg) scale(1); }
+      100% { transform: rotate(8deg) scale(1.15); }
+    }
   </style>
 </head>
 <body>
+
+<!-- BANNER DE ALERTA DE MAREA CRÍTICA -->
+<div id="marea-alerta-banner" style="display: none; position: fixed; top: 16px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 380px; z-index: 10005; background: rgba(18, 18, 24, 0.95); border: 2.5px solid var(--marea-border, #ef4444); border-radius: 20px; padding: 14px 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.7), 0 0 25px var(--marea-glow, rgba(239, 68, 68, 0.35)); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); font-family: system-ui, -apple-system, sans-serif; align-items: center; gap: 12px; transition: all 0.3s ease; animation: banner-slide-down 0.4s ease-out;">
+  <div id="marea-alerta-icon" style="font-size: 26px; animation: marea-icon-shake 1.5s infinite alternate; display: flex; align-items: center; justify-content: center;">🚨</div>
+  <div style="flex: 1; text-align: left;">
+    <div id="marea-alerta-titulo" style="font-size: 11px; font-weight: 900; color: var(--marea-color, #ef4444); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 2px;">⚠️ ALERTA DE SUDESTADA</div>
+    <div id="marea-alerta-cuerpo" style="font-size: 12px; color: #fff; line-height: 1.4; font-weight: 600;"></div>
+  </div>
+  <button onclick="cerrarMareaAlertaBanner()" style="background: rgba(255,255,255,0.06); border: none; color: #aaa; font-size: 14px; font-weight: 700; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; outline: none; margin-left: 4px; transition: all 0.2s;-webkit-tap-highlight-color:transparent;">✕</button>
+</div>
 
 <!-- ══ POPUP DE INGRESO VALIDADO ══ -->
 <div id="modal-ingreso-validado" style="display: none; position: fixed; inset: 0; background: rgba(5, 20, 15, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 10000; align-items: center; justify-content: center; padding: 24px;">
@@ -3366,6 +3384,7 @@ let _tokenInterval = null;
 
 // Visitas Adentro
 async function syncMisVisitas() {
+  if (document.visibilityState !== 'visible') return;
   const url = localStorage.getItem('nx_url') || PANIC_URL;
   const mza = localStorage.getItem('nx_manzana') || localStorage.getItem('nx_mza') || '0';
   const casa = localStorage.getItem('nx_casa') || '0';
@@ -4237,6 +4256,16 @@ function initBtnOleajeLongPress() {
         <div class="dir-card-call-btn">📞</div>
       </div>
     </a>
+    <a href="tel:106" class="dir-card-link" onclick="triggerHaptic('soft'); playSound('tap')">
+      <div class="dir-card" style="--dcolor: 26,188,156; --dcglow: rgba(26,188,156,0.15)">
+        <div class="dir-card-icon">⚓</div>
+        <div class="dir-card-info">
+          <div class="dir-card-name">Prefectura Naval (106)</div>
+          <div class="dir-card-sub">Emergencias náuticas y seguridad en el río</div>
+        </div>
+        <div class="dir-card-call-btn">📞</div>
+      </div>
+    </a>
     <a href="tel:#" class="dir-card-link" id="dir-guardia-link" onclick="triggerHaptic('soft'); playSound('tap')">
       <div class="dir-card" style="--dcolor: 46,204,113; --dcglow: rgba(46,204,113,0.15)">
         <div class="dir-card-icon">🛡️</div>
@@ -4745,7 +4774,7 @@ function initBtnOleajeLongPress() {
     try { sessionStorage.setItem('nx_lp_s', tsStr); } catch(e) {}
   }
 
-  const PANIC_URL = 'https://script.google.com/macros/s/AKfycbz7aGvirGs-D3kLN3YgyGuqPuwScjoIxd1NSeuZI7BRu152afCL458pljW2M_IUGEdeVQ/exec';
+  const PANIC_URL = 'https://script.google.com/macros/s/AKfycbwv6PU1SDLR-6MO6CmtaQr_KcEJhwfy3u-eCasomB7RfKMOFP4mOf7istvAvlzhN9jMFA/exec';
 
 
   function actualizarOffline(){
@@ -4834,7 +4863,32 @@ function initBtnOleajeLongPress() {
   }
 
   async function inicializar(){
+    const mza = localStorage.getItem('nx_manzana') || '';
+    const casa = localStorage.getItem('nx_casa') || '';
+    
+    // Check locally cached bans first
+    const ban = esBaneado(mza, casa);
+    if (ban) {
+      mostrarPantallaBaneado(ban);
+      return;
+    }
+    
     mostrarPantallaPanico();
+    
+    // Asynchronously fetch fresh bans to verify
+    try {
+      await cargarBaneados();
+      const banFresh = esBaneado(mza, casa);
+      if (banFresh) {
+        mostrarPantallaBaneado(banFresh);
+      } else {
+        // If they were banned but are now unbanned, restore the panic screen
+        const banScreenVisible = document.getElementById('pantalla-baneado').classList.contains('visible');
+        if (banScreenVisible) {
+          mostrarPantallaPanico();
+        }
+      }
+    } catch (err) {}
   }
 
   function mostrarSetup(){
@@ -6036,7 +6090,7 @@ function initBtnOleajeLongPress() {
 
   window.addEventListener('DOMContentLoaded', () => {
     // Migrar cualquier URL de Apps Script vieja o vacía a la nueva URL activa
-    const newUrl = 'https://script.google.com/macros/s/AKfycbz7aGvirGs-D3kLN3YgyGuqPuwScjoIxd1NSeuZI7BRu152afCL458pljW2M_IUGEdeVQ/exec';
+    const newUrl = 'https://script.google.com/macros/s/AKfycbwv6PU1SDLR-6MO6CmtaQr_KcEJhwfy3u-eCasomB7RfKMOFP4mOf7istvAvlzhN9jMFA/exec';
     const currentUrl = localStorage.getItem('nx_url');
     if (!currentUrl || (currentUrl.includes('script.google.com') && currentUrl !== newUrl)) {
       localStorage.setItem('nx_url', newUrl);
@@ -7544,7 +7598,7 @@ function initBtnOleajeLongPress() {
   document.addEventListener('DOMContentLoaded', () => {
     setTimeout(marquesinaInit, 800);
     setTimeout(syncMisVisitas, 2000);
-    setInterval(syncMisVisitas, 5000);
+    setInterval(syncMisVisitas, 20000);
     actualizarEstadoBotonToken();
     
     
@@ -7558,7 +7612,60 @@ function initBtnOleajeLongPress() {
 
   // ── NUEVOS CAMPOS Y FUNCIONES NÁUTICAS ──
   let _datosClimaNautico = { altura: 1.20, viento: 15, direccion: 'SE' };
-  
+  let _mareaAlertaDesestimada = null; // Guardar última altura desestimada por el vecino
+
+  function actualizarBannerAlertaMarea(altura) {
+    const banner = document.getElementById('marea-alerta-banner');
+    if (!banner) return;
+    
+    // Si el vecino desestimó esta altura exacta, no volver a molestar
+    if (_mareaAlertaDesestimada === altura) return;
+    
+    if (altura >= 2.40) {
+      const iconEl = document.getElementById('marea-alerta-icon');
+      const titleEl = document.getElementById('marea-alerta-titulo');
+      const bodyEl = document.getElementById('marea-alerta-cuerpo');
+      
+      if (iconEl) iconEl.innerText = '🌊';
+      if (titleEl) {
+        titleEl.innerText = '⚠️ ALERTA DE SUDESTADA';
+        titleEl.style.color = '#ef4444';
+      }
+      if (bodyEl) bodyEl.innerHTML = `El río está en <strong>${altura.toFixed(2)}m</strong>. Alto riesgo de inundación de muelles. Asegure las amarras de su embarcación.`;
+      
+      banner.style.setProperty('--marea-border', '#ef4444');
+      banner.style.setProperty('--marea-color', '#ef4444');
+      banner.style.setProperty('--marea-glow', 'rgba(239, 68, 68, 0.4)');
+      banner.style.display = 'flex';
+    } else if (altura <= 0.80) {
+      const iconEl = document.getElementById('marea-alerta-icon');
+      const titleEl = document.getElementById('marea-alerta-titulo');
+      const bodyEl = document.getElementById('marea-alerta-cuerpo');
+      
+      if (iconEl) iconEl.innerText = '🛶';
+      if (titleEl) {
+        titleEl.innerText = '⚠️ ALERTA DE BAJAMAR';
+        titleEl.style.color = '#f59e0b';
+      }
+      if (bodyEl) bodyEl.innerHTML = `El río está en <strong>${altura.toFixed(2)}m</strong>. Riesgo de encallar en canales internos por bajo calado. Evite navegar.`;
+      
+      banner.style.setProperty('--marea-border', '#f59e0b');
+      banner.style.setProperty('--marea-color', '#f59e0b');
+      banner.style.setProperty('--marea-glow', 'rgba(245, 158, 11, 0.4)');
+      banner.style.display = 'flex';
+    } else {
+      banner.style.display = 'none';
+      _mareaAlertaDesestimada = null; // Reiniciar cuando vuelve a valores seguros
+    }
+  }
+
+  function cerrarMareaAlertaBanner() {
+    const banner = document.getElementById('marea-alerta-banner');
+    if (banner) {
+      banner.style.display = 'none';
+      _mareaAlertaDesestimada = _datosClimaNautico.altura;
+    }
+  }
 
   function actualizarPildoraClimaNautico(clima) {
     if (!clima) return;
@@ -7581,6 +7688,8 @@ function initBtnOleajeLongPress() {
         }
       }
     }
+    // Disparar la alerta visual flotante
+    actualizarBannerAlertaMarea(clima.altura);
   }
 </script>
 </body>

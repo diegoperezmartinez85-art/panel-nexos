@@ -2115,6 +2115,8 @@
 let _tokenPollingInterval = null;
 let _tokenAlertaVista = new Set();
 let _tokenPendienteData = null; // datos del último token para confirmar ingreso
+let _tokenQueue = [];
+let _bannerActive = false;
 
 function abrirValidarToken() {
   document.getElementById('modal-admin-token').style.display = 'flex';
@@ -2128,12 +2130,14 @@ function abrirValidarToken() {
 }
 
 function abrirValidarTokenDesdeAlerta() {
+  const currentTokenData = _tokenPendienteData;
   cerrarTokenBanner();
   abrirValidarToken();
   // Si hay token pendiente, precargarlo
-  if (_tokenPendienteData) {
-    document.getElementById('in-token').value = _tokenPendienteData.token;
-    mostrarTarjetaToken(_tokenPendienteData);
+  if (currentTokenData) {
+    _tokenPendienteData = currentTokenData;
+    document.getElementById('in-token').value = currentTokenData.token;
+    mostrarTarjetaToken(currentTokenData);
   }
 }
 
@@ -2417,13 +2421,36 @@ function iniciarPollingTokens() {
 
 let _bannerTimeout = null;
 function mostrarTokenBanner(t) {
+  if (_tokenQueue.some(x => x.token === t.token)) return;
+  _tokenQueue.push(t);
+  procesarColaTokens();
+}
+
+function procesarColaTokens() {
+  if (_bannerActive || _tokenQueue.length === 0) return;
+
+  const t = _tokenQueue[0];
   _tokenPendienteData = t;
+  _bannerActive = true;
+
   document.getElementById('tab-matricula').innerText = (t.matricula || '—') + '   ' + t.token;
   document.getElementById('tab-detalle').innerText   =
     (t.nombre || '') +
     (t.muelle ? ' · ⚓ ' + t.muelle : '') +
     (t.lote   ? ' · ' + t.lote    : '') +
     '  —  Mza ' + t.mza + ' Amarre ' + t.casa;
+
+  const badgeEl = document.getElementById('token-queue-badge');
+  if (badgeEl) {
+    const extraCount = _tokenQueue.length - 1;
+    if (extraCount > 0) {
+      badgeEl.innerText = `+${extraCount} EN COLA`;
+      badgeEl.style.display = 'inline-block';
+    } else {
+      badgeEl.style.display = 'none';
+    }
+  }
+
   document.getElementById('token-alert-banner').style.display = 'block';
 
   // Sonar alerta (si el audio está disponible)
@@ -2443,6 +2470,12 @@ function mostrarTokenBanner(t) {
 function cerrarTokenBanner() {
   document.getElementById('token-alert-banner').style.display = 'none';
   if (_bannerTimeout) { clearTimeout(_bannerTimeout); _bannerTimeout = null; }
+
+  _tokenQueue.shift();
+  _bannerActive = false;
+  _tokenPendienteData = null;
+
+  setTimeout(procesarColaTokens, 400);
 }
 
 // Arrancar polling al cargar la app
@@ -2596,7 +2629,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <button class="btn-modal-action btn-green no-print" style="margin-top:8px; background:#25d366; color:white; border:none; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="compartirTurnoWhatsApp()">💬 ENVIAR POR WHATSAPP</button><div class="pdf-report" id="pdf-report"></div></div></div>
 <div class="modal-overlay" id="modal-delivery-activos"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-delivery-activos')">✕</button><div class="modal-title">⛵ SERVICIOS ACTIVOS</div><div id="delivery-activos-contenido"></div></div></div>
 <div class="modal-overlay" id="modal-visitas-activas"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-visitas-activas')">✕</button><div class="modal-title">⛵ EMBARCACIONES ACTIVAS</div><div id="visitas-activas-contenido"></div></div></div>
-<div class="modal-overlay" id="modal-delivery-alertas"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-delivery-alertas')">✕</button><div class="modal-title">⚠ SERVICIOS +15 MIN</div><div id="delivery-alertas-contenido"></div></div></div>
+<div class="modal-overlay" id="modal-delivery-alertas"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-delivery-alertas')">✕</button><div class="modal-title">⚠ ALERTAS DE SERVICIOS</div><div id="delivery-alertas-contenido"></div></div></div>
 <div class="modal-overlay" id="modal-sos"><div class="modal-box"><button class="modal-close" onclick="cerrarModal('modal-sos')">✕</button><div class="modal-title">🆘 DIRECTORIO SOS</div><div id="sos-contenido"></div></div></div>
 
 <!-- ══════════════════════════════════════════════════════════
@@ -2959,7 +2992,6 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
     <div class="ia-sugerencias">
       <div class="ia-sug" onclick="iaSugerencia(this)">¿Quién navega adentro ahora?</div>
-      <div class="ia-sug" onclick="iaSugerencia(this)">¿Delivery en alerta +15min?</div>
       <div class="ia-sug" onclick="iaSugerencia(this)">Resumen fluvial del día</div>
       <div class="ia-sug" onclick="iaSugerencia(this)">¿Hay reportes de exceso de velocidad u oleaje?</div>
       <div class="ia-sug" onclick="iaSugerencia(this)">¿Qué amarras de cortesía están ocupadas hoy?</div>
@@ -3051,7 +3083,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="qr-field-row"><span class="qr-field-label">MATRÍCULA</span><input class="qr-field-input" id="qr-f-pat" placeholder="Matrícula" maxlength="10" oninput="this.value=this.value.toUpperCase()"></div>
     <div class="qr-field-row"><span class="qr-field-label">DNI</span><input class="qr-field-input" id="qr-f-dni" placeholder="DNI" inputmode="numeric" maxlength="9"></div>
     <div class="qr-dest-grid"><div class="qr-field-row"><span class="qr-field-label">MZA</span><input class="qr-field-input" id="qr-f-mza" placeholder="Mza" inputmode="numeric" maxlength="4"></div><div class="qr-field-row"><span class="qr-field-label">CASA</span><input class="qr-field-input" id="qr-f-casa" placeholder="Casa" inputmode="numeric" maxlength="4"></div></div>
-    <div class="qr-field-row" style="margin-bottom:0;"><span class="qr-field-label">TIPO</span><select class="qr-field-input" id="qr-f-tipo" style="cursor:pointer;"><option value="VISITA">VISITA</option><option value="DELIVERY">DELIVERY</option><option value="MANUAL">MANUAL</option><option value="PROPIETARIO">PROPIETARIO</option></select></div>
+    <div class="qr-field-row" style="margin-bottom:0;"><span class="qr-field-label">TIPO</span><select class="qr-field-input" id="qr-f-tipo" style="cursor:pointer;"><option value="VISITA">VISITA</option><option value="DELIVERY">SERVICIOS</option><option value="MANUAL">MANUAL</option><option value="PROPIETARIO">PROPIETARIO</option></select></div>
     <button class="qr-btn-confirm" id="qr-btn-confirm" onclick="confirmarIngresoQR()" style="margin-top:12px;">📥 REGISTRAR INGRESO</button>
     <button class="qr-btn-rescan" onclick="qrReescanear()">🔄 VOLVER A ESCANEAR</button>
     <div class="qr-raw-display" id="qr-raw-display"></div>
@@ -3265,7 +3297,7 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 
   <div class="monitor">
-    <div class="mon-card" id="mon-card-delivery" style="color:var(--gold);cursor:pointer;" onclick="abrirDeliveryActivos()"><span class="mon-val" id="mon-d" style="text-shadow:0 0 16px rgba(245,200,66,0.7);">0</span><span style="font-size:10px">DELIVERY ▶</span></div>
+    <div class="mon-card" id="mon-card-delivery" style="color:var(--gold);cursor:pointer;" onclick="abrirDeliveryActivos()"><span class="mon-val" id="mon-d" style="text-shadow:0 0 16px rgba(245,200,66,0.7);">0</span><span style="font-size:10px">SERVICIOS ▶</span></div>
     <div class="mon-card" id="mon-card-visitas" style="color:var(--green);cursor:pointer;" onclick="abrirVisitasActivas()"><span class="mon-val" id="mon-v" style="text-shadow:0 0 16px rgba(46,204,113,0.7);">0</span><span style="font-size:10px">VISITAS ▶</span></div>
     <div class="mon-card" id="mon-card-alertas" style="color:var(--red);cursor:pointer;" onclick="abrirDeliveryAlertas()"><span class="mon-val" id="mon-a" style="text-shadow:0 0 16px rgba(231,76,60,0.7);">0</span><span style="font-size:10px">ALERTAS ▶</span></div>
   </div>
@@ -3444,6 +3476,9 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="campo-label" style="margin-top:16px;">URL RAW GITHUB (CONTROL GUARDIA)</div>
       <input id="cfg-github-control" class="giant" placeholder="Ej. https://raw.githubusercontent.com/.../nexos_control (2).html">
       
+      <div class="campo-label" style="margin-top:16px;">TIEMPO LÍMITE ALERTA DE SERVICIOS (MINUTOS)</div>
+      <input id="cfg-limit-delivery-time" type="number" class="giant" placeholder="Ej. 30" min="5" max="180" style="text-align: center;">
+      
       <button class="btn-save" onclick="guardarConfig()" style="margin-top:16px;">GUARDAR CONFIGURACIÓN</button>
       <button class="btn-save" onclick="comprobarActualizacionControl()" style="margin-top:10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: #fff;">🔄 COMPROBAR ACTUALIZACIÓN</button>
     </div>
@@ -3482,6 +3517,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       </div>
       <button class="btn-save" onclick="guardarClimaNautico()" style="background: var(--cyan); color: black; font-weight: 900; width: 100%;">💾 ACTUALIZAR CLIMA</button>
+      <button class="btn-save" onclick="cargarValoresRealesClima()" style="background: var(--bg3); color: var(--cyan); border: 1px solid rgba(0,212,212,0.3); font-weight: 800; width: 100%; margin-top: 8px;">🔄 CARGAR VALORES REALES</button>
     </div>
     <!-- SECCIÓN AUDIO Y VOCAL -->
     <div class="section" style="border-color:var(--border);">
@@ -3491,7 +3527,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <input type="checkbox" id="cfg-voz-alertas" onchange="toggleVozAlertas(this.checked)" style="width:20px;height:20px;accent-color:var(--cyan);cursor:pointer;">
       </label>
       <div style="font-size:10px; color:var(--text-muted); margin-top:6px; line-height:1.4;">
-        Anuncia verbalmente y de forma 100% offline cuando ocurra un evento de PÁNICO o cuando un delivery se demore más de 15 minutos.
+        Anuncia verbalmente y de forma 100% offline cuando ocurra un evento de PÁNICO o cuando un servicio se demore más del límite configurado.
       </div>
       <button onclick="probarVozAlertas()" style="width:100%;background:var(--bg3);color:var(--cyan);border:1px solid rgba(0,212,212,0.3);border-radius:12px;padding:12px;font-weight:800;font-size:13px;cursor:pointer;margin-top:10px;transition:background 0.2s, border-color 0.2s;">🧪 Probar voz de alerta</button>
     </div>
@@ -3501,7 +3537,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div id="push-status" style="font-size:14px;font-weight:800;margin-bottom:14px;color:#888;">Verificando...</div>
       <div style="font-size:11px;color:#555;margin-bottom:14px;line-height:1.6;">
         Recibí alertas aunque la app esté cerrada:<br>
-        🚨 Pánico de vecinos · ⚠ Delivery +15min · 💬 Mensajes de chat
+        🚨 Pánico de vecinos · ⚠ Alerta de servicios · 💬 Mensajes de chat
       </div>
       <button id="push-btn-activar" onclick="pushActivar()" style="display:none;width:100%;background:var(--green);color:#000;border:none;border-radius:12px;padding:14px;font-weight:900;font-size:14px;cursor:pointer;margin-bottom:8px;">🔔 ACTIVAR NOTIFICACIONES</button>
       <button id="push-btn-desactivar" onclick="pushDesuscribir()" style="display:none;width:100%;background:var(--bg3);color:#888;border:1px solid var(--border);border-radius:12px;padding:12px;font-weight:800;font-size:13px;cursor:pointer;margin-bottom:8px;">🔕 Desactivar notificaciones</button>
@@ -3934,9 +3970,70 @@ function renderForecastData(d) {
     offlineBanner = `<div style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.25); color: #f59e0b; font-size: 11px; font-weight: 700; text-align: center; padding: 8px; border-radius: 10px; margin-bottom: 12px; font-family: system-ui, -apple-system, sans-serif;">⚠ Servidor de clima lento o sin conexión. Pronóstico estimado.</div>`;
   }
 
+  // Cargar Clima Náutico Local
+  let climaLocal = { altura: 1.20, viento: 15, direccion: 'SE' };
+  try {
+    const cached = localStorage.getItem('nx_clima_local');
+    if (cached) {
+      climaLocal = JSON.parse(cached);
+    }
+  } catch (err) {}
+
+  const altura = parseFloat(climaLocal.altura != null ? climaLocal.altura : 1.20);
+  const vientoNautico = parseInt(climaLocal.viento != null ? climaLocal.viento : 15);
+  const dirNautico = climaLocal.direccion || 'SE';
+
+  let rioColor = '#10b981';
+  let rioAlertText = '✅ Navegación Libre y segura. Condiciones normales en el canal.';
+  
+  if (altura >= 2.40) {
+    rioColor = '#ef4444';
+    rioAlertText = '⚠️ ALERTA DE SUDESTADA: Riesgo de inundación de muelles y marejada fuerte. Asegurar amarras.';
+  } else if (altura <= 0.80) {
+    rioColor = '#f59e0b';
+    rioAlertText = '⚠️ ALERTA DE NAVEGACIÓN: Marea extremadamente baja (bajamar). Peligro de encallar en canales internos.';
+  } else if (vientoNautico >= 45) {
+    rioColor = '#ef4444';
+    rioAlertText = `🚫 ALERTA DE TEMPORAL: Vientos muy fuertes (${vientoNautico} km/h). Navegación suspendida.`;
+  } else if (vientoNautico >= 30) {
+    rioColor = '#f59e0b';
+    rioAlertText = `⚠️ PRECAUCIÓN: Vientos fuertes (${vientoNautico} km/h). Recomendado solo para embarcaciones mayores.`;
+  }
+
+  const direccAngulos = { 'N': 0, 'NNE': 22.5, 'NE': 45, 'ENE': 67.5, 'E': 90, 'ESE': 112.5, 'SE': 135, 'SSE': 157.5, 'S': 180, 'SSW': 202.5, 'SW': 225, 'WSW': 247.5, 'W': 270, 'WNW': 292.5, 'NW': 315, 'NNW': 337.5 };
+  const angulo = direccAngulos[dirNautico] !== undefined ? direccAngulos[dirNautico] : 135;
+
+  const rioHtml = `
+    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(6,182,212,0.25); border-radius:16px; padding:12px; margin-bottom:12px; font-family:system-ui,-apple-system,sans-serif; color:white; text-align:left;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div style="font-size:10px; font-weight:800; color:#06b6d4; letter-spacing:1px; text-transform:uppercase;">Navegación y Altura de Río</div>
+        <span style="font-size:9px; font-weight:900; background:rgba(6,182,212,0.15); color:#06b6d4; border:1px solid rgba(6,182,212,0.3); padding:1px 6px; border-radius:10px;">DELTAlink</span>
+      </div>
+      
+      <div style="display:flex; gap:12px; align-items:center;">
+        <div style="flex:1; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); padding:8px 10px; border-radius:10px; text-align:center;">
+          <div style="font-size:24px; font-weight:900; color:${rioColor}; font-family:monospace; letter-spacing:-0.5px;">🌊 ${altura.toFixed(2)}m</div>
+          <div style="font-size:9px; color:#aaa; margin-top:1px; font-weight:700;">ALTURA RÍO TIGRE</div>
+        </div>
+        
+        <div style="width:65px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <div style="width:34px; height:34px; border-radius:50%; border:2px solid #06b6d4; position:relative; display:flex; align-items:center; justify-content:center; background:rgba(6,182,212,0.05);">
+            <span style="position:absolute; top:1px; font-size:5px; font-weight:900; color:#06b6d4;">N</span>
+            <div style="width:0; height:0; border-left:3px solid transparent; border-right:3px solid transparent; border-bottom:11px solid #ef4444; position:absolute; transform:rotate(${angulo}deg); transform-origin:50% 100%; top:5px;"></div>
+          </div>
+          <div style="font-size:8px; font-weight:800; color:#fff; margin-top:2px; font-family:monospace; letter-spacing:0.5px;">${dirNautico} ${vientoNautico}km/h</div>
+        </div>
+      </div>
+      
+      <div style="font-size:10px; color:#dfdfdf; margin-top:8px; line-height:1.4; padding:6px 8px; background:rgba(255,255,255,0.02); border-radius:8px; border-left:3px solid ${rioColor};">
+        ${rioAlertText}
+      </div>
+    </div>
+  `;
+
   const sensHtml = sensacion != null ? `<span class="clima-current-sensacion">ST: ${sensacion}°${viento != null ? ' · 💨 ' + viento + ' km/h' : ''}</span>` : `<span class="clima-current-sensacion">Buenos Aires</span>`;
 
-  document.getElementById('clima-contenido').innerHTML = offlineBanner + `
+  document.getElementById('clima-contenido').innerHTML = offlineBanner + rioHtml + `
     <div class="clima-current">
       <span class="clima-current-icon">${icon}</span>
       <span class="clima-current-temp">${temp}°</span>
@@ -4115,24 +4212,25 @@ setInterval(function tickContadores(){
     const tsE=parseInt(el.dataset.tse)||0;
     const elapsed=Math.floor((ahora-tsE)/1000);
     const eraAlerta=el.dataset.alerta==='1';
-    const esAlerta=elapsed>=900;
+    const limitSecs=Math.floor(obtenerLimiteAlertaServiciosMs()/1000);
+    const esAlerta=elapsed>=limitSecs;
     if(esAlerta){
       if(!eraAlerta){el.dataset.alerta='1';el.classList.add('alerta-cd');}
-      const over=elapsed-900;const oM=Math.floor(over/60),oS=over%60;
+      const over=elapsed-limitSecs;const oM=Math.floor(over/60),oS=over%60;
       el.textContent=`+${oM}m${String(oS).padStart(2,'0')}s ⚠`;
     } else {
-      const resta=900-elapsed;const rM=Math.floor(resta/60),rS=resta%60;
+      const resta=limitSecs-elapsed;const rM=Math.floor(resta/60),rS=resta%60;
       el.textContent=`${rM}:${String(rS).padStart(2,'0')}`;
     }
   });
   // Chequear nuevas alertas sin hacer full render
-  DB.filter(r=>!r.hS&&r.tipo==='DELIVERY'&&(ahora-(r.tsE||0))>900000).forEach(r=>{
+  DB.filter(r=>!r.hS&&r.tipo==='DELIVERY'&&(ahora-(r.tsE||0))>obtenerLimiteAlertaServiciosMs()).forEach(r=>{
     if(!_alertasNotificadas.has(String(r.id))){
       _alertasNotificadas.add(String(r.id));
       sessionStorage.setItem('nx_alertas_notif',JSON.stringify([..._alertasNotificadas]));
       initAudio();
       tocarAlertaDelivery();
-      emitirAlertaVoz(`Aviso. Delivery demorado en manzana ${r.mza}, casa ${r.casa}.`);
+      emitirAlertaVoz(`Aviso. Servicio demorado en manzana ${r.mza}, casa ${r.casa}.`);
       const mins=Math.floor((ahora-(r.tsE||0))/60000);
       if(typeof pushNotifDeliveryAlerta==='function') pushNotifDeliveryAlerta(r.pat||'—', mins);
       render();
@@ -4298,6 +4396,7 @@ function setSyncStatus(msg,cls){const el=document.getElementById('sync-status');
 function horaActual(){return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
 function limpiarHora(h){if(!h)return'';const s=String(h);if(s.includes('T'))return s.split('T')[1].substring(0,5);if(s.includes('\n'))return s.split('\n')[1]||'';return s;}
 function escHtml(str){if(!str)return'';return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function obtenerLimiteAlertaServiciosMs(){const mins=parseInt(localStorage.getItem('nx_limit_delivery_time')||'30',10);return mins*60*1000;}
 function ver(n){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item,.bn-item').forEach(i=>i.classList.remove('active'));
@@ -5661,6 +5760,7 @@ function guardarConfig(){
   lsSet('nx_lpr_token',document.getElementById('cfg-lpr-token').value.trim());
   lsSet('nx_github_raw_vecino',document.getElementById('cfg-github-vecino').value.trim());
   lsSet('nx_github_raw_control',document.getElementById('cfg-github-control').value.trim());
+  lsSet('nx_limit_delivery_time',document.getElementById('cfg-limit-delivery-time').value.trim());
   const checked = document.getElementById('cfg-voz-alertas').checked;
   lsSet('nx_voz_alertas', checked ? 'true' : 'false');
   showToast("⚙ GUARDADO");
@@ -5722,7 +5822,8 @@ function render(){
   const html=sorted.map((r,idx)=>{
     const hE=limpiarHora(r.hE);const tsE=r.tsE||0;
     const mins=Math.floor((ahora-tsE)/60000);
-    const isA=(r.tipo==='DELIVERY'&&(ahora-tsE>900000));
+    const limitMs=obtenerLimiteAlertaServiciosMs();
+    const isA=(r.tipo==='DELIVERY'&&(ahora-tsE>limitMs));
     if(r.tipo==='DELIVERY'){if(isA)a++;else d++;}else v++;
     let cls='adentro';if(isA)cls='alerta';else if(r.tipo==='DELIVERY')cls='dely-adentro';
     const isLN=LISTA_NEGRA.find(ln=>(ln.pat&&ln.pat===r.pat)||(ln.dni&&ln.dni===r.dni&&r.dni));
@@ -5734,15 +5835,16 @@ function render(){
     const timeTxt=mins<60?`${mins}m`:`${Math.floor(mins/60)}h${String(mins%60).padStart(2,'0')}`;
     const isNew=!prevIds.has(String(r.id));
     const animStyle=isNew?`animation:regSlideIn 0.35s cubic-bezier(0.22,1,0.36,1) ${idx*50}ms both`:'';
-    // Countdown for delivery: show remaining seconds until 15min alert, or overtime
+    // Countdown for delivery: show remaining seconds until alert limit, or overtime
     let countdownHtml='';
     if(r.tipo==='DELIVERY'){
+      const limitSecs=Math.floor(limitMs/1000);
       if(isA){
-        const overSecs=Math.floor((ahora-tsE)/1000)-900;
+        const overSecs=Math.floor((ahora-tsE)/1000)-limitSecs;
         const overM=Math.floor(overSecs/60),overS=overSecs%60;
         countdownHtml=`<span class="dely-countdown alerta-cd" data-tse="${tsE}" data-alerta="1">+${overM}m${String(overS).padStart(2,'0')}s ⚠</span>`;
       } else {
-        const restaSecs=900-Math.floor((ahora-tsE)/1000);
+        const restaSecs=limitSecs-Math.floor((ahora-tsE)/1000);
         const rM=Math.floor(restaSecs/60),rS=restaSecs%60;
         countdownHtml=`<span class="dely-countdown" data-tse="${tsE}" data-alerta="0">${rM}:${String(rS).padStart(2,'0')}</span>`;
       }
@@ -5754,7 +5856,7 @@ function render(){
       setTimeout(()=>{
         initAudio();
         tocarAlertaDelivery();
-        emitirAlertaVoz(`Aviso. Delivery demorado en manzana ${r.mza}, casa ${r.casa}.`);
+        emitirAlertaVoz(`Aviso. Servicio demorado en manzana ${r.mza}, casa ${r.casa}.`);
       },200);
     }
     
@@ -5780,7 +5882,7 @@ function abrirResumen(){
     tot++;
     const h=new Date(r.tsE||0).getHours();
     porHora[h]++;
-    const isA=r.tipo==='DELIVERY'&&(ahora-(r.tsE||0)>900000);
+    const isA=r.tipo==='DELIVERY'&&(ahora-(r.tsE||0)>obtenerLimiteAlertaServiciosMs());
     if(r.tipo==='DELIVERY'){if(isA)ale++;else del++;}else vis++;
     if(r.hS)sal++;
   });
@@ -5878,10 +5980,10 @@ function abrirAlertas(){
 function abrirTurno(){const ahora=new Date(),hoyStr=ahora.toLocaleDateString('es-AR'),horaStr=ahora.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});const vigNombre=sessionStorage.getItem('nx_vigilador')||'—';let del=0,vis=0,sal=0,sinSal=[];const deDia=DB.filter(r=>new Date(r.tsE||0).toLocaleDateString('es-AR')===hoyStr);deDia.forEach(r=>{if(r.tipo==='DELIVERY')del++;else vis++;if(r.hS)sal++;else sinSal.push(r);});document.getElementById('turno-resumen').innerHTML=`<div class="modal-stat"><span class="modal-stat-label">👤 Vigilador</span><span style="font-weight:800;color:var(--purple)">${escHtml(vigNombre)}</span></div><div class="modal-stat"><span class="modal-stat-label">📅 Fecha</span><span style="font-weight:700;color:#fff">${hoyStr}</span></div><div class="modal-stat"><span class="modal-stat-label">🕐 Hora de cierre</span><span style="font-weight:700;color:#fff">${horaStr}</span></div>` +
     (()=>{const ini=localStorage.getItem('nx_turno_inicio');if(!ini)return'';const diff=Math.floor((Date.now()-new Date(ini).getTime())/60000);const h=Math.floor(diff/60),m=diff%60;const dur=h>0?`${h}h ${String(m).padStart(2,'0')}min`:`${m}min`;return`<div class="modal-stat"><span class="modal-stat-label">⏱ Duración del turno</span><span style="font-weight:800;color:var(--purple)">${dur}</span></div>`;})() + `<div class="modal-stat"><span class="modal-stat-label">📋 Total ingresos</span><span class="modal-stat-val" style="color:var(--cyan)">${deDia.length}</span></div><div class="modal-stat"><span class="modal-stat-label">📤 Con salida</span><span class="modal-stat-val" style="color:var(--green)">${sal}</span></div><div class="modal-stat"><span class="modal-stat-label">🚨 Sin salida</span><span class="modal-stat-val" style="color:${sinSal.length>0?'var(--red)':'#888'}">${sinSal.length}</span></div>${sinSal.map(r=>`<div class="modal-row" style="border-left:3px solid var(--red)"><strong>${escHtml(r.pat)}</strong> · Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')}</div>`).join('')}`;document.getElementById('pdf-report').innerHTML=`<h2>NEXOS — Cierre de Turno</h2><p>${hoyStr} | ${horaStr} | Vigilador: ${escHtml(vigNombre)}</p><table><tr><th>Matrícula</th><th>DNI</th><th>Destino</th><th>Tipo</th><th>Entrada</th><th>Salida</th></tr>${deDia.map(r=>`<tr><td>${escHtml(r.pat)}</td><td>${escHtml(r.dni||'-')}</td><td>Mza ${escHtml(r.mza||'-')} Casa ${escHtml(r.casa||'-')}</td><td>${escHtml(r.tipo)}</td><td>${escHtml(limpiarHora(r.hE))}</td><td style="color:${r.hS?'#27ae60':'#e74c3c'}">${r.hS?escHtml(limpiarHora(r.hS)):'SIN SALIDA'}</td></tr>`).join('')}</table>`;abrirModal('modal-turno');}
 function imprimirTurno(){document.getElementById('pdf-report').style.display='block';setTimeout(()=>{window.print();setTimeout(()=>{document.getElementById('pdf-report').style.display='none';localStorage.removeItem('nx_turno_inicio');localStorage.removeItem('nx_turno_vigilador');},1000);},100);}
-function abrirDeliveryActivos(){const ahora=Date.now();const activos=DB.filter(r=>r.tipo==='DELIVERY'&&!r.hS&&(ahora-(r.tsE||0)<=900000)).sort((a,b)=>(a.tsE||0)-(b.tsE||0));let html=activos.length?activos.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);return`<div class="modal-row" style="border-left:4px solid var(--gold)"><strong style="color:var(--gold);font-size:16px;">⛵ ${escHtml(r.pat)}</strong><span style="float:right;background:var(--gold);color:black;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">${mins} min</span><br><span style="font-size:12px;color:#aaa;">Manzana ${escHtml(r.mza||'-')} — Muelle/Dársena ${escHtml(r.casa||'-')}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-delivery-activos');" style="margin-top:8px;background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;}).join(''):'<div class="empty-msg">Sin servicios activos 🟢</div>';document.getElementById('delivery-activos-contenido').innerHTML=html;abrirModal('modal-delivery-activos');}
+function abrirDeliveryActivos(){const ahora=Date.now();const activos=DB.filter(r=>r.tipo==='DELIVERY'&&!r.hS&&(ahora-(r.tsE||0)<=obtenerLimiteAlertaServiciosMs())).sort((a,b)=>(a.tsE||0)-(b.tsE||0));let html=activos.length?activos.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);return`<div class="modal-row" style="border-left:4px solid var(--gold)"><strong style="color:var(--gold);font-size:16px;">⛵ ${escHtml(r.pat)}</strong><span style="float:right;background:var(--gold);color:black;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">${mins} min</span><br><span style="font-size:12px;color:#aaa;">Manzana ${escHtml(r.mza||'-')} — Muelle/Dársena ${escHtml(r.casa||'-')}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-delivery-activos');" style="margin-top:8px;background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;}).join(''):'<div class="empty-msg">Sin servicios activos 🟢</div>';document.getElementById('delivery-activos-contenido').innerHTML=html;abrirModal('modal-delivery-activos');}
 function abrirVisitasActivas(){const ahora=Date.now();const visitas=DB.filter(r=>r.tipo!=='DELIVERY'&&!r.hS).sort((a,b)=>(a.tsE||0)-(b.tsE||0));let html=visitas.length?visitas.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);return`<div class="modal-row" style="border-left:4px solid var(--green)"><strong style="color:var(--green);font-size:16px;">${getVehiculoIcon(r.pat, r.tipo)} ${escHtml(r.pat)}</strong><span style="float:right;background:var(--green);color:black;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">${mins} min</span><br><span style="font-size:12px;color:#aaa;">Manzana ${escHtml(r.mza||'-')} — Muelle/Dársena ${escHtml(r.casa||'-')}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-visitas-activas');" style="margin-top:8px;background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;}).join(''):'<div class="empty-msg">Sin visitas activas 🟢</div>';document.getElementById('visitas-activas-contenido').innerHTML=html;abrirModal('modal-visitas-activas');}
-function abrirDeliveryAlertas(){const ahora=Date.now();const enAlerta=DB.filter(r=>r.tipo==='DELIVERY'&&!r.hS&&(ahora-(r.tsE||0)>900000)).sort((a,b)=>(a.tsE||0)-(b.tsE||0));let html=enAlerta.length?enAlerta.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);return`<div class="modal-row" style="border-left:4px solid var(--red);background:rgba(231,76,60,0.08)"><strong style="color:var(--red);font-size:16px;">⛵ ${escHtml(r.pat)}</strong><span style="float:right;background:var(--red);color:white;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">+${mins} min</span><br><span style="font-size:12px;color:#aaa;">Manzana ${escHtml(r.mza||'-')} — Muelle/Dársena ${escHtml(r.casa||'-')}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-delivery-alertas');" style="margin-top:8px;background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;}).join(''):'<div class="empty-msg">Sin alertas 🟢</div>';document.getElementById('delivery-alertas-contenido').innerHTML=html;abrirModal('modal-delivery-alertas');}
-const SOS_NUMEROS=[{icon:'🚔',nombre:'Policía',desc:'Emergencias policiales',num:'911'},{icon:'🔥',nombre:'Bomberos',desc:'Incendios y rescates',num:'100'},{icon:'🚑',nombre:'Emergencia Médica',desc:'SAME / Ambulancias',num:'107'},{icon:'🛡',nombre:'Defensa Civil',desc:'Inundaciones, desastres',num:'103'},{icon:'⚡',nombre:'Edesur / Edenor',desc:'Corte de luz',num:'0800-333-3787'},{icon:'💧',nombre:'AySA',desc:'Agua y cloacas',num:'0800-321-2482'},{icon:'🚨',nombre:'Violencia de Gén.',desc:'Línea gratuita 24h',num:'144'},{icon:'👶',nombre:'Niñez y Adolesc.',desc:'Vulneración de derechos',num:'102'}];
+function abrirDeliveryAlertas(){const ahora=Date.now();const enAlerta=DB.filter(r=>r.tipo==='DELIVERY'&&!r.hS&&(ahora-(r.tsE||0)>obtenerLimiteAlertaServiciosMs())).sort((a,b)=>(a.tsE||0)-(b.tsE||0));let html=enAlerta.length?enAlerta.map(r=>{const mins=Math.floor((ahora-(r.tsE||0))/60000);return`<div class="modal-row" style="border-left:4px solid var(--red);background:rgba(231,76,60,0.08)"><strong style="color:var(--red);font-size:16px;">⛵ ${escHtml(r.pat)}</strong><span style="float:right;background:var(--red);color:white;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800;">+${mins} min</span><br><span style="font-size:12px;color:#aaa;">Manzana ${escHtml(r.mza||'-')} — Muelle/Dársena ${escHtml(r.casa||'-')}</span><br><button onclick="darSalida(${r.id});cerrarModal('modal-delivery-alertas');" style="margin-top:8px;background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:800;cursor:pointer;width:100%;">📤 REGISTRAR SALIDA</button></div>`;}).join(''):'<div class="empty-msg">Sin alertas 🟢</div>';document.getElementById('delivery-alertas-contenido').innerHTML=html;abrirModal('modal-delivery-alertas');}
+const SOS_NUMEROS=[{icon:'🚔',nombre:'Policía',desc:'Emergencias policiales',num:'911'},{icon:'🔥',nombre:'Bomberos',desc:'Incendios y rescates',num:'100'},{icon:'🚑',nombre:'Emergencia Médica',desc:'SAME / Ambulancias',num:'107'},{icon:'⚓',nombre:'Prefectura Naval',desc:'Emergencias náuticas y río',num:'106'},{icon:'🛡',nombre:'Defensa Civil',desc:'Inundaciones, desastres',num:'103'},{icon:'⚡',nombre:'Edesur / Edenor',desc:'Corte de luz',num:'0800-333-3787'},{icon:'💧',nombre:'AySA',desc:'Agua y cloacas',num:'0800-321-2482'},{icon:'🚨',nombre:'Violencia de Gén.',desc:'Línea gratuita 24h',num:'144'},{icon:'👶',nombre:'Niñez y Adolesc.',desc:'Vulneración de derechos',num:'102'}];
 function abrirSOS(){document.getElementById('sos-contenido').innerHTML='<div class="sos-header">Tocá el número para llamar</div>'+SOS_NUMEROS.map(s=>`<a class="sos-item" href="tel:${s.num}"><div class="sos-item-left"><span class="sos-item-icon">${s.icon}</span><div><div class="sos-item-nombre">${s.nombre}</div><div class="sos-item-desc">${s.desc}</div></div></div><span class="sos-item-num">${s.num}</span></a>`).join('');abrirModal('modal-sos');}
 
 // ── LISTA NEGRA ────────────────────────────────────────────
@@ -7498,7 +7600,7 @@ window.addEventListener('resize',ajustarScrollTop);
 
 function iniciarApp(){
   // Migrar cualquier URL de Apps Script vieja a la nueva URL activa
-  const newUrl = 'https://script.google.com/macros/s/AKfycbz7aGvirGs-D3kLN3YgyGuqPuwScjoIxd1NSeuZI7BRu152afCL458pljW2M_IUGEdeVQ/exec';
+  const newUrl = 'https://script.google.com/macros/s/AKfycbwv6PU1SDLR-6MO6CmtaQr_KcEJhwfy3u-eCasomB7RfKMOFP4mOf7istvAvlzhN9jMFA/exec';
   const currentUrl = localStorage.getItem('nx_url');
   if (currentUrl && currentUrl.includes('script.google.com') && currentUrl !== newUrl) {
     localStorage.setItem('nx_url', newUrl);
@@ -7512,6 +7614,7 @@ function iniciarApp(){
   document.getElementById('cfg-lpr-token').value=localStorage.getItem('nx_lpr_token')||'';
   document.getElementById('cfg-github-vecino').value=localStorage.getItem('nx_github_raw_vecino')||'';
   document.getElementById('cfg-github-control').value=localStorage.getItem('nx_github_raw_control')||'';
+  document.getElementById('cfg-limit-delivery-time').value=localStorage.getItem('nx_limit_delivery_time')||'30';
   const vozHabilitada = localStorage.getItem('nx_voz_alertas') !== 'false';
   const inputVoz = document.getElementById('cfg-voz-alertas');
   if (inputVoz) inputVoz.checked = vozHabilitada;
@@ -7853,7 +7956,7 @@ function renderDashboard() {
   const salidos = hoy.filter(r => r.hS).length;
   const delivery = hoy.filter(r => r.tipo === 'DELIVERY').length;
   const visitas = hoy.filter(r => r.tipo !== 'DELIVERY').length;
-  const alertas = DB.filter(r => r.tipo === 'DELIVERY' && !r.hS && (ahora - (r.tsE || 0)) > 900000).length;
+  const alertas = DB.filter(r => r.tipo === 'DELIVERY' && !r.hS && (ahora - (r.tsE || 0)) > obtenerLimiteAlertaServiciosMs()).length;
 
   // Tiempo promedio de permanencia (solo los que ya salieron)
   const conSalida = hoy.filter(r => r.hS && r.tsE);
@@ -7885,7 +7988,7 @@ function renderDashboard() {
   // Por tipo (pie donut SVG)
   const tipoData = [
     { label: 'Visitas', val: visitas, color: '#2ecc71' },
-    { label: 'Delivery', val: delivery, color: '#f5c842' },
+    { label: 'Servicios', val: delivery, color: '#f5c842' },
   ];
 
   // Patentes más frecuentes (últimos 30 días)
@@ -8632,7 +8735,7 @@ function pushNotifPanico(alerta) {
 
 function pushNotifDeliveryAlerta(pat, mins) {
   pushNotifLocal(
-    '⚠ Delivery con alerta — NEXOS',
+    '⚠ Servicio con alerta — NEXOS',
     `${pat} lleva ${mins} minutos adentro sin salir`,
     'nexos-delivery-' + pat
   );
@@ -9415,6 +9518,51 @@ if (sessionStorage.getItem('nx_auth') === '1') {
     } catch(e) {
       console.error(e);
       showToast("❌ Error al transmitir clima");
+    }
+  }
+
+  async function cargarValoresRealesClima() {
+    if (typeof playSynthClick === 'function') playSynthClick();
+    showToast("🔄 Consultando satélite y mareógrafo...");
+    try {
+      const hoy = new Date();
+      const haceDosDias = new Date(hoy.getTime() - 2 * 24 * 60 * 60 * 1000);
+      const timeStart = haceDosDias.toISOString().split('T')[0];
+      const timeEnd = new Date(hoy.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      
+      const urlIna = `https://alerta.ina.gob.ar/pub/datos/datos&seriesId=52&timeStart=${timeStart}&timeEnd=${timeEnd}&format=json`;
+      const rIna = await fetch(urlIna);
+      if (!rIna.ok) throw new Error("Error consultando mareógrafo");
+      const dIna = await rIna.json();
+      const dataArray = dIna && dIna.data;
+      if (!dataArray || dataArray.length === 0) throw new Error("No hay lecturas recientes del mareógrafo");
+      
+      const ultimaLectura = dataArray[dataArray.length - 1];
+      const alturaReal = parseFloat(ultimaLectura.valor);
+      if (isNaN(alturaReal)) throw new Error("Lectura de altura inválida");
+
+      const rW = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-34.43&longitude=-58.55&current_weather=true');
+      if (!rW.ok) throw new Error("Error consultando viento");
+      const dW = await rW.json();
+      const cw = dW.current_weather;
+      if (!cw) throw new Error("No hay datos de viento recientes");
+
+      const vientoKmh = parseFloat(cw.windspeed || '0');
+      const vientoNudos = Math.round(vientoKmh * 0.539957);
+
+      const grados = parseFloat(cw.winddirection || '0');
+      const direcciones = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+      const idx = Math.round(((grados % 360) / 22.5)) % 16;
+      const dirReal = direcciones[idx];
+
+      document.getElementById('cfg-clima-altura').value = alturaReal.toFixed(2);
+      document.getElementById('cfg-clima-viento').value = vientoNudos;
+      document.getElementById('cfg-clima-direccion').value = dirReal;
+
+      showToast("✅ Valores reales cargados. Presioná 'ACTUALIZAR CLIMA' para guardar.");
+    } catch (err) {
+      console.error(err);
+      showToast("❌ Error: " + err.message);
     }
   }
 </script>
