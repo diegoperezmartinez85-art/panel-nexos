@@ -1,6 +1,6 @@
 // ── NEXOS SERVICE WORKER ─────────────────────────────────
 // ⚠️ Cambiar este número CADA VEZ que subas un HTML nuevo
-const CACHE_NAME = 'nexos-v1.45';
+const CACHE_NAME = 'nexos-v1.46';
 
 const ARCHIVOS = [
   './nexos_panico.html',
@@ -38,17 +38,18 @@ self.addEventListener('fetch', event => {
                  event.request.url.endsWith('.html');
 
   if (esHTML) {
-    // HTML: network first → si falla, usa caché (offline)
+    // HTML: cache first → respuesta instantánea, actualiza en background
     event.respondWith(
-      fetch(event.request)
-        .then(response => {
+      caches.match(event.request).then(cached => {
+        const network = fetch(event.request).then(response => {
           if (response && response.status === 200) {
             const clone = response.clone();
             caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
           }
           return response;
-        })
-        .catch(() => caches.match(event.request))
+        }).catch(() => null);
+        return cached || network;
+      })
     );
   } else {
     // Resto (iconos, manifest): cache first → actualiza en background
