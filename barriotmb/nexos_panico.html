@@ -5857,6 +5857,12 @@
     const casa = localStorage.getItem('nx_casa') || '';
     if (!mza || !casa) {
       mostrarSetup();
+      return;
+    }
+    await cargarBaneados();
+    const ban = esBaneado(mza, casa);
+    if (ban) {
+      mostrarPantallaBaneado(ban);
     } else {
       mostrarPantallaPanico();
     }
