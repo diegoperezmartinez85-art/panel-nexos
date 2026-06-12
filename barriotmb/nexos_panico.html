@@ -5859,13 +5859,18 @@
       mostrarSetup();
       return;
     }
-    await cargarBaneados();
-    const ban = esBaneado(mza, casa);
-    if (ban) {
-      mostrarPantallaBaneado(ban);
+    // Chequeo rápido con datos en caché local (sin esperar red)
+    const banLocal = esBaneado(mza, casa);
+    if (banLocal) {
+      mostrarPantallaBaneado(banLocal);
     } else {
       mostrarPantallaPanico();
     }
+    // Actualizar lista de baneados en segundo plano
+    cargarBaneados().then(() => {
+      const ban = esBaneado(mza, casa);
+      if (ban) mostrarPantallaBaneado(ban);
+    });
   }
 
   function mostrarSetup(){
