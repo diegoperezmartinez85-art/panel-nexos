@@ -4092,6 +4092,9 @@
       max-height: calc(100dvh - 160px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
       width: min(135vw, calc((100vh - 160px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) * (4 / 3))) !important;
       width: min(135dvw, calc((100dvh - 160px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) * (4 / 3))) !important;
+      position: relative !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
     }
     body.in-stadium .anime-panel {
       margin-top: auto !important;
@@ -16624,7 +16627,7 @@ window.iniciarEstadioJuego = function() {
       // La fuerza del tiro escala con la stat de Fuerza del jugador (¡Súper Potenciado para todos!)
       let effFuerza = selectedPlayer.fuerza;
       if (rachaActual >= 3) effFuerza = 160; // Súper Potencia física racha
-      let fuerzaFactor = 0.22 + (effFuerza / 100) * 0.065;
+      let fuerzaFactor = 0.70 + (effFuerza / 100) * 0.20;
       if (rachaActual >= 3 || selectedBallSkin === 'fuego' || selectedBallSkin === 'oro') {
         fuerzaFactor *= 1.35; // ¡SÚPER POTENCIA!
       }
@@ -18511,7 +18514,7 @@ window.iniciarEstadioJuego = function() {
         arquero.vx = 0; // Controlado por el usuario
       } else {
         // IA de arquero rival rápido e inteligente, escalando velocidad con las rondas del torneo
-        let speed = 4.2 + (penalesGolesFavor * 0.35);
+        let speed = 9.0 + (penalesGolesFavor * 0.80);
         if (torneoPenales && torneoPenales.active) {
           // Multiplicador progresivo de velocidad: Grupos = 0.75-0.91, Cuartos = 1.0, Semis = 1.18, Final = 1.35
           const rondaMult = torneoPenales.fase === 'grupos' 
@@ -18525,8 +18528,8 @@ window.iniciarEstadioJuego = function() {
       }
     } else {
       // ── DIBU NIVELES: se acelera con cada gol recibido ──
-      const dibuBase = 2.05 + (5 - Math.max(0, Math.min(5, remainingShots))) * 0.22;
-      const dibuBonus = goalsScoredInRound * 0.28; // +0.28 por cada gol que ya le metieron
+      const dibuBase = 5.5 + (5 - Math.max(0, Math.min(5, remainingShots))) * 0.60;
+      const dibuBonus = goalsScoredInRound * 0.75; // +0.75 por cada gol que ya le metieron
       let finalDibuSpeed = (dibuBase + dibuBonus);
       
       if (gameDifficulty === 'facil') {
@@ -18849,10 +18852,10 @@ window.iniciarEstadioJuego = function() {
           targetY = zona.y + (Math.random() - 0.5) * 6;
         }
 
-        const duration = 24 + Math.random() * 6; // tiro rápido y consistente
+        const duration = 8 + Math.random() * 2; // tiro ultra rápido y explosivo
         
         pelota.vx = (targetX - 200) / duration;
-        pelota.vy = ((targetY - 260) - 0.5 * 0.26 * duration * duration) / duration;
+        pelota.vy = ((targetY - 260) - 0.5 * 1.04 * duration * duration) / duration;
         pelota.isShot = true;
         pelota.hitPostThisShot = false;
         shotFrameCounter = 0;
@@ -19089,7 +19092,7 @@ window.iniciarEstadioJuego = function() {
       pelota.y += pelota.vy * vyModifier * dt;
       
       // ── GRAVEDAD más realista (aumenta más rápido al inicio, se estabiliza) ──
-      pelota.vy += 0.26 * dt;
+      pelota.vy += 1.04 * dt;
 
       // ── RESISTENCIA DEL AIRE — frena la pelota de forma natural ──
       const speedNow = Math.sqrt(pelota.vx * pelota.vx + pelota.vy * pelota.vy);
@@ -19171,7 +19174,7 @@ window.iniciarEstadioJuego = function() {
         // El efecto Magnus es más fuerte en la mitad del vuelo (más rpm = más curva)
         const flightProgress = Math.max(0, 1 - (pelota.y - 58) / 160);
         const magnusMult = 0.85 + flightProgress * 0.65; // Crece hacia el arco
-        const combaFuerza = (effComba / 100) * 0.125 * combaMult * magnusMult;
+        const combaFuerza = (effComba / 100) * 0.38 * combaMult * magnusMult;
         if (pelota.vx > 0.4) {
           pelota.vx += combaFuerza * dt; // comba hacia la derecha
         } else if (pelota.vx < -0.4) {
@@ -19248,7 +19251,7 @@ window.iniciarEstadioJuego = function() {
         let targetX = 200;
         if (penalesDibuDir === -1) targetX = 145;
         else if (penalesDibuDir === 1) targetX = 255;
-        arquero.x += (targetX - arquero.x) * 0.28 * dt;
+        arquero.x += (targetX - arquero.x) * 0.75 * dt;
       } else {
         arquero.x += arquero.vx * dt;
         if (arquero.x < 145 || arquero.x > 255) {
@@ -24026,7 +24029,7 @@ if (player.hairType === 'rulos-cortos') {
 
     // ── COPA DEL MUNDO AL COSTADO DEL ARCO — misma que Road to Glory ──
     {
-      const tropeX = 18;
+      const tropeX = GOAL_LEFT - 28;
       const trophyBob = Math.sin(Date.now() * 0.002) * 1.5;
       const trophyGlow = 0.5 + Math.sin(Date.now() * 0.003) * 0.3;
       const h = 36;
@@ -24052,12 +24055,12 @@ if (player.hairType === 'rulos-cortos') {
       ctx.restore();
     }
 
-    // ── INFANTINO DE TRAJE — parado al lado izquierdo del arco ──
+    // ── INFANTINO DE TRAJE — parado al lado derecho del arco ──
     {
       if (infantinoCelebTimer > 0) infantinoCelebTimer--;
 
-      // Mover a la izquierda cerca de la copa (que está en x=18, terminando en x=27)
-      const ix = 45;
+      // Mover a la derecha cerca del arco
+      const ix = GOAL_RIGHT + 28;
       // Posición Y ligeramente más arriba para dar perspectiva de profundidad
       const finalY = GOAL_Y - 15;
       const isCeleb = infantinoCelebTimer > 0;
