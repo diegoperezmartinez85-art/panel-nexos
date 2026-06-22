@@ -15403,7 +15403,7 @@ window.iniciarEstadioJuego = function() {
       // La fuerza del tiro escala con la stat de Fuerza del jugador (¡Súper Potenciado para todos!)
       let effFuerza = selectedPlayer.fuerza;
       if (rachaActual >= 3) effFuerza = 160; // Súper Potencia física racha
-      let fuerzaFactor = 0.70 + (effFuerza / 100) * 0.20;
+      let fuerzaFactor = 0.46 + (effFuerza / 100) * 0.12;
       if (rachaActual >= 3 || selectedBallSkin === 'fuego' || selectedBallSkin === 'oro') {
         fuerzaFactor *= 1.35; // ¡SÚPER POTENCIA!
       }
@@ -15427,8 +15427,10 @@ window.iniciarEstadioJuego = function() {
         pelota.superKickType = '';
       }
 
-      pelota.vx = dx * fuerzaFactor;
-      pelota.vy = dy * fuerzaFactor;
+      const shotDist = Math.sqrt(dx*dx + dy*dy);
+      const cappedScale = shotDist > 65 ? (65 / shotDist) : 1.0;
+      pelota.vx = dx * cappedScale * fuerzaFactor;
+      pelota.vy = dy * cappedScale * fuerzaFactor;
       
       triggerHaptic('medium');
       playKickSound();
@@ -17596,10 +17598,10 @@ window.iniciarEstadioJuego = function() {
           targetY = zona.y + (Math.random() - 0.5) * 6;
         }
 
-        const duration = 8 + Math.random() * 2; // tiro ultra rápido y explosivo
+        const duration = 11 + Math.random() * 2; // tiro rápido y dinámico equilibrado
         
         pelota.vx = (targetX - 200) / duration;
-        pelota.vy = ((targetY - 260) - 0.5 * 1.04 * duration * duration) / duration;
+        pelota.vy = ((targetY - 260) - 0.5 * 0.72 * duration * duration) / duration;
         pelota.isShot = true;
         pelota.hitPostThisShot = false;
         shotFrameCounter = 0;
@@ -17764,7 +17766,7 @@ window.iniciarEstadioJuego = function() {
       pelota.y += pelota.vy * vyModifier * dt;
       
       // ── GRAVEDAD más realista (aumenta más rápido al inicio, se estabiliza) ──
-      pelota.vy += 1.04 * dt;
+      pelota.vy += 0.72 * dt;
 
       // ── RESISTENCIA DEL AIRE — frena la pelota de forma natural ──
       const speedNow = Math.sqrt(pelota.vx * pelota.vx + pelota.vy * pelota.vy);
@@ -22174,7 +22176,7 @@ const isP1Arquero = penalesTurno === 'defensa';
       
       if (dist > 10) {
         const angle = Math.atan2(dy, dx);
-        let fuerzaFactor = 0.22 + (selectedPlayer.fuerza / 100) * 0.065;
+        let fuerzaFactor = 0.46 + (selectedPlayer.fuerza / 100) * 0.12;
         if (rachaActual >= 3 || selectedBallSkin === 'fuego' || selectedBallSkin === 'oro') {
           fuerzaFactor *= 1.35; // ¡SÚPER POTENCIA!
         }
@@ -22199,7 +22201,7 @@ const isP1Arquero = penalesTurno === 'defensa';
         for (let i = 0; i < simSteps; i++) {
           simX += simVx;
           simY += simVy;
-          simVy += 0.22; // Gravedad real
+          simVy += 0.72; // Gravedad real
           
           // Viento en la guía
           if (simY < 245 && simY > 50) {
