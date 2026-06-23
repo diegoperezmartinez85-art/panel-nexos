@@ -3177,9 +3177,9 @@
       width: calc(100% + 24px); /* Ocupa el 100% del ancho de pantalla anulando los mrgns */
       margin-left: -12px;
       margin-right: -12px;
-      flex: 1; /* Comparte el alto negro inferior disponible junto al campo (proporción reducida a la mitad) */
-      flex-grow: 1;
-      min-height: 38px;
+      flex: 1; /* Comparte el alto negro inferior disponible junto al campo */
+      flex-grow: 1.3;
+      min-height: 48px;
       max-height: none !important;
       background: #010103;
       border-top: 3px solid #ffffff; /* Borde superior brillante de estilo gabinete arcade */
@@ -3241,16 +3241,16 @@
     }
 
     .canvas-wrapper {
-      aspect-ratio: 4 / 4.2;
+      aspect-ratio: 4 / 3;
       max-width: 100%;
-      max-height: calc(100vh - 60px);
-      max-height: calc(100dvh - 60px);
-      width: min(100%, calc((100vh - 60px) * (4 / 4.2)));
-      width: min(100%, calc((100dvh - 60px) * (4 / 4.2)));
+      max-height: calc(100vh - 65px);
+      max-height: calc(100dvh - 65px);
+      width: min(100%, calc((100vh - 65px) * (4 / 3)));
+      width: min(100%, calc((100dvh - 65px) * (4 / 3)));
       margin-left: auto;
       margin-right: auto;
       flex-shrink: 1;
-      flex-grow: 3;
+      flex-grow: 2.4;
       margin-top: 0;
       margin-bottom: 0;
       background: linear-gradient(180deg, #050e07 0%, #071510 100%);
@@ -3265,10 +3265,15 @@
     #canvas-futbol {
       width: 100%;
       height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: contain;
       display: block;
       touch-action: none; /* Bloquea cualquier scroll nativo del teléfono al patear! */
       position: absolute;
       inset: 0;
+      margin: auto;
     }
     .swipe-hint {
       position: absolute;
@@ -19191,26 +19196,6 @@ window.iniciarEstadioJuego = function() {
         }
       }
 
-      // ── TRAYECTORIA DE SÚPER TIRO GRAVEDAD CERO ──
-      if (pelota.superKickType === 'gravedad_cero' && pelota.isShot && !pelota.isSettled) {
-        if (typeof pelota.gravedadCeroTimer === 'undefined') {
-          pelota.gravedadCeroTimer = 20; // 20 frames de trayectoria recta antes del quiebre
-        }
-        if (pelota.gravedadCeroTimer > 0) {
-          pelota.gravedadCeroTimer--;
-          if (pelota.gravedadCeroTimer === 0) {
-            const bendDir = Math.random() < 0.5 ? -1 : 1;
-            pelota.vx = bendDir * 5.2; // quiebre lateral violento
-            pelota.vy = -1.5; // pequeña sustentación vertical
-            triggerScreenShake(10);
-            playSound('pop');
-            bannerTxt = '🌀 ¡¡¡CURVA GRAVEDAD CERO!!!';
-            bannerTimer = 100;
-            spawnSonicRing(pelota.x, pelota.y);
-          }
-        }
-      }
-
       // ── SPIN ACUMULADO: hace girar la pelota visualmente ──
       pelotaSpin += (pelota.vx * 0.04) * dt;
 
@@ -22688,32 +22673,6 @@ if (player.hairType === 'rulos-cortos') {
         ctx.stroke();
       }
       ctx.restore();
-
-      // Dibujar pequeñas banderas ondeando en la tribuna
-      ctx.save();
-      for (let f = 0; f < 8; f++) {
-        const fx = 40 + f * 45 + Math.sin(Date.now() * 0.01 + f) * 8;
-        const fy = 12 + Math.cos(Date.now() * 0.015 + f) * 4;
-        const w = 12 + Math.sin(Date.now() * 0.02 + f) * 2;
-        const h = 7;
-        
-        ctx.fillStyle = flagColors[f % flagColors.length] || '#7c3aed';
-        ctx.beginPath();
-        ctx.moveTo(fx, fy);
-        ctx.quadraticCurveTo(fx + w/2, fy + Math.sin(Date.now()*0.02 + f)*3, fx + w, fy);
-        ctx.lineTo(fx + w, fy + h);
-        ctx.quadraticCurveTo(fx + w/2, fy + h + Math.sin(Date.now()*0.02 + f)*3, fx, fy + h);
-        ctx.closePath();
-        ctx.fill();
-        
-        ctx.strokeStyle = '#94a3b8';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(fx, fy - 2);
-        ctx.lineTo(fx, fy + h + 6);
-        ctx.stroke();
-      }
-      ctx.restore();
     } else {
       // ── DIBUJAR CROWD DE HINCHAS DE MINI-CABEZONES EXPRESIVOS ──
       let crowdState = 'normal'; // normal, expectacion, gol, palo, lamento
@@ -24389,34 +24348,6 @@ if (player.hairType === 'rulos-cortos') {
         }
         ctx.restore();
       }
-
-      // Dibujar anillo de carga de Súper Tiro alrededor de la pelota (cuando no ha sido pateada)
-      if (!pelota.isShot && !pelota.isSettled) {
-        ctx.save();
-        ctx.lineWidth = 2.0;
-        if (superKickCharge < 100) {
-          ctx.strokeStyle = 'rgba(6, 182, 212, 0.45)';
-          ctx.beginPath();
-          ctx.arc(bx, by, 16, 0, Math.PI * 2);
-          ctx.stroke();
-          
-          ctx.strokeStyle = '#06b6d4';
-          ctx.shadowColor = '#06b6d4';
-          ctx.shadowBlur = 6;
-          ctx.beginPath();
-          ctx.arc(bx, by, 16, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2) * (superKickCharge / 100));
-          ctx.stroke();
-        } else {
-          const pulse = Math.abs(Math.sin(Date.now() * 0.01));
-          ctx.strokeStyle = `rgba(251, 191, 36, ${0.45 + pulse * 0.55})`;
-          ctx.shadowColor = '#fbbf24';
-          ctx.shadowBlur = 4 + pulse * 10;
-          ctx.beginPath();
-          ctx.arc(bx, by, 16 + pulse * 2.5, 0, Math.PI * 2);
-          ctx.stroke();
-        }
-        ctx.restore();
-      }
       
       // Sombra de la pelota en el suelo (perspectiva 3D simulada de consola)
       let groundY = 260;
@@ -24444,25 +24375,6 @@ if (player.hairType === 'rulos-cortos') {
       ctx.fill();
       ctx.restore();
       
-      // Dibujar balones fantasma para el tiro espejismo
-      if (pelota.superKickType === 'espejismo' && pelota.isShot && !pelota.isSettled) {
-        ctx.save();
-        ctx.globalAlpha = 0.45;
-        // Dibujar fantasma izquierdo
-        const bGradL = ctx.createRadialGradient(bx - 38 - br * 0.3, by - br * 0.3, 0, bx - 38, by, br * 1.5);
-        bGradL.addColorStop(0, 'rgba(255,255,255,0.9)');
-        bGradL.addColorStop(1, 'rgba(56,189,248,0.2)');
-        ctx.fillStyle = bGradL;
-        ctx.beginPath(); ctx.arc(bx - 38, by, br, 0, Math.PI * 2); ctx.fill();
-        // Dibujar fantasma derecho
-        const bGradR = ctx.createRadialGradient(bx + 38 - br * 0.3, by - br * 0.3, 0, bx + 38, by, br * 1.5);
-        bGradR.addColorStop(0, 'rgba(255,255,255,0.9)');
-        bGradR.addColorStop(1, 'rgba(56,189,248,0.2)');
-        ctx.fillStyle = bGradR;
-        ctx.beginPath(); ctx.arc(bx + 38, by, br, 0, Math.PI * 2); ctx.fill();
-        ctx.restore();
-      }
-
       // Dibujar balones fantasma para el tiro espejismo
       if (pelota.superKickType === 'espejismo' && pelota.isShot && !pelota.isSettled) {
         ctx.save();
