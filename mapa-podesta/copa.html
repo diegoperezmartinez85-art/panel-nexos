@@ -9864,6 +9864,7 @@
   let physicsAccumulator = 0;
   let gameCanvas = null;
   let ctx = null;
+  let GAME_LOGICAL_W = 400; // Ancho lógico del campo de juego (siempre 400, independiente del ancho físico real del canvas)
   // ── CACHÉ DE ELEMENTOS DOM PARA EL HOT PATH (evita getElementById repetido 60x/seg, clave para fluidez en móvil) ──
   let _elGameoverOverlay = null;
   let _elEstadioTiros = null;
@@ -16604,9 +16605,27 @@ window.iniciarEstadioJuego = function() {
     if (!gameCanvas) return;
     ctx = gameCanvas.getContext('2d');
     
-    // Dimensiones internas lógicas del juego
-    gameCanvas.width = 400;
-    gameCanvas.height = 300;
+    // ── CORRECCIÓN DE PROPORCIÓN ──
+    // El contenedor visual (.canvas-wrapper) usa aspect-ratio 4/3.5 para aprovechar mejor
+    // el alto de pantalla en móviles, pero toda la lógica/dibujo del juego está escrita
+    // en coordenadas de un campo lógico de 400x300 (proporción 4:3 real).
+    // Si el canvas físico fuera 400x300, el navegador lo estiraría horizontalmente un 16.7%
+    // para llenar el wrapper 4:3.5, deformando a los jugadores y el arco.
+    // Solución: el canvas físico se ajusta a la proporción REAL del wrapper, y un scale()
+    // interno re-mapea el sistema de coordenadas a 400x300 para que TODO el código de
+    // dibujo (arco, jugadores, líneas de cancha, etc.) siga funcionando sin cambios.
+    const LOGICAL_W = 400;
+    const LOGICAL_H = 300;
+    const WRAPPER_RATIO = 4 / 3.5; // debe coincidir con aspect-ratio de .canvas-wrapper
+    const physicalW = Math.round(LOGICAL_H * WRAPPER_RATIO);
+    gameCanvas.width = physicalW;
+    gameCanvas.height = LOGICAL_H;
+    const _gameScaleX = physicalW / LOGICAL_W;
+    ctx.setTransform(_gameScaleX, 0, 0, 1, 0, 0);
+    // Ancho LÓGICO (400) para que el código de dibujo que asume coordenadas 0-400
+    // siga siendo correcto, aunque el canvas físico real ahora sea más angosto
+    // (la diferencia se compensa exactamente con el setTransform de arriba).
+    GAME_LOGICAL_W = LOGICAL_W;
     
     // Cachear referencias DOM usadas en el hot path del game loop (60x/seg)
     cacheGameDOMRefs();
@@ -16633,7 +16652,7 @@ window.iniciarEstadioJuego = function() {
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     return {
-      x: ((clientX - rect.left) / rect.width) * gameCanvas.width,
+      x: ((clientX - rect.left) / rect.width) * GAME_LOGICAL_W,
       y: ((clientY - rect.top) / rect.height) * gameCanvas.height
     };
   }
@@ -22357,7 +22376,7 @@ if (player.hairType === 'rulos-cortos') {
       fogGrad.addColorStop(0.4, `rgba(70, 90, 120, ${fogOpacity * 0.9})`);
       fogGrad.addColorStop(1, `rgba(40, 60, 90, ${fogOpacity * 0.4})`);
       ctx.fillStyle = fogGrad;
-      ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+      ctx.fillRect(0, 0, GAME_LOGICAL_W, gameCanvas.height);
     }
 
     // 2. PASTO MOJADO — destello especular sobre las franjas del campo
@@ -22368,7 +22387,7 @@ if (player.hairType === 'rulos-cortos') {
       wetGrad.addColorStop(0.5, `rgba(80, 160, 120, ${grassWetness * 0.07})`);
       wetGrad.addColorStop(1, `rgba(40, 100, 80, ${grassWetness * 0.04})`);
       ctx.fillStyle = wetGrad;
-      ctx.fillRect(0, standH, gameCanvas.width, gameCanvas.height - standH);
+      ctx.fillRect(0, standH, GAME_LOGICAL_W, gameCanvas.height - standH);
 
       // Reflejos de luz especulares aleatorios (charcos)
       const t = Date.now() * 0.0008;
@@ -22411,7 +22430,7 @@ if (player.hairType === 'rulos-cortos') {
     // 4. FLASH DE RELÁMPAGO (overlay blanco azulado sobre toda la pantalla)
     if (lightningFlash > 0) {
       ctx.fillStyle = `rgba(200, 220, 255, ${lightningFlash * 0.55})`;
-      ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+      ctx.fillRect(0, 0, GAME_LOGICAL_W, gameCanvas.height);
 
       // Rayo (zigzag luminoso)
       if (lightningBolt && lightningFlash > 0.4) {
@@ -22442,13 +22461,13 @@ if (player.hairType === 'rulos-cortos') {
       ctx.globalAlpha = Math.min(1, intensity * 1.5) * 0.85;
       ctx.fillStyle = 'rgba(0,0,0,0.45)';
       ctx.beginPath();
-      ctx.roundRect(gameCanvas.width - 34, 6, 28, 16, 5);
+      ctx.roundRect(GAME_LOGICAL_W - 34, 6, 28, 16, 5);
       ctx.fill();
       ctx.fillStyle = '#93c5fd';
       ctx.font = '700 8px system-ui, -apple-system, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('🌧️ WET', gameCanvas.width - 20, 14);
+      ctx.fillText('🌧️ WET', GAME_LOGICAL_W - 20, 14);
     }
 
     ctx.globalAlpha = 1;
@@ -22579,7 +22598,7 @@ if (player.hairType === 'rulos-cortos') {
       ctx.translate(-cameraFocusX, -cameraFocusY);
     }
     
-    ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+    ctx.clearRect(0, 0, GAME_LOGICAL_W, gameCanvas.height);
     
     // ══════════════════════════════════════════════
     // 0. TRIBUNA Y FONDO DEL ESTADIO (Fotorrealista!)
@@ -22590,13 +22609,13 @@ if (player.hairType === 'rulos-cortos') {
     const _staticGrads = getStaticGradients(ctx, gameCanvas, stadiumAtmosphere, standHeight, standHeight, gameCanvas.height - standHeight);
     const skyGrad = _staticGrads.sky;
     ctx.fillStyle = skyGrad;
-    ctx.fillRect(0, 0, gameCanvas.width, 45);
+    ctx.fillRect(0, 0, GAME_LOGICAL_W, 45);
 
     // TRIBUNA NORTE — gradas con profundidad y espectadores
     // Fondo de tribuna con gradiente más profundo y atmosférico
     const standGrad = _staticGrads.stand;
     ctx.fillStyle = standGrad;
-    ctx.fillRect(0, 0, gameCanvas.width, standHeight);
+    ctx.fillRect(0, 0, GAME_LOGICAL_W, standHeight);
 
     // Estructura del estadio: vigas y arcos de acero más detallados
     ctx.strokeStyle = 'rgba(70, 100, 140, 0.5)';
@@ -22954,7 +22973,7 @@ if (player.hairType === 'rulos-cortos') {
     // Borde inferior de la tribuna (separación del campo)
     const borderGrad = _staticGrads.border;
     ctx.fillStyle = borderGrad;
-    ctx.fillRect(0, standHeight - 2, gameCanvas.width, 6);
+    ctx.fillRect(0, standHeight - 2, GAME_LOGICAL_W, 6);
 
     // ── FOCOS DEL ESTADIO — rayos de luz cónica desde esquinas superiores ──
     {
@@ -22987,7 +23006,7 @@ if (player.hairType === 'rulos-cortos') {
     {
       const adH = 16;
       const adY = standHeight - adH;
-      const adW = gameCanvas.width;
+      const adW = GAME_LOGICAL_W;
 
       // Fondo negro LED de la valla
       ctx.fillStyle = '#060810';
@@ -23064,7 +23083,7 @@ if (player.hairType === 'rulos-cortos') {
       const stripeY = FIELD_TOP + t * FIELD_H;
       const stripeH = FIELD_H / stripeCount;
       ctx.fillStyle = _staticGrads.stripes[s];
-      ctx.fillRect(0, stripeY, gameCanvas.width, stripeH + 1);
+      ctx.fillRect(0, stripeY, GAME_LOGICAL_W, stripeH + 1);
     }
 
     // Textura sutil de césped (patrón pre-renderizado una sola vez, costo mínimo por frame)
@@ -23072,22 +23091,22 @@ if (player.hairType === 'rulos-cortos') {
       ctx.save();
       ctx.globalAlpha = 0.5;
       ctx.fillStyle = _staticGrads.grassTexture;
-      ctx.fillRect(0, FIELD_TOP, gameCanvas.width, FIELD_H);
+      ctx.fillRect(0, FIELD_TOP, GAME_LOGICAL_W, FIELD_H);
       ctx.restore();
     }
 
     // Luces cenitales del estadio y focos laterales
     const lightGrad = _staticGrads.light;
     ctx.fillStyle = lightGrad;
-    ctx.fillRect(0, FIELD_TOP, gameCanvas.width, FIELD_H);
+    ctx.fillRect(0, FIELD_TOP, GAME_LOGICAL_W, FIELD_H);
 
     const leftSpotGrad = _staticGrads.leftSpot;
     ctx.fillStyle = leftSpotGrad;
-    ctx.fillRect(0, FIELD_TOP, gameCanvas.width / 2, FIELD_H);
+    ctx.fillRect(0, FIELD_TOP, GAME_LOGICAL_W / 2, FIELD_H);
 
     const rightSpotGrad = _staticGrads.rightSpot;
     ctx.fillStyle = rightSpotGrad;
-    ctx.fillRect(gameCanvas.width / 2, FIELD_TOP, gameCanvas.width / 2, FIELD_H);
+    ctx.fillRect(GAME_LOGICAL_W / 2, FIELD_TOP, GAME_LOGICAL_W / 2, FIELD_H);
 
     // ══════════════════════════════════════════════
     // LÍNEAS DEL CAMPO (perspectiva real)
@@ -23125,7 +23144,7 @@ if (player.hairType === 'rulos-cortos') {
     ctx.save();
     // Clip: solo mostrar la parte que queda FUERA (por debajo) del área grande
     ctx.beginPath();
-    ctx.rect(0, GOAL_BASE_EARLY + 90, gameCanvas.width, gameCanvas.height);
+    ctx.rect(0, GOAL_BASE_EARLY + 90, GAME_LOGICAL_W, gameCanvas.height);
     ctx.clip();
     ctx.beginPath();
     ctx.arc(200, GOAL_BASE_EARLY + 55, 38, 0, Math.PI);
@@ -24758,7 +24777,7 @@ if (player.hairType === 'rulos-cortos') {
       flashCenterGrad.addColorStop(0.4, `rgba(220, 255, 200, ${goalScreenFlash * 0.35})`);
       flashCenterGrad.addColorStop(1, `rgba(100, 220, 120, ${goalScreenFlash * 0.08})`);
       ctx.fillStyle = flashCenterGrad;
-      ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+      ctx.fillRect(0, 0, GAME_LOGICAL_W, gameCanvas.height);
       ctx.restore();
     }
 
@@ -24779,7 +24798,7 @@ if (player.hairType === 'rulos-cortos') {
 
         // Overlay oscuro semitransparente para enfocar el replay
         ctx.fillStyle = 'rgba(0, 0, 0, 0.48)';
-        ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+        ctx.fillRect(0, 0, GAME_LOGICAL_W, gameCanvas.height);
 
         // Scanlines retro estilo televisión analógica para el replay
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
@@ -24787,7 +24806,7 @@ if (player.hairType === 'rulos-cortos') {
         for (let y = 0; y < gameCanvas.height; y += 4) {
           ctx.beginPath();
           ctx.moveTo(0, y);
-          ctx.lineTo(gameCanvas.width, y);
+          ctx.lineTo(GAME_LOGICAL_W, y);
           ctx.stroke();
         }
 
@@ -25022,7 +25041,7 @@ if (player.hairType === 'rulos-cortos') {
       vignette.addColorStop(0.5, `rgba(139, 0, 0, ${decisiveVignetteOpacity * 0.5})`);
       vignette.addColorStop(1, `rgba(255, 0, 0, ${decisiveVignetteOpacity})`);
       ctx.fillStyle = vignette;
-      ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+      ctx.fillRect(0, 0, GAME_LOGICAL_W, gameCanvas.height);
       
       // Texto sutil que late con el corazón "¡TIRO DECISIVO!"
       ctx.textAlign = 'center';
@@ -25044,7 +25063,7 @@ if (player.hairType === 'rulos-cortos') {
       vignette.addColorStop(0.6, `rgba(168, 85, 247, ${tensionLevel * 0.15})`); // Toque violeta neón sutil
       vignette.addColorStop(1, `rgba(0, 0, 0, ${tensionLevel * 0.72})`); // Borde oscuro dramático
       ctx.fillStyle = vignette;
-      ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+      ctx.fillRect(0, 0, GAME_LOGICAL_W, gameCanvas.height);
       
       // Letras cinematográficas estilo película
       ctx.textAlign = 'center';
@@ -25102,7 +25121,7 @@ if (player.hairType === 'rulos-cortos') {
       ctx.save();
       ctx.globalAlpha = Math.min(0.6, impactFlash);
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+      ctx.fillRect(0, 0, GAME_LOGICAL_W, gameCanvas.height);
       ctx.restore();
     }
   }
