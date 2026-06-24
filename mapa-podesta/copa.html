@@ -3241,12 +3241,12 @@
     }
 
     .canvas-wrapper {
-      aspect-ratio: 4 / 3;
+      aspect-ratio: 4 / 3.5;
       max-width: 100%;
       max-height: calc(100vh - 65px);
       max-height: calc(100dvh - 65px);
-      width: min(100%, calc((100vh - 65px) * (4 / 3)));
-      width: min(100%, calc((100dvh - 65px) * (4 / 3)));
+      width: min(100%, calc((100vh - 65px) * (4 / 3.5)));
+      width: min(100%, calc((100dvh - 65px) * (4 / 3.5)));
       margin-left: auto;
       margin-right: auto;
       flex-shrink: 1;
@@ -3265,15 +3265,10 @@
     #canvas-futbol {
       width: 100%;
       height: 100%;
-      max-width: 100%;
-      max-height: 100%;
-      aspect-ratio: 4 / 3;
-      object-fit: contain;
       display: block;
       touch-action: none; /* Bloquea cualquier scroll nativo del teléfono al patear! */
       position: absolute;
       inset: 0;
-      margin: auto;
     }
     .swipe-hint {
       position: absolute;
@@ -9780,8 +9775,8 @@
 
   let MUNDIAL_JUGADORES = [
     { id: 'mesias', nombre: 'El Mesías', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 99, fuerza: 96, precision: 95, skin: '#fed7aa', hair: '#4a2c11', beard: '#5a3818', hairType: 'messi', jersey: ['#74acdf', '#ffffff', '#18181b'] },
-    { id: 'kanyon', nombre: 'Harry Kañón', pais: 'Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', flagColors: ['#ffffff'], flagType: 'cross', flagCross: '#cf111b', comba: 82, fuerza: 97, precision: 94, skin: '#ffedd5', hair: '#fef08a', beard: null, hairType: 'blonde', eyeColor: '#7dd3fc', jersey: ['#ffffff', '#cf111b', '#1e3a8a'] },
-    { id: 'yamalisimo', nombre: 'Yamalísimo', pais: 'España 🇪🇸', flag: '🇪🇸', flagColors: ['#c60b1e','#ffc400','#c60b1e'], flagType: 'h3', comba: 92, fuerza: 94, precision: 93, skin: '#78350f', hair: '#eab308', beard: null, hairType: 'curly', jersey: ['#dc2626', '#dc2626', '#1e3a8a'] , locked: true, unlockPrice: 950, unlockDesc: 'Racha 18 ⚽ o 950 🪙'},
+    { id: 'kanyon', nombre: 'Harry Kañón', pais: 'Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', flagColors: ['#ffffff'], flagType: 'cross', flagCross: '#cf111b', comba: 82, fuerza: 97, precision: 94, skin: '#ffedd5', hair: '#fef08a', beard: null, hairType: 'blonde', eyeColor: '#7dd3fc', jersey: ['#ffffff', '#ffffff', '#1e3a8a'] },
+    { id: 'yamalisimo', nombre: 'Yamalísimo', pais: 'España 🇪🇸', flag: '🇪🇸', flagColors: ['#c60b1e','#ffc400','#c60b1e'], flagType: 'h3', comba: 92, fuerza: 94, precision: 93, skin: '#78350f', hair: '#eab308', beard: null, hairType: 'curly', jersey: ['#dc2626', '#dc2626', '#dc2626'] , locked: true, unlockPrice: 950, unlockDesc: 'Racha 18 ⚽ o 950 🪙'},
     { id: 'mbafest', nombre: 'MbaFest', pais: 'Francia 🇫🇷', flag: '🇫🇷', flagColors: ['#002395','#ffffff','#ed2939'], flagType: 'v3', comba: 75, fuerza: 98, precision: 90, skin: '#78350f', hair: '#27272a', beard: null, hairType: 'buzz', jersey: ['#1e40af', '#1e40af', '#ffffff'] },
     { id: 'neymareado', nombre: 'Neymareado', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00'], flagType: 'br', comba: 98, fuerza: 95, precision: 88, skin: '#b45309', hair: '#1c1917', beard: '#1c1917', beardType: 'barba-corta', hairType: 'rulos-cortos', eyeColor: '#16a34a', jersey: ['#facc15', '#009c3b', '#1d4ed8'] , locked: true, unlockPrice: 1100, unlockDesc: 'Récord 20 🏆 o 1100 🪙'},
     { id: 'penaldo', nombre: 'Penaldo', pais: 'Portugal 🇵🇹', flag: '🇵🇹', flagColors: ['#006600','#ff0000'], flagType: 'v2', comba: 85, fuerza: 99, precision: 96, skin: '#fed7aa', hair: '#18181b', beard: null, hairType: 'penaldo', jersey: ['#dc2626', '#006600', '#006600'] , locked: true, unlockPrice: 800, unlockDesc: 'Racha 15 ⚡ o 800 🪙'},
@@ -9791,7 +9786,7 @@
     { id: 'zazu', nombre: 'Zazu', pais: 'Francia 🇫🇷', flag: '🇫🇷', flagColors: ['#002395','#ffffff','#ed2939'], flagType: 'v3', comba: 96, fuerza: 91, precision: 98, skin: '#ffedd5', hair: '#3f3f46', beard: null, hairType: 'calvo', jersey: ['#002395', '#002395', '#ffffff'], locked: true, classic: true, unlockPrice: 850, unlockDesc: 'Racha 12 ⚡ o 850 🪙' },
     { id: 'orey', nombre: 'Orey', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00'], flagType: 'br', comba: 95, fuerza: 98, precision: 98, skin: '#653b1b', hair: '#18181b', beard: null, hairType: 'afro-short', jersey: ['#facc15', '#009c3b', '#1d4ed8'], locked: true, classic: true, unlockPrice: 1100, unlockDesc: 'Récord 15 🏆 o 1100 🪙' },
     { id: 'fenomeno', nombre: 'El Fenómeno', pais: 'Brasil 🇧🇷', flag: '🇧🇷', flagColors: ['#009c3b','#ffdf00','#002277'], flagType: 'br', comba: 94, fuerza: 98, precision: 96, skin: '#b45309', hair: '#18181b', beard: null, hairType: 'calva-flequillo', jersey: ['#facc15', '#009c3b', '#1d4ed8'], locked: true, classic: true, unlockPrice: 700, unlockDesc: 'Racha 12 ⚽ o 700 🪙' },
-    { id: 'becan', nombre: 'Becan', pais: 'Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', flagColors: ['#ffffff'], flagType: 'cross', flagCross: '#cf111b', comba: 99, fuerza: 93, precision: 97, skin: '#ffedd5', hair: '#fef08a', beard: null, hairType: 'beckham-mohawk', eyeColor: '#7dd3fc', jersey: ['#cf142b', '#ffffff', '#ffffff'], locked: true, classic: true, unlockPrice: 850, unlockDesc: 'Récord 15 🏆 o 850 🪙' },
+    { id: 'becan', nombre: 'Becan', pais: 'Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', flagColors: ['#ffffff'], flagType: 'cross', flagCross: '#cf111b', comba: 99, fuerza: 93, precision: 97, skin: '#ffedd5', hair: '#fef08a', beard: null, hairType: 'beckham-mohawk', eyeColor: '#7dd3fc', jersey: ['#cf142b', '#cf142b', '#cf142b'], locked: true, classic: true, unlockPrice: 850, unlockDesc: 'Récord 15 🏆 o 850 🪙' },
     { id: 'witch', nombre: 'The Witch', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 96, fuerza: 94, precision: 95, skin: '#fed7aa', hair: '#18181b', beard: '#18181b', beardType: 'candado-chico', hairType: 'calvo-total', jersey: ['#0ea5e9', '#ffffff', '#18181b'], locked: true, classic: true, unlockPrice: 550, unlockDesc: 'Racha 10 ⚡ o 550 🪙' },
     { id: 'david', nombre: 'David', pais: 'Países Bajos 🇳🇱', flag: '🇳🇱', flagColors: ['#ff4f00','#ffffff','#21468b'], flagType: 'h3', comba: 94, fuerza: 97, precision: 92, skin: '#5c4033', hair: '#1c1917', beard: null, hairType: 'rastas', jersey: ['#ff4f00', '#ff4f00', '#ff4f00'], locked: true, classic: true, unlockPrice: 550, unlockDesc: 'Récord 8 🏆 o 550 🪙' },
     { id: 'kingsman', nombre: 'Kingsman', pais: 'Alemania 🇩🇪', flag: '🇩🇪', flagColors: ['#000000','#dd0000','#ffcf00'], flagType: 'h3', comba: 91, fuerza: 96, precision: 98, skin: '#ffedd5', hair: '#fde047', beard: null, hairType: 'long-rubio', eyeColor: '#7dd3fc', jersey: ['#10b981', '#ffffff', '#ffffff'], locked: true, classic: true, unlockPrice: 700, unlockDesc: 'Récord 12 🏆 o 700 🪙' },
@@ -9799,7 +9794,7 @@
     { id: 'totto', nombre: 'Totto', pais: 'Italia 🇮🇹', flag: '🇮🇹', flagColors: ['#009246','#ffffff','#ce2b37'], flagType: 'v3', comba: 95, fuerza: 96, precision: 95, skin: '#fed7aa', hair: '#ca8a04', beard: null, hairType: 'totti', jersey: ['#0087e0', '#0087e0', '#ffffff'], locked: true, classic: true, unlockPrice: 700, unlockDesc: 'Récord 12 🏆 o 700 🪙' },
     { id: 'craft', nombre: 'Craft', pais: 'Países Bajos 🇳🇱', flag: '🇳🇱', flagColors: ['#ff4f00','#ffffff','#21468b'], flagType: 'h3', comba: 98, fuerza: 94, precision: 97, skin: '#ffedd5', hair: '#854d0e', beard: null, hairType: 'long-lasio', jersey: ['#ff4f00', '#ff4f00', '#ff4f00'], locked: true, classic: true, unlockPrice: 950, unlockDesc: 'Racha 14 ⚽ o 950 🪙' },
     { id: 'batifrutta', nombre: 'Batifrutta', pais: 'Argentina 🇦🇷', flag: '🇦🇷', flagColors: ['#74acdf','#ffffff','#74acdf'], flagType: 'h3', comba: 88, fuerza: 99, precision: 96, skin: '#fed7aa', hair: '#5c4033', beard: '#5c4033', beardType: 'candado-chico', hairType: 'long-rubio', eyeColor: '#7dd3fc', jersey: ['#74acdf', '#ffffff', '#18181b'], locked: true, classic: true, unlockPrice: 900, unlockDesc: 'Récord 18 🏆 o 900 🪙' },
-    { id: 'lakaka', nombre: 'Lakaka', pais: 'Bélgica 🇧🇪', flag: '🇧🇪', flagColors: ['#000000','#ffd700','#ff0000'], flagType: 'v3', comba: 68, fuerza: 98, precision: 75, skin: '#4a3319', hair: '#18181b', beard: null, hairType: 'rapado-oscuro', jersey: ['#800020', '#fbbf24', '#18181b'] , locked: true, unlockPrice: 900, unlockDesc: 'Récord 18 🏆 o 900 🪙'},
+    { id: 'lakaka', nombre: 'Lakaka', pais: 'Bélgica 🇧🇪', flag: '🇧🇪', flagColors: ['#000000','#ffd700','#ff0000'], flagType: 'v3', comba: 68, fuerza: 98, precision: 75, skin: '#4a3319', hair: '#18181b', beard: null, hairType: 'rapado-oscuro', jersey: ['#7f1d1d', '#7f1d1d', '#7f1d1d'] , locked: true, unlockPrice: 900, unlockDesc: 'Récord 18 🏆 o 900 🪙'},
     { id: 'lucho', nombre: 'Lucho', pais: 'Uruguay 🇺🇾', flag: '🇺🇾', flagColors: ['#ffffff','#007fff','#ffffff'], flagType: 'uy', comba: 80, fuerza: 88, precision: 95, skin: '#fed7aa', hair: '#18181b', beard: null, hairType: 'corto-despeinado', jersey: ['#5ca2db', '#5ca2db', '#18181b'] }
   ];
 
@@ -9884,13 +9879,34 @@
   let _gradCacheKey = '';
   let _gradSky = null, _gradStand = null, _gradBorder = null, _gradSpotL = null, _gradSpotR = null,
       _gradLight = null, _gradLeftSpot = null, _gradRightSpot = null,
-      _gradGrassA = null, _gradGrassB = null, _gradStripes = null;
+      _gradGrassA = null, _gradGrassB = null, _gradStripes = null, _grassTexturePattern = null;
+  function buildGrassTexturePattern(ctx) {
+    // Genera una sola vez un patrón de textura de césped (manchitas sutiles) en un canvas offscreen pequeño.
+    // Se reutiliza vía createPattern, así que no cuesta nada extra por frame.
+    const tile = document.createElement('canvas');
+    tile.width = 40;
+    tile.height = 40;
+    const tctx = tile.getContext('2d');
+    // Semilla fija para que la textura sea consistente entre frames
+    let seed = 42;
+    const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+    for (let i = 0; i < 55; i++) {
+      const px = rnd() * 40;
+      const py = rnd() * 40;
+      const r = 0.4 + rnd() * 0.7;
+      tctx.fillStyle = rnd() > 0.5 ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.045)';
+      tctx.beginPath();
+      tctx.ellipse(px, py, r * 1.8, r * 0.6, rnd() * Math.PI, 0, Math.PI * 2);
+      tctx.fill();
+    }
+    return ctx.createPattern(tile, 'repeat');
+  }
   function getStaticGradients(ctx, gameCanvas, stadiumAtmosphere, standHeight, FIELD_TOP, FIELD_H) {
     const key = stadiumAtmosphere + '|' + gameCanvas.width + '|' + gameCanvas.height + '|' + FIELD_TOP + '|' + FIELD_H;
     if (key === _gradCacheKey) {
       return { sky: _gradSky, stand: _gradStand, border: _gradBorder, spotL: _gradSpotL, spotR: _gradSpotR,
         light: _gradLight, leftSpot: _gradLeftSpot, rightSpot: _gradRightSpot, grassA: _gradGrassA, grassB: _gradGrassB,
-        stripes: _gradStripes };
+        stripes: _gradStripes, grassTexture: _grassTexturePattern };
     }
     _gradCacheKey = key;
 
@@ -9988,7 +10004,7 @@
 
     return { sky: _gradSky, stand: _gradStand, border: _gradBorder, spotL: _gradSpotL, spotR: _gradSpotR,
       light: _gradLight, leftSpot: _gradLeftSpot, rightSpot: _gradRightSpot, grassA: _gradGrassA, grassB: _gradGrassB,
-      stripes: _gradStripes };
+      stripes: _gradStripes, grassTexture: (_grassTexturePattern || (_grassTexturePattern = buildGrassTexturePattern(ctx))) };
   }
   let mundialRecord = 0;
   let gameMode = 'clasico'; // 'clasico', 'timeattack', 'survival'
@@ -10648,6 +10664,7 @@
   let aimStart = { x: 0, y: 0 };
   let aimCurrent = { x: 0, y: 0 };
   let shakeIntensity = 0;
+  let impactFlash = 0; // Flash blanco breve de pantalla al golpear el palo (feedback táctil de impacto)
   let netWaveTimer = 0;     // frames desde que la pelota entró a la red
   let netWaveX = 200;       // X del impacto en la red
   let netWaveY = 40;        // Y del impacto en la red
@@ -12389,24 +12406,32 @@ if (player.hairType === 'rulos-cortos') {
       });
       c.restore();
     } else if (player.hairType === 'calvo') {
-      // Zidane: Corona calva con pelo denso en nuca y costados
+      // Zidane: Corona calva. Rapado en coronilla con tonsure sutil, pelo en costados y nuca.
       c.save();
       c.fillStyle = player.hair;
       // Masa de pelo lateral izquierda
       c.beginPath();
-      c.arc(-14, -2, 5, 0, Math.PI * 2);
+      c.arc(-13.5, -2, 4.5, 0, Math.PI * 2);
       c.fill();
       // Masa de pelo lateral derecha
       c.beginPath();
-      c.arc(14, -2, 5, 0, Math.PI * 2);
+      c.arc(13.5, -2, 4.5, 0, Math.PI * 2);
       c.fill();
-      // Textura sutil de pelo corto en nuca
-      c.strokeStyle = 'rgba(0,0,0,0.1)';
+      // Conector nuca trasero
+      c.lineWidth = 3.5;
+      c.strokeStyle = player.hair;
+      c.beginPath();
+      c.arc(0, 0, 15.5, 0.15 * Math.PI, 0.85 * Math.PI);
+      c.stroke();
+      // Textura sutil de rapado/sombra corta en la nuca
+      c.strokeStyle = 'rgba(0,0,0,0.12)';
       c.lineWidth = 0.8;
-      for (let a = 0.1; a < 0.9; a += 0.12) {
-        const bx = Math.cos(a * Math.PI) * 16;
-        const by = Math.sin(a * Math.PI) * 16;
-        c.beginPath(); c.moveTo(bx, by); c.lineTo(bx * 0.88, by * 0.88); c.stroke();
+      for (let a = 0.18; a < 0.82; a += 0.14) {
+        const sx = Math.cos(a * Math.PI) * 15.5;
+        const sy = Math.sin(a * Math.PI) * 15.5;
+        const ex = Math.cos(a * Math.PI) * 12.5;
+        const ey = Math.sin(a * Math.PI) * 12.5;
+        c.beginPath(); c.moveTo(sx, sy); c.lineTo(ex, ey); c.stroke();
       }
       c.restore();
     } else if (player.hairType === 'afro-short') {
@@ -12721,22 +12746,7 @@ if (player.hairType === 'rulos-cortos') {
     c.arc(0, 5, 3, 0, Math.PI);
     c.stroke();
 
-    // Dientes salidos para Lucho (Suarez)
-    if (player.id === 'lucho') {
-      c.fillStyle = '#ffffff';
-      c.strokeStyle = '#000000';
-      c.lineWidth = 0.8;
-      // Diente izquierdo
-      c.beginPath();
-      c.rect(-1.8, 5, 1.4, 2.5);
-      c.fill();
-      c.stroke();
-      // Diente derecho
-      c.beginPath();
-      c.rect(0.4, 5, 1.4, 2.5);
-      c.fill();
-      c.stroke();
-    }
+    // (Lucho usa la boca estándar, sin dientes sobresalientes)
 
     // Bigote (si corresponde)
     if (player.beard && player.beardType === 'bigote') {
@@ -18855,6 +18865,10 @@ window.iniciarEstadioJuego = function() {
     shakeIntensity = intensity;
   }
 
+  function triggerImpactFlash(strength = 0.5) {
+    impactFlash = strength;
+  }
+
   function updatePhysics() {
     // Actualizar dianas móviles
     actualizarDianas();
@@ -18881,6 +18895,9 @@ window.iniciarEstadioJuego = function() {
     // Reducir temblor de pantalla suavemente
     if (shakeIntensity > 0) shakeIntensity -= 0.6;
     if (shakeIntensity < 0) shakeIntensity = 0;
+    // Reducir flash de impacto suavemente (fade-out rápido)
+    if (impactFlash > 0) impactFlash -= 0.06;
+    if (impactFlash < 0) impactFlash = 0;
     if (netWaveTimer > 0) netWaveTimer--; // animar onda de red
     if (photographerFlashTimer > 0) photographerFlashTimer--; // animar flash de cámara
 
@@ -19135,9 +19152,12 @@ window.iniciarEstadioJuego = function() {
         return;
       }
 
-      // Guardar estela de partículas
-      trail.push({ x: pelota.x, y: pelota.y, r: pelota.r * 0.75, opacity: 0.6 });
-      if (trail.length > 8) trail.shift();
+      // Guardar estela de partículas (más larga e intensa en tiros fuertes)
+      const ballSpeed = Math.sqrt(pelota.vx * pelota.vx + pelota.vy * pelota.vy);
+      const isPoderosoShot = ballSpeed > 9;
+      trail.push({ x: pelota.x, y: pelota.y, r: pelota.r * 0.75, opacity: isPoderosoShot ? 0.95 : 0.6 });
+      const trailMaxLen = isPoderosoShot ? 14 : 8;
+      if (trail.length > trailMaxLen) trail.shift();
 
       // ── GRABAR FRAMES PARA POSIBLE REPLAY ──
       if (replayFrames.length < 300) {
@@ -19351,7 +19371,7 @@ const isP1Arquero = penalesTurno === 'defensa';
       // ── TRAVESAÑO SUPERIOR ──
       if (pelota.y <= GOAL_Y + 4 && pelota.y >= GOAL_Y - 4 && pelota.x >= GOAL_LEFT - 3 && pelota.x <= GOAL_RIGHT + 3 && pelota.vy < 0 && pelota.status === '') {
         if (!pelota.hitPostThisShot) { playPostVoice(); }
-        pelota.hitPostThisShot = true; triggerScreenShake(12);
+        pelota.hitPostThisShot = true; triggerScreenShake(12); triggerImpactFlash(0.55);
         triggerScreenShake(14);
         triggerHaptic('heavy');
         playClangSound();
@@ -19374,7 +19394,7 @@ const isP1Arquero = penalesTurno === 'defensa';
       // ── POSTE IZQUIERDO ──
       if (pelota.x >= GOAL_LEFT - 5 && pelota.x <= GOAL_LEFT + 5 && pelota.y >= 56 && pelota.y <= 76 && pelota.status !== 'palo') {
         if (!pelota.hitPostThisShot) { playPostVoice(); }
-        pelota.hitPostThisShot = true; triggerScreenShake(12);
+        pelota.hitPostThisShot = true; triggerScreenShake(12); triggerImpactFlash(0.55);
         triggerScreenShake(13);
         triggerHaptic('heavy');
         playClangSound();
@@ -19396,7 +19416,7 @@ const isP1Arquero = penalesTurno === 'defensa';
       // ── POSTE DERECHO ──
       if (pelota.x >= GOAL_RIGHT - 5 && pelota.x <= GOAL_RIGHT + 5 && pelota.y >= 56 && pelota.y <= 76 && pelota.status !== 'palo') {
         if (!pelota.hitPostThisShot) { playPostVoice(); }
-        pelota.hitPostThisShot = true; triggerScreenShake(12);
+        pelota.hitPostThisShot = true; triggerScreenShake(12); triggerImpactFlash(0.55);
         triggerScreenShake(13);
         triggerHaptic('heavy');
         playClangSound();
@@ -20234,6 +20254,21 @@ const isP1Arquero = penalesTurno === 'defensa';
   }
 
   // ── FUNCIÓN DIBUJAR CABEZÓN (ESTILO HEAD SOCCER PROCEDURAL EN CAMPO) ──────────
+  // Sombra elíptica liviana en el suelo bajo el jugador (sin gradiente, optimizada para móvil)
+  function drawPlayerGroundShadow(ctx, x, y, scale = 1) {
+    ctx.save();
+    ctx.globalAlpha = 0.28;
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.ellipse(x, y + 17 * scale, 11 * scale, 3.6 * scale, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 0.14;
+    ctx.beginPath();
+    ctx.ellipse(x, y + 17 * scale, 15 * scale, 4.8 * scale, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
   function drawCabezon(ctx, x, y, player, isKicking, isGoalie, isJoyful, isDefender = false) {
     ctx.save();
     ctx.translate(x, y);
@@ -20527,6 +20562,19 @@ const isP1Arquero = penalesTurno === 'defensa';
     ctx.lineTo(0, 19.5);
     ctx.lineTo(2.5, 16);
     ctx.stroke();
+
+    // Costura sutil tipo rib-knit en el cuello (mejora gráfica liviana, sin gradientes)
+    ctx.save();
+    ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+    ctx.lineWidth = 0.5;
+    ctx.setLineDash([0.8, 0.8]);
+    ctx.beginPath();
+    ctx.moveTo(-2.5, 16.6);
+    ctx.lineTo(0, 19.7);
+    ctx.lineTo(2.5, 16.6);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
     
     // Rayas o detalles en la camiseta (y=16 a y=27)
     if (player.id === 'hajalan') {
@@ -20605,6 +20653,16 @@ const isP1Arquero = penalesTurno === 'defensa';
       ctx.closePath();
       ctx.fill();
     }
+
+    // Costura sutil en el ruedo inferior de la camiseta (mejora gráfica liviana)
+    ctx.save();
+    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(-6.5, 26.5);
+    ctx.lineTo(6.5, 26.5);
+    ctx.stroke();
+    ctx.restore();
 
     // Pantalones cortos / Shorts (y=27 a y=34) con color personalizado
     const shortsColor = player.jersey[2] || player.jersey[1] || '#ffffff';
@@ -22744,15 +22802,8 @@ if (player.hairType === 'rulos-cortos') {
           ctx.arc(cx, finalRowY + cr * 0.4, cr * 0.45, 0, Math.PI);
           ctx.fill();
           
-          // Rostro (Piel) — Gradiente 3D esférico estilo vinilo coleccionable
-          const faceGrad = ctx.createRadialGradient(
-            cx - cr * 0.3, finalRowY - cr * 0.35, cr * 0.05,
-            cx, finalRowY, cr
-          );
-          faceGrad.addColorStop(0, skinColor);
-          faceGrad.addColorStop(0.55, skinColor);
-          faceGrad.addColorStop(1, 'rgba(0,0,0,0.28)');
-          ctx.fillStyle = faceGrad;
+          // Rostro (Piel) — color plano simple (optimizado para fluidez en móvil)
+          ctx.fillStyle = skinColor;
           ctx.beginPath();
           ctx.arc(cx, finalRowY, cr, 0, Math.PI * 2);
           ctx.fill();
@@ -22762,16 +22813,8 @@ if (player.hairType === 'rulos-cortos') {
           ctx.arc(cx, finalRowY + cr * 0.2, cr * 0.8, 0, Math.PI);
           ctx.fill();
           
-          // Gorra o cabello — con degradado para dar volumen
-          const hatGrad = ctx.createRadialGradient(
-            cx - cr * 0.25, finalRowY - cr * 0.6, 0,
-            cx, finalRowY - cr * 0.1, cr
-          );
-          const clr = clothingColor;
-          hatGrad.addColorStop(0, clr);
-          hatGrad.addColorStop(0.6, clr + 'cc');
-          hatGrad.addColorStop(1, 'rgba(0,0,0,0.3)');
-          ctx.fillStyle = hatGrad;
+          // Gorra o cabello — color plano simple (optimizado para fluidez en móvil)
+          ctx.fillStyle = clothingColor;
           ctx.beginPath();
           ctx.arc(cx, finalRowY - cr * 0.1, cr, Math.PI, 0);
           ctx.fill();
@@ -23022,6 +23065,15 @@ if (player.hairType === 'rulos-cortos') {
       const stripeH = FIELD_H / stripeCount;
       ctx.fillStyle = _staticGrads.stripes[s];
       ctx.fillRect(0, stripeY, gameCanvas.width, stripeH + 1);
+    }
+
+    // Textura sutil de césped (patrón pre-renderizado una sola vez, costo mínimo por frame)
+    if (_staticGrads.grassTexture) {
+      ctx.save();
+      ctx.globalAlpha = 0.5;
+      ctx.fillStyle = _staticGrads.grassTexture;
+      ctx.fillRect(0, FIELD_TOP, gameCanvas.width, FIELD_H);
+      ctx.restore();
     }
 
     // Luces cenitales del estadio y focos laterales
@@ -23976,11 +24028,13 @@ if (player.hairType === 'rulos-cortos') {
     // 4. DIBUJAR BARRERA DE DEFENSORAS (Caricaturas procedurales!)
     defensores.forEach((def, index) => {
       const defIsJoyful = pelota.isSettled && (pelota.status === 'bloqueado' || pelota.status === 'afuera' || pelota.status === 'palo');
+      drawPlayerGroundShadow(ctx, def.x, def.y);
       drawCabezon(ctx, def.x, def.y, defensorJugador, false, false, defIsJoyful, true);
     });
 
     // 5. DIBUJAR ARQUERO CABEZÓN EN ACCIÓN (🧤)
     if (gameMode !== 'dianas') {
+      drawPlayerGroundShadow(ctx, arquero.x, arquero.y);
       drawCabezon(ctx, arquero.x, arquero.y, arqueroJugador, false, true, (pelota.status === 'bloqueado'));
     }
 
@@ -24007,6 +24061,7 @@ if (player.hairType === 'rulos-cortos') {
         finalPlayerX = playerX + swing;
       }
     }
+    drawPlayerGroundShadow(ctx, finalPlayerX, playerY);
     drawCabezon(ctx, finalPlayerX, playerY, tiradorADibujar, (kickTimer > 0), false, (pelota.status === 'gol'));
 
     // ══════════════════════════════════════════════
@@ -24034,6 +24089,7 @@ if (player.hairType === 'rulos-cortos') {
       ctx.fillStyle = motionGrad;
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r * 1.5, 0, Math.PI * 2);
+      ctx.fill();
     });
 
     // ══════════════════════════════════════════════
@@ -24318,8 +24374,18 @@ if (player.hairType === 'rulos-cortos') {
     }
 
     if (!pelota.isSettled || pelota.status === 'palo') {
-      const bx = pelota.x, by = pelota.y, br = pelota.r;
+      let bx = pelota.x, by = pelota.y;
+      let br = pelota.r;
       const activeBallSkin = (rachaActual >= 3) ? 'fuego' : selectedBallSkin;
+
+      // Vibración/pulso de tensión en la pelota mientras se carga el tiro (feedback táctil de anticipación)
+      if (!pelota.isShot && !pelota.isSettled && isAiming) {
+        const chargeRatio = Math.min(1, superKickCharge / 100);
+        const jitterMag = chargeRatio * 1.4;
+        bx += (Math.random() - 0.5) * jitterMag;
+        by += (Math.random() - 0.5) * jitterMag;
+        br = pelota.r * (1 + chargeRatio * 0.06 + Math.sin(Date.now() * 0.04) * chargeRatio * 0.03);
+      }
 
       // Dibujar anillo de carga de Súper Tiro alrededor de la pelota (cuando no ha sido pateada)
       if (!pelota.isShot && !pelota.isSettled) {
@@ -25030,6 +25096,15 @@ if (player.hairType === 'rulos-cortos') {
     }
     
     ctx.restore();
+
+    // Flash blanco breve de impacto (palo) — cubre toda la pantalla, no afectado por el shake
+    if (impactFlash > 0) {
+      ctx.save();
+      ctx.globalAlpha = Math.min(0.6, impactFlash);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+      ctx.restore();
+    }
   }
 
   // --- GOOGLE ADMOB INTEGRATION (PLAYSTORE VERSION) ---
