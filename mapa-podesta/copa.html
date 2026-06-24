@@ -14433,34 +14433,7 @@ if (player.hairType === 'rulos-cortos') {
         cCtx.stroke();
         cCtx.shadowBlur = 0;
         
-        // 4. Patrocinador Nexos
-        cCtx.save();
-        cCtx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-        cCtx.strokeStyle = 'rgba(6, 182, 212, 0.4)';
-        cCtx.lineWidth = 1.5;
-        const pbW = W * 0.65;
-        const pbH = 22;
-        const pbX = (W - pbW) * 0.5;
-        const pbY = 14;
-        cCtx.beginPath();
-        if (cCtx.roundRect) {
-          cCtx.roundRect(pbX, pbY, pbW, pbH, 5);
-        } else {
-          cCtx.rect(pbX, pbY, pbW, pbH);
-        }
-        cCtx.fill();
-        cCtx.stroke();
-        
-        const alphaGlow = 0.6 + Math.abs(Math.sin(subFrame * 0.1)) * 0.4;
-        cCtx.fillStyle = `rgba(6, 182, 212, ${alphaGlow})`;
-        cCtx.font = '900 8px sans-serif';
-        cCtx.textAlign = 'center';
-        cCtx.textBaseline = 'middle';
-        cCtx.shadowColor = '#06b6d4';
-        cCtx.shadowBlur = 5;
-        cCtx.fillText('🏘️ NEXOS — SISTEMAS DE GESTIÓN DE BARRIOS CERRADOS 🏘️', W * 0.5, pbY + pbH * 0.5);
-        cCtx.shadowBlur = 0;
-        cCtx.restore();
+        // 4. (Cartel de patrocinador removido)
         
         // 5. VS Logo
         if (subFrame > 15) {
@@ -16600,32 +16573,45 @@ window.iniciarEstadioJuego = function() {
     }
   };
 
+  function applyCanvasScale() {
+    if (!gameCanvas || !ctx) return;
+    const LOGICAL_W = 400;
+    const LOGICAL_H = 300;
+    // Medir el tamaño REAL renderizado del wrapper (no asumir el aspect-ratio del CSS,
+    // ya que flexbox + max-height + aspect-ratio combinados pueden no dar exactamente
+    // la proporción declarada). Esto es lo que realmente ve el usuario en pantalla.
+    const wrapper = gameCanvas.parentElement;
+    const wrapperRect = wrapper ? wrapper.getBoundingClientRect() : null;
+    let realRatio = LOGICAL_W / LOGICAL_H; // fallback 4:3 si no se puede medir
+    if (wrapperRect && wrapperRect.width > 0 && wrapperRect.height > 0) {
+      realRatio = wrapperRect.width / wrapperRect.height;
+    } else {
+      // El layout puede no estar listo todavía (primer frame) — reintentar en breve
+      requestAnimationFrame(() => setTimeout(applyCanvasScale, 50));
+    }
+    const physicalW = Math.max(100, Math.round(LOGICAL_H * realRatio));
+    gameCanvas.width = physicalW;
+    gameCanvas.height = LOGICAL_H;
+    const _gameScaleX = physicalW / LOGICAL_W;
+    ctx.setTransform(_gameScaleX, 0, 0, 1, 0, 0);
+    GAME_LOGICAL_W = LOGICAL_W;
+  }
+
   function initCanvas() {
     gameCanvas = document.getElementById('canvas-futbol');
     if (!gameCanvas) return;
     ctx = gameCanvas.getContext('2d');
     
-    // ── CORRECCIÓN DE PROPORCIÓN ──
-    // El contenedor visual (.canvas-wrapper) usa aspect-ratio 4/3.5 para aprovechar mejor
-    // el alto de pantalla en móviles, pero toda la lógica/dibujo del juego está escrita
-    // en coordenadas de un campo lógico de 400x300 (proporción 4:3 real).
-    // Si el canvas físico fuera 400x300, el navegador lo estiraría horizontalmente un 16.7%
-    // para llenar el wrapper 4:3.5, deformando a los jugadores y el arco.
-    // Solución: el canvas físico se ajusta a la proporción REAL del wrapper, y un scale()
-    // interno re-mapea el sistema de coordenadas a 400x300 para que TODO el código de
-    // dibujo (arco, jugadores, líneas de cancha, etc.) siga funcionando sin cambios.
-    const LOGICAL_W = 400;
-    const LOGICAL_H = 300;
-    const WRAPPER_RATIO = 4 / 3.5; // debe coincidir con aspect-ratio de .canvas-wrapper
-    const physicalW = Math.round(LOGICAL_H * WRAPPER_RATIO);
-    gameCanvas.width = physicalW;
-    gameCanvas.height = LOGICAL_H;
-    const _gameScaleX = physicalW / LOGICAL_W;
-    ctx.setTransform(_gameScaleX, 0, 0, 1, 0, 0);
-    // Ancho LÓGICO (400) para que el código de dibujo que asume coordenadas 0-400
-    // siga siendo correcto, aunque el canvas físico real ahora sea más angosto
-    // (la diferencia se compensa exactamente con el setTransform de arriba).
-    GAME_LOGICAL_W = LOGICAL_W;
+    // ── CORRECCIÓN DE PROPORCIÓN (sin deformar a los jugadores ni al arco) ──
+    // Toda la lógica/dibujo del juego está escrita en coordenadas de un campo lógico
+    // de 400x300. El contenedor visual real puede tener una proporción distinta
+    // (varía según el dispositivo/navegador), así que medimos su tamaño real y
+    // ajustamos el canvas físico + una transformación interna para que el dibujo
+    // nunca se estire, sin importar qué proporción termine teniendo el contenedor.
+    applyCanvasScale();
+    // Recalcular si la ventana cambia de tamaño u orientación (rotación de pantalla)
+    window.addEventListener('resize', applyCanvasScale);
+    window.addEventListener('orientationchange', () => setTimeout(applyCanvasScale, 200));
     
     // Cachear referencias DOM usadas en el hot path del game loop (60x/seg)
     cacheGameDOMRefs();
@@ -23109,22 +23095,36 @@ if (player.hairType === 'rulos-cortos') {
     ctx.fillRect(GAME_LOGICAL_W / 2, FIELD_TOP, GAME_LOGICAL_W / 2, FIELD_H);
 
     // ══════════════════════════════════════════════
-    // LÍNEAS DEL CAMPO (perspectiva real)
+    // LÍNEAS DEL CAMPO (perspectiva real, con relieve de pintura realista)
     // ══════════════════════════════════════════════
-    ctx.strokeStyle = 'rgba(240, 255, 235, 0.30)';
-    ctx.lineWidth = 1.5;
     ctx.setLineDash([]);
 
     // Línea de meta (línea de gol) — a la altura de la base del arco, en el piso
+    ctx.strokeStyle = 'rgba(0, 30, 10, 0.18)';
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    ctx.moveTo(0, GOAL_Y + 56.4);
+    ctx.lineTo(GAME_LOGICAL_W, GOAL_Y + 56.4);
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(245, 255, 240, 0.42)';
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
     ctx.moveTo(0, GOAL_Y + 56);
-    ctx.lineTo(400, GOAL_Y + 56);
+    ctx.lineTo(GAME_LOGICAL_W, GOAL_Y + 56);
     ctx.stroke();
 
     // Línea del medio campo
+    ctx.strokeStyle = 'rgba(0, 30, 10, 0.18)';
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    ctx.moveTo(0, 290.4);
+    ctx.lineTo(GAME_LOGICAL_W, 290.4);
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(245, 255, 240, 0.42)';
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
     ctx.moveTo(0, 290);
-    ctx.lineTo(400, 290);
+    ctx.lineTo(GAME_LOGICAL_W, 290);
     ctx.stroke();
 
     // [Las líneas del área se dibujan DESPUÉS del arco para quedar por encima]
@@ -23139,13 +23139,18 @@ if (player.hairType === 'rulos-cortos') {
     // Semicírculo del área penal — asoma por debajo del borde del área hacia el jugador.
     // Punto del penal: GOAL_BASE_EARLY + 55. Área termina: GOAL_BASE_EARLY + 90.
     // Radio 38 → extremo inferior en +93, asoma 3px fuera del área (correcto reglamentariamente).
-    ctx.strokeStyle = 'rgba(240, 255, 235, 0.45)';
-    ctx.lineWidth = 1.4;
     ctx.save();
     // Clip: solo mostrar la parte que queda FUERA (por debajo) del área grande
     ctx.beginPath();
     ctx.rect(0, GOAL_BASE_EARLY + 90, GAME_LOGICAL_W, gameCanvas.height);
     ctx.clip();
+    ctx.strokeStyle = 'rgba(0, 30, 10, 0.16)';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.arc(200.4, GOAL_BASE_EARLY + 55.4, 38, 0, Math.PI);
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(245, 255, 240, 0.42)';
+    ctx.lineWidth = 1.3;
     ctx.beginPath();
     ctx.arc(200, GOAL_BASE_EARLY + 55, 38, 0, Math.PI);
     ctx.stroke();
@@ -23957,13 +23962,23 @@ if (player.hairType === 'rulos-cortos') {
     // ── LÍNEAS DEL ÁREA — dibujadas DESPUÉS del arco para quedar por encima ──
     // El arco ocupa desde GOAL_Y hasta GOAL_Y+56; las líneas del área arrancan desde la base del arco
     // GOAL_BASE ya declarada al principio de drawGame
-    ctx.strokeStyle = 'rgba(240, 255, 235, 0.30)';
-    ctx.lineWidth = 1.5;
     ctx.setLineDash([]);
 
     // Área grande — márgenes de 15px a cada lado del arco, profundidad 90px desde base
     const areaGrandeL = Math.max(2, GOAL_LEFT - 15);
     const areaGrandeR = Math.min(398, GOAL_RIGHT + 15);
+    // Sombra de relieve (da sensación de pintura real sobre el césped)
+    ctx.strokeStyle = 'rgba(0, 30, 10, 0.18)';
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    ctx.moveTo(areaGrandeL + 0.5, GOAL_BASE);
+    ctx.lineTo(areaGrandeL + 0.5, GOAL_BASE + 90.5);
+    ctx.lineTo(areaGrandeR + 0.5, GOAL_BASE + 90.5);
+    ctx.lineTo(areaGrandeR + 0.5, GOAL_BASE);
+    ctx.stroke();
+    // Trazo principal nítido
+    ctx.strokeStyle = 'rgba(245, 255, 240, 0.42)';
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
     ctx.moveTo(areaGrandeL, GOAL_BASE);
     ctx.lineTo(areaGrandeL, GOAL_BASE + 90);
@@ -23974,6 +23989,16 @@ if (player.hairType === 'rulos-cortos') {
     // Área chica — 15px dentro de cada poste, 28px de profundidad desde base
     const areaChicaL = GOAL_LEFT + 15;
     const areaChicaR = GOAL_RIGHT - 15;
+    ctx.strokeStyle = 'rgba(0, 30, 10, 0.18)';
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    ctx.moveTo(areaChicaL + 0.5, GOAL_BASE);
+    ctx.lineTo(areaChicaL + 0.5, GOAL_BASE + 28.5);
+    ctx.lineTo(areaChicaR + 0.5, GOAL_BASE + 28.5);
+    ctx.lineTo(areaChicaR + 0.5, GOAL_BASE);
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(245, 255, 240, 0.42)';
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
     ctx.moveTo(areaChicaL, GOAL_BASE);
     ctx.lineTo(areaChicaL, GOAL_BASE + 28);
