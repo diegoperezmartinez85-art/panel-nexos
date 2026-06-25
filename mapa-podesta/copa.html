@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <script src="capacitor.js"></script>
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Copa Nexos Mundial</title>
   <link rel="manifest" href="manifest.json">
@@ -3241,12 +3241,12 @@
     }
 
     .canvas-wrapper {
-      aspect-ratio: 4 / 3.5;
+      aspect-ratio: 400 / 320;
       max-width: 100%;
-      max-height: calc(100vh - 65px);
-      max-height: calc(100dvh - 65px);
-      width: min(100%, calc((100vh - 65px) * (4 / 3.5)));
-      width: min(100%, calc((100dvh - 65px) * (4 / 3.5)));
+      max-height: calc(100vh - 60px);
+      max-height: calc(100dvh - 60px);
+      width: min(100%, calc((100vh - 60px) * (400 / 320)));
+      width: min(100%, calc((100dvh - 60px) * (400 / 320)));
       margin-left: auto;
       margin-right: auto;
       flex-shrink: 1;
@@ -3263,12 +3263,14 @@
     }
 
     #canvas-futbol {
-      width: 100%;
-      height: 100%;
       display: block;
       touch-action: none; /* Bloquea cualquier scroll nativo del teléfono al patear! */
       position: absolute;
-      inset: 0;
+      will-change: transform; /* GPU composite layer para el canvas del juego */
+      -webkit-user-select: none;
+      user-select: none;
+      /* width, height, left, top se controlan dinámicamente en JS (applyCanvasScale)
+         para mantener siempre la proporción real 4:3 sin deformar el contenido */
     }
     .swipe-hint {
       position: absolute;
@@ -4063,6 +4065,40 @@
 
     /* Standalone overrides: hide non-game elements */
 
+    /* ── MOBILE PERFORMANCE OPTIMIZATIONS ── */
+    @media (max-width: 480px) and (hover: none) {
+      /* Reducir blur de esferas ambient en móvil — alto costo GPU */
+      .glow-sphere {
+        filter: blur(40px);
+        animation: none;
+      }
+      .sphere-3, .sphere-4 {
+        display: none;
+      }
+      /* Reducir backdrop-filter en paneles */
+      .form-box, .cfg-content, .pin-content {
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+      }
+      /* Eliminar grain overlay en móvil */
+      body::after { display: none; }
+    }
+
+    /* Canvas del juego — GPU layer y touch optimizado */
+    #gameCanvas {
+      will-change: contents;
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .pantalla-mundial {
+      contain: layout style;
+    }
+    /* Esferas — GPU composite layer */
+    .glow-sphere {
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+    }
   </style>
 </head>
 <body>
@@ -4120,6 +4156,41 @@
     @keyframes fadeInUpStart {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── MOBILE PERFORMANCE OPTIMIZATIONS ── */
+    @media (max-width: 480px) and (hover: none) {
+      /* Reducir blur de esferas ambient en móvil — alto costo GPU */
+      .glow-sphere {
+        filter: blur(40px);
+        animation: none;
+      }
+      .sphere-3, .sphere-4 {
+        display: none;
+      }
+      /* Reducir backdrop-filter en paneles */
+      .form-box, .cfg-content, .pin-content {
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+      }
+      /* Eliminar grain overlay en móvil */
+      body::after { display: none; }
+    }
+
+    /* Canvas del juego — GPU layer y touch optimizado */
+    #gameCanvas {
+      will-change: contents;
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .pantalla-mundial {
+      contain: layout style;
+    }
+    /* Esferas — GPU composite layer */
+    .glow-sphere {
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
     }
   </style>
 
@@ -4762,7 +4833,42 @@
 <style>
 .tut-dot { width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.15);transition:all 0.3s; }
 .tut-dot-active { background:#a855f7;box-shadow:0 0 8px #a855f7;transform:scale(1.3); }
-</style>
+
+    /* ── MOBILE PERFORMANCE OPTIMIZATIONS ── */
+    @media (max-width: 480px) and (hover: none) {
+      /* Reducir blur de esferas ambient en móvil — alto costo GPU */
+      .glow-sphere {
+        filter: blur(40px);
+        animation: none;
+      }
+      .sphere-3, .sphere-4 {
+        display: none;
+      }
+      /* Reducir backdrop-filter en paneles */
+      .form-box, .cfg-content, .pin-content {
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+      }
+      /* Eliminar grain overlay en móvil */
+      body::after { display: none; }
+    }
+
+    /* Canvas del juego — GPU layer y touch optimizado */
+    #gameCanvas {
+      will-change: contents;
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .pantalla-mundial {
+      contain: layout style;
+    }
+    /* Esferas — GPU composite layer */
+    .glow-sphere {
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+    }
+  </style>
 
 <!-- MODAL PRONÓSTICO -->
 <div class="clima-overlay" id="clima-overlay" onclick="cerrarPronostico(event)">
@@ -5260,7 +5366,42 @@
           box-shadow: 0 0 15px rgba(239, 68, 68, 0.7);
         }
       }
-    </style>
+
+    /* ── MOBILE PERFORMANCE OPTIMIZATIONS ── */
+    @media (max-width: 480px) and (hover: none) {
+      /* Reducir blur de esferas ambient en móvil — alto costo GPU */
+      .glow-sphere {
+        filter: blur(40px);
+        animation: none;
+      }
+      .sphere-3, .sphere-4 {
+        display: none;
+      }
+      /* Reducir backdrop-filter en paneles */
+      .form-box, .cfg-content, .pin-content {
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+      }
+      /* Eliminar grain overlay en móvil */
+      body::after { display: none; }
+    }
+
+    /* Canvas del juego — GPU layer y touch optimizado */
+    #gameCanvas {
+      will-change: contents;
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .pantalla-mundial {
+      contain: layout style;
+    }
+    /* Esferas — GPU composite layer */
+    .glow-sphere {
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+    }
+  </style>
     <div class="ball-selector-container">
       
       <div class="ball-skin-card selected" id="ball-skin-clasica" onclick="seleccionarBalon('clasica')">
@@ -5365,7 +5506,42 @@
         background: rgba(6, 182, 212, 0.2);
         color: #06b6d4;
       }
-    </style>
+
+    /* ── MOBILE PERFORMANCE OPTIMIZATIONS ── */
+    @media (max-width: 480px) and (hover: none) {
+      /* Reducir blur de esferas ambient en móvil — alto costo GPU */
+      .glow-sphere {
+        filter: blur(40px);
+        animation: none;
+      }
+      .sphere-3, .sphere-4 {
+        display: none;
+      }
+      /* Reducir backdrop-filter en paneles */
+      .form-box, .cfg-content, .pin-content {
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+      }
+      /* Eliminar grain overlay en móvil */
+      body::after { display: none; }
+    }
+
+    /* Canvas del juego — GPU layer y touch optimizado */
+    #gameCanvas {
+      will-change: contents;
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .pantalla-mundial {
+      contain: layout style;
+    }
+    /* Esferas — GPU composite layer */
+    .glow-sphere {
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+    }
+  </style>
     <div class="game-modes-container" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; margin-top: 8px; margin-bottom: 20px;">
       <div class="game-mode-card selected" id="mode-card-clasico" onclick="seleccionarModo('clasico')">
         <div class="mode-icon">🏆</div>
@@ -6042,7 +6218,42 @@
     font-weight: 900;
     color: #fff;
   }
-</style>
+
+    /* ── MOBILE PERFORMANCE OPTIMIZATIONS ── */
+    @media (max-width: 480px) and (hover: none) {
+      /* Reducir blur de esferas ambient en móvil — alto costo GPU */
+      .glow-sphere {
+        filter: blur(40px);
+        animation: none;
+      }
+      .sphere-3, .sphere-4 {
+        display: none;
+      }
+      /* Reducir backdrop-filter en paneles */
+      .form-box, .cfg-content, .pin-content {
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+      }
+      /* Eliminar grain overlay en móvil */
+      body::after { display: none; }
+    }
+
+    /* Canvas del juego — GPU layer y touch optimizado */
+    #gameCanvas {
+      will-change: contents;
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .pantalla-mundial {
+      contain: layout style;
+    }
+    /* Esferas — GPU composite layer */
+    .glow-sphere {
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+    }
+  </style>
 
 <!-- GUIA DE INSTALACION PWA (Premium OS Smart Assist) -->
 <div class="pwa-guia" id="pwa-guia-instalacion">
@@ -6202,7 +6413,7 @@
   // ══════════════════════════════════════════════════════
   // LOGO
   // ══════════════════════════════════════════════════════
-  const LOGO_SRC = 'data:image/jpeg;base64,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';
+  const LOGO_SRC = ''; // removed for optimization
 
   ['access-logo-img','panico-logo-img','baneado-logo-img','setup-logo-img','pwa-duplicado-logo-img'].forEach(id => {
     const el = document.getElementById(id);
@@ -6315,8 +6526,6 @@
     }
   }
 
-  let BANEADOS_LOCAL = JSON.parse(localStorage.getItem('nx_baneados_vecino') || '[]');
-  let DEVICES_BANEADOS = JSON.parse(localStorage.getItem('nx_devices_baneados') || '[]');
 
   async function cargarBaneados() {
     try {
@@ -8489,18 +8698,15 @@
 
     function drawRain() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (let d of drops) {
-        ctx.save();
+      // Batch all drops in one path — eliminar save/restore por gota (mobile perf)
+      ctx.strokeStyle = 'rgba(6, 182, 212, 1)';
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      for (const d of drops) {
         ctx.globalAlpha = d.alpha;
-        ctx.strokeStyle = 'rgba(6, 182, 212, 1)';
         ctx.lineWidth = d.width;
-        ctx.lineCap = 'round';
-        ctx.beginPath();
-        // Slight diagonal (rain angle ~10deg)
         ctx.moveTo(d.x, d.y);
         ctx.lineTo(d.x + d.len * 0.18, d.y + d.len);
-        ctx.stroke();
-        ctx.restore();
         // Move drop down
         d.y += d.speed;
         d.x += d.speed * 0.18;
@@ -8511,6 +8717,8 @@
           d.alpha = 0.15 + Math.random() * 0.35;
         }
       }
+      ctx.stroke();
+      ctx.globalAlpha = 1.0;
     }
 
     function loop() {
@@ -9878,6 +10086,8 @@
   }
   // ── CACHÉ DE GRADIENTES ESTÁTICOS DEL FONDO (evita recrear gradientes 60x/seg, clave para FPS en móvil) ──
   let _gradCacheKey = '';
+  // Cached goal/net gradients (created once, reused every frame)
+  let _cachedPostGradL=null,_cachedPostGradR=null,_cachedCrossGrad=null,_cachedNetShadow=null,_cachedNetDepth=null,_cachedGoalGlow=null;
   let _gradSky = null, _gradStand = null, _gradBorder = null, _gradSpotL = null, _gradSpotR = null,
       _gradLight = null, _gradLeftSpot = null, _gradRightSpot = null,
       _gradGrassA = null, _gradGrassB = null, _gradStripes = null, _grassTexturePattern = null;
@@ -10669,6 +10879,16 @@
   let netWaveTimer = 0;     // frames desde que la pelota entró a la red
   let netWaveX = 200;       // X del impacto en la red
   let netWaveY = 40;        // Y del impacto en la red
+
+  // ── RED ARDIENDO (SuperTiro Gol) ──
+  let netOnFire = false;        // true cuando el super tiro metió gol → red en llamas
+  let netFireParticles = [];    // partículas de fuego en la red
+  let netFireTimer = 0;         // frames que dura el fuego en la red
+
+  // ── BANDERAS Y BENGALAS (pre-computadas para rendimiento) ──
+  let _flagsData = null;        // posiciones de banderas, calculadas una vez
+  let _bengalasData = null;     // posiciones de bengalas
+  let _fogLayers = null;        // capas de niebla pre-calculadas (humo bengalas)
   let pelotaSpin = 0;       // spin visual acumulado para curva
   let bannerTxt = '';
   let bannerTimer = 0;
@@ -12407,33 +12627,12 @@ if (player.hairType === 'rulos-cortos') {
       });
       c.restore();
     } else if (player.hairType === 'calvo') {
-      // Zidane: Corona calva. Rapado en coronilla con tonsure sutil, pelo en costados y nuca.
+      // Calva total — sin pelo de ningún tipo, solo un leve brillo de cuero cabelludo
       c.save();
-      c.fillStyle = player.hair;
-      // Masa de pelo lateral izquierda
+      c.fillStyle = 'rgba(255,255,255,0.18)';
       c.beginPath();
-      c.arc(-13.5, -2, 4.5, 0, Math.PI * 2);
+      c.ellipse(-3, -9, 5, 3.2, -0.3, 0, Math.PI * 2);
       c.fill();
-      // Masa de pelo lateral derecha
-      c.beginPath();
-      c.arc(13.5, -2, 4.5, 0, Math.PI * 2);
-      c.fill();
-      // Conector nuca trasero
-      c.lineWidth = 3.5;
-      c.strokeStyle = player.hair;
-      c.beginPath();
-      c.arc(0, 0, 15.5, 0.15 * Math.PI, 0.85 * Math.PI);
-      c.stroke();
-      // Textura sutil de rapado/sombra corta en la nuca
-      c.strokeStyle = 'rgba(0,0,0,0.12)';
-      c.lineWidth = 0.8;
-      for (let a = 0.18; a < 0.82; a += 0.14) {
-        const sx = Math.cos(a * Math.PI) * 15.5;
-        const sy = Math.sin(a * Math.PI) * 15.5;
-        const ex = Math.cos(a * Math.PI) * 12.5;
-        const ey = Math.sin(a * Math.PI) * 12.5;
-        c.beginPath(); c.moveTo(sx, sy); c.lineTo(ex, ey); c.stroke();
-      }
       c.restore();
     } else if (player.hairType === 'afro-short') {
       // Pelé: Afro corto texturado con volumen y profundidad
@@ -13355,24 +13554,14 @@ if (player.hairType === 'rulos-cortos') {
     setInterval(renderDesafioCard, 60000);
   }
 
-  // Hook desafío into goal detection
-  (function() {
-    const _origCheckGoal = window._origCheckGoal;
-    // We patch via the cinematic goal window var set in Feature 4
-    const _origRAF = window.requestAnimationFrame;
-    // Instead, listen for cinematic goal events via polling the window var
-    let _lastGoalTs = 0;
-    setInterval(() => {
-      if (window._lastCinematicGoal && window._lastCinematicGoal.ts !== _lastGoalTs) {
-        _lastGoalTs = window._lastCinematicGoal.ts;
-        const t = window._lastCinematicGoal;
-        const tipoMap = { '¡BOMBAZO! 💥':'bombazo', '¡PANENKA! 🃏':'panenka', '¡DE ROSCA! 🌀':'rosca', '¡ESCUADRA! ⭐':'escuadra', '¡PALO Y ADENTRO! 🎯':'escuadra' };
-        const tipo = tipoMap[t.texto] || 'gol';
-        const jugId = (typeof selectedPlayer !== 'undefined' && selectedPlayer) ? selectedPlayer.id : null;
-        if (typeof checkDesafioCompletion === 'function') checkDesafioCompletion(tipo, jugId);
-      }
-    }, 300);
-  })();
+  // Hook desafío into goal detection — via CustomEvent (no polling setInterval)
+  document.addEventListener('_nexos_goal', function(e) {
+    const t = e.detail;
+    const tipoMap = { '¡BOMBAZO! 💥':'bombazo', '¡PANENKA! 🃏':'panenka', '¡DE ROSCA! 🌀':'rosca', '¡ESCUADRA! ⭐':'escuadra', '¡PALO Y ADENTRO! 🎯':'escuadra' };
+    const tipo = tipoMap[t.texto] || 'gol';
+    const jugId = (typeof selectedPlayer !== 'undefined' && selectedPlayer) ? selectedPlayer.id : null;
+    if (typeof checkDesafioCompletion === 'function') checkDesafioCompletion(tipo, jugId);
+  });
 
   // ══════════════════════════════════════════════
   // COMPARTIR RESULTADO
@@ -16573,30 +16762,53 @@ window.iniciarEstadioJuego = function() {
     }
   };
 
-  function applyCanvasScale() {
-    if (!gameCanvas || !ctx) return;
-    const LOGICAL_W = 400;
-    const LOGICAL_H = 300;
-    // Medir el tamaño REAL renderizado del wrapper (no asumir el aspect-ratio del CSS,
-    // ya que flexbox + max-height + aspect-ratio combinados pueden no dar exactamente
-    // la proporción declarada). Esto es lo que realmente ve el usuario en pantalla.
-    const wrapper = gameCanvas.parentElement;
-    const wrapperRect = wrapper ? wrapper.getBoundingClientRect() : null;
-    let realRatio = LOGICAL_W / LOGICAL_H; // fallback 4:3 si no se puede medir
-    if (wrapperRect && wrapperRect.width > 0 && wrapperRect.height > 0) {
-      realRatio = wrapperRect.width / wrapperRect.height;
-    } else {
-      // El layout puede no estar listo todavía (primer frame) — reintentar en breve
-      requestAnimationFrame(() => setTimeout(applyCanvasScale, 50));
-    }
-    const physicalW = Math.max(100, Math.round(LOGICAL_H * realRatio));
-    gameCanvas.width = physicalW;
-    gameCanvas.height = LOGICAL_H;
-    const _gameScaleX = physicalW / LOGICAL_W;
-    ctx.setTransform(_gameScaleX, 0, 0, 1, 0, 0);
-    GAME_LOGICAL_W = LOGICAL_W;
-  }
+  // GAME_OFFSET_Y: píxeles extra ARRIBA del juego base (tribuna expandida + techo)
+  // El juego base sigue siendo 400x300. El canvas se hace más alto = más tribuna arriba + más pasto abajo.
+  let GAME_OFFSET_Y = 0; // se calcula en applyCanvasScale
 
+  function applyCanvasScale() {
+    if (!gameCanvas) return;
+    const wrapper = gameCanvas.parentElement;
+    if (!wrapper) return;
+
+    // Restablecer estilos para medir correctamente
+    gameCanvas.style.width  = '';
+    gameCanvas.style.height = '';
+    gameCanvas.style.left   = '';
+    gameCanvas.style.top    = '';
+
+    const wrapperRect = wrapper.getBoundingClientRect();
+    if (!wrapperRect || wrapperRect.width <= 0 || wrapperRect.height <= 0) {
+      requestAnimationFrame(() => setTimeout(applyCanvasScale, 50));
+      return;
+    }
+
+    // El canvas LLENA TODO el wrapper sin barras negras
+    // Coordenadas lógicas: ancho fijo 400, alto = proporcional al wrapper real
+    const wW = wrapperRect.width;
+    const wH = wrapperRect.height;
+
+    // El juego base es 400x300. Escala = wW/400
+    const scale = wW / 400;
+    const logicalH = Math.round(wH / scale); // alto lógico que cubre TODO el wrapper
+
+    // Extra pixels arriba respecto del juego base (300px)
+    // 70% del extra va arriba (más tribuna) y 30% ya lo cubre el césped extendido
+    const extraTotal = Math.max(0, logicalH - 300);
+    GAME_OFFSET_Y = Math.round(extraTotal * 0.70);
+
+    // Ajustar canvas lógico
+    gameCanvas.width  = 400;
+    gameCanvas.height = logicalH;
+    GAME_LOGICAL_W    = 400;
+    if (ctx) ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+    // El canvas CSS llena el wrapper completamente
+    gameCanvas.style.width  = '100%';
+    gameCanvas.style.height = '100%';
+    gameCanvas.style.left   = '0px';
+    gameCanvas.style.top    = '0px';
+  }
   function initCanvas() {
     gameCanvas = document.getElementById('canvas-futbol');
     if (!gameCanvas) return;
@@ -16604,10 +16816,10 @@ window.iniciarEstadioJuego = function() {
     
     // ── CORRECCIÓN DE PROPORCIÓN (sin deformar a los jugadores ni al arco) ──
     // Toda la lógica/dibujo del juego está escrita en coordenadas de un campo lógico
-    // de 400x300. El contenedor visual real puede tener una proporción distinta
-    // (varía según el dispositivo/navegador), así que medimos su tamaño real y
-    // ajustamos el canvas físico + una transformación interna para que el dibujo
-    // nunca se estire, sin importar qué proporción termine teniendo el contenedor.
+    // de 400x300 (4:3), que NUNCA se modifica. El contenedor visual real puede tener
+    // una proporción distinta según el dispositivo, así que medimos su tamaño real y
+    // ajustamos el tamaño CSS (en píxeles) del propio canvas para que siempre respete
+    // la proporción 4:3, centrado dentro del contenedor — sin estirar nunca el contenido.
     applyCanvasScale();
     // Recalcular si la ventana cambia de tamaño u orientación (rotación de pantalla)
     window.addEventListener('resize', applyCanvasScale);
@@ -16639,7 +16851,7 @@ window.iniciarEstadioJuego = function() {
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     return {
       x: ((clientX - rect.left) / rect.width) * GAME_LOGICAL_W,
-      y: ((clientY - rect.top) / rect.height) * gameCanvas.height
+      y: ((clientY - rect.top) / rect.height) * gameCanvas.height - GAME_OFFSET_Y
     };
   }
 
@@ -18853,13 +19065,21 @@ window.iniciarEstadioJuego = function() {
     }
   }
 
-  function gameLoop() {
-    const estadio = document.getElementById('mundial-estadio');
+  let _lastFrameTime = 0;
+  let _cachedEstadioEl = null;
+  function gameLoop(timestamp) {
+    if (!_cachedEstadioEl) _cachedEstadioEl = document.getElementById('mundial-estadio');
+    const estadio = _cachedEstadioEl;
     if (!estadio || estadio.style.display === 'none') {
       physicsInterval = null;
+      _cachedEstadioEl = null;
       return;
     }
-    updatePhysics();
+    // Delta-time real — compensar frames perdidos en móvil
+    const rawDt = _lastFrameTime ? (timestamp - _lastFrameTime) / (1000/60) : 1.0;
+    const _dt = Math.min(rawDt, 2.0); // Cap en 2 frames para evitar tunneling
+    _lastFrameTime = timestamp;
+    updatePhysics(_dt);
     updateWeather();
     actualizarTVMarcador();
     drawGame();
@@ -18874,7 +19094,7 @@ window.iniciarEstadioJuego = function() {
     impactFlash = strength;
   }
 
-  function updatePhysics() {
+  function updatePhysics(_dt = 1.0) {
     // Actualizar dianas móviles
     actualizarDianas();
     // ── CAMARA Y TIEMPO REAL (SIN SLOW-MO NI EFECTO LENTO PARA ALTA DINÁMICA DE JUEGO) ──
@@ -18957,7 +19177,7 @@ window.iniciarEstadioJuego = function() {
     }
 
     if (gameMode === 'timeattack' && !isCelebrating && (_elGameoverOverlay && _elGameoverOverlay.style.display !== 'flex')) {
-      timeAttackTimeLeft = Math.max(0, timeAttackTimeLeft - 1/60); // 60fps
+      timeAttackTimeLeft = Math.max(0, timeAttackTimeLeft - _dt/60); // delta-time adjusted
       if (_elEstadioTiros) _elEstadioTiros.innerText = Math.ceil(timeAttackTimeLeft) + 's';
       if (timeAttackTimeLeft <= 0) {
         timeAttackTimeLeft = 0;
@@ -19500,6 +19720,7 @@ const isP1Arquero = penalesTurno === 'defensa';
             if (tipoGol) {
               // Guardar tipo de gol para overlay
               window._lastCinematicGoal = { ...tipoGol, x: px, y: py, ts: Date.now() };
+              document.dispatchEvent(new CustomEvent('_nexos_goal', { detail: window._lastCinematicGoal }));
               window._cinematicActive = true;
               window._cinematicStart = Date.now();
               window._cinematicPhase = 'flash'; // flash → zoom → text → fadeout
@@ -21504,33 +21725,12 @@ if (player.hairType === 'rulos-cortos') {
       });
       ctx.restore();
     } else if (player.hairType === 'calvo') {
-      // Zidane: Corona calva. Rapado en coronilla con tonsure sutil, pelo en costados y nuca.
+      // Calva total — sin pelo de ningún tipo, solo un leve brillo de cuero cabelludo
       ctx.save();
-      ctx.fillStyle = player.hair;
-      // Masa de pelo lateral izquierda
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
       ctx.beginPath();
-      ctx.arc(-13.5, -2, 4.5, 0, Math.PI * 2);
+      ctx.ellipse(-3, -9, 5, 3.2, -0.3, 0, Math.PI * 2);
       ctx.fill();
-      // Masa de pelo lateral derecha
-      ctx.beginPath();
-      ctx.arc(13.5, -2, 4.5, 0, Math.PI * 2);
-      ctx.fill();
-      // Conector nuca trasero
-      ctx.lineWidth = 3.5;
-      ctx.strokeStyle = player.hair;
-      ctx.beginPath();
-      ctx.arc(0, 0, 15.5, 0.15 * Math.PI, 0.85 * Math.PI);
-      ctx.stroke();
-      // Textura sutil de rapado/sombra corta en la nuca
-      ctx.strokeStyle = 'rgba(0,0,0,0.12)';
-      ctx.lineWidth = 0.8;
-      for (let a = 0.18; a < 0.82; a += 0.14) {
-        const sx = Math.cos(a * Math.PI) * 15.5;
-        const sy = Math.sin(a * Math.PI) * 15.5;
-        const ex = Math.cos(a * Math.PI) * 12.5;
-        const ey = Math.sin(a * Math.PI) * 12.5;
-        ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke();
-      }
       ctx.restore();
     } else if (player.hairType === 'afro-short') {
       // Pelé: Afro corto texturado premium con inercia física (pitch version)
@@ -22585,12 +22785,284 @@ if (player.hairType === 'rulos-cortos') {
     }
     
     ctx.clearRect(0, 0, GAME_LOGICAL_W, gameCanvas.height);
+    // ── UN SOLO _now por frame (evita 30+ llamadas costosas) ──
+    const _now = Date.now();
+    // ── MODO PERF: menos efectos cuando la pelota está en vuelo ──
+    const _perfMode = pelota.isShot && pelota.status === '';
     
     // ══════════════════════════════════════════════
     // 0. TRIBUNA Y FONDO DEL ESTADIO (Fotorrealista!)
     // ══════════════════════════════════════════════
     
     // Cielo nocturno/atardecer/día del estadio según atmósfera
+    // ══════════════════════════════════════════════════════════════
+    // ZONA EXPANDIDA: Techo + Tribuna extra para llenar el espacio
+    // superior del wrapper (GAME_OFFSET_Y píxeles sobre el juego base)
+    // ══════════════════════════════════════════════════════════════
+    if (GAME_OFFSET_Y > 0) {
+      const extraH = GAME_OFFSET_Y;
+      const crowdColors = ['#ef4444','#3b82f6','#f59e0b','#10b981','#ffffff','#ec4899','#a855f7','#f97316','#06b6d4'];
+      const skinColors  = ['#fed7aa','#b45309','#ffedd5','#78350f'];
+      const crowdSeed   = Math.floor(_now / 800);
+
+      // --- Fondo de la zona extra (continuación de tribuna oscura) ---
+      const bgExtra = ctx.createLinearGradient(0, 0, 0, extraH);
+      bgExtra.addColorStop(0, '#05080f');
+      bgExtra.addColorStop(0.4, '#080c15');
+      bgExtra.addColorStop(1, '#101520');
+      ctx.fillStyle = bgExtra;
+      ctx.fillRect(0, 0, GAME_LOGICAL_W, extraH);
+
+      // --- Techo del estadio (estructura con neón y focos) ---
+      const roofH = Math.max(10, extraH * 0.13);
+      const roofNeon = stadiumAtmosphere === 'noche' ? '#818cf8' : (stadiumAtmosphere === 'tarde' ? '#fb923c' : '#22d3ee');
+      // Placa base del techo
+      const roofGrad = ctx.createLinearGradient(0, 0, 0, roofH);
+      roofGrad.addColorStop(0, '#060a14');
+      roofGrad.addColorStop(1, '#0c1828');
+      ctx.fillStyle = roofGrad;
+      ctx.fillRect(0, 0, GAME_LOGICAL_W, roofH);
+
+      // Arco neón del techo
+      ctx.save();
+      ctx.strokeStyle = roofNeon;
+      ctx.lineWidth = 2.5;
+      ctx.shadowColor = roofNeon;
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      ctx.moveTo(0, roofH);
+      ctx.quadraticCurveTo(GAME_LOGICAL_W * 0.5, roofH * 0.1, GAME_LOGICAL_W, roofH);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      // Segunda línea sutil
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, roofH - 2);
+      ctx.quadraticCurveTo(GAME_LOGICAL_W * 0.5, roofH * 0.2, GAME_LOGICAL_W, roofH - 2);
+      ctx.stroke();
+      ctx.restore();
+
+      // Vigas verticales del techo
+      ctx.save();
+      ctx.strokeStyle = 'rgba(50, 90, 150, 0.55)';
+      ctx.lineWidth = 0.9;
+      const beamCount = 11;
+      for (let i = 0; i <= beamCount; i++) {
+        const bx = (GAME_LOGICAL_W / beamCount) * i;
+        const t = bx / GAME_LOGICAL_W;
+        const arcY = roofH * (0.1 + 0.85 * Math.pow(t - 0.5, 2) * 4);
+        ctx.beginPath();
+        ctx.moveTo(bx, Math.max(0, arcY));
+        ctx.lineTo(bx, extraH);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // Focos LED del techo (los focos grandes y brillantes de la imagen)
+      ctx.save();
+      const fCount = 9;
+      for (let i = 0; i < fCount; i++) {
+        const sx = (GAME_LOGICAL_W / (fCount + 1)) * (i + 1);
+        const sy = roofH * 0.52;
+        // Halo grande
+        const haloGrad = ctx.createRadialGradient(sx, sy, 0, sx, sy, roofH * 0.55);
+        haloGrad.addColorStop(0, 'rgba(255,255,220,0.90)');
+        haloGrad.addColorStop(0.2, 'rgba(255,255,200,0.50)');
+        haloGrad.addColorStop(0.5, 'rgba(255,255,180,0.18)');
+        haloGrad.addColorStop(1, 'rgba(255,255,150,0)');
+        ctx.fillStyle = haloGrad;
+        ctx.beginPath();
+        ctx.arc(sx, sy, roofH * 0.55, 0, Math.PI * 2);
+        ctx.fill();
+        // Núcleo brillante
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(sx, sy, roofH * 0.09, 0, Math.PI * 2);
+        ctx.fill();
+        // Rayo de luz hacia abajo
+        const rayGrad = ctx.createLinearGradient(sx, sy + roofH * 0.1, sx, extraH);
+        rayGrad.addColorStop(0, 'rgba(255,255,220,0.18)');
+        rayGrad.addColorStop(1, 'rgba(255,255,200,0)');
+        ctx.fillStyle = rayGrad;
+        ctx.beginPath();
+        ctx.moveTo(sx - roofH * 0.3, sy + roofH * 0.1);
+        ctx.lineTo(sx + roofH * 0.3, sy + roofH * 0.1);
+        ctx.lineTo(sx + roofH * 1.2, extraH);
+        ctx.lineTo(sx - roofH * 1.2, extraH);
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // --- Filas de tribuna extra (hinchas) llenando el espacio entre el techo y el campo ---
+      const tribStartY = roofH;
+      const tribH = extraH - roofH;
+      const extraRowH = 14;
+      const extraRows = Math.floor(tribH / extraRowH);
+      for (let row = 0; row < extraRows; row++) {
+        const rowY = tribStartY + row * extraRowH + 2;
+        const density = 30 + Math.floor((1 - row / extraRows) * 6);
+        const cr = 5.5 - row * 0.15;
+
+        // Banco de tribuna
+        ctx.fillStyle = '#1a2438';
+        ctx.fillRect(0, rowY + cr * 0.6, GAME_LOGICAL_W, 3.5);
+        ctx.strokeStyle = '#243050';
+        ctx.lineWidth = 0.4;
+        ctx.beginPath();
+        ctx.moveTo(0, rowY + cr * 0.6);
+        ctx.lineTo(GAME_LOGICAL_W, rowY + cr * 0.6);
+        ctx.stroke();
+
+        for (let i = 0; i < density; i++) {
+          const seed = (i * 7 + row * 13 + crowdSeed * (row % 2 === 0 ? 1 : -1)) % crowdColors.length;
+          const cx = 6 + (i / density) * (GAME_LOGICAL_W - 12) + (row % 2 === 0 ? 3 : -3);
+          const clothColor = crowdColors[Math.abs(seed)];
+          const skinColor  = skinColors[Math.abs(i * 3 + row * 7) % skinColors.length];
+          // Cuerpo/hombros
+          ctx.fillStyle = clothColor;
+          ctx.beginPath();
+          ctx.ellipse(cx, rowY + cr * 0.95, cr * 1.2, cr * 0.7, 0, 0, Math.PI * 2);
+          ctx.fill();
+          // Cara
+          const fGrad = ctx.createRadialGradient(cx - cr*0.25, rowY - cr*0.25, cr*0.05, cx, rowY, cr);
+          fGrad.addColorStop(0, skinColor);
+          fGrad.addColorStop(0.55, skinColor);
+          fGrad.addColorStop(1, 'rgba(0,0,0,0.25)');
+          ctx.fillStyle = fGrad;
+          ctx.beginPath();
+          ctx.arc(cx, rowY, cr, 0, Math.PI * 2);
+          ctx.fill();
+          // Gorra
+          const hGrad = ctx.createRadialGradient(cx - cr*0.2, rowY - cr*0.55, 0, cx, rowY, cr);
+          hGrad.addColorStop(0, clothColor);
+          hGrad.addColorStop(1, 'rgba(0,0,0,0.28)');
+          ctx.fillStyle = hGrad;
+          ctx.beginPath();
+          ctx.arc(cx, rowY - cr*0.1, cr, Math.PI, 0);
+          ctx.fill();
+          // Flash de cámara aleatorio
+          const fOff = (i * 1337 + _now * (0.22 + i * 0.07)) % 2800;
+          if (fOff < 100) {
+            const fo = 1 - fOff / 100;
+            ctx.fillStyle = `rgba(255,255,245,${fo * 0.7})`;
+            ctx.beginPath();
+            ctx.arc(cx, rowY - cr * 0.5, cr * 0.9, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      }
+
+      // Vigas horizontales de la tribuna extra
+      ctx.strokeStyle = 'rgba(50, 75, 110, 0.28)';
+      ctx.lineWidth = 0.5;
+      for (let r = 0; r < 4; r++) {
+        const hy = tribStartY + (r + 1) * (tribH / 5);
+        ctx.beginPath();
+        ctx.moveTo(0, hy); ctx.lineTo(GAME_LOGICAL_W, hy);
+        ctx.stroke();
+      }
+
+      // ── BANDERAS Y BENGALAS EN TRIBUNA EXTRA ──
+      const _extraFlagColors = ['#ef4444','#3b82f6','#f59e0b','#10b981','#ffffff','#ec4899','#a855f7'];
+      for (let f = 0; f < 10; f++) {
+        const efx = 20 + f * 36 + (f % 3) * 8;
+        const efy = tribStartY + 8 + (f % 3) * (extraRowH * 1.5);
+        const ewv = 14 + Math.sin(_now * 0.016 + f * 0.9) * 3;
+        const efh = 9;
+        const eWave = Math.sin(_now * 0.018 + f) * 3;
+        const efColor  = _extraFlagColors[f % _extraFlagColors.length];
+        const efColor2 = _extraFlagColors[(f + 2) % _extraFlagColors.length];
+        ctx.save();
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.moveTo(efx, efy + efh + 4);
+        ctx.lineTo(efx, efy - 3);
+        ctx.stroke();
+        ctx.fillStyle = efColor;
+        ctx.beginPath();
+        ctx.moveTo(efx, efy);
+        ctx.quadraticCurveTo(efx + ewv / 2, efy + eWave, efx + ewv, efy + eWave * 0.4);
+        ctx.lineTo(efx + ewv, efy + efh / 2);
+        ctx.quadraticCurveTo(efx + ewv / 2, efy + efh / 2 + eWave * 0.5, efx, efy + efh / 2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = efColor2;
+        ctx.beginPath();
+        ctx.moveTo(efx, efy + efh / 2);
+        ctx.quadraticCurveTo(efx + ewv / 2, efy + efh / 2 + eWave * 0.5, efx + ewv, efy + efh / 2);
+        ctx.lineTo(efx + ewv, efy + efh + eWave * 0.4);
+        ctx.quadraticCurveTo(efx + ewv / 2, efy + efh + eWave, efx, efy + efh);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+      const eBengalas = [
+        { x: 55,  y: tribStartY + extraRowH * 1.2, color: {r:255,g:80, b:0  } },
+        { x: 200, y: tribStartY + extraRowH * 2.0, color: {r:0,  g:180,b:255} },
+        { x: 345, y: tribStartY + extraRowH * 1.5, color: {r:255,g:220,b:0  } },
+      ];
+      for (let b = 0; b < eBengalas.length; b++) {
+        const eb = eBengalas[b];
+        const {r, g, b: bc} = eb.color;
+        const eFlicker = 0.75 + Math.sin(_now * 0.09 + b * 1.4) * 0.25;
+        ctx.save();
+
+        // Mástil
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(eb.x, eb.y + 5);
+        ctx.lineTo(eb.x, eb.y - 8);
+        ctx.stroke();
+
+        // Punta brillante (sin chispas)
+        const eTipGrd = ctx.createRadialGradient(eb.x, eb.y - 8, 0, eb.x, eb.y - 8, 5 * eFlicker);
+        eTipGrd.addColorStop(0,   `rgba(255,255,255,${0.95 * eFlicker})`);
+        eTipGrd.addColorStop(0.4, `rgba(${r},${g},${bc},${0.7 * eFlicker})`);
+        eTipGrd.addColorStop(1,   `rgba(${r},${g},${bc},0)`);
+        ctx.fillStyle = eTipGrd;
+        ctx.beginPath();
+        ctx.arc(eb.x, eb.y - 8, 5 * eFlicker, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Columna de humo denso coloreado — tribuna extra (más grande, más visible)
+        const eSmokeSteps = 11;
+        const eTOffset = (_now * 0.013 + b * 60) % 1;
+        for (let s = 0; s < eSmokeSteps; s++) {
+          const progress = ((s / eSmokeSteps) + eTOffset) % 1;
+          const smokeAge = progress;
+          const eSmokeY  = eb.y - 8 - progress * 52;
+          const eDrift   = Math.sin(_now * 0.007 + b * 1.1 + s * 0.8) * (progress * 7);
+          const eRadius  = 4 + smokeAge * 12;
+          const eOpacity = smokeAge < 0.15
+            ? smokeAge / 0.15 * 0.6
+            : (1 - smokeAge) * 0.6;
+          const colorMix = 1 - smokeAge;
+          const sr = Math.round(r * colorMix + 155 * (1 - colorMix));
+          const sg = Math.round(g * colorMix + 155 * (1 - colorMix));
+          const sb = Math.round(bc * colorMix + 155 * (1 - colorMix));
+
+          const eSGrd = ctx.createRadialGradient(eb.x + eDrift, eSmokeY, 0, eb.x + eDrift, eSmokeY, eRadius);
+          eSGrd.addColorStop(0,   `rgba(${sr},${sg},${sb},${eOpacity})`);
+          eSGrd.addColorStop(0.6, `rgba(${sr},${sg},${sb},${eOpacity * 0.45})`);
+          eSGrd.addColorStop(1,   `rgba(${sr},${sg},${sb},0)`);
+          ctx.fillStyle = eSGrd;
+          ctx.beginPath();
+          ctx.arc(eb.x + eDrift, eSmokeY, eRadius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.restore();
+      }
+      // ── FIN BANDERAS Y BENGALAS TRIBUNA EXTRA ──
+    }
+
+    // ── Aplicar offset vertical: el juego base se dibuja desplazado hacia abajo ──
+    ctx.save();
+    ctx.translate(0, GAME_OFFSET_Y);
     const standHeight = 45;
     const _staticGrads = getStaticGradients(ctx, gameCanvas, stadiumAtmosphere, standHeight, standHeight, gameCanvas.height - standHeight);
     const skyGrad = _staticGrads.sky;
@@ -22603,6 +23075,69 @@ if (player.hairType === 'rulos-cortos') {
     ctx.fillStyle = standGrad;
     ctx.fillRect(0, 0, GAME_LOGICAL_W, standHeight);
 
+
+    // ── TECHO DEL ESTADIO (estructura metálica superior con neón) ──
+    {
+      ctx.save();
+      const roofH = 7;
+      const roofGrad = ctx.createLinearGradient(0, 0, 0, roofH);
+      roofGrad.addColorStop(0, '#0a1220');
+      roofGrad.addColorStop(0.5, '#111e35');
+      roofGrad.addColorStop(1, '#0d1520');
+      ctx.fillStyle = roofGrad;
+      ctx.fillRect(0, 0, gameCanvas.width, roofH);
+
+      const roofNeonColor = stadiumAtmosphere === 'noche' ? '#818cf8' : (stadiumAtmosphere === 'tarde' ? '#fb923c' : '#22d3ee');
+
+      ctx.strokeStyle = roofNeonColor;
+      ctx.lineWidth = 2.2;
+      ctx.shadowColor = roofNeonColor;
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.moveTo(0, roofH);
+      ctx.quadraticCurveTo(gameCanvas.width * 0.5, -5, gameCanvas.width, roofH);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, roofH - 2);
+      ctx.quadraticCurveTo(gameCanvas.width * 0.5, -2, gameCanvas.width, roofH - 2);
+      ctx.stroke();
+
+      ctx.strokeStyle = 'rgba(60, 100, 160, 0.5)';
+      ctx.lineWidth = 0.8;
+      for (let i = 0; i <= 9; i++) {
+        const bx = (gameCanvas.width / 9) * i;
+        const t = bx / gameCanvas.width;
+        const arcY = roofH * (1 - 4 * Math.pow(t - 0.5, 2));
+        ctx.beginPath();
+        ctx.moveTo(bx, Math.max(0, arcY));
+        ctx.lineTo(bx, 45);
+        ctx.stroke();
+      }
+
+      const spotCount = 7;
+      for (let i = 0; i < spotCount; i++) {
+        const sx = (gameCanvas.width / (spotCount + 1)) * (i + 1);
+        const sy = roofH * 0.55;
+        const spotGrad = ctx.createRadialGradient(sx, sy, 0, sx, sy, 7);
+        spotGrad.addColorStop(0, 'rgba(255, 255, 230, 0.95)');
+        spotGrad.addColorStop(0.35, 'rgba(255, 255, 200, 0.35)');
+        spotGrad.addColorStop(1, 'rgba(255, 255, 180, 0)');
+        ctx.fillStyle = spotGrad;
+        ctx.beginPath();
+        ctx.arc(sx, sy, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(sx, sy, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
     // Estructura del estadio: vigas y arcos de acero más detallados
     ctx.strokeStyle = 'rgba(70, 100, 140, 0.5)';
     ctx.lineWidth = 1.2;
@@ -22625,16 +23160,16 @@ if (player.hairType === 'rulos-cortos') {
 
     // Filas de espectadores con puntos de colores (camisetas variadas) y animación de salto
     const crowdColors = ['#ef4444','#3b82f6','#f59e0b','#10b981','#ffffff','#ec4899','#a855f7','#f97316','#06b6d4'];
-    const crowdSeed = Math.floor(Date.now() / 800); // cambia lento para animación sutil
+    const crowdSeed = Math.floor(_now / 800); // cambia lento para animación sutil
     
     // Calcular rebote / salto de la hinchada (Jumping Crowd)
     let crowdJump = 0;
     if (isCelebrating) {
-      crowdJump = Math.sin(Date.now() * 0.024) * 2.8 - 0.8;
+      crowdJump = Math.sin(_now * 0.024) * 2.8 - 0.8;
     } else if (pelota.isShot && pelota.status === '') {
       const distToGoal = Math.max(0, pelota.y - GOAL_Y);
       if (distToGoal < 150) {
-        crowdJump = -Math.max(0, (150 - distToGoal) / 75) * (1.0 + Math.sin(Date.now() * 0.015) * 0.4);
+        crowdJump = -Math.max(0, (150 - distToGoal) / 75) * (1.0 + Math.sin(_now * 0.015) * 0.4);
       }
     }
 
@@ -22703,7 +23238,7 @@ if (player.hairType === 'rulos-cortos') {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.shadowColor = '#d97706';
-      ctx.shadowBlur = 6;
+      if (!_perfMode) { ctx.shadowBlur = 6; }
       
       let nameStr = selectedPlayer ? selectedPlayer.nombre.toUpperCase() : 'LEYENDA';
       ctx.fillText(`🏆 ¡¡CAMPEÓN ${nameStr}!! 🏆`, 200, tifoT + tifoH / 2);
@@ -22714,17 +23249,17 @@ if (player.hairType === 'rulos-cortos') {
       // Dibujar pequeñas banderas ondeando en la tribuna
       ctx.save();
       for (let f = 0; f < 8; f++) {
-        const fx = 40 + f * 45 + Math.sin(Date.now() * 0.01 + f) * 8;
-        const fy = 12 + Math.cos(Date.now() * 0.015 + f) * 4;
-        const w = 12 + Math.sin(Date.now() * 0.02 + f) * 2;
+        const fx = 40 + f * 45 + Math.sin(_now * 0.01 + f) * 8;
+        const fy = 12 + Math.cos(_now * 0.015 + f) * 4;
+        const w = 12 + Math.sin(_now * 0.02 + f) * 2;
         const h = 7;
         
         ctx.fillStyle = flagColors[f % flagColors.length] || '#7c3aed';
         ctx.beginPath();
         ctx.moveTo(fx, fy);
-        ctx.quadraticCurveTo(fx + w/2, fy + Math.sin(Date.now()*0.02 + f)*3, fx + w, fy);
+        ctx.quadraticCurveTo(fx + w/2, fy + Math.sin(_now*0.02 + f)*3, fx + w, fy);
         ctx.lineTo(fx + w, fy + h);
-        ctx.quadraticCurveTo(fx + w/2, fy + h + Math.sin(Date.now()*0.02 + f)*3, fx, fy + h);
+        ctx.quadraticCurveTo(fx + w/2, fy + h + Math.sin(_now*0.02 + f)*3, fx, fy + h);
         ctx.closePath();
         ctx.fill();
         
@@ -22753,9 +23288,11 @@ if (player.hairType === 'rulos-cortos') {
 
             const skinColors = ['#fed7aa', '#b45309', '#ffedd5', '#78350f'];
 
+      // Pre-calc time vars for crowd (shared across all fans in all rows)
+      const _ct1 = _now * 0.0055, _ct2 = _now * 0.03, _ct3 = _now * 0.022, _ct4 = _now * 0.05, _ct5 = _now * 0.0035;
       for (let row = 0; row < 5; row++) {
         const rowY = 6 + row * 12.0 + crowdJump;
-        const density = row === 0 ? 34 : (row === 1 ? 30 : (row === 2 ? 26 : (row === 3 ? 22 : 18)));
+        const density = _perfMode ? (row < 2 ? 8 : 5) : (row === 0 ? 34 : (row === 1 ? 30 : (row === 2 ? 26 : (row === 3 ? 22 : 18))));
         const cr = 6.2 - row * 0.45;
 
         // Dibujar banco/grada de la fila (bancos de la tribuna)
@@ -22772,17 +23309,13 @@ if (player.hairType === 'rulos-cortos') {
           const seed = (i * 7 + row * 13 + crowdSeed * (row % 2 === 0 ? 1 : -1)) % crowdColors.length;
           const cx = 5 + (i / density) * 390 + (row % 2 === 0 ? 4 : -2);
           
-          // Ola mexicana más aleatoria, orgánica y viva (frecuencias cruzadas + fluctuación de ruido)
-          const wavePhase = (cx * 0.06 - Date.now() * 0.0035);
-          const waveNoise = Math.sin(wavePhase) * 2.5 + Math.sin(wavePhase * 2.3 + 1.2) * 1.0;
-          const individualJump = Math.sin(Date.now() * 0.0055 + cx * 0.07 + row * 1.4) * 1.5;
-          const randomShimmer = Math.sin(Date.now() * 0.03 + cx * 0.41 + row * 0.7) * 0.6;
-          
+          const wavePhase = (cx * 0.06 - _ct5);
+          const waveNoise = _perfMode ? 0 : (Math.sin(wavePhase) * 2.5 + Math.sin(wavePhase * 2.3 + 1.2) * 1.0);
+          const individualJump = Math.sin(_ct1 + cx * 0.07 + row * 1.4) * 1.5;
+          const randomShimmer = _perfMode ? 0 : Math.sin(_ct2 + cx * 0.41 + row * 0.7) * 0.6;
           let finalRowY = rowY + waveNoise + individualJump + randomShimmer;
-          
-          // En caso de GOL, la ola se magnifica con saltos altos aleatorios
-          if (crowdState === 'gol') {
-            finalRowY -= Math.abs(Math.sin(Date.now() * 0.022 + cx * 0.12 + Math.sin(Date.now() * 0.05 + cx * 0.2) * 0.1)) * 6.5;
+          if (crowdState === 'gol' && !_perfMode) {
+            finalRowY -= Math.abs(Math.sin(_ct3 + cx * 0.12 + Math.sin(_ct4 + cx * 0.2) * 0.1)) * 6.5;
           }
           
           const skinColor = skinColors[Math.abs(i * 3 + row * 7) % skinColors.length];
@@ -22937,8 +23470,171 @@ if (player.hairType === 'rulos-cortos') {
       }
     }
 
+    // ── BANDERAS Y BENGALAS EN TRIBUNA (pre-computadas para rendimiento) ──
+    {
+      // Pre-calcular posiciones UNA sola vez (no cada frame)
+      if (!_flagsData) {
+        _flagsData = [];
+        // 18 banderas distribuidas entre las filas
+        for (let f = 0; f < 18; f++) {
+          _flagsData.push({
+            x: 8 + (f / 17) * 384,
+            row: f % 5,
+            wBase: 10 + (f % 3) * 3,    // ancho base 10-15px
+            hBase: 6 + (f % 2) * 2,     // alto base 6-8px
+            phase: f * 0.73,             // fase de animación única por bandera
+            speedW: 0.018 + (f % 5) * 0.004,
+            speedY: 0.012 + (f % 4) * 0.003,
+          });
+        }
+      }
+      if (!_bengalasData) {
+        _bengalasData = [];
+        // 6 bengalas en posiciones fijas de la tribuna
+        const bPositions = [18, 68, 130, 200, 270, 330, 380];
+        const bColors = [
+          { r:255, g:60,  b:0   }, // naranja
+          { r:255, g:0,   b:80  }, // rosa/rojo
+          { r:0,   g:200, b:255 }, // cian
+          { r:255, g:220, b:0   }, // amarillo
+          { r:180, g:0,   b:255 }, // violeta
+          { r:0,   g:255, b:100 }, // verde
+          { r:255, g:100, b:0   }, // rojo-naranja
+        ];
+        for (let b = 0; b < 7; b++) {
+          _bengalasData.push({
+            x: bPositions[b],
+            row: b % 4,
+            color: bColors[b],
+            phase: b * 1.1,
+            sparkCount: 5 + (b % 3),
+          });
+        }
+      }
+
+      const _flagColors = ['#ef4444','#3b82f6','#f59e0b','#10b981','#ffffff','#ec4899','#a855f7','#f97316','#06b6d4','#fef3c7'];
+
+      // Dibujar BENGALAS — columna de humo denso coloreado estilo hinchada real
+      for (let b = 0; b < _bengalasData.length; b++) {
+        const bg = _bengalasData[b];
+        const baseRowY = 6 + bg.row * 12;
+        const bx = bg.x;
+        const by = baseRowY - 4;
+        const {r, g} = bg.color;
+        const bc = bg.color.b;
+
+        ctx.save();
+
+        // Mástil de la bengala
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.moveTo(bx, by + 4);
+        ctx.lineTo(bx, by - 6);
+        ctx.stroke();
+
+        // Punta brillante de la bengala (pequeña, sin chispas)
+        const flicker = 0.75 + Math.sin(_now * 0.11 + bg.phase) * 0.25;
+        const tipGrd = ctx.createRadialGradient(bx, by - 6, 0, bx, by - 6, 4 * flicker);
+        tipGrd.addColorStop(0,   `rgba(255,255,255,${0.95 * flicker})`);
+        tipGrd.addColorStop(0.4, `rgba(${r},${g},${bc},${0.7 * flicker})`);
+        tipGrd.addColorStop(1,   `rgba(${r},${g},${bc},0)`);
+        ctx.fillStyle = tipGrd;
+        ctx.beginPath();
+        ctx.arc(bx, by - 6, 4 * flicker, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Columna de humo denso — múltiples círculos que suben y se expanden
+        const smokeSteps = 9;
+        const tOffset = (_now * 0.014 + bg.phase * 50) % 1;
+        for (let s = 0; s < smokeSteps; s++) {
+          const progress = ((s / smokeSteps) + tOffset) % 1; // 0 = base, 1 = top
+          const smokeAge = progress; // 0 joven, 1 viejo
+          const smokeY = by - 6 - progress * 38;  // sube hasta 38px
+          const drift  = Math.sin(_now * 0.006 + bg.phase + s * 0.7) * (progress * 5);
+          const radius = 3 + smokeAge * 8;         // se expande: 3px → 11px
+          // Opacidad: aparece, se mantiene y desvanece en la punta
+          const opacity = smokeAge < 0.15
+            ? smokeAge / 0.15 * 0.55              // fade in
+            : (1 - smokeAge) * 0.55;              // fade out gradual
+          // El humo mezcla color de la bengala (base) hacia gris (arriba)
+          const colorMix = 1 - smokeAge;           // 1 = color puro, 0 = gris
+          const sr = Math.round(r * colorMix + 160 * (1 - colorMix));
+          const sg = Math.round(g * colorMix + 160 * (1 - colorMix));
+          const sb = Math.round(bc * colorMix + 160 * (1 - colorMix));
+
+          const sGrd = ctx.createRadialGradient(bx + drift, smokeY, 0, bx + drift, smokeY, radius);
+          sGrd.addColorStop(0,   `rgba(${sr},${sg},${sb},${opacity})`);
+          sGrd.addColorStop(0.6, `rgba(${sr},${sg},${sb},${opacity * 0.5})`);
+          sGrd.addColorStop(1,   `rgba(${sr},${sg},${sb},0)`);
+          ctx.fillStyle = sGrd;
+          ctx.beginPath();
+          ctx.arc(bx + drift, smokeY, radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.restore();
+      }
+
+      // Dibujar BANDERAS ondeando en la tribuna
+      for (let f = 0; f < _flagsData.length; f++) {
+        const fd = _flagsData[f];
+        // Solo dibujar la bandera si no hay un bengala muy cerca (evitar superposición)
+        const baseRowY = 6 + fd.row * 12;
+        const fy = baseRowY - 3 + Math.cos(_now * fd.speedY + fd.phase) * 2.5;
+        const fx = fd.x;
+        const wv = fd.wBase + Math.sin(_now * fd.speedW + fd.phase) * 2;
+        const fh = fd.hBase;
+        const fColor = _flagColors[f % _flagColors.length];
+        const fColor2 = _flagColors[(f + 3) % _flagColors.length];
+
+        ctx.save();
+        // Mástil
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 0.7;
+        ctx.beginPath();
+        ctx.moveTo(fx, fy + fh + 3);
+        ctx.lineTo(fx, fy - 2);
+        ctx.stroke();
+
+        // Bandera bicolor ondeando (forma cuadrilátero con curva)
+        // Mitad superior
+        const wave1 = Math.sin(_now * fd.speedW + fd.phase) * 2.5;
+        const wave2 = Math.sin(_now * fd.speedW + fd.phase + 0.8) * 2;
+        ctx.fillStyle = fColor;
+        ctx.beginPath();
+        ctx.moveTo(fx, fy);
+        ctx.quadraticCurveTo(fx + wv / 2, fy + wave1, fx + wv, fy + wave2 * 0.3);
+        ctx.lineTo(fx + wv, fy + fh / 2 + wave2 * 0.2);
+        ctx.quadraticCurveTo(fx + wv / 2, fy + fh / 2 + wave1 * 0.5, fx, fy + fh / 2);
+        ctx.closePath();
+        ctx.fill();
+
+        // Mitad inferior
+        ctx.fillStyle = fColor2;
+        ctx.beginPath();
+        ctx.moveTo(fx, fy + fh / 2);
+        ctx.quadraticCurveTo(fx + wv / 2, fy + fh / 2 + wave1 * 0.5, fx + wv, fy + fh / 2 + wave2 * 0.2);
+        ctx.lineTo(fx + wv, fy + fh + wave2 * 0.4);
+        ctx.quadraticCurveTo(fx + wv / 2, fy + fh + wave1, fx, fy + fh);
+        ctx.closePath();
+        ctx.fill();
+
+        // Línea divisoria sutil
+        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+        ctx.lineWidth = 0.4;
+        ctx.beginPath();
+        ctx.moveTo(fx, fy + fh / 2);
+        ctx.quadraticCurveTo(fx + wv / 2, fy + fh / 2 + wave1 * 0.5, fx + wv, fy + fh / 2 + wave2 * 0.2);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+    }
+    // ── FIN BANDERAS Y BENGALAS ──
+
     // Flash de cámaras en la tribuna (más destellos, más orgánicos)
-    const flashNow = Date.now();
+    const flashNow = _now;
     for (let i = 0; i < 12; i++) {
       const fOff = (i * 1337 + flashNow * (0.25 + i * 0.08)) % 2800;
       if (fOff < 140) {
@@ -22990,7 +23686,7 @@ if (player.hairType === 'rulos-cortos') {
 
     // ── CARTELES PUBLICITARIOS (valla LED al borde del campo) ──
     {
-      const adH = 16;
+      const adH = 28; // carteles más altos
       const adY = standHeight - adH;
       const adW = GAME_LOGICAL_W;
 
@@ -23013,9 +23709,9 @@ if (player.hairType === 'rulos-cortos') {
       ];
 
       // Scroll continuo para 5 carteles
-      const slotW = 134;
+      const slotW = 240; // carteles más anchos
       const totalW = slotW * 5;
-      const offset = (Date.now() * 0.1) % totalW;
+      const offset = (_now * 0.04) % totalW; // scroll más lento
 
       ctx.save();
       ctx.beginPath();
@@ -23037,16 +23733,16 @@ if (player.hairType === 'rulos-cortos') {
 
           // Borde de acento superior e inferior
           ctx.fillStyle = ad.accent;
-          ctx.fillRect(sx, adY, slotW - 1, 2);
-          ctx.fillRect(sx, adY + adH - 2, slotW - 1, 2);
+          ctx.fillRect(sx, adY, slotW - 1, 3);
+          ctx.fillRect(sx, adY + adH - 3, slotW - 1, 3);
 
           // Texto del cartel
           ctx.fillStyle = ad.fg;
-          ctx.font = 'bold 8px system-ui, -apple-system, sans-serif';
+          ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.shadowColor = ad.accent;
-          ctx.shadowBlur = 5;
+          if (!_perfMode) { ctx.shadowBlur = 5; }
           ctx.fillText(ad.text, sx + slotW / 2, adY + adH / 2);
           ctx.shadowBlur = 0;
         }
@@ -23234,7 +23930,7 @@ if (player.hairType === 'rulos-cortos') {
       rachaDisplayTimer--;
       if (rachaFlash > 0) rachaFlash -= 0.04;
       const rAlpha = Math.min(1, rachaDisplayTimer / 25);
-      const rPulse = 1 + Math.sin(Date.now() * 0.018) * 0.06;
+      const rPulse = 1 + Math.sin(_now * 0.018) * 0.06;
       
       ctx.save();
       ctx.globalAlpha = rAlpha;
@@ -23267,7 +23963,7 @@ if (player.hairType === 'rulos-cortos') {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.shadowColor = '#f97316';
-      ctx.shadowBlur = 10;
+      if (!_perfMode) { ctx.shadowBlur = 10; }
       ctx.fillText(`x${rachaMultiplier}`, 0, -2);
       ctx.shadowBlur = 0;
 
@@ -23329,7 +24025,7 @@ if (player.hairType === 'rulos-cortos') {
       const pId = selectedPlayer ? selectedPlayer.id : 'default';
       if (pId === 'custom_legend') {
         // ── CELEBRACIÓN DE LA LEYENDA: ¡EL SALTO DEL SIUUU! ──
-        const celebTime = (Date.now() / 200) % (Math.PI * 2); // bucle de animación elástico
+        const celebTime = (_now / 200) % (Math.PI * 2); // bucle de animación elástico
         let cellY = 220;
         let cellScaleX = 1;
         let isLanding = false;
@@ -23363,8 +24059,8 @@ if (player.hairType === 'rulos-cortos') {
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.shadowColor = '#f97316';
-          ctx.shadowBlur = 12;
-          const textPulse = 1 + Math.sin(Date.now() * 0.02) * 0.06;
+          if (!_perfMode) { ctx.shadowBlur = 12; }
+          const textPulse = 1 + Math.sin(_now * 0.02) * 0.06;
           ctx.scale(textPulse, textPulse);
           ctx.fillText('¡¡¡ S I U U U U !!! 🐐', 200 / textPulse, 252 / textPulse);
           ctx.restore();
@@ -23432,7 +24128,7 @@ if (player.hairType === 'rulos-cortos') {
         ctx.stroke();
         
         // Destello de guiño de estrella
-        const winkTime = Date.now() * 0.015;
+        const winkTime = _now * 0.015;
         const winkSize = 4.5 + Math.sin(winkTime) * 1.5;
         ctx.fillStyle = '#ffffff';
         ctx.font = `bold ${winkSize}px Arial`;
@@ -23513,7 +24209,7 @@ if (player.hairType === 'rulos-cortos') {
         p.rot += p.rotSpeed;
         
         // Efecto viento oscilante
-        p.vx = Math.sin(Date.now() * 0.0035 + p.w) * 0.6;
+        p.vx = Math.sin(_now * 0.0035 + p.w) * 0.6;
         
         if (p.y > 310) {
           p.y = -20;
@@ -23832,12 +24528,8 @@ if (player.hairType === 'rulos-cortos') {
     ctx.fillRect(GOAL_RIGHT + 1, GOAL_BASE + 3, 3, 4);
 
     // Poste izquierdo (Polígono con corte a 45° en la junta superior)
-    const postGradL = ctx.createLinearGradient(GOAL_LEFT - 4, 0, GOAL_LEFT + 4, 0);
-    postGradL.addColorStop(0, '#9ca3af');
-    postGradL.addColorStop(0.22, '#f3f4f6');
-    postGradL.addColorStop(0.45, '#ffffff');
-    postGradL.addColorStop(0.8, '#f9fafb');
-    postGradL.addColorStop(1, '#6b7280');
+    if(!_cachedPostGradL){_cachedPostGradL=ctx.createLinearGradient(GOAL_LEFT-4,0,GOAL_LEFT+4,0);_cachedPostGradL.addColorStop(0,'#9ca3af');_cachedPostGradL.addColorStop(0.22,'#f3f4f6');_cachedPostGradL.addColorStop(0.45,'#ffffff');_cachedPostGradL.addColorStop(0.8,'#f9fafb');_cachedPostGradL.addColorStop(1,'#6b7280');}
+    const postGradL = _cachedPostGradL;
     ctx.fillStyle = postGradL;
     ctx.beginPath();
     ctx.moveTo(GOAL_LEFT - 4, GOAL_BASE);
@@ -23848,12 +24540,8 @@ if (player.hairType === 'rulos-cortos') {
     ctx.fill();
 
     // Poste derecho (Polígono con corte a 45° en la junta superior)
-    const postGradR = ctx.createLinearGradient(GOAL_RIGHT - 4, 0, GOAL_RIGHT + 4, 0);
-    postGradR.addColorStop(0, '#9ca3af');
-    postGradR.addColorStop(0.22, '#f3f4f6');
-    postGradR.addColorStop(0.45, '#ffffff');
-    postGradR.addColorStop(0.8, '#f9fafb');
-    postGradR.addColorStop(1, '#6b7280');
+    if(!_cachedPostGradR){_cachedPostGradR=ctx.createLinearGradient(GOAL_RIGHT-4,0,GOAL_RIGHT+4,0);_cachedPostGradR.addColorStop(0,'#9ca3af');_cachedPostGradR.addColorStop(0.22,'#f3f4f6');_cachedPostGradR.addColorStop(0.45,'#ffffff');_cachedPostGradR.addColorStop(0.8,'#f9fafb');_cachedPostGradR.addColorStop(1,'#6b7280');}
+    const postGradR = _cachedPostGradR;
     ctx.fillStyle = postGradR;
     ctx.beginPath();
     ctx.moveTo(GOAL_RIGHT - 4, GOAL_BASE);
@@ -23864,12 +24552,8 @@ if (player.hairType === 'rulos-cortos') {
     ctx.fill();
 
     // Travesaño superior (Polígono con cortes a 45° en extremos)
-    const crossGrad = ctx.createLinearGradient(0, GOAL_Y - 4, 0, GOAL_Y + 4);
-    crossGrad.addColorStop(0, '#9ca3af');
-    crossGrad.addColorStop(0.22, '#f3f4f6');
-    crossGrad.addColorStop(0.45, '#ffffff');
-    crossGrad.addColorStop(0.8, '#f9fafb');
-    crossGrad.addColorStop(1, '#6b7280');
+    if(!_cachedCrossGrad){_cachedCrossGrad=ctx.createLinearGradient(0,GOAL_Y-4,0,GOAL_Y+4);_cachedCrossGrad.addColorStop(0,'#9ca3af');_cachedCrossGrad.addColorStop(0.22,'#f3f4f6');_cachedCrossGrad.addColorStop(0.45,'#ffffff');_cachedCrossGrad.addColorStop(0.8,'#f9fafb');_cachedCrossGrad.addColorStop(1,'#6b7280');}
+    const crossGrad = _cachedCrossGrad;
     ctx.fillStyle = crossGrad;
     ctx.beginPath();
     ctx.moveTo(GOAL_LEFT - 4, GOAL_Y - 4);
@@ -24009,8 +24693,8 @@ if (player.hairType === 'rulos-cortos') {
     // ── COPA DEL MUNDO AL COSTADO DEL ARCO — misma que Road to Glory ──
     {
       const tropeX = 18;
-      const trophyBob = Math.sin(Date.now() * 0.002) * 1.5;
-      const trophyGlow = 0.5 + Math.sin(Date.now() * 0.003) * 0.3;
+      const trophyBob = Math.sin(_now * 0.002) * 1.5;
+      const trophyGlow = 0.5 + Math.sin(_now * 0.003) * 0.3;
       const h = 36;
       const tropeY = GOAL_Y + 54 - h + trophyBob; // base alineada con pies de Infantino
 
@@ -24028,7 +24712,7 @@ if (player.hairType === 'rulos-cortos') {
       // Copa — misma función que Road to Glory
       ctx.save();
       ctx.shadowColor = '#fbbf24';
-      ctx.shadowBlur = 5 + trophyGlow * 7;
+      if (!_perfMode) { ctx.shadowBlur = 5 + trophyGlow * 7; }
       drawWorldCupTrophy(ctx, tropeX, tropeY, h);
       ctx.shadowBlur = 0;
       ctx.restore();
@@ -24055,7 +24739,7 @@ if (player.hairType === 'rulos-cortos') {
 
       // Corazoncitos flotantes sobre la cabeza (solo cuando celebra al Mesías)
       if (isCeleb && selectedPlayer && selectedPlayer.id === 'mesias') {
-        const t = Date.now();
+        const t = _now;
         const emojiPhase = Math.floor(t / 250) % 4;
         const emojis = ['❤️', '💖', '💕', '💝'];
         const floatY = -28 - Math.abs(Math.sin(t * 0.015)) * 6;
@@ -24149,7 +24833,7 @@ if (player.hairType === 'rulos-cortos') {
           ctx.translate(p.x, p.y);
           ctx.rotate(p.rot || 0);
           ctx.shadowColor = p.color;
-          ctx.shadowBlur = 6;
+          if (!_perfMode) { ctx.shadowBlur = 6; }
           ctx.fillStyle = p.color;
           ctx.fillRect(-p.r, -p.r, p.r * 2, p.r * 2);
           ctx.strokeStyle = '#ffffff';
@@ -24159,7 +24843,7 @@ if (player.hairType === 'rulos-cortos') {
         } else if (p.type === 'spark') {
           // Chispa de estrella neón brillante con glow
           ctx.shadowColor = p.color;
-          ctx.shadowBlur = 8;
+          if (!_perfMode) { ctx.shadowBlur = 8; }
           ctx.fillStyle = '#ffffff';
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.r * 0.5, 0, Math.PI * 2);
@@ -24180,7 +24864,7 @@ if (player.hairType === 'rulos-cortos') {
           flameGrad.addColorStop(1, 'rgba(0,0,0,0)');
           ctx.fillStyle = flameGrad;
           ctx.shadowColor = p.color;
-          ctx.shadowBlur = p.r * 2;
+          if (!_perfMode) { ctx.shadowBlur = p.r * 2; }
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.r * 1.5, 0, Math.PI * 2);
           ctx.fill();
@@ -24214,7 +24898,7 @@ if (player.hairType === 'rulos-cortos') {
       ctx.strokeStyle = 'rgba(254, 240, 138, 0.26)'; // Amarillo suave neón
       ctx.lineWidth = 1.05;
       const speedLinesCount = 14;
-      const now = Date.now();
+      const now = _now;
       for (let i = 0; i < speedLinesCount; i++) {
         const seed = Math.sin(i * 12 + now * 0.05);
         if (seed > 0) {
@@ -24242,14 +24926,14 @@ if (player.hairType === 'rulos-cortos') {
         if (!d.active) return;
         ctx.save();
         ctx.shadowColor = d.color;
-        ctx.shadowBlur = 10;
+        if (!_perfMode) { ctx.shadowBlur = 10; }
         
         // Efecto de pulsación
-        const pulse = 1.0 + Math.sin(Date.now() * 0.007 + d.x) * 0.12;
+        const pulse = 1.0 + Math.sin(_now * 0.007 + d.x) * 0.12;
         const rad = d.r * pulse;
         
         // 1. Anillo exterior punteado en rotación
-        const rotAngle = (Date.now() * 0.0016 + d.x) % (Math.PI * 2);
+        const rotAngle = (_now * 0.0016 + d.x) % (Math.PI * 2);
         ctx.strokeStyle = d.color;
         ctx.lineWidth = 1.5;
         ctx.setLineDash([4, 4]);
@@ -24321,7 +25005,7 @@ if (player.hairType === 'rulos-cortos') {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'bottom';
         ctx.shadowColor = d.color;
-        ctx.shadowBlur = 4;
+        if (!_perfMode) { ctx.shadowBlur = 4; }
         ctx.fillText('+' + d.points, d.x, d.y - rad * 1.6);
         
         ctx.restore();
@@ -24343,7 +25027,7 @@ if (player.hairType === 'rulos-cortos') {
         ctx.lineWidth = 3.0 * sw.opacity;
         ctx.globalAlpha = sw.opacity;
         ctx.shadowColor = sw.color;
-        ctx.shadowBlur = 12 * sw.opacity;
+        if (!_perfMode) { ctx.shadowBlur = 12 * sw.opacity; }
         
         // Anillo principal
         ctx.beginPath();
@@ -24353,7 +25037,7 @@ if (player.hairType === 'rulos-cortos') {
         // Anillo secundario concéntrico punteado
         ctx.setLineDash([6, 6]);
         ctx.beginPath();
-        ctx.arc(sw.x, sw.y, sw.r * 1.25, -Date.now() * 0.01, -Date.now() * 0.01 + Math.PI * 2);
+        ctx.arc(sw.x, sw.y, sw.r * 1.25, -_now * 0.01, -_now * 0.01 + Math.PI * 2);
         ctx.stroke();
         
         ctx.restore();
@@ -24428,7 +25112,7 @@ if (player.hairType === 'rulos-cortos') {
         const jitterMag = chargeRatio * 1.4;
         bx += (Math.random() - 0.5) * jitterMag;
         by += (Math.random() - 0.5) * jitterMag;
-        br = pelota.r * (1 + chargeRatio * 0.06 + Math.sin(Date.now() * 0.04) * chargeRatio * 0.03);
+        br = pelota.r * (1 + chargeRatio * 0.06 + Math.sin(_now * 0.04) * chargeRatio * 0.03);
       }
 
       // Dibujar anillo de carga de Súper Tiro alrededor de la pelota (cuando no ha sido pateada)
@@ -24443,15 +25127,15 @@ if (player.hairType === 'rulos-cortos') {
           
           ctx.strokeStyle = '#06b6d4';
           ctx.shadowColor = '#06b6d4';
-          ctx.shadowBlur = 6;
+          if (!_perfMode) { ctx.shadowBlur = 6; }
           ctx.beginPath();
           ctx.arc(bx, by, 16, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2) * (superKickCharge / 100));
           ctx.stroke();
         } else {
-          const pulse = Math.abs(Math.sin(Date.now() * 0.01));
+          const pulse = Math.abs(Math.sin(_now * 0.01));
           ctx.strokeStyle = `rgba(251, 191, 36, ${0.45 + pulse * 0.55})`;
           ctx.shadowColor = '#fbbf24';
-          ctx.shadowBlur = 4 + pulse * 10;
+          if (!_perfMode) { ctx.shadowBlur = 4 + pulse * 10; }
           ctx.beginPath();
           ctx.arc(bx, by, 16 + pulse * 2.5, 0, Math.PI * 2);
           ctx.stroke();
@@ -24524,7 +25208,7 @@ if (player.hairType === 'rulos-cortos') {
         ctx.stroke();
 
         // Estrella de destello de oro
-        const tGold = Date.now() * 0.005;
+        const tGold = _now * 0.005;
         ctx.save();
         ctx.translate(bx, by);
         ctx.rotate(tGold);
@@ -24553,7 +25237,7 @@ if (player.hairType === 'rulos-cortos') {
         ctx.fill();
 
         // Patrón de lenguas de fuego en el balón
-        const tFire = Date.now() * 0.008;
+        const tFire = _now * 0.008;
         ctx.fillStyle = 'rgba(239, 68, 68, 0.45)';
         for (let i = 0; i < 5; i++) {
           const angle = (i / 5) * Math.PI * 2 + tFire;
@@ -24589,7 +25273,7 @@ if (player.hairType === 'rulos-cortos') {
         // 1. Dibujar el halo de neón cyan del fondo
         ctx.save();
         ctx.shadowColor = '#06b6d4'; // Halo de neón cyan
-        ctx.shadowBlur = 10;
+        if (!_perfMode) { ctx.shadowBlur = 10; }
         ctx.fillStyle = '#0e7490'; // Cyan oscuro base
         ctx.beginPath();
         ctx.arc(bx, by, br, 0, Math.PI * 2);
@@ -24607,7 +25291,7 @@ if (player.hairType === 'rulos-cortos') {
         ctx.fill();
 
         // 3. Pentágonos de neón oro/cyan animados
-        const t = Date.now() * 0.012;
+        const t = _now * 0.012;
         ctx.save();
         const penPositions = [
           [0, -0.7],
@@ -24625,7 +25309,7 @@ if (player.hairType === 'rulos-cortos') {
           
           // Estilo de trazo neón para las estrellas pentagonales
           ctx.shadowColor = '#06b6d4';
-          ctx.shadowBlur = 6;
+          if (!_perfMode) { ctx.shadowBlur = 6; }
           ctx.strokeStyle = '#22d3ee'; // Cyan neón brillante
           ctx.fillStyle = '#0f172a'; // Oscuro azulado para el centro del pentágono
           ctx.lineWidth = 1.5;
@@ -24754,7 +25438,7 @@ if (player.hairType === 'rulos-cortos') {
           }
           ctx.save();
           ctx.globalAlpha = p.life;
-          ctx.shadowBlur = 10;
+          if (!_perfMode) { ctx.shadowBlur = 10; }
           ctx.shadowColor = p.color;
           ctx.fillStyle = p.color;
           ctx.beginPath();
@@ -24772,7 +25456,7 @@ if (player.hairType === 'rulos-cortos') {
         } else {
           p.x += p.vx;
           p.y += p.vy;
-          p.vx = Math.sin(Date.now() * 0.0035 + p.w) * 0.6;
+          p.vx = Math.sin(_now * 0.0035 + p.w) * 0.6;
         }
         p.rot += p.rotSpeed;
         
@@ -24923,7 +25607,7 @@ if (player.hairType === 'rulos-cortos') {
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
         ctx.shadowColor = '#f59e0b';
-        ctx.shadowBlur = 6;
+        if (!_perfMode) { ctx.shadowBlur = 6; }
         let replayLabel = '▶ REPETICIÓN  ⚽';
         if (replayFrames.puntosArana) replayLabel = '▶ REPETICIÓN  🕸️';
         else if (replayFrames.esPaloAdentro) replayLabel = '▶ REPETICIÓN  🎯';
@@ -24932,7 +25616,7 @@ if (player.hairType === 'rulos-cortos') {
         ctx.shadowBlur = 0;
 
         // ── "CAM LENTA" parpadeante ──
-        const blink = Math.sin(Date.now() * 0.012) > 0;
+        const blink = Math.sin(_now * 0.012) > 0;
         if (blink) {
           ctx.fillStyle = '#f87171';
           ctx.font = '700 7.5px system-ui, -apple-system, sans-serif';
@@ -24962,7 +25646,7 @@ if (player.hairType === 'rulos-cortos') {
 
       if (isDibu) {
         // ══ BANNER ESPECIAL DIBU — ENORME Y DRAMÁTICO ══
-        const pulse = 1 + Math.sin(Date.now() * 0.025) * 0.04;
+        const pulse = 1 + Math.sin(_now * 0.025) * 0.04;
 
         // Fondo rojo intenso con degradado
         const dibBg = ctx.createLinearGradient(0, 95, 400, 175);
@@ -25016,7 +25700,7 @@ if (player.hairType === 'rulos-cortos') {
         }
         // Texto rojo con glow
         ctx.shadowColor = '#ff0000';
-        ctx.shadowBlur = 22;
+        if (!_perfMode) { ctx.shadowBlur = 22; }
         ctx.fillStyle = '#ffffff';
         ctx.font = '900 19px system-ui, -apple-system, sans-serif';
         ctx.fillText('¡¡¡ATAJA EL DIBUUUU!!!', 0, 0);
@@ -25047,7 +25731,7 @@ if (player.hairType === 'rulos-cortos') {
         ctx.stroke();
 
         ctx.shadowColor = bannerColor;
-        ctx.shadowBlur = isGol ? 18 : 8;
+        if (!_perfMode) { ctx.shadowBlur = isGol ? 18 : 8; }
         ctx.fillStyle = bannerColor;
         ctx.font = `900 ${isGol ? 20 : 16}px system-ui, -apple-system, sans-serif`;
         ctx.textAlign = 'center';
@@ -25074,7 +25758,7 @@ if (player.hairType === 'rulos-cortos') {
       ctx.font = '900 9px system-ui, -apple-system, sans-serif';
       ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + decisiveVignetteOpacity * 1.5})`;
       ctx.shadowColor = 'rgba(255, 0, 0, 0.8)';
-      ctx.shadowBlur = 4;
+      if (!_perfMode) { ctx.shadowBlur = 4; }
       ctx.fillText('¡MOMENTO DECISIVO!', 200, 68);
       ctx.restore();
     }
@@ -25096,7 +25780,7 @@ if (player.hairType === 'rulos-cortos') {
       ctx.font = '900 italic 10px system-ui, -apple-system, sans-serif';
       ctx.fillStyle = `rgba(255, 255, 255, ${tensionLevel * 0.95})`;
       ctx.shadowColor = 'rgba(168, 85, 247, 0.8)';
-      ctx.shadowBlur = 6;
+      if (!_perfMode) { ctx.shadowBlur = 6; }
       ctx.fillText('⚡ TENSIÓN AL MÁXIMO ⚡', 200, 18);
       ctx.restore();
     }
@@ -25125,7 +25809,7 @@ if (player.hairType === 'rulos-cortos') {
         
         // Glow neón
         ctx.shadowColor = a.color || '#fbbf24';
-        ctx.shadowBlur = 10;
+        if (!_perfMode) { ctx.shadowBlur = 10; }
         ctx.font = '900 11px "Outfit", system-ui, -apple-system, sans-serif';
         
         // Borde negro
@@ -25140,6 +25824,147 @@ if (player.hairType === 'rulos-cortos') {
     }
     
     ctx.restore();
+
+        // Cerrar el ctx.save() del translate(0, GAME_OFFSET_Y) -- tribuna expandida
+    ctx.restore();
+
+    // ── NIEBLA DE BENGALAS — humo denso inmersivo SOLO EN LA TRIBUNA ──
+    {
+      // Pre-calcular capas de niebla una sola vez
+      if (!_fogLayers) {
+        _fogLayers = [];
+        // 50+ nubes de niebla con posiciones, velocidades y colores distintos (rojizo y azul dominantes)
+        const fogColors = [
+          // Rojos y rojisos (60% de las bengalas)
+          {r:255, g:30,  b:30 }, // rojo puro
+          {r:255, g:60,  b:40 }, // rojo-naranja
+          {r:220, g:20,  b:50 }, // rojo profundo
+          {r:255, g:80,  b:60 }, // rojo coral
+          {r:200, g:30,  b:30 }, // rojo oscuro
+          
+          // Azules y cian (40% de las bengalas)
+          {r:0,   g:150, b:255}, // azul cielo
+          {r:30,  g:180, b:255}, // azul claro
+          {r:0,   g:100, b:220}, // azul profundo
+          {r:50,  g:200, b:255}, // cian brillante
+        ];
+        
+        // 50 nubes en lugar de 28
+        for (let i = 0; i < 50; i++) {
+          // Ponderación: más rojos que azules
+          const col = fogColors[i % 9];
+          _fogLayers.push({
+            xBase:    10 + (i / 49) * 380,        // posición horizontal base
+            yBase:    -0.15 + (i % 7) * 0.08,     // altura relativa SOLO tribuna (negativo = arriba)
+            radius:   40 + (i % 8) * 18,          // radios más grandes: 40–184px
+            phase:    i * 0.82,                   // fase variable
+            speedX:   (0.0012 + (i % 6) * 0.0008) * (i % 2 === 0 ? 1 : -1),
+            speedY:   0.0006 + (i % 5) * 0.0004,
+            r: col.r, g: col.g, b: col.b,
+            // Más mezcla hacia el color saturado (menos gris)
+            grayMix:  0.08 + (i % 7) * 0.05,     // 0.08–0.43 (más color puro)
+          });
+        }
+      }
+
+      const canvasH = gameCanvas.height;
+      const canvasW = GAME_LOGICAL_W;
+      const tribunaBottom = canvasH * 0.35; // Límite inferior de la tribuna (donde comienza el campo)
+
+      ctx.save();
+
+      // ── Crear máscara para limitar el humo solo a la tribuna ──
+      ctx.beginPath();
+      ctx.rect(0, 0, canvasW, tribunaBottom);
+      ctx.clip();
+
+      // ── Capa base: niebla coloreada semi-permanente en la tribuna ──
+      const groundFogGrd = ctx.createLinearGradient(0, 0, 0, tribunaBottom);
+      groundFogGrd.addColorStop(0,   'rgba(200, 140, 150, 0)');
+      groundFogGrd.addColorStop(0.3, 'rgba(180, 100, 120, 0.12)');
+      groundFogGrd.addColorStop(0.65,'rgba(140, 150, 200, 0.15)');
+      groundFogGrd.addColorStop(1,   'rgba(120, 140, 200, 0.28)');
+      ctx.fillStyle = groundFogGrd;
+      ctx.fillRect(0, 0, canvasW, tribunaBottom);
+
+      // ── Niebla media: zona intermedia de la tribuna — más densa ──
+      const midFogGrd = ctx.createLinearGradient(0, 0, 0, tribunaBottom);
+      midFogGrd.addColorStop(0,   'rgba(200, 120, 140, 0)');
+      midFogGrd.addColorStop(0.35,'rgba(180, 100, 130, 0.1)');
+      midFogGrd.addColorStop(0.65,'rgba(130, 140, 200, 0.13)');
+      midFogGrd.addColorStop(1,   'rgba(110, 130, 190, 0.18)');
+      ctx.fillStyle = midFogGrd;
+      ctx.fillRect(0, 0, canvasW, tribunaBottom);
+
+      // ── Nubes individuales de humo coloreado flotando por la tribuna ──
+      for (let i = 0; i < _fogLayers.length; i++) {
+        const fl = _fogLayers[i];
+        // Movimiento orgánico: deriva lenta y oscilación suave
+        const tx = (_now * fl.speedX + fl.phase * 6.8) % (canvasW + fl.radius * 2) - fl.radius;
+        const xPos = fl.xBase + tx * 0.5 + Math.sin(_now * 0.0025 + fl.phase) * 25;
+        const yFrac = fl.yBase + Math.sin(_now * fl.speedY + fl.phase * 0.5) * 0.06;
+        const yPos = yFrac * canvasH;
+
+        // Solo dibujar si está dentro de la tribuna
+        if (yPos < tribunaBottom) {
+          // Mezclar el color de bengala con menos gris (mantener saturación)
+          const gm = fl.grayMix + Math.sin(_now * 0.003 + fl.phase) * 0.04;
+          const sr = Math.round(fl.r * (1 - gm) + 140 * gm);
+          const sg = Math.round(fl.g * (1 - gm) + 130 * gm);
+          const sb = Math.round(fl.b * (1 - gm) + 150 * gm);
+
+          // Opacidad más pronunciada para más visibilidad
+          const baseOpacity = 0.075 + Math.sin(_now * 0.004 + fl.phase * 0.7) * 0.03;
+
+          const fGrd = ctx.createRadialGradient(xPos, yPos, 0, xPos, yPos, fl.radius);
+          fGrd.addColorStop(0,   `rgba(${sr},${sg},${sb},${baseOpacity})`);
+          fGrd.addColorStop(0.45, `rgba(${sr},${sg},${sb},${baseOpacity * 0.5})`);
+          fGrd.addColorStop(1,   `rgba(${sr},${sg},${sb},0)`);
+          ctx.fillStyle = fGrd;
+          ctx.beginPath();
+          ctx.ellipse(xPos, yPos, fl.radius, fl.radius * 0.6, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // ── Velo de dispersión general: solo en la tribuna ──
+      const veloDist = ctx.createLinearGradient(0, 0, 0, tribunaBottom);
+      veloDist.addColorStop(0,    'rgba(200, 120, 140, 0)');
+      veloDist.addColorStop(0.35, 'rgba(180, 100, 130, 0.05)');
+      veloDist.addColorStop(0.65, 'rgba(130, 140, 200, 0.08)');
+      veloDist.addColorStop(1,    'rgba(110, 130, 190, 0.14)');
+      ctx.fillStyle = veloDist;
+      ctx.fillRect(0, 0, canvasW, tribunaBottom);
+
+      // ── Tinte ambiental lateral: los colores de las bengalas tiñen fuertemente los bordes (tribuna) ──
+      // Izquierda: rojo intenso
+      const leftTint = ctx.createLinearGradient(0, 0, 120, 0);
+      leftTint.addColorStop(0,   `rgba(255, 40, 40, ${0.14 + Math.sin(_now * 0.006) * 0.04})`);
+      leftTint.addColorStop(0.6, `rgba(255, 80, 60, ${0.09 + Math.sin(_now * 0.006) * 0.03})`);
+      leftTint.addColorStop(1,   'rgba(255, 100, 80, 0)');
+      ctx.fillStyle = leftTint;
+      ctx.fillRect(0, 0, 120, tribunaBottom);
+
+      // Derecha: azul intenso
+      const rightTint = ctx.createLinearGradient(canvasW, 0, canvasW - 120, 0);
+      rightTint.addColorStop(0,   `rgba(30, 150, 255, ${0.14 + Math.sin(_now * 0.006 + 2) * 0.04})`);
+      rightTint.addColorStop(0.6, `rgba(60, 180, 255, ${0.09 + Math.sin(_now * 0.006 + 2) * 0.03})`);
+      rightTint.addColorStop(1,   'rgba(80, 200, 255, 0)');
+      ctx.fillStyle = rightTint;
+      ctx.fillRect(canvasW - 120, 0, 120, tribunaBottom);
+
+      // ── Capa extra: pulsos de niebla densa para efecto inmersivo (solo tribuna) ──
+      const pulseFactor = 0.5 + Math.sin(_now * 0.002) * 0.3;
+      const denseVeil = ctx.createLinearGradient(0, 0, 0, tribunaBottom);
+      denseVeil.addColorStop(0,   'rgba(150, 100, 150, 0)');
+      denseVeil.addColorStop(0.5, `rgba(140, 110, 180, ${0.05 * pulseFactor})`);
+      denseVeil.addColorStop(1,   'rgba(150, 100, 150, 0)');
+      ctx.fillStyle = denseVeil;
+      ctx.fillRect(0, 0, canvasW, tribunaBottom);
+
+      ctx.restore();
+    }
+    // ── FIN NIEBLA DE BENGALAS ──
 
     // Flash blanco breve de impacto (palo) — cubre toda la pantalla, no afectado por el shake
     if (impactFlash > 0) {
@@ -25170,7 +25995,7 @@ if (player.hairType === 'rulos-cortos') {
   }
 
   window.mostrarAnuncioIntersticial = async function() {
-    const ahora = Date.now();
+    const ahora = _now;
     // Cooldown de 60 segundos entre anuncios de pantalla completa
     if (ahora - ultimoAnuncioIntersticial < 60000) {
       console.log("Anuncio intersticial en cooldown...");
