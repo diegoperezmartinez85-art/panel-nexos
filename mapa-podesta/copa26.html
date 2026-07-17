@@ -3332,20 +3332,28 @@
     }
     .swipe-hint {
       position: absolute;
-      bottom: 12px;
+      bottom: 135px; /* Elevado para evitar solapar con el selector de efecto y controles */
       left: 0;
       right: 0;
       text-align: center;
-      font-size: 10px;
-      font-weight: 800;
-      color: rgba(255, 255, 255, 0.4);
+      font-size: 12.5px;
+      font-weight: 900;
+      color: #ffffff;
+      background: rgba(9, 9, 11, 0.82);
+      border: 1.2px solid rgba(255, 255, 255, 0.16);
+      border-radius: 24px;
+      padding: 6px 16px;
+      width: fit-content;
+      margin: 0 auto;
       pointer-events: none;
       letter-spacing: 0.5px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.45);
+      z-index: 10;
       animation: pulseHint 2s infinite;
     }
     @keyframes pulseHint {
-      0%, 100% { opacity: 0.3; }
-      50% { opacity: 0.7; }
+      0%, 100% { transform: scale(1.0); opacity: 0.85; }
+      50% { transform: scale(1.05); opacity: 1.0; }
     }
 
     /* Game Over */
@@ -5617,7 +5625,7 @@
   <div id="cinematic-flash" style="position:fixed;inset:0;background:#ffffff;opacity:0;pointer-events:none;z-index:9998;transition:opacity 0.35s ease;"></div>
   <div id="cinematic-overlay" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:9997;opacity:0;transform:scale(0.85);transition:opacity 0.22s ease,transform 0.22s cubic-bezier(0.34,1.56,0.64,1);">
     <div style="text-align:center;">
-      <div id="cinematic-text" style="font-family:'Outfit',sans-serif;font-size:clamp(28px,8vw,48px);font-weight:900;letter-spacing:-1px;text-transform:uppercase;line-height:1.1;filter:drop-shadow(0 4px 24px rgba(0,0,0,0.6));"></div>
+      <div id="cinematic-text" style="font-family:'Outfit',sans-serif;font-size:clamp(28px,8vw,48px);font-weight:900;letter-spacing:-1px;text-transform:uppercase;line-height:1.1;filter:drop-shadow(0 4px 24px rgba(0,0,0,0.6)); max-width: 90vw; margin: 0 auto; word-wrap: break-word;"></div>
     </div>
   </div>
   <div class="mundial-container" id="mundial-estadio" style="display: none;">
@@ -5713,7 +5721,7 @@
         </div>
       </div>
 
-      <div class="swipe-hint" id="swipe-hint">Arrastrá la pelota y soltá para chutar</div>
+      <div class="swipe-hint" id="swipe-hint">Arrastrá para atrás y soltá para chutar</div>
       <!-- Botón de Súper Tiro -->
       <button id="superkick-btn" onclick="activateSuperKick()" style="display: none; position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); z-index: 100; background: linear-gradient(135deg, #ef4444, #fb923c); border: 2px solid #fff; color: #fff; font-weight: 950; padding: 10px 22px; border-radius: 20px; font-size: 14px; text-transform: uppercase; cursor: pointer; box-shadow: 0 0 20px rgba(239, 68, 68, 0.8), 0 0 5px rgba(251, 146, 60, 0.4); letter-spacing: 1px; outline: none; transition: all 0.2s;">⚡ SÚPER TIRO LISTO ⚡</button>
       <!-- Controles de defensa en penales -->
@@ -16829,6 +16837,11 @@ window.iniciarEstadioJuego = function() {
     // Cachear referencias DOM usadas en el hot path del game loop (60x/seg)
     cacheGameDOMRefs();
     
+    // Inicializar cache de balones pre-renderizados si aún no existe
+    if (Object.keys(ballSkinsCache).length === 0) {
+      inicializarCacheBalones();
+    }
+    
     // Escuchar eventos táctiles/mouse
     gameCanvas.removeEventListener('mousedown', onAimStart);
     gameCanvas.removeEventListener('mousemove', onAimMove);
@@ -18778,45 +18791,50 @@ window.iniciarEstadioJuego = function() {
       if (gameDifficulty === 'facil') {
         if (isLeftFooted) {
           defensores = [
-            { x: 180, y: 155, r: 8.5, targetY: 155, vy: 0 }
+            { x: 180, y: 155, r: 8.5, targetY: 155, vy: 0, baseX: 180 }
           ];
         } else {
           defensores = [
-            { x: 220, y: 155, r: 8.5, targetY: 155, vy: 0 }
+            { x: 220, y: 155, r: 8.5, targetY: 155, vy: 0, baseX: 220 }
           ];
         }
       } else if (gameDifficulty === 'dificil') {
         if (isLeftFooted) {
           defensores = [
-            { x: 142, y: 165, r: 8.5, targetY: 165, vy: 0 },
-            { x: 165, y: 155, r: 8.5, targetY: 155, vy: 0 },
-            { x: 188, y: 155, r: 8.5, targetY: 155, vy: 0 },
-            { x: 211, y: 165, r: 8.5, targetY: 165, vy: 0 }
+            { x: 142, y: 165, r: 8.5, targetY: 165, vy: 0, baseX: 142 },
+            { x: 165, y: 155, r: 8.5, targetY: 155, vy: 0, baseX: 165 },
+            { x: 188, y: 155, r: 8.5, targetY: 155, vy: 0, baseX: 188 },
+            { x: 211, y: 165, r: 8.5, targetY: 165, vy: 0, baseX: 211 }
           ];
         } else {
           defensores = [
-            { x: 189, y: 165, r: 8.5, targetY: 165, vy: 0 },
-            { x: 212, y: 155, r: 8.5, targetY: 155, vy: 0 },
-            { x: 235, y: 155, r: 8.5, targetY: 155, vy: 0 },
-            { x: 258, y: 165, r: 8.5, targetY: 165, vy: 0 }
+            { x: 189, y: 165, r: 8.5, targetY: 165, vy: 0, baseX: 189 },
+            { x: 212, y: 155, r: 8.5, targetY: 155, vy: 0, baseX: 212 },
+            { x: 235, y: 155, r: 8.5, targetY: 155, vy: 0, baseX: 235 },
+            { x: 258, y: 165, r: 8.5, targetY: 165, vy: 0, baseX: 258 }
           ];
         }
       } else {
         // Normal
         if (isLeftFooted) {
           defensores = [
-            { x: 155, y: 165, r: 8.5, targetY: 165, vy: 0 },
-            { x: 180, y: 155, r: 8.5, targetY: 155, vy: 0 },
-            { x: 205, y: 165, r: 8.5, targetY: 165, vy: 0 }
+            { x: 155, y: 165, r: 8.5, targetY: 165, vy: 0, baseX: 155 },
+            { x: 180, y: 155, r: 8.5, targetY: 155, vy: 0, baseX: 180 },
+            { x: 205, y: 165, r: 8.5, targetY: 165, vy: 0, baseX: 205 }
           ];
         } else {
           defensores = [
-            { x: 195, y: 165, r: 8.5, targetY: 165, vy: 0 },
-            { x: 220, y: 155, r: 8.5, targetY: 155, vy: 0 },
-            { x: 245, y: 165, r: 8.5, targetY: 165, vy: 0 }
+            { x: 195, y: 165, r: 8.5, targetY: 165, vy: 0, baseX: 195 },
+            { x: 220, y: 155, r: 8.5, targetY: 155, vy: 0, baseX: 220 },
+            { x: 245, y: 165, r: 8.5, targetY: 165, vy: 0, baseX: 245 }
           ];
         }
       }
+      
+      // Inicializar flags para amagues y fintas del arquero IA
+      window.goalieAmagueChecked = false;
+      window.goalieAmagueTimer = 0;
+      window.goalieAmagueDir = 0;
     }
     
     trail = [];
@@ -18888,23 +18906,24 @@ window.iniciarEstadioJuego = function() {
     
     const hint = document.getElementById('swipe-hint');
     if (hint) {
+      const t = translations[currentLang] || translations['es'];
       if (gameMode === 'penales' || gameMode === 'local2p') {
         if (gameMode === 'local2p') {
           const isP1Arquero = penalesTurno === 'defensa';
           if (isP1Arquero) {
-            hint.innerText = '¡JUGADOR 2 PATEA! ¡JUGADOR 1 ATAJA!';
+            hint.innerText = t.hintP2Patea || '¡JUGADOR 2 PATEA! ¡JUGADOR 1 ATAJA!';
           } else {
-            hint.innerText = '¡JUGADOR 1 PATEA! ¡JUGADOR 2 ATAJA!';
+            hint.innerText = t.hintP1Patea || '¡JUGADOR 1 PATEA! ¡JUGADOR 2 ATAJA!';
           }
         } else {
           if (penalesTurno === 'defensa') {
-            hint.innerText = '¡ATAJÁS VOS! Deslizá en la pantalla para mover al Dibu 🧤';
+            hint.innerText = t.hintAtajaDibu || '¡ATAJÁS VOS! Deslizá en la pantalla para mover al portero 🧤';
           } else {
-            hint.innerText = '¡CHUTÁS VOS! Arrastrá la pelota y pateá ⚽';
+            hint.innerText = t.hintPatearP1 || '¡CHUTÁS VOS! Arrastrá para atrás y soltá 🚀';
           }
         }
       } else {
-        hint.innerText = 'Arrastrá la pelota y soltá para chutar';
+        hint.innerText = t.hintPatear || 'Arrastrá para atrás y soltá para chutar';
       }
       hint.style.opacity = '1';
     }
@@ -19488,13 +19507,13 @@ window.iniciarEstadioJuego = function() {
       pelota.vx *= (1 - airDrag * dt);
       pelota.vy *= (1 - airDrag * 0.7 * dt); // vertical un poco menos frenada
 
-      // ── VIENTO: desvía la pelota en vuelo (más efecto cuanto más alto va) ──
-      if (pelota.y < 245 && pelota.y > 50) {
-        const altitudeFactor = Math.max(0, (245 - pelota.y) / 195); // más viento en altura
+      // ── VIENTO: desvía la pelota en vuelo (más efecto cuanto más alto va, aplicándose desde la salida) ──
+      if (pelota.y < 262 && pelota.y > 50) {
+        const altitudeFactor = Math.max(0, (262 - pelota.y) / 212); // más viento en altura
         let windModifier = 1.0;
         if (selectedBallSkin === 'fuego' || rachaActual >= 3) windModifier = 0.6; // menos afectado por viento
         else if (selectedBallSkin === 'hielo') windModifier = 1.4; // más afectado por viento
-        pelota.vx += vientoActual * (0.22 + altitudeFactor * 0.14) * windModifier * dt;
+        pelota.vx += vientoActual * (0.68 + altitudeFactor * 0.48) * windModifier * dt; // Mayor influencia del viento desde la salida
       }
 
       // ── TRAYECTORIA DE SÚPER TIRO GRAVEDAD CERO ──
@@ -19525,16 +19544,15 @@ window.iniciarEstadioJuego = function() {
       // Efecto Comba / Curva Magnus — ¡Bananeras espectaculares con aceleración progresiva!
       if (!pelota.isCpuShot && pelota.y < 220 && pelota.y > 58) {
         let effComba = selectedPlayer.comba;
-        if (rachaActual >= 2) effComba = 150; // Sper Curva fsica racha
         let combaMult = 1.0;
-        if (rachaActual >= 2 || selectedBallSkin === 'hielo' || selectedBallSkin === 'oro') combaMult = 2.15; // SPER CURVA!
-        if (selectedBallSkin === 'fuego' || rachaActual >= 3) combaMult = 0.45; // Muy poca curva
+        if (selectedBallSkin === 'hielo' || selectedBallSkin === 'oro') combaMult = 1.15; // Curva boosteada muy sutil
+        if (selectedBallSkin === 'fuego') combaMult = 0.85; // Reducción sutil
         // El efecto Magnus es ms fuerte en la mitad del vuelo (ms rpm = ms curva)
         const flightProgress = Math.max(0, 1 - (pelota.y - 58) / 160);
         const magnusMult = 0.85 + flightProgress * 0.65; // Crece hacia el arco
         // La fuerza de curva se normaliza contra la duración del tiro (pelota.flightDuration)
         // para que un tiro fuerte y corto se doble TANTO como uno suave y largo.
-        const CURVA_STRENGTH = 32; // Ajustá este número para más/menos comba
+        const CURVA_STRENGTH = 24; // Reducido de 32 a 24 para trayectorias más realistas y menos exageradas
         const flightDur = pelota.flightDuration || 16;
         const combaFuerza = (effComba / 100) * combaMult * magnusMult * (CURVA_STRENGTH / flightDur);
         
@@ -19549,10 +19567,21 @@ window.iniciarEstadioJuego = function() {
 
       // 2. Colisión con la Barrera (Defensores Cabezones)
       defensores.forEach((def, index) => {
-        // Los defensores saltan de forma realista
-        if (pelota.y > 140 && pelota.y < 190 && !pelota.isSettled) {
-          if (Math.random() < 0.08 && def.y === def.targetY) {
-            def.vy = -3.8; // Fuerza de salto
+        // Los defensores saltan al disparar, pero también amagan y dan pequeños pasos laterales si no se ha pateado
+        if (pelota.isShot) {
+          if (pelota.y > 140 && pelota.y < 190 && !pelota.isSettled) {
+            if (Math.random() < 0.08 && def.y === def.targetY) {
+              def.vy = -3.8; // Fuerza de salto
+            }
+          }
+        } else {
+          // Desplazamiento lateral oscilante (shuffling/pasos de acomodo en la barrera)
+          if (typeof def.baseX !== 'undefined') {
+            def.x = def.baseX + Math.sin(_now * 0.005 + index * 1.5) * 5.2;
+          }
+          // Salto de distracción ocasional antes del tiro
+          if (Math.random() < 0.003 && def.y === def.targetY) {
+            def.vy = -3.2;
           }
         }
         
@@ -19626,10 +19655,42 @@ window.iniciarEstadioJuego = function() {
             const trackFactor = 0.13;
             arquero.x += (window.cpuGoalieTargetX - arquero.x) * trackFactor * dt;
           } else {
-            // Si la pelota no vuela, patrulla el arco normalmente
-            arquero.x += arquero.vx * dt;
-            if (arquero.x < 140 || arquero.x > 260) {
-              arquero.vx = -arquero.vx;
+            // Si la pelota no vuela, patrulla el arco normalmente pero puede hacer fintas
+            let isAmagando = false;
+            
+            // Fintas y amagues de la IA del arquero (solo en apuntado y si no es 2P)
+            if (isAiming && gameMode !== 'local2p' && penalesTurno !== 'defensa') {
+              const dx = aimStart.x - aimCurrent.x;
+              const dy = aimStart.y - aimCurrent.y;
+              const dragDist = Math.sqrt(dx*dx + dy*dy);
+              
+              if (dragDist > 18 && !window.goalieAmagueChecked) {
+                window.goalieAmagueChecked = true;
+                if (Math.random() < 0.45) { // 45% de probabilidad de amague
+                  window.goalieAmagueTimer = 32;
+                  window.goalieAmagueDir = Math.random() < 0.5 ? -1 : 1;
+                }
+              }
+              
+              if (window.goalieAmagueTimer > 0) {
+                isAmagando = true;
+                window.goalieAmagueTimer--;
+                if (window.goalieAmagueTimer > 12) {
+                  // Deslizarse rápido al lado del amague
+                  arquero.x += window.goalieAmagueDir * 4.8 * dt;
+                  arquero.x = Math.max(138, Math.min(262, arquero.x));
+                } else {
+                  // Recuperación rápida hacia el centro
+                  arquero.x += (200 - arquero.x) * 0.32 * dt;
+                }
+              }
+            }
+            
+            if (!isAmagando) {
+              arquero.x += arquero.vx * dt;
+              if (arquero.x < 140 || arquero.x > 260) {
+                arquero.vx = -arquero.vx;
+              }
             }
           }
         }
@@ -20423,44 +20484,51 @@ window.iniciarEstadioJuego = function() {
       triggerHaptic('heavy');
       
       // Ocultar estadio
-  document.getElementById('mundial-estadio').style.display = 'none';
-  if (typeof toggleHeaderSalir === "function") toggleHeaderSalir(false);
-  if (typeof window.mostrarAnuncioIntersticial === 'function') {
-    window.mostrarAnuncioIntersticial();
-  }
+      document.getElementById('mundial-estadio').style.display = 'none';
+      if (typeof toggleHeaderSalir === "function") toggleHeaderSalir(false);
       
-      const esFaseGrupos = torneoPenales && torneoPenales.active && torneoPenales.fase === 'grupos';
+      // Incrementar contador de partidos de penales jugados
+      let penalesMatchesPlayed = parseInt(localStorage.getItem('nx_admob_penales_played_count') || '0') + 1;
+      localStorage.setItem('nx_admob_penales_played_count', String(penalesMatchesPlayed));
       
-      if (esFaseGrupos) {
-        // En fase de grupos, ganar o perder da igual para la navegación: ¡siempre avanzamos al siguiente partido!
-        if (!_torneoYaAvanzado) {
-          avanzarRondaTorneo(penalesGolesFavor, penalesGolesContra);
-        }
-        _torneoYaAvanzado = false;
-        
-        // Se le pasa false a mostrarBracketTorneoScreen para indicar que no hay "modo derrota/reintentar" en fase de grupos
-        mostrarBracketTorneoScreen(false);
-      } else {
-        // Fase eliminatoria directa (Cuartos, Semis, Final)
-        if (penalesVictoria) {
-          // Guardar marcador y avanzar
+      const continuarFlujoMundial = () => {
+        const esFaseGrupos = torneoPenales && torneoPenales.active && torneoPenales.fase === 'grupos';
+        if (esFaseGrupos) {
+          // En fase de grupos, ganar o perder da igual para la navegación: ¡siempre avanzamos al siguiente partido!
           if (!_torneoYaAvanzado) {
             avanzarRondaTorneo(penalesGolesFavor, penalesGolesContra);
           }
           _torneoYaAvanzado = false;
-          
-          if (torneoPenales.winner) {
-            // Ganó el torneo (la gran final)!
-            mostrarCeremoniaFinalCampeon();
-          } else {
-            // Avanza a la siguiente ronda
-            mostrarBracketTorneoScreen(false);
-          }
+          mostrarBracketTorneoScreen(false);
         } else {
-          _torneoYaAvanzado = false;
-          // Perdió el partido en fase eliminatoria: se le pasa true para activar el modo derrota (con reintentar activo)
-          mostrarBracketTorneoScreen(true);
+          // Fase eliminatoria directa (Cuartos, Semis, Final)
+          if (penalesVictoria) {
+            // Guardar marcador y avanzar
+            if (!_torneoYaAvanzado) {
+              avanzarRondaTorneo(penalesGolesFavor, penalesGolesContra);
+            }
+            _torneoYaAvanzado = false;
+            
+            if (torneoPenales.winner) {
+              // Ganó el torneo (la gran final)!
+              mostrarCeremoniaFinalCampeon();
+            } else {
+              // Avanza a la siguiente ronda
+              mostrarBracketTorneoScreen(false);
+            }
+          } else {
+            _torneoYaAvanzado = false;
+            // Perdió el partido en fase eliminatoria: se le pasa true para activar el modo derrota (con reintentar activo)
+            mostrarBracketTorneoScreen(true);
+          }
         }
+      };
+
+      // Si es el segundo partido de penales, mostrar anuncio de transición
+      if (penalesMatchesPlayed % 2 === 0 && typeof window.mostrarAdDeTransicion === 'function') {
+        window.mostrarAdDeTransicion(continuarFlujoMundial);
+      } else {
+        continuarFlujoMundial();
       }
       return;
     }
@@ -23163,118 +23231,148 @@ if (player.hairType === 'rulos-cortos') {
     ctx.restore();
   }
 
-  function drawBallWithSkin(ctx, cx, cy, br, rotationAngle, skin) {
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(rotationAngle || 0);
+  // Cache global de balones pre-renderizados
+  let ballSkinsCache = {};
 
-    if (skin === 'oro') {
-      // BALÓN DE ORO
-      const ballGrad = ctx.createRadialGradient(-br * 0.35, -br * 0.35, br * 0.1, 0, 0, br);
-      ballGrad.addColorStop(0, '#fef08a');
-      ballGrad.addColorStop(0.5, '#fbbf24');
-      ballGrad.addColorStop(1, '#b45309');
-      ctx.fillStyle = ballGrad;
-      ctx.beginPath();
-      ctx.arc(0, 0, br, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.strokeStyle = 'rgba(180, 83, 9, 0.45)';
-      ctx.lineWidth = 0.65;
-      ctx.beginPath();
-      for (let i = 0; i < 5; i++) {
-        const angle = (i / 5) * Math.PI * 2;
-        const px = Math.cos(angle) * br * 0.35;
-        const py = Math.sin(angle) * br * 0.35;
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      }
-      ctx.closePath();
-      ctx.stroke();
+  function inicializarCacheBalones() {
+    const skins = ['clasica', 'oro', 'fuego', 'hielo'];
+    const radius = 64; // Alta resolución (128x128 píxeles total)
+    const size = 128;
+    
+    skins.forEach(skin => {
+      const c = document.createElement('canvas');
+      c.width = size;
+      c.height = size;
+      const cCtx = c.getContext('2d');
+      if (!cCtx) return;
       
-      ctx.beginPath();
-      for (let i = 0; i < 5; i++) {
-        const angle = (i / 5) * Math.PI * 2;
-        const px = Math.cos(angle) * br * 0.35;
-        const py = Math.sin(angle) * br * 0.35;
-        const ex = Math.cos(angle) * br;
-        const ey = Math.sin(angle) * br;
-        ctx.moveTo(px, py);
-        ctx.lineTo(ex, ey);
-      }
-      ctx.stroke();
+      cCtx.translate(radius, radius);
+      
+      if (skin === 'oro') {
+        const ballGrad = cCtx.createRadialGradient(-radius * 0.35, -radius * 0.35, radius * 0.1, 0, 0, radius);
+        ballGrad.addColorStop(0, '#fef08a');
+        ballGrad.addColorStop(0.5, '#fbbf24');
+        ballGrad.addColorStop(1, '#b45309');
+        cCtx.fillStyle = ballGrad;
+        cCtx.beginPath();
+        cCtx.arc(0, 0, radius, 0, Math.PI * 2);
+        cCtx.fill();
 
-      // Estrella de destello de oro
-      ctx.save();
-      ctx.fillStyle = '#ffffff';
-      ctx.globalAlpha = 0.55;
-      for (let i = 0; i < 4; i++) {
-        ctx.rotate(Math.PI / 2);
-        ctx.beginPath();
-        ctx.moveTo(-1.8, 0);
-        ctx.quadraticCurveTo(0, 0, 0, -br * 0.75);
-        ctx.quadraticCurveTo(0, 0, 1.8, 0);
-        ctx.quadraticCurveTo(0, 0, 0, br * 0.75);
-        ctx.quadraticCurveTo(0, 0, -1.8, 0);
-        ctx.fill();
-      }
-      ctx.restore();
-    } else if (skin === 'fuego') {
-      // BALÓN DE FUEGO
-      const ballGrad = ctx.createRadialGradient(-br * 0.3, -br * 0.3, br * 0.1, 0, 0, br);
-      ballGrad.addColorStop(0, '#fef08a');
-      ballGrad.addColorStop(0.4, '#f97316');
-      ballGrad.addColorStop(1, '#7f1d1d');
-      ctx.fillStyle = ballGrad;
-      ctx.beginPath();
-      ctx.arc(0, 0, br, 0, Math.PI * 2);
-      ctx.fill();
+        cCtx.strokeStyle = 'rgba(180, 83, 9, 0.45)';
+        cCtx.lineWidth = 0.65 * (radius / 16);
+        cCtx.beginPath();
+        for (let i = 0; i < 5; i++) {
+          const angle = (i / 5) * Math.PI * 2;
+          const px = Math.cos(angle) * radius * 0.35;
+          const py = Math.sin(angle) * radius * 0.35;
+          if (i === 0) cCtx.moveTo(px, py);
+          else cCtx.lineTo(px, py);
+        }
+        cCtx.closePath();
+        cCtx.stroke();
+        
+        cCtx.beginPath();
+        for (let i = 0; i < 5; i++) {
+          const angle = (i / 5) * Math.PI * 2;
+          const px = Math.cos(angle) * radius * 0.35;
+          const py = Math.sin(angle) * radius * 0.35;
+          const ex = Math.cos(angle) * radius;
+          const ey = Math.sin(angle) * radius;
+          cCtx.moveTo(px, py);
+          cCtx.lineTo(ex, ey);
+        }
+        cCtx.stroke();
 
-      ctx.fillStyle = 'rgba(239, 68, 68, 0.45)';
-      for (let i = 0; i < 5; i++) {
-        const angle = (i / 5) * Math.PI * 2;
-        const fx = Math.cos(angle) * br * 0.4;
-        const fy = Math.sin(angle) * br * 0.4;
-        ctx.beginPath();
-        ctx.arc(fx, fy, br * 0.28, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    } else if (skin === 'hielo') {
-      // BALÓN DE HIELO
-      const ballGrad = ctx.createRadialGradient(-br * 0.35, -br * 0.35, br * 0.1, 0, 0, br);
-      ballGrad.addColorStop(0, '#ffffff');
-      ballGrad.addColorStop(0.5, '#7dd3fc');
-      ballGrad.addColorStop(1, '#0c4a6e');
-      ctx.fillStyle = ballGrad;
-      ctx.beginPath();
-      ctx.arc(0, 0, br, 0, Math.PI * 2);
-      ctx.fill();
+        cCtx.save();
+        cCtx.fillStyle = '#ffffff';
+        cCtx.globalAlpha = 0.55;
+        for (let i = 0; i < 4; i++) {
+          cCtx.rotate(Math.PI / 2);
+          cCtx.beginPath();
+          cCtx.moveTo(-1.8 * (radius / 16), 0);
+          cCtx.quadraticCurveTo(0, 0, 0, -radius * 0.75);
+          cCtx.quadraticCurveTo(0, 0, 1.8 * (radius / 16), 0);
+          cCtx.quadraticCurveTo(0, 0, 0, radius * 0.75);
+          cCtx.quadraticCurveTo(0, 0, -1.8 * (radius / 16), 0);
+          cCtx.fill();
+        }
+        cCtx.restore();
+      } else if (skin === 'fuego') {
+        const ballGrad = cCtx.createRadialGradient(-radius * 0.3, -radius * 0.3, radius * 0.1, 0, 0, radius);
+        ballGrad.addColorStop(0, '#fef08a');
+        ballGrad.addColorStop(0.4, '#f97316');
+        ballGrad.addColorStop(1, '#7f1d1d');
+        cCtx.fillStyle = ballGrad;
+        cCtx.beginPath();
+        cCtx.arc(0, 0, radius, 0, Math.PI * 2);
+        cCtx.fill();
 
-      ctx.strokeStyle = 'rgba(224, 242, 254, 0.5)';
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      for (let i = 0; i < 3; i++) {
-        const angle = (i / 3) * Math.PI * 2;
-        ctx.moveTo(0, 0);
-        ctx.lineTo(Math.cos(angle) * br * 0.85, Math.sin(angle) * br * 0.85);
+        cCtx.fillStyle = 'rgba(239, 68, 68, 0.45)';
+        for (let i = 0; i < 5; i++) {
+          const angle = (i / 5) * Math.PI * 2;
+          const fx = Math.cos(angle) * radius * 0.4;
+          const fy = Math.sin(angle) * radius * 0.4;
+          cCtx.beginPath();
+          cCtx.arc(fx, fy, radius * 0.28, 0, Math.PI * 2);
+          cCtx.fill();
+        }
+      } else if (skin === 'hielo') {
+        const ballGrad = cCtx.createRadialGradient(-radius * 0.35, -radius * 0.35, radius * 0.1, 0, 0, radius);
+        ballGrad.addColorStop(0, '#ffffff');
+        ballGrad.addColorStop(0.5, '#7dd3fc');
+        ballGrad.addColorStop(1, '#0c4a6e');
+        cCtx.fillStyle = ballGrad;
+        cCtx.beginPath();
+        cCtx.arc(0, 0, radius, 0, Math.PI * 2);
+        cCtx.fill();
+
+        cCtx.strokeStyle = 'rgba(224, 242, 254, 0.5)';
+        cCtx.lineWidth = 1.2 * (radius / 16);
+        cCtx.beginPath();
+        for (let i = 0; i < 3; i++) {
+          const angle = (i / 3) * Math.PI * 2;
+          cCtx.moveTo(0, 0);
+          cCtx.lineTo(Math.cos(angle) * radius * 0.85, Math.sin(angle) * radius * 0.85);
+        }
+        cCtx.stroke();
+      } else {
+        drawTricolore(cCtx, 0, 0, radius);
       }
-      ctx.stroke();
-    } else {
-      // BALÓN FREEONDA / TRICOLORE
-      drawTricolore(ctx, 0, 0, br);
+
+      // Reflejo de luz cenital común
+      const highlight = cCtx.createRadialGradient(-radius * 0.35, -radius * 0.38, 0, -radius * 0.2, -radius * 0.2, radius * 0.55);
+      highlight.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
+      highlight.addColorStop(0.4, 'rgba(255, 255, 255, 0.3)');
+      highlight.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      cCtx.fillStyle = highlight;
+      cCtx.beginPath();
+      cCtx.arc(0, 0, radius, 0, Math.PI * 2);
+      cCtx.fill();
+
+      ballSkinsCache[skin] = c;
+    });
+  }
+
+  function drawBallWithSkin(ctx, cx, cy, br, rotationAngle, skin) {
+    // Si no se ha inicializado la cache, inicializarla
+    if (Object.keys(ballSkinsCache).length === 0) {
+      inicializarCacheBalones();
     }
-
-    // Reflejo de luz cenital común
-    const highlight = ctx.createRadialGradient(-br * 0.35, -br * 0.38, 0, -br * 0.2, -br * 0.2, br * 0.55);
-    highlight.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
-    highlight.addColorStop(0.4, 'rgba(255, 255, 255, 0.3)');
-    highlight.addColorStop(1, 'rgba(255, 255, 255, 0)');
-    ctx.fillStyle = highlight;
-    ctx.beginPath();
-    ctx.arc(0, 0, br, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.restore();
+    const cacheCanvas = ballSkinsCache[skin || 'clasica'];
+    if (cacheCanvas) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(rotationAngle || 0);
+      ctx.drawImage(cacheCanvas, -br, -br, br * 2, br * 2);
+      ctx.restore();
+    } else {
+      // Fallback
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(rotationAngle || 0);
+      drawTricolore(ctx, 0, 0, br);
+      ctx.restore();
+    }
   }
 
 
@@ -24462,7 +24560,8 @@ if (player.hairType === 'rulos-cortos') {
       vientoVisible--;
       const windAlpha = Math.min(1, vientoVisible / 20);
       const windX = 200;
-      const windY = 225;
+      // Dividido por _mobZoom para convertir la altura física a coordenadas lógicas y restar 62 para centrarlo abajo del swipe-hint
+      const windY = (gameCanvas.height / _mobZoom) - 48; /* Bajado un poco más para ajuste visual perfecto */
       const windDir = vientoActual > 0 ? 1 : -1;
       const windStrength = Math.abs(vientoActual);
       const arrowLen = 20 + windStrength * 55;
@@ -24483,24 +24582,38 @@ if (player.hairType === 'rulos-cortos') {
       ctx.textBaseline = 'middle';
       ctx.fillText('💨 VIENTO', windX, windY - 3);
 
-      // Flecha de dirección
-      const arrowColor = windStrength > 0.25 ? '#fb923c' : '#38bdf8';
+      // Fluctuar levemente el viento de forma dinámica (simula ráfagas de aire)
+      const tWind = Date.now() * 0.0018;
+      const dynamicFluct = Math.sin(tWind * 1.6) * 0.025;
+      const effectiveWind = vientoActual + dynamicFluct;
+      const windDirEff = effectiveWind > 0 ? 1 : -1;
+      const windStrengthEff = Math.abs(effectiveWind);
+      
+      // Flecha de dirección animada (Wind Flow effect con guiones móviles)
+      const arrowColor = windStrengthEff > 0.25 ? '#fb923c' : '#38bdf8';
       ctx.strokeStyle = arrowColor;
       ctx.fillStyle = arrowColor;
       ctx.lineWidth = 2.5;
       ctx.lineCap = 'round';
-      const ax = windX - windDir * 16;
-      const ax2 = windX + windDir * 16;
+      const ax = windX - windDirEff * 16;
+      const ax2 = windX + windDirEff * 16;
+      
+      ctx.save();
+      // Flecha animada (desliza un patrón de guiones en dirección del viento)
+      ctx.setLineDash([5, 4]);
+      ctx.lineDashOffset = -windDirEff * (Date.now() * 0.07) % 9;
       ctx.beginPath();
       ctx.moveTo(ax, windY + 6);
       ctx.lineTo(ax2, windY + 6);
       ctx.stroke();
-      // Punta de flecha
+      ctx.restore();
+      
+      // Punta de flecha (fija en la dirección del viento)
       ctx.beginPath();
       ctx.moveTo(ax2, windY + 6);
-      ctx.lineTo(ax2 - windDir * 5, windY + 2);
+      ctx.lineTo(ax2 - windDirEff * 5, windY + 2);
       ctx.moveTo(ax2, windY + 6);
-      ctx.lineTo(ax2 - windDir * 5, windY + 10);
+      ctx.lineTo(ax2 - windDirEff * 5, windY + 10);
       ctx.stroke();
       
       ctx.restore();
@@ -25946,23 +26059,23 @@ if (player.hairType === 'rulos-cortos') {
           simVx *= (1 - airDrag);
           simVy *= (1 - airDrag * 0.7);
           
-          if (simY < 245 && simY > (GOAL_Y + 4)) {
-            const altitudeFactor = Math.max(0, (245 - simY) / 195);
+          if (simY < 262 && simY > (GOAL_Y + 4)) {
+            const altitudeFactor = Math.max(0, (262 - simY) / 212);
             let windModifier = 1.0;
             if (selectedBallSkin === 'fuego' || rachaActual >= 3) windModifier = 0.6;
             else if (selectedBallSkin === 'hielo') windModifier = 1.4;
-            simVx += vientoActual * (0.22 + altitudeFactor * 0.14) * windModifier;
+            // Aumentado para coincidir con la física real
+            simVx += vientoActual * (0.68 + altitudeFactor * 0.48) * windModifier; // Mayor influencia en predicción
           }
           
           if (simY < 220 && simY > (GOAL_Y + 12)) {
             let effComba = selectedPlayer.comba;
-            if (rachaActual >= 2) effComba = 150;
             let combaMult = 1.0;
-            if (rachaActual >= 2 || selectedBallSkin === 'hielo' || selectedBallSkin === 'oro') combaMult = 2.15;
-            if (selectedBallSkin === 'fuego' || rachaActual >= 3) combaMult = 0.45;
+            if (selectedBallSkin === 'hielo' || selectedBallSkin === 'oro') combaMult = 1.15; // Curva boosteada sutil
+            if (selectedBallSkin === 'fuego') combaMult = 0.85; // Curva reducida sutil
             const flightProgress = Math.max(0, 1 - (simY - (GOAL_Y + 12)) / 160);
-            const magnusMult = 0.85 + flightProgress * 0.65;
-            const CURVA_STRENGTH = 32;
+            const magnusMult = 0.85 + flightProgress * 0.65; // Crece hacia el arco
+            const CURVA_STRENGTH = 24; // Reducido de 32 a 24 para coincidir con la física real
             const combaFuerza = (effComba / 100) * combaMult * magnusMult * (CURVA_STRENGTH / duration);
             
             // Solo aplica curva si el jugador eligio efecto - sin efecto = flecha recta
@@ -26239,18 +26352,18 @@ if (player.hairType === 'rulos-cortos') {
         ctx.shadowColor = '#000';
         ctx.shadowBlur = 0;
         ctx.fillStyle = '#000';
-        ctx.font = '900 19px system-ui, -apple-system, sans-serif';
+        ctx.font = '900 16px system-ui, -apple-system, sans-serif'; // Reducido de 19px a 16px
         for (let ox = -2; ox <= 2; ox++) {
           for (let oy = -2; oy <= 2; oy++) {
-            if (ox !== 0 || oy !== 0) ctx.fillText('¡¡¡ATAJA EL DIBUUUU!!!', ox, oy);
+            if (ox !== 0 || oy !== 0) ctx.fillText('¡¡¡ATAJA EL DIBUUUU!!!', ox, oy, 270);
           }
         }
         // Texto rojo con glow
         ctx.shadowColor = '#ff0000';
         if (!_perfMode) { ctx.shadowBlur = 22; }
         ctx.fillStyle = '#ffffff';
-        ctx.font = '900 19px system-ui, -apple-system, sans-serif';
-        ctx.fillText('¡¡¡ATAJA EL DIBUUUU!!!', 0, 0);
+        ctx.font = '900 16px system-ui, -apple-system, sans-serif'; // Reducido de 19px a 16px
+        ctx.fillText('¡¡¡ATAJA EL DIBUUUU!!!', 0, 0, 270);
         ctx.shadowBlur = 0;
         ctx.restore();
 
@@ -26280,10 +26393,10 @@ if (player.hairType === 'rulos-cortos') {
         ctx.shadowColor = bannerColor;
         if (!_perfMode) { ctx.shadowBlur = isGol ? 14 : 7; }
         ctx.fillStyle = bannerColor;
-        ctx.font = `900 ${isGol ? 17 : 13}px system-ui, -apple-system, sans-serif`;
+        ctx.font = `900 ${isGol ? 13.5 : 11}px system-ui, -apple-system, sans-serif`; // Reducido tamaño de letra para evitar cortes
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(bannerTxt, 200, 134, 370);
+        ctx.fillText(bannerTxt, 200, 134, 270); // Reducido maxWidth de 315 a 270 para asegurar visibilidad en pantallas muy delgadas
         ctx.shadowBlur = 0;
       }
 
@@ -26375,143 +26488,7 @@ if (player.hairType === 'rulos-cortos') {
         // Cerrar el ctx.save() del translate(0, GAME_OFFSET_Y) -- tribuna expandida
     ctx.restore();
 
-    // ── NIEBLA DE BENGALAS — humo denso inmersivo SOLO EN LA TRIBUNA ──
-    if (false) {
-      // Pre-calcular capas de niebla una sola vez
-      if (!_fogLayers) {
-        _fogLayers = [];
-        // 50+ nubes de niebla con posiciones, velocidades y colores distintos (rojizo y azul dominantes)
-        const fogColors = [
-          // Rojos y rojisos (60% de las bengalas)
-          {r:255, g:30,  b:30 }, // rojo puro
-          {r:255, g:60,  b:40 }, // rojo-naranja
-          {r:220, g:20,  b:50 }, // rojo profundo
-          {r:255, g:80,  b:60 }, // rojo coral
-          {r:200, g:30,  b:30 }, // rojo oscuro
-          
-          // Azules y cian (40% de las bengalas)
-          {r:0,   g:150, b:255}, // azul cielo
-          {r:30,  g:180, b:255}, // azul claro
-          {r:0,   g:100, b:220}, // azul profundo
-          {r:50,  g:200, b:255}, // cian brillante
-        ];
-        
-        // 50 nubes en lugar de 28
-        for (let i = 0; i < 50; i++) {
-          // Ponderación: más rojos que azules
-          const col = fogColors[i % 9];
-          _fogLayers.push({
-            xBase:    10 + (i / 49) * 380,        // posición horizontal base
-            yBase:    -0.15 + (i % 7) * 0.08,     // altura relativa SOLO tribuna (negativo = arriba)
-            radius:   40 + (i % 8) * 18,          // radios más grandes: 40–184px
-            phase:    i * 0.82,                   // fase variable
-            speedX:   (0.0012 + (i % 6) * 0.0008) * (i % 2 === 0 ? 1 : -1),
-            speedY:   0.0006 + (i % 5) * 0.0004,
-            r: col.r, g: col.g, b: col.b,
-            // Más mezcla hacia el color saturado (menos gris)
-            grayMix:  0.08 + (i % 7) * 0.05,     // 0.08–0.43 (más color puro)
-          });
-        }
-      }
 
-      const canvasH = gameCanvas.height;
-      const canvasW = GAME_LOGICAL_W;
-      const tribunaBottom = canvasH * 0.35; // Límite inferior de la tribuna (donde comienza el campo)
-
-      ctx.save();
-
-      // ── Crear máscara para limitar el humo solo a la tribuna ──
-      ctx.beginPath();
-      ctx.rect(0, 0, canvasW, tribunaBottom);
-      ctx.clip();
-
-      // ── Capa base: niebla coloreada semi-permanente en la tribuna ──
-      const groundFogGrd = ctx.createLinearGradient(0, 0, 0, tribunaBottom);
-      groundFogGrd.addColorStop(0,   'rgba(200, 140, 150, 0)');
-      groundFogGrd.addColorStop(0.3, 'rgba(180, 100, 120, 0.12)');
-      groundFogGrd.addColorStop(0.65,'rgba(140, 150, 200, 0.15)');
-      groundFogGrd.addColorStop(1,   'rgba(120, 140, 200, 0.28)');
-      ctx.fillStyle = groundFogGrd;
-      ctx.fillRect(0, 0, canvasW, tribunaBottom);
-
-      // ── Niebla media: zona intermedia de la tribuna — más densa ──
-      const midFogGrd = ctx.createLinearGradient(0, 0, 0, tribunaBottom);
-      midFogGrd.addColorStop(0,   'rgba(200, 120, 140, 0)');
-      midFogGrd.addColorStop(0.35,'rgba(180, 100, 130, 0.1)');
-      midFogGrd.addColorStop(0.65,'rgba(130, 140, 200, 0.13)');
-      midFogGrd.addColorStop(1,   'rgba(110, 130, 190, 0.18)');
-      ctx.fillStyle = midFogGrd;
-      ctx.fillRect(0, 0, canvasW, tribunaBottom);
-
-      // ── Nubes individuales de humo coloreado flotando por la tribuna ──
-      for (let i = 0; i < _fogLayers.length; i++) {
-        const fl = _fogLayers[i];
-        // Movimiento orgánico: deriva lenta y oscilación suave
-        const tx = (_now * fl.speedX + fl.phase * 6.8) % (canvasW + fl.radius * 2) - fl.radius;
-        const xPos = fl.xBase + tx * 0.5 + Math.sin(_now * 0.0025 + fl.phase) * 25;
-        const yFrac = fl.yBase + Math.sin(_now * fl.speedY + fl.phase * 0.5) * 0.06;
-        const yPos = yFrac * canvasH;
-
-        // Solo dibujar si está dentro de la tribuna
-        if (yPos < tribunaBottom) {
-          // Mezclar el color de bengala con menos gris (mantener saturación)
-          const gm = fl.grayMix + Math.sin(_now * 0.003 + fl.phase) * 0.04;
-          const sr = Math.round(fl.r * (1 - gm) + 140 * gm);
-          const sg = Math.round(fl.g * (1 - gm) + 130 * gm);
-          const sb = Math.round(fl.b * (1 - gm) + 150 * gm);
-
-          // Opacidad más pronunciada para más visibilidad
-          const baseOpacity = 0.075 + Math.sin(_now * 0.004 + fl.phase * 0.7) * 0.03;
-
-          const fGrd = ctx.createRadialGradient(xPos, yPos, 0, xPos, yPos, fl.radius);
-          fGrd.addColorStop(0,   `rgba(${sr},${sg},${sb},${baseOpacity})`);
-          fGrd.addColorStop(0.45, `rgba(${sr},${sg},${sb},${baseOpacity * 0.5})`);
-          fGrd.addColorStop(1,   `rgba(${sr},${sg},${sb},0)`);
-          ctx.fillStyle = fGrd;
-          ctx.beginPath();
-          ctx.ellipse(xPos, yPos, fl.radius, fl.radius * 0.6, 0, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-
-      // ── Velo de dispersión general: solo en la tribuna ──
-      const veloDist = ctx.createLinearGradient(0, 0, 0, tribunaBottom);
-      veloDist.addColorStop(0,    'rgba(200, 120, 140, 0)');
-      veloDist.addColorStop(0.35, 'rgba(180, 100, 130, 0.05)');
-      veloDist.addColorStop(0.65, 'rgba(130, 140, 200, 0.08)');
-      veloDist.addColorStop(1,    'rgba(110, 130, 190, 0.14)');
-      ctx.fillStyle = veloDist;
-      ctx.fillRect(0, 0, canvasW, tribunaBottom);
-
-      // ── Tinte ambiental lateral: los colores de las bengalas tiñen fuertemente los bordes (tribuna) ──
-      // Izquierda: rojo intenso
-      const leftTint = ctx.createLinearGradient(0, 0, 120, 0);
-      leftTint.addColorStop(0,   `rgba(255, 40, 40, ${0.14 + Math.sin(_now * 0.006) * 0.04})`);
-      leftTint.addColorStop(0.6, `rgba(255, 80, 60, ${0.09 + Math.sin(_now * 0.006) * 0.03})`);
-      leftTint.addColorStop(1,   'rgba(255, 100, 80, 0)');
-      ctx.fillStyle = leftTint;
-      ctx.fillRect(0, 0, 120, tribunaBottom);
-
-      // Derecha: azul intenso
-      const rightTint = ctx.createLinearGradient(canvasW, 0, canvasW - 120, 0);
-      rightTint.addColorStop(0,   `rgba(30, 150, 255, ${0.14 + Math.sin(_now * 0.006 + 2) * 0.04})`);
-      rightTint.addColorStop(0.6, `rgba(60, 180, 255, ${0.09 + Math.sin(_now * 0.006 + 2) * 0.03})`);
-      rightTint.addColorStop(1,   'rgba(80, 200, 255, 0)');
-      ctx.fillStyle = rightTint;
-      ctx.fillRect(canvasW - 120, 0, 120, tribunaBottom);
-
-      // ── Capa extra: pulsos de niebla densa para efecto inmersivo (solo tribuna) ──
-      const pulseFactor = 0.5 + Math.sin(_now * 0.002) * 0.3;
-      const denseVeil = ctx.createLinearGradient(0, 0, 0, tribunaBottom);
-      denseVeil.addColorStop(0,   'rgba(150, 100, 150, 0)');
-      denseVeil.addColorStop(0.5, `rgba(140, 110, 180, ${0.05 * pulseFactor})`);
-      denseVeil.addColorStop(1,   'rgba(150, 100, 150, 0)');
-      ctx.fillStyle = denseVeil;
-      ctx.fillRect(0, 0, canvasW, tribunaBottom);
-
-      ctx.restore();
-    }
-    // ── FIN NIEBLA DE BENGALAS ──
 
     // Flash blanco breve de impacto (palo) — cubre toda la pantalla, no afectado por el shake
     if (impactFlash > 0) {
@@ -26591,6 +26568,58 @@ if (player.hairType === 'rulos-cortos') {
       } catch (e) {
         console.warn("Error mostrando video recompensado:", e);
       }
+    }
+  };
+
+  // Anuncio de transición genérico (Maneja fallback y descarte para evitar softlocks)
+  window.mostrarAdDeTransicion = function(callback) {
+    if (window.AndroidAdBridge && typeof window.AndroidAdBridge.showRewardedAd === 'function') {
+      // Registrar callback temporal de cierre
+      window.onAdClosed = function() {
+        window.onAdClosed = null;
+        if (typeof callback === 'function') callback();
+      };
+      console.log("Mostrando anuncio de transición nativo...");
+      window.AndroidAdBridge.showRewardedAd(''); // No requiere callback de recompensa
+    } else if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob) {
+      const { AdMob } = window.Capacitor.Plugins;
+      console.log("Cargando anuncio de transición (Capacitor)...");
+      AdMob.prepareInterstitial({
+        adId: 'ca-app-pub-3940256099942544/1033173712',
+        isTesting: true
+      }).then(() => {
+        AdMob.showInterstitial().finally(() => {
+          if (typeof callback === 'function') callback();
+        });
+      }).catch(() => {
+        if (typeof callback === 'function') callback();
+      });
+    } else {
+      // Simulador Web
+      console.log("Simulando anuncio de transición en navegador...");
+      const confirmar = confirm("🤖 SIMULADOR ADMOB (Transición)\n\n¿Quieres simular ver un video publicitario completo?");
+      if (typeof callback === 'function') callback();
+    }
+  };
+
+  // Envolver iniciarRondaJuego original para inyectar anuncio si se pulsa Jugar de Nuevo / Reintentar
+  window.iniciarRondaJuegoReal = window.iniciarRondaJuego;
+  window.iniciarRondaJuego = function() {
+    const gameOverOverlay = document.getElementById('gameover-overlay');
+    const isGameOverActive = gameOverOverlay && gameOverOverlay.style.display !== 'none';
+    
+    const startReal = () => {
+      if (typeof window.iniciarRondaJuegoReal === 'function') {
+        window.iniciarRondaJuegoReal();
+      }
+    };
+
+    if (isGameOverActive) {
+      // Si la pantalla de derrota está activa, es un reinicio: mostrar anuncio
+      window.mostrarAdDeTransicion(startReal);
+    } else {
+      // Lanzamiento directo desde el menú principal
+      startReal();
     }
   };
 
@@ -26701,7 +26730,12 @@ if (player.hairType === 'rulos-cortos') {
       soundVoicesDesc: "Narración de goles y atajadas.",
       soundMusic: "Música y Ambiente",
       soundMusicDesc: "Música del menú y ambiente de la tribuna.",
-      soundClose: "Guardar"
+      soundClose: "Guardar",
+      hintPatear: "Arrastrá para atrás y soltá para chutar",
+      hintPatearP1: "¡CHUTÁS VOS! Arrastrá para atrás y soltá 🚀",
+      hintP2Patea: "¡JUGADOR 2 PATEA! ¡JUGADOR 1 ATAJA!",
+      hintP1Patea: "¡JUGADOR 1 PATEA! ¡JUGADOR 2 ATAJA!",
+      hintAtajaDibu: "¡ATAJÁS VOS! Deslizá en la pantalla para mover al portero 🧤"
     },
     en: {
       selCabezon: "CHOOSE YOUR BOBBLEHEAD",
@@ -26732,7 +26766,12 @@ if (player.hairType === 'rulos-cortos') {
       soundVoicesDesc: "Voiceovers for goals and misses.",
       soundMusic: "Music & Ambient",
       soundMusicDesc: "Menu background chiptune & crowd chants.",
-      soundClose: "Save"
+      soundClose: "Save",
+      hintPatear: "Drag backwards and release to shoot",
+      hintPatearP1: "YOUR TURN TO SHOOT! Drag backwards and release 🚀",
+      hintP2Patea: "PLAYER 2 SHOOTS! PLAYER 1 SAVES!",
+      hintP1Patea: "PLAYER 1 SHOOTS! PLAYER 2 SAVES!",
+      hintAtajaDibu: "YOUR TURN TO SAVE! Swipe screen to move the goalkeeper 🧤"
     },
     it: {
       selCabezon: "SCEGLI IL TUO TESTONE",
@@ -26763,7 +26802,12 @@ if (player.hairType === 'rulos-cortos') {
       soundVoicesDesc: "Narrazione di gol e parate.",
       soundMusic: "Musica e Ambiente",
       soundMusicDesc: "Musica dei menu e cori dei tifosi.",
-      soundClose: "Salva"
+      soundClose: "Salva",
+      hintPatear: "Trascina all'indietro e rilascia per calciare",
+      hintPatearP1: "TOCCA A TE! Trascina all'indietro e rilascia 🚀",
+      hintP2Patea: "GIOCATORE 2 CALCIA! GIOCATORE 1 PARA!",
+      hintP1Patea: "GIOCATORE 1 CALCIA! GIOCATORE 2 PARA!",
+      hintAtajaDibu: "TOCCA A TE PARARE! Trascina sullo schermo per muovere il portiere 🧤"
     },
     fr: {
       selCabezon: "CHOISISSEZ VOTRE GROSSE TÊTE",
@@ -26794,7 +26838,12 @@ if (player.hairType === 'rulos-cortos') {
       soundVoicesDesc: "Récits de buts et arrêts.",
       soundMusic: "Musique et Ambiance",
       soundMusicDesc: "Musique de fond rétro et chants du public.",
-      soundClose: "Sauvegarder"
+      soundClose: "Sauvegarder",
+      hintPatear: "Glisse vers l'arrière et relâche pour tirer",
+      hintPatearP1: "À TOI DE JOUER! Glisse vers l'arrière et relâche 🚀",
+      hintP2Patea: "LE JOUEUR 2 TIRE! LE JOUEUR 1 ARRÊTE!",
+      hintP1Patea: "LE JOUEUR 1 TIRE! LE JOUEUR 2 ARRÊTE!",
+      hintAtajaDibu: "À TOI D'ARRÊTER! Glisse sur l'écran pour déplacer le gardien 🧤"
     },
     pt: {
       selCabezon: "SELECIONE SEU CABEÇUDO",
@@ -26825,7 +26874,12 @@ if (player.hairType === 'rulos-cortos') {
       soundVoicesDesc: "Narrações de gols e defesas.",
       soundMusic: "Música e Ambiente",
       soundMusicDesc: "Música do menu e ambiente de torcida.",
-      soundClose: "Salvar"
+      soundClose: "Salvar",
+      hintPatear: "Arraste para trás e solte para chutar",
+      hintPatearP1: "SUA VEZ DE CHUTAR! Arraste para trás e solte 🚀",
+      hintP2Patea: "JOGADOR 2 CHUTA! JOGADOR 1 DEFENDE!",
+      hintP1Patea: "JOGADOR 1 CHUTA! JOGADOR 2 DEFENDE!",
+      hintAtajaDibu: "SUA VEZ DE DEFENDER! Deslize na tela para mover o goleiro 🧤"
     }
   };
 
