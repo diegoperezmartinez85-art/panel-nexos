@@ -21352,6 +21352,7 @@ window.iniciarEstadioJuego = function() {
   let _torneoYaAvanzado = false;
 
   function finalizarRondaJuego(penalesVictoria) {
+    const t = translations[currentLang] || translations.es;
     // Incrementar cantidad de partidos en el historial
     statsPartidos++;
     localStorage.setItem('nx_stats_partidos', statsPartidos);
@@ -21379,7 +21380,6 @@ window.iniciarEstadioJuego = function() {
       }
       triggerHaptic('heavy');
       
-      const t = translations[currentLang] || translations.es;
       const titleEl = document.querySelector('.gameover-title');
       if (titleEl) {
         titleEl.innerText = penalesVictoria ? (t.winTitle || '🏆 ¡VICTORIA! 🏆') : (t.lossTitle || '😞 DERROTA 😞');
@@ -21531,7 +21531,6 @@ window.iniciarEstadioJuego = function() {
     triggerHaptic('heavy');
     
     const timeTaken = parseFloat(((Date.now() - roundStartTime) / 1000).toFixed(1));
-    const t = translations[currentLang] || translations.es;
     
     // Configurar textos y botones según idioma
     const primaryBtn = document.getElementById('gameover-btn-primary');
