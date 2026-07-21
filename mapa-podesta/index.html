@@ -26374,7 +26374,7 @@ if (player.hairType === 'rulos-cortos') {
 
     // 6. DIBUJAR AL TIRADOR SELECCIONADO AL PIE DE LA PELOTA (El Mesías con barba, etc.)
     let tiradorADibujar = selectedPlayer;
-    if ((gameMode === 'penales' || gameMode === 'local2p') && penalesTurno === 'defensa') {
+    if ((gameMode === 'penales' || gameMode === 'local2p' || gameMode === 'online') && penalesTurno === 'defensa') {
       tiradorADibujar = cpuTirador || selectedPlayer;
     }
     const isLeftFooted = ['mesias', 'yamalisimo', 'maradonuts', 'hajalan', 'lakaka'].includes(tiradorADibujar.id);
@@ -27642,6 +27642,7 @@ if (player.hairType === 'rulos-cortos') {
         pais: selectedPlayer ? selectedPlayer.pais : 'Mundo 🌐',
         flag: selectedPlayer ? selectedPlayer.flag : '🌐',
         salaPropia: `sala-partido-${myOnlineClientId}`,
+        playerId: selectedPlayer ? selectedPlayer.id : 'mesias',
         onlineStats: { played: onlinePlayed, won: onlineWon, lost: onlineLost }
       }, (err) => {
         if (err) {
@@ -27714,7 +27715,8 @@ if (player.hairType === 'rulos-cortos') {
         nombre: onlineUsername,
         pais: selectedPlayer ? selectedPlayer.pais : 'Mundo 🌐',
         flag: selectedPlayer ? selectedPlayer.flag : '🌐',
-        onlineStats: { played: onlinePlayed, won: onlineWon, lost: onlineLost }
+        onlineStats: { played: onlinePlayed, won: onlineWon, lost: onlineLost },
+        playerId: selectedPlayer ? selectedPlayer.id : 'mesias'
       });
     }
     
@@ -27722,17 +27724,15 @@ if (player.hairType === 'rulos-cortos') {
     // miRolOnline es el rol del JUGADOR LOCAL en el TURNO ACTUAL
     miRolOnline = isHost ? 'chute' : 'defensa';
     
-    // Configurar rival para display
-    cpuTirador = {
-      id: 'rival',
-      nombre: partnerData.nombre.toUpperCase(),
-      pais: partnerData.pais,
-      flag: partnerData.flag || '🌐',
-      skin: '#f5d0a9',
-      hair: '#1a0f00',
-      jersey: ['#1e293b', '#1e293b'],
-      onlineStats: partnerData.onlineStats || { played: 0, won: 0, lost: 0 }
-    };
+    // Configurar rival para display clonando al personaje seleccionado por el rival
+    const rivalId = partnerData.playerId || 'romaldinho';
+    const foundRival = MUNDIAL_JUGADORES.find(p => p.id === rivalId) || MUNDIAL_JUGADORES[0];
+    
+    cpuTirador = JSON.parse(JSON.stringify(foundRival));
+    cpuTirador.nombre = partnerData.nombre.toUpperCase();
+    cpuTirador.pais = partnerData.pais;
+    cpuTirador.flag = partnerData.flag || '🌐';
+    cpuTirador.onlineStats = partnerData.onlineStats || { played: 0, won: 0, lost: 0 };
     
     penalesArqueroCpu = obtenerArqueroPorJugador(cpuTirador);
     penalesArqueroUser = obtenerArqueroPorJugador(selectedPlayer);
