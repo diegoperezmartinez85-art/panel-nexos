@@ -5267,6 +5267,15 @@
         </div>
       </div>
       
+      <!-- Selector de Modalidad Online -->
+      <div style="margin-bottom: 16px;">
+        <div style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Modalidad Online</div>
+        <div style="display: flex; gap: 8px;">
+          <button id="submode-btn-penales" onclick="seleccionarSubModoOnline('penales')" style="flex: 1; background: rgba(6, 182, 212, 0.25); border: 2px solid #06b6d4; color: #fff; font-weight: 900; font-size: 11px; padding: 10px 4px; border-radius: 12px; cursor: pointer; transition: all 0.2s; -webkit-tap-highlight-color: transparent;">🎯 Penales 11m</button>
+          <button id="submode-btn-tiroslibres" onclick="seleccionarSubModoOnline('tiros_libres')" style="flex: 1; background: rgba(255, 255, 255, 0.05); border: 1.5px solid rgba(255, 255, 255, 0.15); color: #94a3b8; font-weight: 800; font-size: 11px; padding: 10px 4px; border-radius: 12px; cursor: pointer; transition: all 0.2s; -webkit-tap-highlight-color: transparent;">⚽ Tiros Libres 25m</button>
+        </div>
+      </div>
+
       <!-- Input de Nombre -->
       <input type="text" id="online-username-input" maxlength="12" placeholder="Apodo de Leyenda..." style="width: 100%; padding: 12px 16px; border-radius: 12px; background: rgba(9, 9, 11, 0.95); border: 2px solid rgba(6, 182, 212, 0.4); color: #fff; text-align: center; font-size: 13px; font-weight: bold; outline: none; margin-bottom: 20px; transition: all 0.2s; box-sizing: border-box;" onfocus="this.style.borderColor='#06b6d4'; this.style.boxShadow='0 0 10px rgba(6,182,212,0.2)';" onblur="this.style.borderColor='rgba(6,182,212,0.4)'; this.style.boxShadow='none';">
       
@@ -5364,7 +5373,17 @@
   <div id="modal-atajada-secreta" style="display: none; position: fixed; inset: 0; background: rgba(9, 9, 11, 0.96); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
     <div style="width: 90%; max-width: 320px; background: #18181b; border: 2px solid #a855f7; border-radius: 16px; padding: 22px; box-shadow: 0 0 25px rgba(168, 85, 247, 0.25); text-align: center; color: #fff; font-family: system-ui, -apple-system, sans-serif; box-sizing: border-box;">
       <h3 style="margin-top: 0; color: #c084fc; font-size: 15px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;" id="local2p-arquero-title">👥 ARQUERO: ELEGÍ TU ATAJADA</h3>
-      <p style="font-size: 11px; color: #a1a1aa; margin: 10px 0 20px 0; line-height: 1.4;" id="local2p-arquero-desc">Elegí hacia dónde saltará el arquero en secreto antes del disparo de tu rival.</p>
+      <p style="font-size: 11px; color: #a1a1aa; margin: 10px 0 14px 0; line-height: 1.4;" id="local2p-arquero-desc">Elegí hacia dónde saltará el arquero en secreto antes del disparo de tu rival.</p>
+
+      <!-- Control de Barrera Online (Solo en modo Tiros Libres) -->
+      <div id="online-barrier-controls" style="display: none; margin-bottom: 16px; background: rgba(0,0,0,0.35); border: 1px solid rgba(168,85,247,0.3); border-radius: 12px; padding: 10px;">
+        <div style="font-size: 10px; font-weight: 900; color: #fbbf24; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">🛡️ ACOMODAR BARRERA DE DEFENSOR ES</div>
+        <div style="display: flex; gap: 8px; align-items: center; justify-content: center;">
+          <button onclick="ajustarBarreraOnline(-20)" style="background: rgba(168,85,247,0.25); border: 1.5px solid #c084fc; color: #fff; border-radius: 8px; padding: 7px 12px; font-weight: 900; font-size: 11px; cursor: pointer; -webkit-tap-highlight-color: transparent;">⬅️ Izq</button>
+          <span id="online-barrier-label" style="font-size: 10.5px; color: #e9d5ff; font-weight: 800; width: 85px; text-align: center;">Centro</span>
+          <button onclick="ajustarBarreraOnline(20)" style="background: rgba(168,85,247,0.25); border: 1.5px solid #c084fc; color: #fff; border-radius: 8px; padding: 7px 12px; font-weight: 900; font-size: 11px; cursor: pointer; -webkit-tap-highlight-color: transparent;">Der ➡️</button>
+        </div>
+      </div>
       
       <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 20px;">
         <button id="atajada-btn-izq" onclick="seleccionarAtajadaSecreta(-1)" style="flex: 1; background: rgba(239, 68, 68, 0.12); border: 1.5px solid rgba(239, 68, 68, 0.4); color: #f87171; font-weight: 900; padding: 12px 0; border-radius: 10px; cursor: pointer; transition: all 0.2s; font-size: 10px; text-transform: uppercase;">⬅️ Izquierda</button>
@@ -10372,7 +10391,11 @@
   let statsGanados = parseInt(localStorage.getItem('nx_stats_ganados') || '0');
   let statsPartidos = parseInt(localStorage.getItem('nx_stats_partidos') || '0');
   let local2pGoalieSelection = 0;
-  let miRolOnline = 'chute'; // Rol del jugador local en el turno actual del modo online
+  let miRolOnline = 'chute';
+  window.onlineSubMode = 'penales'; // 'penales' o 'tiros_libres'
+  window.onlineBarrierOffset = 0;
+  window.onlineBarrierBaseX = 200;
+  window.onlineReceivedBarrierOffset = 0; // Rol del jugador local en el turno actual del modo online
   let isSnowyClima = false;
   let currentScore = 0;
   let remainingShots = 5;
@@ -10940,6 +10963,13 @@
     if (btnDer) btnDer.innerText = `${t.der || 'Derecha'} ➡️`;
     isAiming = false; // Bloquear apuntado
     document.getElementById('modal-atajada-secreta').style.display = 'flex';
+    const bCtrl = document.getElementById('online-barrier-controls');
+    if (bCtrl) {
+      bCtrl.style.display = (gameMode === 'online' && window.onlineSubMode === 'tiros_libres') ? 'block' : 'none';
+      window.onlineBarrierOffset = 0;
+      const lbl = document.getElementById('online-barrier-label');
+      if (lbl) lbl.innerText = 'Centro';
+    }
   }
 
   window.seleccionarAtajadaSecreta = function(dir) {
@@ -10960,7 +10990,7 @@
       
       // Notificar al rival que el ARQUERO ya eligió → el rival (pateador) queda habilitado
       if (window.onlineChannel) {
-        window.onlineChannel.publish('atajada_ok', { senderId: myOnlineClientId, dir: dir });
+        window.onlineChannel.publish('atajada_ok', { senderId: myOnlineClientId, dir: dir, barrierOffset: window.onlineBarrierOffset || 0 });
       }
       
       const t = translations[currentLang] || translations.es;
@@ -12450,6 +12480,50 @@
     }).join('');
   }
 
+  
+  window.seleccionarSubModoOnline = function(mode) {
+    window.onlineSubMode = mode;
+    const btnP = document.getElementById('submode-btn-penales');
+    const btnTL = document.getElementById('submode-btn-tiroslibres');
+    if (btnP && btnTL) {
+      if (mode === 'tiros_libres') {
+        btnTL.style.background = 'rgba(6, 182, 212, 0.25)';
+        btnTL.style.borderColor = '#06b6d4';
+        btnTL.style.color = '#fff';
+        btnTL.style.fontWeight = '900';
+        btnP.style.background = 'rgba(255, 255, 255, 0.05)';
+        btnP.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+        btnP.style.color = '#94a3b8';
+        btnP.style.fontWeight = '800';
+      } else {
+        btnP.style.background = 'rgba(6, 182, 212, 0.25)';
+        btnP.style.borderColor = '#06b6d4';
+        btnP.style.color = '#fff';
+        btnP.style.fontWeight = '900';
+        btnTL.style.background = 'rgba(255, 255, 255, 0.05)';
+        btnTL.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+        btnTL.style.color = '#94a3b8';
+        btnTL.style.fontWeight = '800';
+      }
+    }
+    triggerHaptic('soft');
+  };
+
+  window.ajustarBarreraOnline = function(delta) {
+    window.onlineBarrierOffset = Math.max(-40, Math.min(40, (window.onlineBarrierOffset || 0) + delta));
+    const lbl = document.getElementById('online-barrier-label');
+    if (lbl) {
+      if (window.onlineBarrierOffset < 0) {
+        lbl.innerText = window.onlineBarrierOffset <= -40 ? '← Máx Izq' : '← Cubrir Izq';
+      } else if (window.onlineBarrierOffset > 0) {
+        lbl.innerText = window.onlineBarrierOffset >= 40 ? 'Máx Der →' : 'Cubrir Der →';
+      } else {
+        lbl.innerText = 'Centro';
+      }
+    }
+    triggerHaptic('soft');
+  };
+
   window.initMundial = function() {
     actualizarMonedasDisplay();
     renderPlayersList();
@@ -12806,6 +12880,13 @@
     if (btnDer) btnDer.innerText = `${t.der || 'Derecha'} ➡️`;
     isAiming = false; // Bloquear apuntado
     document.getElementById('modal-atajada-secreta').style.display = 'flex';
+    const bCtrl = document.getElementById('online-barrier-controls');
+    if (bCtrl) {
+      bCtrl.style.display = (gameMode === 'online' && window.onlineSubMode === 'tiros_libres') ? 'block' : 'none';
+      window.onlineBarrierOffset = 0;
+      const lbl = document.getElementById('online-barrier-label');
+      if (lbl) lbl.innerText = 'Centro';
+    }
   }
 
   window.seleccionarAtajadaSecreta = function(dir) {
@@ -12826,7 +12907,7 @@
       
       // Notificar al rival que el ARQUERO ya eligió → el rival (pateador) queda habilitado
       if (window.onlineChannel) {
-        window.onlineChannel.publish('atajada_ok', { senderId: myOnlineClientId, dir: dir });
+        window.onlineChannel.publish('atajada_ok', { senderId: myOnlineClientId, dir: dir, barrierOffset: window.onlineBarrierOffset || 0 });
       }
       
       const t = translations[currentLang] || translations.es;
@@ -18331,7 +18412,10 @@ window.iniciarEstadioJuego = function() {
     }
     
     // Elegir arquero y defensores al azar de forma dinámica
-    const otros = MUNDIAL_JUGADORES.filter(p => p.id !== selectedPlayer.id);
+    const otros = MUNDIAL_JUGADORES.filter(p => p.id !== (selectedPlayer ? selectedPlayer.id : ''));
+    if (!defensorJugador || typeof defensorJugador === 'undefined') {
+      defensorJugador = otros.length > 0 ? otros[0] : MUNDIAL_JUGADORES[0];
+    }
     if (gameMode === 'penales') {
       arqueroJugador = penalesArqueroCpu ? JSON.parse(JSON.stringify(penalesArqueroCpu)) : obtenerArqueroPorJugador(MUNDIAL_JUGADORES[0]);
     } else {
@@ -18439,8 +18523,54 @@ window.iniciarEstadioJuego = function() {
         
         const tiradorActual = (miRolOnline === 'chute') ? selectedPlayer : cpuTirador;
         const isLeftFooted = ['mesias', 'yamalisimo', 'maradonuts', 'hajalan', 'lakaka'].includes(tiradorActual ? tiradorActual.id : '');
-        playerX = isLeftFooted ? 218 : 150;
-        playerY = 242;
+        
+        // ── CONFIGURACIÓN ONLINE (POSICIONES DINÁMICAS DE TIRO LIBRE Y BARRERA ALINEADA) ──
+        vientoActual = 0;
+        vientoVisible = 0;
+        
+        if (window.onlineSubMode === 'tiros_libres') {
+          const roundNum = penalesRondaActual || 1;
+          const posIdx = ((roundNum - 1) % 5) + 1;
+          
+          let startX = 200, startY = 250, barrierBaseX = 200, barrierY = 155;
+          if (posIdx === 1) {
+            // Ronda 1: Frontal directo (20m)
+            startX = 200; startY = 248; barrierBaseX = 200; barrierY = 155;
+          } else if (posIdx === 2) {
+            // Ronda 2: Escorado Izquierda (24m - ideal zurdo)
+            startX = 148; startY = 260; barrierBaseX = 165; barrierY = 160;
+          } else if (posIdx === 3) {
+            // Ronda 3: Escorado Derecha (24m - ideal diestro)
+            startX = 252; startY = 260; barrierBaseX = 235; barrierY = 160;
+          } else if (posIdx === 4) {
+            // Ronda 4: Bomba Lejana (28m)
+            startX = 200; startY = 275; barrierBaseX = 200; barrierY = 172;
+          } else {
+            // Ronda 5: Ángulo Imposible Cerca del Área (18m)
+            startX = 130; startY = 238; barrierBaseX = 145; barrierY = 148;
+          }
+          
+          pelota.x = startX;
+          pelota.y = startY;
+          window.onlineBarrierBaseX = barrierBaseX;
+          
+          playerX = startX + (isLeftFooted ? 18 : -18);
+          playerY = startY - 8;
+          
+          const offset = window.onlineReceivedBarrierOffset || 0;
+          const finalB = barrierBaseX + offset;
+          defensores = [
+            { x: finalB - 22, y: barrierY + 5, r: 8.5, targetY: barrierY + 5, vy: 0, baseX: finalB - 22 },
+            { x: finalB,      y: barrierY,     r: 8.5, targetY: barrierY,     vy: 0, baseX: finalB },
+            { x: finalB + 22, y: barrierY + 5, r: 8.5, targetY: barrierY + 5, vy: 0, baseX: finalB + 22 }
+          ];
+        } else {
+          pelota.x = 200;
+          pelota.y = 260;
+          playerX = isLeftFooted ? 218 : 150;
+          playerY = 242;
+          defensores = [];
+        }
         penalesCPUPreparando = false;
         
         // Guardar snapshot del rol para este turno (usado en puntuación al settlear)
@@ -27318,7 +27448,9 @@ if (player.hairType === 'rulos-cortos') {
         pais: selectedPlayer ? selectedPlayer.pais : 'Mundo 🌐',
         flag: selectedPlayer ? selectedPlayer.flag : '🌐',
         salaPropia: `sala-partido-${myOnlineClientId}`,
+        subMode: window.onlineSubMode || 'penales',
         playerId: selectedPlayer ? selectedPlayer.id : 'mesias',
+        playerData: selectedPlayer ? JSON.parse(JSON.stringify(selectedPlayer)) : null,
         onlineStats: { played: onlinePlayed, won: onlineWon, lost: onlineLost }
       }, (err) => {
         if (err) {
@@ -27337,7 +27469,8 @@ if (player.hairType === 'rulos-cortos') {
           }
           
           // Filtrar rivales (excluirnos)
-          const otherMembers = members.filter(m => m.clientId !== myOnlineClientId);
+          const mySub = window.onlineSubMode || 'penales';
+          const otherMembers = members.filter(m => m.clientId !== myOnlineClientId && (m.data.subMode || 'penales') === mySub);
           
           if (otherMembers.length > 0) {
             // ¡Encontramos a alguien esperando! Nos unimos a su sala
@@ -27392,7 +27525,9 @@ if (player.hairType === 'rulos-cortos') {
         pais: selectedPlayer ? selectedPlayer.pais : 'Mundo 🌐',
         flag: selectedPlayer ? selectedPlayer.flag : '🌐',
         onlineStats: { played: onlinePlayed, won: onlineWon, lost: onlineLost },
-        playerId: selectedPlayer ? selectedPlayer.id : 'mesias'
+        subMode: window.onlineSubMode || 'penales',
+        playerId: selectedPlayer ? selectedPlayer.id : 'mesias',
+        playerData: selectedPlayer ? JSON.parse(JSON.stringify(selectedPlayer)) : null
       });
     }
     
@@ -27402,7 +27537,12 @@ if (player.hairType === 'rulos-cortos') {
     
     // Configurar rival para display clonando al personaje seleccionado por el rival
     const rivalId = partnerData.playerId || 'romaldinho';
-    const foundRival = MUNDIAL_JUGADORES.find(p => p.id === rivalId) || MUNDIAL_JUGADORES[0];
+    let foundRival = null;
+    if (partnerData.playerData && (partnerData.playerData.id === 'custom_legend' || partnerData.playerId === 'custom_legend')) {
+      foundRival = JSON.parse(JSON.stringify(partnerData.playerData));
+    } else {
+      foundRival = MUNDIAL_JUGADORES.find(p => p.id === rivalId) || MUNDIAL_JUGADORES[0];
+    }
     
     cpuTirador = JSON.parse(JSON.stringify(foundRival));
     cpuTirador.nombre = partnerData.nombre.toUpperCase();
@@ -27439,6 +27579,24 @@ if (player.hairType === 'rulos-cortos') {
       window.rivalLastAtajada = msg.data; // dir: -1|0|1
       window.onlineEstadoTurno = 'pateador_puede_patear';
       window.onlinePateadorBloqueado = false;
+      window.onlineReceivedBarrierOffset = msg.data.barrierOffset || 0;
+      if (window.onlineSubMode === 'tiros_libres') {
+        const roundNum = penalesRondaActual || 1;
+        const posIdx = ((roundNum - 1) % 5) + 1;
+        let barrierBaseX = 200, barrierY = 155;
+        if (posIdx === 1) { barrierBaseX = 200; barrierY = 155; }
+        else if (posIdx === 2) { barrierBaseX = 165; barrierY = 160; }
+        else if (posIdx === 3) { barrierBaseX = 235; barrierY = 160; }
+        else if (posIdx === 4) { barrierBaseX = 200; barrierY = 172; }
+        else { barrierBaseX = 145; barrierY = 148; }
+        
+        const finalB = barrierBaseX + window.onlineReceivedBarrierOffset;
+        defensores = [
+          { x: finalB - 22, y: barrierY + 5, r: 8.5, targetY: barrierY + 5, vy: 0, baseX: finalB - 22 },
+          { x: finalB,      y: barrierY,     r: 8.5, targetY: barrierY,     vy: 0, baseX: finalB },
+          { x: finalB + 22, y: barrierY + 5, r: 8.5, targetY: barrierY + 5, vy: 0, baseX: finalB + 22 }
+        ];
+      }
       
       // Ocultar overlay de espera
       const waitingShooter = document.getElementById('online-waiting-shooter');
@@ -27534,6 +27692,7 @@ if (player.hairType === 'rulos-cortos') {
       actualizarTVMarcador();
       
       requestAnimationFrame(() => {
+        gameMode = 'online';
         initCanvas();
         iniciarRondaJuego();
       });
@@ -27902,8 +28061,8 @@ if (player.hairType === 'rulos-cortos') {
       postBounceIn: postBounceIn,
       ballSpinX: 0,
       ballSpinY: 0,
-      startX: 200,
-      startY: 260,
+      startX: pelota.x,
+      startY: pelota.y,
       zeroGravityBendDir: 0
     };
     
