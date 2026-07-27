@@ -4820,8 +4820,8 @@
 </div>
 
 <!-- MODAL EDITOR DE LEYENDA (CREAR O EDITAR JUGADOR) -->
-<div id="futbol-editor-overlay" style="display: none; position: fixed; inset: 0; background: rgba(9, 9, 12, 0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 9990; align-items: center; justify-content: center; padding: 15px; box-sizing: border-box; font-family: 'Outfit', sans-serif;">
-  <div class="editor-modal-box" style="background: rgba(18, 18, 24, 0.94); border: 2px solid rgba(168, 85, 247, 0.5); border-radius: 24px; width: 100%; max-width: 440px; box-shadow: 0 15px 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(168, 85, 247, 0.25); display: flex; flex-direction: column; overflow: hidden; padding: 20px; box-sizing: border-box; gap: 14px; max-height: 92vh;">
+<div id="futbol-editor-overlay" style="display: none; position: fixed; inset: 0; background: rgba(9, 9, 12, 0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 9990; flex-direction: column; align-items: center; justify-content: center; padding: 12px; box-sizing: border-box; font-family: 'Outfit', sans-serif; overflow-y: auto;">
+  <div class="editor-modal-box" style="background: rgba(18, 18, 24, 0.96); border: 2px solid rgba(168, 85, 247, 0.5); border-radius: 20px; width: 94%; max-width: 440px; box-shadow: 0 15px 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(168, 85, 247, 0.25); display: flex; flex-direction: column; overflow: hidden; padding: 16px; box-sizing: border-box; gap: 10px; max-height: 90vh; margin: auto;">
     
     <!-- Header -->
     <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1.5px solid rgba(168, 85, 247, 0.25); padding-bottom: 10px;">
@@ -4863,19 +4863,29 @@
         </div>
       </div>
 
-      <!-- Apariencia Física -->
-      <div style="display: flex; flex-direction: column; gap: 10px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); padding: 12px; border-radius: 16px;">
+      <!-- Selector de Pestañas de Edición -->
+      <div style="display: flex; background: rgba(0,0,0,0.4); border-radius: 12px; padding: 3px; gap: 4px; border: 1px solid rgba(255,255,255,0.06);">
+        <button id="editor-tab-btn-1" onclick="switchEditorTab(1)" style="flex: 1; background: rgba(168, 85, 247, 0.3); border: 1.5px solid #c084fc; color: #fff; border-radius: 9px; padding: 6px 0; font-weight: 900; font-size: 10.5px; cursor: pointer; -webkit-tap-highlight-color: transparent;">👤 JUGADOR</button>
+        <button id="editor-tab-btn-2" onclick="switchEditorTab(2)" style="flex: 1; background: transparent; border: 1.5px solid transparent; color: #94a3b8; border-radius: 9px; padding: 6px 0; font-weight: 800; font-size: 10.5px; cursor: pointer; -webkit-tap-highlight-color: transparent;">👕 UNIFORME</button>
+        <button id="editor-tab-btn-3" onclick="switchEditorTab(3)" style="flex: 1; background: transparent; border: 1.5px solid transparent; color: #94a3b8; border-radius: 9px; padding: 6px 0; font-weight: 800; font-size: 10.5px; cursor: pointer; -webkit-tap-highlight-color: transparent;">📈 STATS</button>
+      </div>
+
+      <!-- PESTAÑA 1: APARIENCIA FÍSICA Y CABELLO -->
+      <div id="editor-tab-1" style="display: flex; flex-direction: column; gap: 10px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); padding: 12px; border-radius: 16px;">
+        <div id="editor-special-lock-badge" style="display: none; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 8px; padding: 6px 10px; color: #c084fc; font-size: 10px; font-weight: 800; text-align: center;">
+          🔒 Aspecto y rostro oficial del personaje especial activo (solo editable en Humano Normal)
+        </div>
         <div style="font-size: 10px; font-weight: 900; color: #c084fc; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 2px;">⚡ APARIENCIA FÍSICA</div>
         
         <!-- Piel -->
         <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px;">
           <span style="font-weight: 800; color: #d1d5db;">Color de Piel</span>
           <div style="display: flex; gap: 6px;">
-            <button onclick="setEditorSkin('#ffedd5', this)" class="skin-btn selected" style="width: 20px; height: 20px; border-radius: 50%; background: #ffedd5; border: 2px solid white; cursor: pointer; outline: none; transition: transform 0.1s;"></button>
-            <button onclick="setEditorSkin('#fed7aa', this)" class="skin-btn" style="width: 20px; height: 20px; border-radius: 50%; background: #fed7aa; border: 2px solid transparent; cursor: pointer; outline: none; transition: transform 0.1s;"></button>
-            <button onclick="setEditorSkin('#b45309', this)" class="skin-btn" style="width: 20px; height: 20px; border-radius: 50%; background: #b45309; border: 2px solid transparent; cursor: pointer; outline: none; transition: transform 0.1s;"></button>
-            <button onclick="setEditorSkin('#78350f', this)" class="skin-btn" style="width: 20px; height: 20px; border-radius: 50%; background: #78350f; border: 2px solid transparent; cursor: pointer; outline: none; transition: transform 0.1s;"></button>
-            <button onclick="setEditorSkin('#4a3319', this)" class="skin-btn" style="width: 20px; height: 20px; border-radius: 50%; background: #4a3319; border: 2px solid transparent; cursor: pointer; outline: none; transition: transform 0.1s;"></button>
+            <button onclick="setEditorSkin('#ffedd5', this)" class="skin-btn selected" style="width: 20px; height: 20px; border-radius: 50%; background: #ffedd5; border: 2px solid white; cursor: pointer; outline: none;"></button>
+            <button onclick="setEditorSkin('#fed7aa', this)" class="skin-btn" style="width: 20px; height: 20px; border-radius: 50%; background: #fed7aa; border: 2px solid transparent; cursor: pointer; outline: none;"></button>
+            <button onclick="setEditorSkin('#b45309', this)" class="skin-btn" style="width: 20px; height: 20px; border-radius: 50%; background: #b45309; border: 2px solid transparent; cursor: pointer; outline: none;"></button>
+            <button onclick="setEditorSkin('#78350f', this)" class="skin-btn" style="width: 20px; height: 20px; border-radius: 50%; background: #78350f; border: 2px solid transparent; cursor: pointer; outline: none;"></button>
+            <button onclick="setEditorSkin('#4a3319', this)" class="skin-btn" style="width: 20px; height: 20px; border-radius: 50%; background: #4a3319; border: 2px solid transparent; cursor: pointer; outline: none;"></button>
           </div>
         </div>
 
@@ -4935,20 +4945,208 @@
           </select>
         </div>
 
-        <!-- Camiseta Colores (Jersey) -->
-        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px;">
-          <span style="font-weight: 800; color: #d1d5db;">Camiseta</span>
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <input type="color" id="editor-jersey-1" value="#a855f7" style="width: 26px; height: 20px; border: none; padding: 0; background: transparent; cursor: pointer; outline: none;" onchange="actualizarEditorPreview()">
-            <span style="color: #a1a1aa; font-weight: 800;">y</span>
-            <input type="color" id="editor-jersey-2" value="#ffffff" style="width: 26px; height: 20px; border: none; padding: 0; background: transparent; cursor: pointer; outline: none;" onchange="actualizarEditorPreview()">
+        <!-- Tatuajes -->
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-weight: 800; color: #d1d5db; font-size: 11px;">Tatuajes de Leyenda</span>
+          <select id="editor-tattoo-type" style="background: #18181b; border: 1.5px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 6px 10px; font-weight: 750; font-size: 11.5px; width: 100%; outline: none; cursor: pointer;" onchange="actualizarEditorPreview()">
+            <option value="none">Sin Tatuajes (Limpio)</option>
+            <option value="sleeve">Manga Completa en Brazo</option>
+            <option value="neck">Tatuaje en Cuello y Nuca</option>
+            <option value="both">Manga Doble Salvaje</option>
+          </select>
+        </div>
+
+        <!-- Máscaras y Apariencias Especiales -->
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 800; color: #d1d5db; font-size: 11px;">Máscara / Disfraz Especial</span>
+            <span style="font-size: 10px; font-weight: 900; color: #fbbf24;">🪙 250 c/u</span>
+          </div>
+          <div style="display: flex; gap: 6px; align-items: center; width: 100%;">
+            <select id="editor-mask-type" style="background: #18181b; border: 1.5px solid rgba(168,85,247,0.3); border-radius: 8px; color: white; padding: 5px 6px; font-weight: 800; font-size: 10.5px; flex: 1; min-width: 0; outline: none; cursor: pointer;" onchange="handleEditorMaskChange()">
+              <option value="none">👤 Humano Normal (Gratis)</option>
+              <option value="spidey">🕷️ Héroe Arácnido</option>
+              <option value="batman">🦇 Caballero Murciélago</option>
+              <option value="zombie">🧟 Zombi Infectado</option>
+              <option value="goat">🐐 Cabra Dorada</option>
+              <option value="alien">👽 Alienígena Cósmico</option>
+              <option value="skeleton">💀 Calavera Esqueleto</option>
+              <option value="cyborg">🤖 Androide Cyborg</option>
+              <option value="jason">🏒 Asesino Hockey Slasher</option>
+              <option value="scream">😱 Espectro Fantasma Grito</option>
+              <option value="scorpion">🦂 Ninja Fuego Escorpión</option>
+              <option value="subzero">❄️ Ninja Hielo Sub-Cero</option>
+              <option value="reptile">🦎 Ninja Reptil</option>
+              <option value="smoke">💨 Ninja Humo</option>
+              <option value="mj_thriller">🕺 Rey del Pop Zombie</option>
+              <option value="rambo">🎖️ Comando Superviviente</option>
+              <option value="terminator">🕶️ Cyber Destructor T-800</option>
+              <option value="omniman">👨‍✈️ Supremo Invencible</option>
+              <option value="thor">⚡ Dios del Trueno</option>
+              <option value="ironman">🚀 Héroe de Hierro</option>
+            <option value="superman">🦸 Super Héroe de Acero</option>
+            </select>
+            <button id="editor-mask-unlock-btn" onclick="comprarMascaraSeleccionada()" style="display: none; background: linear-gradient(135deg, #f59e0b, #d97706); border: none; border-radius: 8px; color: #fff; font-weight: 900; font-size: 10px; padding: 5px 8px; cursor: pointer; white-space: nowrap; flex-shrink: 0;">🔓 Comprar 🪙250</button>
+          </div>
+          <button id="editor-combo-pack-btn" onclick="comprarPackPersonajeCompleto()" style="display: none; width: 100%; background: linear-gradient(135deg, #8b5cf6, #6d28d9); border: 1.5px solid #a78bfa; border-radius: 9px; color: #fff; font-weight: 900; font-size: 10.5px; padding: 7px 10px; cursor: pointer; text-align: center; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4); margin-top: 4px;">⚡ COMPRAR PACK PERSONAJE COMPLETO (MÁSCARA + TRAJE) 🪙350 (¡Ahorrá 🪙100!)</button>
+        </div>
+      </div>
+
+      <!-- PESTAÑA 2: UNIFORME, MODELOS, DORSAL Y BOTINES -->
+      <div id="editor-tab-2" style="display: none; flex-direction: column; gap: 9px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); padding: 12px; border-radius: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-size: 11px; font-weight: 900; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px;">🚀 DESBLOQUEÁ EQUIPACIONES EXCLUSIVAS (🪙200)</span>
+            <span style="font-size: 9.5px; font-weight: 800; color: #cbd5e1;">Elegí camisetas de clubes o trajes especiales para desbloquear:</span>
+          </div>
+          <button onclick="toggleEditorPreviewBackView()" style="background: rgba(168, 85, 247, 0.2); border: 1px solid #c084fc; color: #fff; font-size: 9.5px; font-weight: 900; padding: 4px 8px; border-radius: 6px; cursor: pointer; white-space: nowrap;">🔄 Girar Espalda</button>
+        </div>
+
+        <!-- Modelo / Diseño de Camiseta -->
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <div style="display: flex; gap: 6px; align-items: center; width: 100%;">
+          <select id="editor-jersey-pattern" style="background: #18181b; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; padding: 5px 6px; font-weight: 800; font-size: 10.5px; flex: 1; min-width: 0; outline: none; cursor: pointer;" onchange="handleEditorKitSelectChange()">
+            <optgroup label="Diseño Básico (Gratis)">
+              <option value="lisa">Color Liso Monocromo (Gratis)</option>
+            </optgroup>
+            <optgroup label="Diseños Especiales (🪙200)">
+              <option value="banda">Banda Cruzada Diagonal (200 🪙)</option>
+              <option value="franja-horizontal">Franja Horizontal al Pecho (200 🪙)</option>
+              <option value="bastones">Rayas Verticales (200 🪙)</option>
+              <option value="mitades">Mitades Bicolor (200 🪙)</option>
+            </optgroup>
+            <optgroup label="Equipaciones Famosas (🪙200)">
+              <option value="river">⚪ Millonarios Banda Roja (200 🪙)</option>
+              <option value="boca">🟡 Xeneizes Franja Oro (200 🪙)</option>
+              <option value="barca">🔵 Blaugranas Culés (200 🪙)</option>
+              <option value="real">👑 Merengues de Madrid (200 🪙)</option>
+              <option value="manutd">🔴 Diablos Rojos (200 🪙)</option>
+              <option value="mancity">🩵 Ciudadanos Celestes (200 🪙)</option>
+              <option value="psg">🗼 París Capital Azul (200 🪙)</option>
+              <option value="inter">🖤 Nerazzurri de Milán (200 🪙)</option>
+              <option value="milan">🔴 Rossoneri de Milán (200 🪙)</option>
+              <option value="bvb">🐝 Borussios Amarillos (200 🪙)</option>
+              <option value="bayern">🔴 Gigante Bávaro (200 🪙)</option>
+              <option value="juve">⚪ Vecchia Signora (200 🪙)</option>
+              <option value="roma">🐺 Lobos de Roma (200 🪙)</option>
+              <option value="atleti">🔴 Colchoneros de Madrid (200 🪙)</option>
+              <option value="galatasaray">🦁 Leones de Estambul (200 🪙)</option>
+            </optgroup>
+            <optgroup label="Trajes Monstruos & Héroes (🪙200)">
+              <option value="spidey_suit">🕷️ Traje Arácnido (200 🪙)</option>
+              <option value="bat_suit">🦇 Traje Murciélago (200 🪙)</option>
+              <option value="alien_suit">👽 Traje Cósmico (200 🪙)</option>
+              <option value="skeleton_suit">💀 Traje Esqueleto (200 🪙)</option>
+              <option value="goat_suit">🐐 Traje Cabra Dorada (200 🪙)</option>
+              <option value="zombie_suit">🧟 Traje Zombi (200 🪙)</option>
+              <option value="cyborg_suit">🤖 Traje Cyborg (200 🪙)</option>
+              <option value="jason_suit">🔪 Traje Asesino Slasher (200 🪙)</option>
+              <option value="scream_suit">🗡️ Traje Espectro Fantasma (200 🪙)</option>
+              <option value="scorpion_suit">🦂 Traje Ninja Fuego (200 🪙)</option>
+              <option value="subzero_suit">❄️ Traje Ninja Hielo (200 🪙)</option>
+              <option value="reptile_suit">🦎 Traje Ninja Reptil (200 🪙)</option>
+              <option value="smoke_suit">💨 Traje Ninja Humo (200 🪙)</option>
+              <option value="mj_suit">🕺 Traje Chaqueta Roja Pop (200 🪙)</option>
+              <option value="rambo_suit">🎖️ Traje Comando Selva (200 🪙)</option>
+              <option value="terminator_suit">🕶️ Traje Cuero Destructor (200 🪙)</option>
+              <option value="omniman_suit">👨‍✈️ Traje Capa Suprema (200 🪙)</option>
+              <option value="thor_suit">⚡ Traje Armadura de Rayos (200 🪙)</option>
+              <option value="ironman_suit">🚀 Traje Armadura de Hierro (200 🪙)</option>
+              <option value="superman_suit">🦸 Traje Traje de Acero (200 🪙)</option>
+            </optgroup>
+          </select>
+          <button id="editor-kit-unlock-btn" onclick="comprarEquipacionSeleccionada()" style="display: none; background: linear-gradient(135deg, #eab308, #ca8a04); border: none; color: #000; font-weight: 900; font-size: 10px; padding: 5px 8px; border-radius: 8px; cursor: pointer; white-space: nowrap; flex-shrink: 0;">🔓 Comprar 🪙200</button>
+          </div>
+          <button id="editor-combo-pack-btn-2" onclick="comprarPackPersonajeCompleto()" style="display: none; width: 100%; background: linear-gradient(135deg, #8b5cf6, #6d28d9); border: 1.5px solid #a78bfa; border-radius: 9px; color: #fff; font-weight: 900; font-size: 10.5px; padding: 7px 10px; cursor: pointer; text-align: center; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4); margin-top: 4px;">⚡ COMPRAR PACK PERSONAJE COMPLETO (MÁSCARA + TRAJE) 🪙350 (¡Ahorrá 🪙100!)</button>
+        </div>
+
+
+
+        <!-- Paletas de Colores Swatches (Sin ventanas molestas) -->
+        <!-- Contenedores de Paletas de Colores de Camiseta y Short (Solo para Diseños Básicos Gratis) -->
+        <div id="editor-custom-color-swatches" style="display: flex; flex-direction: column; gap: 8px;">
+          <!-- Color Camiseta Principal -->
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-weight: 800; color: #d1d5db; font-size: 10px;">Color Camiseta Principal</span>
+            <div style="display: flex; gap: 4px; flex-wrap: wrap;" id="palette-jersey-1">
+              <button onclick="setSwatchColor('jersey1', '#ffffff')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #ffffff; border: 1.5px solid #a1a1aa; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('jersey1', '#18181b')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #18181b; border: 1.5px solid #a1a1aa; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('jersey1', '#38bdf8')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #38bdf8; border: 1.5px solid transparent; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('jersey1', '#1d4ed8')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #1d4ed8; border: 1.5px solid transparent; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('jersey1', '#dc2626')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #dc2626; border: 1.5px solid transparent; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('jersey1', '#facc15')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #facc15; border: 1.5px solid transparent; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('jersey1', '#16a34a')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #16a34a; border: 1.5px solid transparent; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('jersey1', '#a855f7')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #a855f7; border: 1.5px solid transparent; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('jersey1', '#ec4899')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #ec4899; border: 1.5px solid transparent; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('jersey1', '#f97316')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #f97316; border: 1.5px solid transparent; cursor: pointer;"></button>
+            </div>
+          </div>
+
+          <!-- Color Camiseta Secundario / Banda / Rayas -->
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-weight: 800; color: #d1d5db; font-size: 10px;">Color de Banda / Rayas / Detalle</span>
+            <div style="display: flex; gap: 4px; flex-wrap: wrap;" id="palette-jersey-2">
+              <button onclick="setSwatchColor('jersey2', '#ffffff')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #ffffff; border: 1.5px solid #a1a1aa; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('jersey2', '#18181b')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #18181b; border: 1.5px solid #a1a1aa; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('jersey2', '#38bdf8')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #38bdf8; border: 1.5px solid transparent; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('jersey2', '#1d4ed8')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #1d4ed8; border: 1.5px solid transparent; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('jersey2', '#dc2626')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #dc2626; border: 1.5px solid transparent; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('jersey2', '#facc15')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #facc15; border: 1.5px solid transparent; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('jersey2', '#16a34a')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #16a34a; border: 1.5px solid transparent; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('jersey2', '#a855f7')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #a855f7; border: 1.5px solid transparent; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('jersey2', '#ec4899')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #ec4899; border: 1.5px solid transparent; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('jersey2', '#f97316')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #f97316; border: 1.5px solid transparent; cursor: pointer;"></button>
+            </div>
+          </div>
+
+          <!-- Color Short -->
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-weight: 800; color: #d1d5db; font-size: 10px;">Color del Short</span>
+            <div style="display: flex; gap: 4px; flex-wrap: wrap;" id="palette-short">
+              <button onclick="setSwatchColor('short', '#18181b')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #18181b; border: 1.5px solid white; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('short', '#ffffff')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #ffffff; border: 1.5px solid #a1a1aa; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('short', '#1d4ed8')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #1d4ed8; border: 1.5px solid transparent; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('short', '#dc2626')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #dc2626; border: 1.5px solid transparent; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('short', '#facc15')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #facc15; border: 1.5px solid transparent; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('short', '#16a34a')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #16a34a; border: 1.5px solid transparent; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('short', '#a855f7')" class="swatch-btn" style="width: 18px; height: 18px; border-radius: 50%; background: #a855f7; border: 1.5px solid transparent; cursor: pointer;"></button>
+            </div>
+          </div>
+        </div>
+        <div id="editor-official-colors-badge" style="display: none; background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 8px; padding: 8px 12px; color: #fbbf24; font-size: 10.5px; font-weight: 800; text-align: center;">
+          🔒 Colores y diseño oficial del club / traje
+        </div>
+
+        <!-- Dorsal (Número) y Color de Dorsal -->
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 10.5px;">
+          <span style="font-weight: 800; color: #d1d5db;">Dorsal (Número y Color)</span>
+          <div style="display: flex; gap: 5px; align-items: center;">
+            <input type="number" id="editor-dorsal-number" min="1" max="99" value="10" style="width: 44px; padding: 3px 4px; background: #18181b; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 7px; color: #fff; text-align: center; font-weight: 900; font-size: 11.5px;" oninput="actualizarEditorPreview(true)">
+            <div style="display: flex; gap: 3.5px;" id="palette-dorsal">
+              <button onclick="setSwatchColor('dorsal', '#ffffff')" class="swatch-btn" style="width: 17px; height: 17px; border-radius: 50%; background: #ffffff; border: 1.5px solid white; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('dorsal', '#18181b')" class="swatch-btn" style="width: 17px; height: 17px; border-radius: 50%; background: #18181b; border: 1.5px solid #a1a1aa; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('dorsal', '#facc15')" class="swatch-btn" style="width: 17px; height: 17px; border-radius: 50%; background: #facc15; border: 1.5px solid transparent; cursor: pointer;"></button>
+              <button onclick="setSwatchColor('dorsal', '#38bdf8')" class="swatch-btn" style="width: 17px; height: 17px; border-radius: 50%; background: #38bdf8; border: 1.5px solid transparent; cursor: pointer;"></button>
+            </div>
           </div>
         </div>
 
+        <!-- Botines -->
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 10.5px;">
+          <span style="font-weight: 800; color: #d1d5db;">Color de Botines</span>
+          <div style="display: flex; gap: 4px;" id="palette-boots">
+            <button onclick="setSwatchColor('boots', '#18181b')" class="swatch-btn" style="width: 17px; height: 17px; border-radius: 50%; background: #18181b; border: 1.5px solid white; cursor: pointer;"></button>
+            <button onclick="setSwatchColor('boots', '#ffffff')" class="swatch-btn" style="width: 17px; height: 17px; border-radius: 50%; background: #ffffff; border: 1.5px solid #a1a1aa; cursor: pointer;"></button>
+            <button onclick="setSwatchColor('boots', '#fde047')" class="swatch-btn" style="width: 17px; height: 17px; border-radius: 50%; background: #fde047; border: 1.5px solid transparent; cursor: pointer;"></button>
+            <button onclick="setSwatchColor('boots', '#ec4899')" class="swatch-btn" style="width: 17px; height: 17px; border-radius: 50%; background: #ec4899; border: 1.5px solid transparent; cursor: pointer;"></button>
+            <button onclick="setSwatchColor('boots', '#06b6d4')" class="swatch-btn" style="width: 17px; height: 17px; border-radius: 50%; background: #06b6d4; border: 1.5px solid transparent; cursor: pointer;"></button>
+            <button onclick="setSwatchColor('boots', '#fbbf24')" class="swatch-btn" style="width: 17px; height: 17px; border-radius: 50%; background: #fbbf24; border: 1.5px solid transparent; cursor: pointer;"></button>
+          </div>
+        </div>
       </div>
 
-      <!-- Atributos -->
-      <div style="display: flex; flex-direction: column; gap: 10px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); padding: 12px; border-radius: 16px;">
+      <!-- PESTAÑA 3: ATRIBUTOS -->
+      <div id="editor-tab-3" style="display: none; flex-direction: column; gap: 10px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); padding: 12px; border-radius: 16px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
           <span style="font-size: 10px; font-weight: 900; color: #c084fc; text-transform: uppercase; letter-spacing: 0.8px;">📈 ATRIBUTOS LEYENDA</span>
           <span id="editor-val-media" style="font-size: 10px; font-weight: 900; color: #fbbf24; background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.25); padding: 2px 6px; border-radius: 8px;">MEDIA: 76 (Crack ⭐)</span>
@@ -4983,14 +5181,14 @@
       </div>
     </div>
 
-    <!-- Footer Acciones -->
-    <div style="display: flex; gap: 10px; border-top: 1.5px solid rgba(168, 85, 247, 0.25); padding-top: 12px; box-sizing: border-box;">
-      <button onclick="cerrarEditorPersonaje()" style="flex: 1; background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1); color: #e4e4e7; font-weight: 800; font-size: 11px; padding: 10px 0; border-radius: 12px; cursor: pointer; transition: all 0.2s; outline: none; letter-spacing: 0.5px;">CANCELAR</button>
-      <!-- Coin upgrade cost label -->
-      <div id="leyenda-upgrade-cost" style="display:none;text-align:center;font-size:10px;color:#fbbf24;font-weight:800;margin-bottom:4px;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.25);border-radius:8px;padding:4px 8px;"></div>
-      <!-- Coin toast -->
+    <!-- Footer Acciones (Abajo de todo dentro del cuadro) -->
+    <div style="flex-shrink: 0; width: 100%; display: flex; flex-direction: column; gap: 6px; border-top: 1.5px solid rgba(168, 85, 247, 0.25); padding-top: 10px; margin-top: auto; box-sizing: border-box;">
+      <div id="leyenda-upgrade-cost" style="display:none; text-align:center; font-size:10.5px; color:#fbbf24; font-weight:800; background:rgba(251,191,36,0.1); border:1px solid rgba(251,191,36,0.25); border-radius:8px; padding:4px 8px; width: 100%; box-sizing: border-box;"></div>
       <div id="coin-upgrade-toast" style="position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:rgba(239,68,68,0.95);color:#fff;font-size:11px;font-weight:900;padding:8px 18px;border-radius:20px;pointer-events:none;opacity:0;transition:opacity 0.3s;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.4);">¡Monedas insuficientes! Jugá para ganar más 🪙</div>
-      <button onclick="guardarLeyendaPersonalizada()" style="flex: 1.3; background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: white; font-weight: 900; font-size: 11px; padding: 10px 0; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.35); transition: all 0.2s; outline: none; letter-spacing: 0.8px;">GUARDAR LEYENDA</button>
+      <div style="display: flex; gap: 10px; width: 100%; align-items: center; justify-content: space-between;">
+        <button onclick="cerrarEditorPersonaje()" style="flex: 1; background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.12); color: #e4e4e7; font-weight: 900; font-size: 11px; padding: 10px 0; border-radius: 12px; cursor: pointer; text-align: center; outline: none; letter-spacing: 0.5px;">CANCELAR</button>
+        <button onclick="guardarLeyendaPersonalizada()" style="flex: 1.4; background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: white; font-weight: 900; font-size: 11.5px; padding: 10px 0; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.35); text-align: center; outline: none; letter-spacing: 0.8px;">GUARDAR LEYENDA</button>
+      </div>
     </div>
 
   </div>
@@ -5294,7 +5492,11 @@
       <div class="lobby-pulsing-icon">🌐</div>
       <div style="font-weight: 950; font-size: 19px; color: #fff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;" id="lobby-title-text">Buscando Rival...</div>
       <div id="lobby-status-text" style="font-size: 11.5px; color: #94a3b8; line-height: 1.5; margin-bottom: 24px; min-height: 36px;">Conectando a la red de emparejamiento...</div>
-      <button onclick="cancelarMatchmakingOnline()" style="background: rgba(239, 68, 68, 0.15); border: 1.5px solid #ef4444; color: #ef4444; font-weight: 900; font-size: 11.5px; padding: 11px 22px; border-radius: 14px; cursor: pointer; transition: all 0.2s; outline: none;">Cancelar Búsqueda</button>
+      <button id="lobby-cancel-btn" onclick="cancelarMatchmakingOnline()" style="background: rgba(239, 68, 68, 0.15); border: 1.5px solid #ef4444; color: #ef4444; font-weight: 900; font-size: 11.5px; padding: 11px 22px; border-radius: 14px; cursor: pointer; transition: all 0.2s; outline: none;">Cancelar Búsqueda</button>
+      <div id="lobby-timeout-actions" style="display: none; flex-direction: column; gap: 8px; width: 100%;">
+        <button onclick="iniciarMatchmakingOnlineReal()" style="background: linear-gradient(135deg, #06b6d4, #0891b2); border: none; color: #fff; font-weight: 900; font-size: 12px; padding: 12px 20px; border-radius: 14px; cursor: pointer; transition: all 0.2s; width: 100%; box-shadow: 0 4px 14px rgba(6, 182, 212, 0.4);">🔄 VOLVER A BUSCAR</button>
+        <button onclick="cancelarMatchmakingOnline()" style="background: rgba(239, 68, 68, 0.15); border: 1.5px solid #ef4444; color: #ef4444; font-weight: 900; font-size: 11.5px; padding: 11px 20px; border-radius: 14px; cursor: pointer; transition: all 0.2s; width: 100%;">🚪 SALIR AL MENÚ</button>
+      </div>
     </div>
   </div>
 
@@ -10633,12 +10835,317 @@
     document.getElementById('editor-flag-container').innerText = current.flag;
 
     // Configurar tipo de pelo y barba
-    document.getElementById('editor-hair-type').value = current.hairType;
-    document.getElementById('editor-beard-type').value = current.beardType || 'none';
+    const hairEl = document.getElementById('editor-hair-type');
+    if (hairEl) hairEl.value = current.hairType || 'messi';
+    const beardEl = document.getElementById('editor-beard-type');
+    if (beardEl) beardEl.value = current.beardType || 'none';
 
-    // Configurar camisetas
-    document.getElementById('editor-jersey-1').value = current.jersey[0] || '#a855f7';
-    document.getElementById('editor-jersey-2').value = current.jersey[1] || '#ffffff';
+    // Configurar colores de equipación, dorsal, botines y tatuajes
+    window.currentEditorJersey1 = (current.jersey && current.jersey[0]) ? current.jersey[0] : '#a855f7';
+    window.currentEditorJersey2 = (current.jersey && current.jersey[1]) ? current.jersey[1] : '#ffffff';
+    window.currentEditorShort = (current.jersey && current.jersey[2]) ? current.jersey[2] : '#18181b';
+    window.currentEditorDorsalColor = (current.dorsalColor || (current.jersey && current.jersey[3])) ? (current.dorsalColor || current.jersey[3]) : '#ffffff';
+    
+  window.getUnlockedMasks = function() {
+    try {
+      const raw = localStorage.getItem('nx_futbol_unlocked_masks');
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return ['none'];
+  };
+
+  window.handleEditorMaskChange = function(isSyncing) {
+    const maskEl = document.getElementById('editor-mask-type');
+    const maskVal = maskEl ? maskEl.value : 'none';
+
+    // Disable/Hide hair, beard, skin controls when special character mask is selected
+    const hairSelect = document.getElementById('editor-hair-type');
+    const hairColor = document.getElementById('palette-hair');
+    const beardSelect = document.getElementById('editor-beard-type');
+    const skinColor = document.getElementById('palette-skin');
+    const lockBadge = document.getElementById('editor-special-lock-badge');
+
+    if (maskVal !== 'none') {
+      if (hairSelect) hairSelect.disabled = true;
+      if (hairColor) hairColor.style.pointerEvents = 'none', hairColor.style.opacity = '0.35';
+      if (beardSelect) beardSelect.disabled = true;
+      if (skinColor) skinColor.style.pointerEvents = 'none', skinColor.style.opacity = '0.35';
+      if (lockBadge) lockBadge.style.display = 'block';
+    } else {
+      if (hairSelect) hairSelect.disabled = false;
+      if (hairColor) hairColor.style.pointerEvents = 'auto', hairColor.style.opacity = '1.0';
+      if (beardSelect) beardSelect.disabled = false;
+      if (skinColor) skinColor.style.pointerEvents = 'auto', skinColor.style.opacity = '1.0';
+      if (lockBadge) lockBadge.style.display = 'none';
+    }
+
+    // Auto-sync kit pattern in Tab 2 if character mask is selected
+    if (!isSyncing && typeof MASK_TO_SUIT_MAP !== 'undefined' && MASK_TO_SUIT_MAP[maskVal]) {
+      const kitEl = document.getElementById('editor-jersey-pattern');
+      if (kitEl) {
+        kitEl.value = MASK_TO_SUIT_MAP[maskVal];
+        if (typeof handleEditorKitSelectChange === 'function') handleEditorKitSelectChange(true);
+      }
+    }
+
+    const unlocked = getUnlockedMasks();
+    const btn = document.getElementById('editor-mask-unlock-btn');
+    if (btn) {
+      if (maskVal === 'none' || unlocked.includes(maskVal)) {
+        btn.style.display = 'none';
+      } else {
+        btn.style.display = 'block';
+      }
+    }
+
+    if (typeof actualizarVisibilidadBotonesCombo === 'function') actualizarVisibilidadBotonesCombo();
+    actualizarEditorPreview();
+  };
+
+  const MASK_TO_SUIT_MAP = {
+    'spidey': 'spidey_suit',
+    'batman': 'bat_suit',
+    'zombie': 'zombie_suit',
+    'goat': 'goat_suit',
+    'alien': 'alien_suit',
+    'skeleton': 'skeleton_suit',
+    'cyborg': 'cyborg_suit',
+    'jason': 'jason_suit',
+    'scream': 'scream_suit',
+    'scorpion': 'scorpion_suit',
+    'subzero': 'subzero_suit',
+    'reptile': 'reptile_suit',
+    'smoke': 'smoke_suit',
+    'mj_thriller': 'mj_suit',
+    'rambo': 'rambo_suit',
+    'terminator': 'terminator_suit',
+    'omniman': 'omniman_suit',
+    'thor': 'thor_suit',
+    'ironman': 'ironman_suit',
+    'superman': 'superman_suit'
+  };
+
+  const SUIT_TO_MASK_MAP = {
+    'spidey_suit': 'spidey',
+    'bat_suit': 'batman',
+    'zombie_suit': 'zombie',
+    'goat_suit': 'goat',
+    'alien_suit': 'alien',
+    'skeleton_suit': 'skeleton',
+    'cyborg_suit': 'cyborg',
+    'jason_suit': 'jason',
+    'scream_suit': 'scream',
+    'scorpion_suit': 'scorpion',
+    'subzero_suit': 'subzero',
+    'reptile_suit': 'reptile',
+    'smoke_suit': 'smoke',
+    'mj_suit': 'mj_thriller',
+    'rambo_suit': 'rambo',
+    'terminator_suit': 'terminator',
+    'omniman_suit': 'omniman',
+    'thor_suit': 'thor',
+    'ironman_suit': 'ironman'
+  };
+
+  window.handleEditorMaskChange = function(isSyncing) {
+    const maskEl = document.getElementById('editor-mask-type');
+    const maskVal = maskEl ? maskEl.value : 'none';
+    
+    // Auto-sync suit in Tab 2 ONLY if character suit is already unlocked
+    if (!isSyncing && typeof MASK_TO_SUIT_MAP !== 'undefined' && MASK_TO_SUIT_MAP[maskVal]) {
+      const targetSuit = MASK_TO_SUIT_MAP[maskVal];
+      const unlockedKits = typeof getUnlockedKits === 'function' ? getUnlockedKits() : ['lisa'];
+      if (unlockedKits.includes(targetSuit)) {
+        const kitEl = document.getElementById('editor-jersey-pattern');
+        if (kitEl) {
+          kitEl.value = targetSuit;
+          if (typeof handleEditorKitSelectChange === 'function') handleEditorKitSelectChange(true);
+        }
+      }
+    }
+
+    const unlockedMasks = getUnlockedMasks();
+    const maskBtn = document.getElementById('editor-mask-unlock-btn');
+    if (maskBtn) {
+      maskBtn.style.display = (maskVal === 'none' || unlockedMasks.includes(maskVal)) ? 'none' : 'block';
+    }
+
+    actualizarVisibilidadBotonesCombo();
+    actualizarEditorPreview();
+  };
+
+  window.actualizarVisibilidadBotonesCombo = function() {
+    const maskVal = document.getElementById('editor-mask-type') ? document.getElementById('editor-mask-type').value : 'none';
+    const kitVal = document.getElementById('editor-jersey-pattern') ? document.getElementById('editor-jersey-pattern').value : 'lisa';
+    const unlockedMasks = getUnlockedMasks();
+    const unlockedKits = getUnlockedKits();
+
+    const targetSuit = MASK_TO_SUIT_MAP[maskVal] || kitVal;
+    const hasSuitMapping = MASK_TO_SUIT_MAP[maskVal] || SUIT_TO_MASK_MAP[kitVal];
+
+    const maskLocked = maskVal !== 'none' && !unlockedMasks.includes(maskVal);
+    const suitLocked = targetSuit !== 'lisa' && !unlockedKits.includes(targetSuit);
+
+    const btn1 = document.getElementById('editor-combo-pack-btn');
+    const btn2 = document.getElementById('editor-combo-pack-btn-2');
+    const showCombo = hasSuitMapping && (maskLocked || suitLocked);
+
+    let btnText = "⚡ COMPRAR PACK PERSONAJE COMPLETO (MÁSCARA + TRAJE) 🪙350 (¡Ahorrá 🪙100!)";
+    if (!maskLocked && suitLocked) {
+      btnText = "⚡ COMPLETAR PACK CON EL TRAJE 🪙100 (¡Oferta Especial!)";
+    } else if (maskLocked && !suitLocked) {
+      btnText = "⚡ DESBLOQUEAR MÁSCARA DEL PERSONAJE 🪙250";
+    }
+
+    if (btn1) {
+      btn1.style.display = showCombo ? 'block' : 'none';
+      btn1.innerText = btnText;
+    }
+    if (btn2) {
+      btn2.style.display = showCombo ? 'block' : 'none';
+      btn2.innerText = btnText;
+    }
+  };
+
+  window.comprarPackPersonajeCompleto = function() {
+    const maskVal = document.getElementById('editor-mask-type') ? document.getElementById('editor-mask-type').value : 'none';
+    const kitVal = document.getElementById('editor-jersey-pattern') ? document.getElementById('editor-jersey-pattern').value : 'lisa';
+
+    const unlockedMasks = getUnlockedMasks();
+    const unlockedKits = getUnlockedKits();
+
+    const targetSuit = MASK_TO_SUIT_MAP[maskVal] || kitVal;
+
+    const maskLocked = maskVal !== 'none' && !unlockedMasks.includes(maskVal);
+    const suitLocked = targetSuit !== 'lisa' && !unlockedKits.includes(targetSuit);
+
+    if (!maskLocked && !suitLocked) return;
+
+    let COMBO_PRICE = 350; // Discounted full pack price!
+    if (!maskLocked && suitLocked) COMBO_PRICE = 100; // Special 100 coin completion price!
+    else if (maskLocked && !suitLocked) COMBO_PRICE = 250;
+
+    const currentCoins = parseInt(localStorage.getItem('nx_futbol_monedas') || '0');
+    if (currentCoins < COMBO_PRICE) {
+      triggerHaptic('heavy');
+      playSound('error');
+      alert(`¡Monedas insuficientes! Necesitás 🪙${COMBO_PRICE} y tenés 🪙${currentCoins}.`);
+      return;
+    }
+
+    const newCoins = currentCoins - COMBO_PRICE;
+    localStorage.setItem('nx_futbol_monedas', newCoins);
+
+    if (maskLocked) {
+      unlockedMasks.push(maskVal);
+      localStorage.setItem('nx_futbol_unlocked_masks', JSON.stringify(unlockedMasks));
+    }
+    if (suitLocked) {
+      unlockedKits.push(targetSuit);
+      localStorage.setItem('nx_futbol_unlocked_kits', JSON.stringify(unlockedKits));
+      const kitEl = document.getElementById('editor-jersey-pattern');
+      if (kitEl) kitEl.value = targetSuit;
+    }
+
+    triggerHaptic('success');
+    playSound('gol');
+    if (typeof actualizarMonedasUI === 'function') actualizarMonedasUI();
+    if (typeof actualizarEtiquetasDesbloqueadas === 'function') actualizarEtiquetasDesbloqueadas();
+    actualizarVisibilidadBotonesCombo();
+    actualizarEditorPreview();
+  };
+
+  window.actualizarEtiquetasDesbloqueadas = function() {
+    const unlockedKits = getUnlockedKits();
+    const unlockedMasks = getUnlockedMasks();
+
+    // 1. Equipaciones y Trajes (#editor-jersey-pattern)
+    const jerseySelect = document.getElementById('editor-jersey-pattern');
+    if (jerseySelect) {
+      Array.from(jerseySelect.options).forEach(opt => {
+        const val = opt.value;
+        if (val === 'lisa') return;
+
+        let rawTitle = opt.getAttribute('data-base-title');
+        if (!rawTitle) {
+          rawTitle = opt.textContent.replace(/\s*\(\s*\d+\s*🪙\s*\)|\s*\(\s*✓\s*Adquirido\s*\)/g, '').trim();
+          opt.setAttribute('data-base-title', rawTitle);
+        }
+
+        if (unlockedKits.includes(val)) {
+          opt.textContent = `${rawTitle} (✓ Adquirido)`;
+        } else {
+          opt.textContent = `${rawTitle} (200 🪙)`;
+        }
+      });
+    }
+
+    // 2. Máscaras Especiales (#editor-mask-type)
+    const maskSelect = document.getElementById('editor-mask-type');
+    if (maskSelect) {
+      Array.from(maskSelect.options).forEach(opt => {
+        const val = opt.value;
+        if (val === 'none') return;
+
+        let rawTitle = opt.getAttribute('data-base-title');
+        if (!rawTitle) {
+          rawTitle = opt.textContent.replace(/\s*\(\s*\d+\s*🪙\s*\)|\s*\(\s*✓\s*Adquirido\s*\)|\s*\(250\s*c\/u\)/g, '').trim();
+          opt.setAttribute('data-base-title', rawTitle);
+        }
+
+        if (unlockedMasks.includes(val)) {
+          opt.textContent = `${rawTitle} (✓ Adquirido)`;
+        } else {
+          opt.textContent = `${rawTitle} (250 🪙)`;
+        }
+      });
+    }
+  };
+
+  window.comprarMascaraSeleccionada = function() {
+    const maskVal = document.getElementById('editor-mask-type') ? document.getElementById('editor-mask-type').value : 'none';
+    if (maskVal === 'none') return;
+    
+    const unlocked = getUnlockedMasks();
+    if (unlocked.includes(maskVal)) return;
+    
+    const MASK_PRICE = 250;
+    const currentCoins = parseInt(localStorage.getItem('nx_futbol_monedas') || '0');
+    if (currentCoins < MASK_PRICE) {
+      triggerHaptic('heavy');
+      playSound('error');
+      alert(`¡Monedas insuficientes! Necesitás 🪙${MASK_PRICE} monedas y tenés 🪙${currentCoins}.`);
+      return;
+    }
+    
+    // Deduct coins and unlock
+    const newCoins = currentCoins - MASK_PRICE;
+    localStorage.setItem('nx_futbol_monedas', newCoins);
+    unlocked.push(maskVal);
+    localStorage.setItem('nx_futbol_unlocked_masks', JSON.stringify(unlocked));
+    
+    // Update coin display
+    const coinEl = document.getElementById('coins-count');
+    if (coinEl) coinEl.textContent = newCoins.toLocaleString();
+    
+    triggerHaptic('success');
+    playSound('tap');
+    
+    const btn = document.getElementById('editor-mask-unlock-btn');
+    if (btn) btn.style.display = 'none';
+    
+    if (typeof actualizarEtiquetasDesbloqueadas === 'function') actualizarEtiquetasDesbloqueadas();
+    actualizarEditorPreview();
+  };
+
+  window.currentEditorBootsColor = current.boots || '#18181b';
+    
+    const jPatEl = document.getElementById('editor-jersey-pattern');
+    if (jPatEl) jPatEl.value = current.jerseyPattern || 'lisa';
+    const dNumEl = document.getElementById('editor-dorsal-number');
+    if (dNumEl) dNumEl.value = current.dorsal || 10;
+    const tatEl = document.getElementById('editor-tattoo-type');
+    if (tatEl) tatEl.value = current.tattoo || 'none';
 
     // Configurar sliders y sus valores de texto
     document.getElementById('slider-fuerza').value = current.fuerza;
@@ -10670,6 +11177,29 @@
     const matchedHair = hairBtns.find(b => b.getAttribute('onclick').includes(currentEditorHairColor));
     if (matchedHair) matchedHair.style.borderColor = 'white';
 
+    // Save initial snapshot to revert unpurchased selections on Cancel
+    window.editorInitialSnapshot = {
+      name: current.name,
+      flag: current.flag,
+      skin: current.skin,
+      hair: current.hair,
+      hairType: current.hairType,
+      beardType: current.beardType,
+      tattoo: current.tattoo,
+      mask: current.mask || 'none',
+      pattern: current.jerseyPattern || 'lisa',
+      c1: current.jerseyColor1 || '#3b82f6',
+      c2: current.jerseyColor2 || '#1d4ed8',
+      short: current.shortColor || '#1d4ed8',
+      dorsal: current.dorsal || 10,
+      fuerza: current.fuerza,
+      comba: current.comba,
+      precision: current.precision
+    };
+
+    // Actualizar etiquetas de Adquirido / Precio en desplegables
+    if (typeof actualizarEtiquetasDesbloqueadas === 'function') actualizarEtiquetasDesbloqueadas();
+
     // Mostrar modal
     document.getElementById('futbol-editor-overlay').style.display = 'flex';
     
@@ -10677,10 +11207,431 @@
     actualizarEditorPreview();
   };
 
+  
+  window.getUnlockedKits = function() {
+    try {
+      const raw = localStorage.getItem('nx_futbol_unlocked_kits');
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return ['lisa'];
+  };
+
+  const KIT_PRESETS_MAP = {
+    'river': { c1: '#ffffff', c2: '#dc2626', short: '#000000', pattern: 'banda' },
+    'boca': { c1: '#1d4ed8', c2: '#facc15', short: '#1d4ed8', pattern: 'franja-horizontal' },
+    'barca': { c1: '#1d4ed8', c2: '#dc2626', short: '#1d4ed8', pattern: 'bastones' },
+    'real': { c1: '#ffffff', c2: '#facc15', short: '#ffffff', pattern: 'lisa' },
+    'manutd': { c1: '#dc2626', c2: '#ffffff', short: '#ffffff', pattern: 'lisa' },
+    'mancity': { c1: '#38bdf8', c2: '#ffffff', short: '#ffffff', pattern: 'lisa' },
+    'psg': { c1: '#1e3a8a', c2: '#dc2626', short: '#1e3a8a', pattern: 'franja-horizontal' },
+    'inter': { c1: '#1d4ed8', c2: '#18181b', short: '#18181b', pattern: 'bastones' },
+    'milan': { c1: '#dc2626', c2: '#18181b', short: '#18181b', pattern: 'bastones' },
+    'bvb': { c1: '#facc15', c2: '#18181b', short: '#18181b', pattern: 'lisa' },
+    'bayern': { c1: '#dc2626', c2: '#ffffff', short: '#dc2626', pattern: 'bastones' },
+    'juve': { c1: '#ffffff', c2: '#18181b', short: '#ffffff', pattern: 'bastones' },
+    'roma': { c1: '#991b1b', c2: '#facc15', short: '#991b1b', pattern: 'lisa' },
+    'atleti': { c1: '#dc2626', c2: '#ffffff', short: '#1d4ed8', pattern: 'bastones' },
+    'galatasaray': { c1: '#f97316', c2: '#dc2626', short: '#dc2626', pattern: 'mitades' },
+    'spidey_suit': { c1: '#dc2626', c2: '#1d4ed8', short: '#1d4ed8', pattern: 'spidey_suit' },
+    'bat_suit': { c1: '#0f172a', c2: '#facc15', short: '#0f172a', pattern: 'bat_suit' },
+    'alien_suit': { c1: '#16a34a', c2: '#38bdf8', short: '#16a34a', pattern: 'alien_suit' },
+    'skeleton_suit': { c1: '#18181b', c2: '#ffffff', short: '#18181b', pattern: 'skeleton_suit' },
+    'goat_suit': { c1: '#facc15', c2: '#78350f', short: '#facc15', pattern: 'goat_suit' },
+    'zombie_suit': { c1: '#15803d', c2: '#a855f7', short: '#15803d', pattern: 'zombie_suit' },
+    'cyborg_suit': { c1: '#64748b', c2: '#ef4444', short: '#64748b', pattern: 'cyborg_suit' },
+    'jason_suit': { c1: '#475569', c2: '#1e293b', short: '#1e293b', pattern: 'jason_suit' },
+    'scream_suit': { c1: '#0f172a', c2: '#334155', short: '#0f172a', pattern: 'scream_suit' },
+    'scorpion_suit': { c1: '#eab308', c2: '#18181b', short: '#18181b', pattern: 'scorpion_suit' },
+    'subzero_suit': { c1: '#38bdf8', c2: '#18181b', short: '#18181b', pattern: 'subzero_suit' },
+    'reptile_suit': { c1: '#22c55e', c2: '#18181b', short: '#18181b', pattern: 'reptile_suit' },
+    'smoke_suit': { c1: '#94a3b8', c2: '#18181b', short: '#18181b', pattern: 'smoke_suit' },
+    'mj_suit': { c1: '#dc2626', c2: '#18181b', short: '#18181b', pattern: 'mj_suit' },
+    'rambo_suit': { c1: '#18181b', c2: '#15803d', short: '#15803d', pattern: 'rambo_suit' },
+    'terminator_suit': { c1: '#0f172a', c2: '#64748b', short: '#0f172a', pattern: 'terminator_suit' },
+    'omniman_suit': { c1: '#ffffff', c2: '#dc2626', short: '#ffffff', pattern: 'omniman_suit' },
+    'thor_suit': { c1: '#475569', c2: '#38bdf8', short: '#334155', pattern: 'thor_suit' },
+    'ironman_suit': { c1: '#dc2626', c2: '#eab308', short: '#dc2626', pattern: 'ironman_suit' }
+  };
+
+  window.handleEditorKitSelectChange = function(isSyncing) {
+    const patEl = document.getElementById('editor-jersey-pattern');
+    const kitVal = patEl ? patEl.value : 'lisa';
+
+    // Auto-sync mask in Tab 1 if character suit is selected
+    if (!isSyncing && typeof SUIT_TO_MASK_MAP !== 'undefined' && SUIT_TO_MASK_MAP[kitVal]) {
+      const maskEl = document.getElementById('editor-mask-type');
+      if (maskEl) {
+        maskEl.value = SUIT_TO_MASK_MAP[kitVal];
+        handleEditorMaskChange(true);
+      }
+    }
+    const unlocked = getUnlockedKits();
+    const btn = document.getElementById('editor-kit-unlock-btn');
+    const swatchesEl = document.getElementById('editor-custom-color-swatches');
+    const badgeEl = document.getElementById('editor-official-colors-badge');
+    
+    if (KIT_PRESETS_MAP[kitVal]) {
+      const data = KIT_PRESETS_MAP[kitVal];
+      window.currentEditorJersey1 = data.c1;
+      window.currentEditorJersey2 = data.c2;
+      window.currentEditorShort = data.short;
+      window.currentEditorJerseyPattern = data.pattern;
+      
+      const j1El = document.getElementById('editor-jersey-1');
+      const j2El = document.getElementById('editor-jersey-2');
+      const shEl = document.getElementById('editor-short-color');
+      if (j1El) j1El.value = data.c1;
+      if (j2El) j2El.value = data.c2;
+      if (shEl) shEl.value = data.short;
+
+      if (swatchesEl) swatchesEl.style.display = 'none';
+      if (badgeEl) badgeEl.style.display = 'block';
+    } else {
+      window.currentEditorJerseyPattern = kitVal;
+      if (swatchesEl) swatchesEl.style.display = 'flex';
+      if (badgeEl) badgeEl.style.display = 'none';
+    }
+    
+    const freePatterns = ['lisa'];
+    if (btn) {
+      if (freePatterns.includes(kitVal) || unlocked.includes(kitVal)) {
+        btn.style.display = 'none';
+      } else {
+        btn.style.display = 'block';
+      }
+    }
+    if (typeof actualizarVisibilidadBotonesCombo === 'function') actualizarVisibilidadBotonesCombo();
+    actualizarEditorPreview();
+  };
+
+  window.comprarEquipacionSeleccionada = function() {
+    const patEl = document.getElementById('editor-jersey-pattern');
+    const kitVal = patEl ? patEl.value : 'lisa';
+    const freePatterns = ['lisa'];
+    if (freePatterns.includes(kitVal)) return;
+    
+    const unlocked = getUnlockedKits();
+    if (unlocked.includes(kitVal)) return;
+    
+    const KIT_PRICE = 200;
+    const currentCoins = parseInt(localStorage.getItem('nx_futbol_monedas') || '0');
+    if (currentCoins < KIT_PRICE) {
+      triggerHaptic('heavy');
+      playSound('error');
+      alert(`¡Monedas insuficientes! Necesitás 🪙${KIT_PRICE} monedas y tenés 🪙${currentCoins}.`);
+      return;
+    }
+    
+    const newCoins = currentCoins - KIT_PRICE;
+    localStorage.setItem('nx_futbol_monedas', newCoins);
+    unlocked.push(kitVal);
+    localStorage.setItem('nx_futbol_unlocked_kits', JSON.stringify(unlocked));
+    
+    const coinEl = document.getElementById('coins-count');
+    if (coinEl) coinEl.textContent = newCoins.toLocaleString();
+    
+    triggerHaptic('success');
+    playSound('tap');
+    
+    const btn = document.getElementById('editor-kit-unlock-btn');
+    if (btn) btn.style.display = 'none';
+    
+    if (typeof actualizarEtiquetasDesbloqueadas === 'function') actualizarEtiquetasDesbloqueadas();
+    actualizarEditorPreview();
+  };
+
   window.cerrarEditorPersonaje = function() {
     triggerHaptic('light');
     playSound('tap');
+    if (window.editorInitialSnapshot) {
+      const snap = window.editorInitialSnapshot;
+      const maskEl = document.getElementById('editor-mask-type');
+      const patEl = document.getElementById('editor-jersey-pattern');
+      if (maskEl) maskEl.value = snap.mask;
+      if (patEl) patEl.value = snap.pattern;
+
+      window.currentEditorSkin = snap.skin;
+      window.currentEditorHairColor = snap.hair;
+      window.currentEditorJersey1 = snap.c1;
+      window.currentEditorJersey2 = snap.c2;
+      window.currentEditorShort = snap.short;
+      window.currentEditorJerseyPattern = snap.pattern;
+
+      if (typeof handleEditorMaskChange === 'function') handleEditorMaskChange(true);
+      if (typeof handleEditorKitSelectChange === 'function') handleEditorKitSelectChange(true);
+    }
     document.getElementById('futbol-editor-overlay').style.display = 'none';
+  };
+
+  
+  
+  window.getUnlockedMasks = function() {
+    try {
+      const raw = localStorage.getItem('nx_futbol_unlocked_masks');
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return ['none'];
+  };
+
+  /* handleEditorMaskChange handled by main window definition */
+
+  window.comprarMascaraSeleccionada = function() {
+    const maskVal = document.getElementById('editor-mask-type') ? document.getElementById('editor-mask-type').value : 'none';
+    if (maskVal === 'none') return;
+    
+    const unlocked = getUnlockedMasks();
+    if (unlocked.includes(maskVal)) return;
+    
+    const MASK_PRICE = 250;
+    const currentCoins = parseInt(localStorage.getItem('nx_futbol_monedas') || '0');
+    if (currentCoins < MASK_PRICE) {
+      triggerHaptic('heavy');
+      playSound('error');
+      alert(`¡Monedas insuficientes! Necesitás 🪙${MASK_PRICE} monedas y tenés 🪙${currentCoins}.`);
+      return;
+    }
+    
+    // Deduct coins and unlock
+    const newCoins = currentCoins - MASK_PRICE;
+    localStorage.setItem('nx_futbol_monedas', newCoins);
+    unlocked.push(maskVal);
+    localStorage.setItem('nx_futbol_unlocked_masks', JSON.stringify(unlocked));
+    
+    // Update coin display
+    const coinEl = document.getElementById('coins-count');
+    if (coinEl) coinEl.textContent = newCoins.toLocaleString();
+    
+    triggerHaptic('success');
+    playSound('tap');
+    
+    const btn = document.getElementById('editor-mask-unlock-btn');
+    if (btn) btn.style.display = 'none';
+    
+    actualizarEditorPreview();
+  };
+
+  window.currentEditorBootsColor = '#18181b';
+  window.editorSpinTimer = 0;
+
+  window.switchEditorTab = function(tabIdx) {
+    for (let i = 1; i <= 3; i++) {
+      const tabEl = document.getElementById(`editor-tab-${i}`);
+      const btnEl = document.getElementById(`editor-tab-btn-${i}`);
+      if (tabEl && btnEl) {
+        if (i === tabIdx) {
+          tabEl.style.display = 'flex';
+          btnEl.style.background = 'rgba(168, 85, 247, 0.3)';
+          btnEl.style.borderColor = '#c084fc';
+          btnEl.style.color = '#fff';
+          btnEl.style.fontWeight = '900';
+        } else {
+          tabEl.style.display = 'none';
+          btnEl.style.background = 'transparent';
+          btnEl.style.borderColor = 'transparent';
+          btnEl.style.color = '#94a3b8';
+          btnEl.style.fontWeight = '800';
+        }
+      }
+    }
+    triggerHaptic('soft');
+  };
+
+  
+  window.currentEditorJersey1 = '#a855f7';
+  window.currentEditorJersey2 = '#ffffff';
+  window.currentEditorShort = '#18181b';
+  window.currentEditorDorsalColor = '#ffffff';
+  
+  window.getUnlockedMasks = function() {
+    try {
+      const raw = localStorage.getItem('nx_futbol_unlocked_masks');
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return ['none'];
+  };
+
+  /* handleEditorMaskChange handled by main window definition */
+
+  window.comprarMascaraSeleccionada = function() {
+    const maskVal = document.getElementById('editor-mask-type') ? document.getElementById('editor-mask-type').value : 'none';
+    if (maskVal === 'none') return;
+    
+    const unlocked = getUnlockedMasks();
+    if (unlocked.includes(maskVal)) return;
+    
+    const MASK_PRICE = 250;
+    const currentCoins = parseInt(localStorage.getItem('nx_futbol_monedas') || '0');
+    if (currentCoins < MASK_PRICE) {
+      triggerHaptic('heavy');
+      playSound('error');
+      alert(`¡Monedas insuficientes! Necesitás 🪙${MASK_PRICE} monedas y tenés 🪙${currentCoins}.`);
+      return;
+    }
+    
+    // Deduct coins and unlock
+    const newCoins = currentCoins - MASK_PRICE;
+    localStorage.setItem('nx_futbol_monedas', newCoins);
+    unlocked.push(maskVal);
+    localStorage.setItem('nx_futbol_unlocked_masks', JSON.stringify(unlocked));
+    
+    // Update coin display
+    const coinEl = document.getElementById('coins-count');
+    if (coinEl) coinEl.textContent = newCoins.toLocaleString();
+    
+    triggerHaptic('success');
+    playSound('tap');
+    
+    const btn = document.getElementById('editor-mask-unlock-btn');
+    if (btn) btn.style.display = 'none';
+    
+    actualizarEditorPreview();
+  };
+
+  window.currentEditorBootsColor = '#18181b';
+  window.editorIsBackView = false;
+
+  window.toggleEditorPreviewBackView = function() {
+    window.editorIsBackView = !window.editorIsBackView;
+    actualizarEditorPreview();
+    triggerHaptic('soft');
+  };
+
+  window.setSwatchColor = function(target, color) {
+    if (target === 'jersey1') window.currentEditorJersey1 = color;
+    else if (target === 'jersey2') window.currentEditorJersey2 = color;
+    else if (target === 'short') window.currentEditorShort = color;
+    else if (target === 'dorsal') { window.currentEditorDorsalColor = color; window.editorIsBackView = true; }
+    else if (target === 'boots') 
+  window.getUnlockedMasks = function() {
+    try {
+      const raw = localStorage.getItem('nx_futbol_unlocked_masks');
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return ['none'];
+  };
+
+  /* handleEditorMaskChange handled by main window definition */
+
+  window.comprarMascaraSeleccionada = function() {
+    const maskVal = document.getElementById('editor-mask-type') ? document.getElementById('editor-mask-type').value : 'none';
+    if (maskVal === 'none') return;
+    
+    const unlocked = getUnlockedMasks();
+    if (unlocked.includes(maskVal)) return;
+    
+    const MASK_PRICE = 250;
+    const currentCoins = parseInt(localStorage.getItem('nx_futbol_monedas') || '0');
+    if (currentCoins < MASK_PRICE) {
+      triggerHaptic('heavy');
+      playSound('error');
+      alert(`¡Monedas insuficientes! Necesitás 🪙${MASK_PRICE} monedas y tenés 🪙${currentCoins}.`);
+      return;
+    }
+    
+    // Deduct coins and unlock
+    const newCoins = currentCoins - MASK_PRICE;
+    localStorage.setItem('nx_futbol_monedas', newCoins);
+    unlocked.push(maskVal);
+    localStorage.setItem('nx_futbol_unlocked_masks', JSON.stringify(unlocked));
+    
+    // Update coin display
+    const coinEl = document.getElementById('coins-count');
+    if (coinEl) coinEl.textContent = newCoins.toLocaleString();
+    
+    triggerHaptic('success');
+    playSound('tap');
+    
+    const btn = document.getElementById('editor-mask-unlock-btn');
+    if (btn) btn.style.display = 'none';
+    
+    actualizarEditorPreview();
+  };
+
+  window.currentEditorBootsColor = color;
+    
+    actualizarEditorPreview();
+    triggerHaptic('soft');
+  };
+
+  window.setEditorPresetFull = function(c1, c2, shortCol, pattern) {
+    window.currentEditorJersey1 = c1;
+    window.currentEditorJersey2 = c2;
+    window.currentEditorShort = shortCol;
+    const patEl = document.getElementById('editor-jersey-pattern');
+    if (patEl) patEl.value = pattern;
+    actualizarEditorPreview();
+    triggerHaptic('soft');
+  };
+
+  window.setEditorJerseyPreset = function(color1, color2, shortColor) {
+    const j1 = document.getElementById('editor-jersey-1');
+    const j2 = document.getElementById('editor-jersey-2');
+    const sh = document.getElementById('editor-short-color');
+    if (j1) j1.value = color1;
+    if (j2) j2.value = color2;
+    if (sh) sh.value = shortColor;
+    actualizarEditorPreview();
+    triggerHaptic('soft');
+  };
+
+  window.setEditorBootsColor = function(color, btn) {
+    
+  window.getUnlockedMasks = function() {
+    try {
+      const raw = localStorage.getItem('nx_futbol_unlocked_masks');
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return ['none'];
+  };
+
+  /* handleEditorMaskChange handled by main window definition */
+
+  window.comprarMascaraSeleccionada = function() {
+    const maskVal = document.getElementById('editor-mask-type') ? document.getElementById('editor-mask-type').value : 'none';
+    if (maskVal === 'none') return;
+    
+    const unlocked = getUnlockedMasks();
+    if (unlocked.includes(maskVal)) return;
+    
+    const MASK_PRICE = 250;
+    const currentCoins = parseInt(localStorage.getItem('nx_futbol_monedas') || '0');
+    if (currentCoins < MASK_PRICE) {
+      triggerHaptic('heavy');
+      playSound('error');
+      alert(`¡Monedas insuficientes! Necesitás 🪙${MASK_PRICE} monedas y tenés 🪙${currentCoins}.`);
+      return;
+    }
+    
+    // Deduct coins and unlock
+    const newCoins = currentCoins - MASK_PRICE;
+    localStorage.setItem('nx_futbol_monedas', newCoins);
+    unlocked.push(maskVal);
+    localStorage.setItem('nx_futbol_unlocked_masks', JSON.stringify(unlocked));
+    
+    // Update coin display
+    const coinEl = document.getElementById('coins-count');
+    if (coinEl) coinEl.textContent = newCoins.toLocaleString();
+    
+    triggerHaptic('success');
+    playSound('tap');
+    
+    const btn = document.getElementById('editor-mask-unlock-btn');
+    if (btn) btn.style.display = 'none';
+    
+    actualizarEditorPreview();
+  };
+
+  window.currentEditorBootsColor = color;
+    document.querySelectorAll('.boots-btn').forEach(b => {
+      b.classList.remove('selected');
+      b.style.borderColor = 'transparent';
+    });
+    if (btn) {
+      btn.classList.add('selected');
+      btn.style.borderColor = 'white';
+    }
+    actualizarEditorPreview();
+    triggerHaptic('soft');
   };
 
   window.setEditorSkin = function(color, btn) {
@@ -10782,34 +11733,46 @@
     const c = canvas.getContext('2d');
     c.clearRect(0, 0, 84, 84);
 
-    // Obtener valores actuales
-    const nameVal = document.getElementById('editor-player-name').value || 'Mi Leyenda';
-    const code = document.getElementById('editor-player-country').value;
+    const nameVal = (document.getElementById('editor-player-name') && document.getElementById('editor-player-name').value) || 'Mi Leyenda';
+    const code = document.getElementById('editor-player-country') ? document.getElementById('editor-player-country').value : 'ARG';
     const countryInfo = EDITOR_PAISES[code] || EDITOR_PAISES.ARG;
 
-    const hairTypeVal = document.getElementById('editor-hair-type').value;
-    const beardTypeVal = document.getElementById('editor-beard-type').value;
-    const jersey1Val = document.getElementById('editor-jersey-1').value;
-    const jersey2Val = document.getElementById('editor-jersey-2').value;
+    const hairTypeVal = document.getElementById('editor-hair-type') ? document.getElementById('editor-hair-type').value : 'messi';
+    const beardTypeVal = document.getElementById('editor-beard-type') ? document.getElementById('editor-beard-type').value : 'none';
+
+    const patternVal = document.getElementById('editor-jersey-pattern') ? document.getElementById('editor-jersey-pattern').value : 'lisa';
+    const dorsalNumVal = document.getElementById('editor-dorsal-number') ? parseInt(document.getElementById('editor-dorsal-number').value || 10) : 10;
+    const tattooVal = document.getElementById('editor-tattoo-type') ? document.getElementById('editor-tattoo-type').value : 'none';
+    const maskVal = document.getElementById('editor-mask-type') ? document.getElementById('editor-mask-type').value : 'none';
+
+    let realPatternVal = patternVal;
+    if (typeof KIT_PRESETS_MAP !== 'undefined' && KIT_PRESETS_MAP[patternVal]) {
+      realPatternVal = KIT_PRESETS_MAP[patternVal].pattern;
+    }
 
     const tempPlayer = {
-      id: code === 'ENG' ? 'kanyon' : 'custom_legend', // para lentes Edgar Davids o cruz de San Jorge
+      id: code === 'ENG' ? 'kanyon' : 'custom_legend',
       nombre: nameVal,
       pais: countryInfo.pais,
       flag: countryInfo.flag,
       flagColors: countryInfo.flagColors,
       flagType: countryInfo.flagType,
       flagCross: countryInfo.flagCross || null,
-      skin: currentEditorSkin,
-      hair: currentEditorHairColor,
-      beard: beardTypeVal === 'none' ? null : currentEditorHairColor,
+      skin: currentEditorSkin || '#ffedd5',
+      hair: currentEditorHairColor || '#18181b',
+      beard: beardTypeVal === 'none' ? null : (currentEditorHairColor || '#18181b'),
       beardType: beardTypeVal === 'none' ? null : beardTypeVal,
       hairType: hairTypeVal,
-      jersey: [jersey1Val, jersey2Val]
+      jerseyPattern: realPatternVal,
+      jersey: [window.currentEditorJersey1 || '#a855f7', window.currentEditorJersey2 || '#ffffff', window.currentEditorShort || '#18181b', window.currentEditorDorsalColor || '#ffffff', window.currentEditorBootsColor || '#18181b'],
+      dorsal: dorsalNumVal,
+      dorsalColor: window.currentEditorDorsalColor || '#ffffff',
+      boots: window.currentEditorBootsColor || '#18181b',
+      tattoo: tattooVal,
+      mask: maskVal
     };
 
-    // Dibujar en el canvas del editor
-    drawCabezonPreview(c, 42, 38, tempPlayer);
+    drawCabezon(c, 42, 38, tempPlayer, false, false, false, false, window.editorIsBackView);
   };
 
   window.guardarLeyendaPersonalizada = function() {
@@ -10820,6 +11783,7 @@
       alert('¡Por favor ingresá un nombre para tu Cabezón Leyenda!');
       return;
     }
+
     // ── Economy: descontar monedas por mejoras sobre 76 ──
     const BASE_STAT = 76;
     const COINS_PER_POINT = 15;
@@ -10844,14 +11808,36 @@
     const code = document.getElementById('editor-player-country').value;
     const countryInfo = EDITOR_PAISES[code] || EDITOR_PAISES.ARG;
 
-    const hairTypeVal = document.getElementById('editor-hair-type').value;
-    const beardTypeVal = document.getElementById('editor-beard-type').value;
-    const jersey1Val = document.getElementById('editor-jersey-1').value;
-    const jersey2Val = document.getElementById('editor-jersey-2').value;
+    const hairTypeVal = document.getElementById('editor-hair-type') ? document.getElementById('editor-hair-type').value : 'messi';
+    const beardTypeVal = document.getElementById('editor-beard-type') ? document.getElementById('editor-beard-type').value : 'none';
 
     const fuerzaVal = parseInt(document.getElementById('slider-fuerza').value);
     const curvaVal = parseInt(document.getElementById('slider-curva').value);
     const precisionVal = parseInt(document.getElementById('slider-precision').value);
+
+    const patternSave = document.getElementById('editor-jersey-pattern') ? document.getElementById('editor-jersey-pattern').value : 'lisa';
+    const dorsalNumSave = document.getElementById('editor-dorsal-number') ? parseInt(document.getElementById('editor-dorsal-number').value || 10) : 10;
+    const tattooSave = document.getElementById('editor-tattoo-type') ? document.getElementById('editor-tattoo-type').value : 'none';
+    const maskSave = document.getElementById('editor-mask-type') ? document.getElementById('editor-mask-type').value : 'none';
+
+    // ── Validar desbloqueo de Equipación / Kit ──
+    const freePatterns = ['lisa'];
+    const unlockedKits = typeof getUnlockedKits === 'function' ? getUnlockedKits() : freePatterns;
+    if (!freePatterns.includes(patternSave) && !unlockedKits.includes(patternSave)) {
+      triggerHaptic('heavy');
+      playSound('error');
+      alert('¡No tenés desbloqueada la equipación seleccionada! Comprala por 🪙200 antes de guardar.');
+      return;
+    }
+
+    // ── Validar desbloqueo de Máscara / Skin ──
+    const unlockedMasks = typeof getUnlockedMasks === 'function' ? getUnlockedMasks() : ['none'];
+    if (maskSave !== 'none' && !unlockedMasks.includes(maskSave)) {
+      triggerHaptic('heavy');
+      playSound('error');
+      alert('¡No tenés desbloqueada la máscara seleccionada! Comprala por 🪙250 antes de guardar.');
+      return;
+    }
 
     // Crear objeto leyenda
     const customPlayer = {
@@ -10870,54 +11856,76 @@
       beard: beardTypeVal === 'none' ? null : currentEditorHairColor,
       beardType: beardTypeVal === 'none' ? null : beardTypeVal,
       hairType: hairTypeVal,
-      jersey: [jersey1Val, jersey2Val]
+      jerseyPattern: (typeof KIT_PRESETS_MAP !== 'undefined' && KIT_PRESETS_MAP[patternSave]) ? KIT_PRESETS_MAP[patternSave].pattern : patternSave,
+      jersey: [window.currentEditorJersey1, window.currentEditorJersey2, window.currentEditorShort, window.currentEditorDorsalColor, window.currentEditorBootsColor],
+      dorsal: dorsalNumSave,
+      dorsalColor: window.currentEditorDorsalColor,
+      boots: window.currentEditorBootsColor,
+      tattoo: tattooSave,
+      mask: maskSave
     };
 
     // Guardar en localStorage
     localStorage.setItem('nx_futbol_custom_legend', JSON.stringify(customPlayer));
+    window.pendingCustomLegendToSave = customPlayer;
 
-    // Inyectar o reemplazar en MUNDIAL_JUGADORES
-    const idx = MUNDIAL_JUGADORES.findIndex(p => p.id === 'custom_legend');
-    if (idx !== -1) {
-      MUNDIAL_JUGADORES[idx] = customPlayer;
-    } else {
-      MUNDIAL_JUGADORES.unshift(customPlayer);
-    }
-
-    // Equipar inmediatamente
-    selectedPlayer = customPlayer;
-
-    // Renderizar la lista
-    renderPlayersList();
-
-    // Feedback visual y auditivo
-    triggerHaptic('success');
-    // Sonido chiptune triunfal de creación
-    try {
-      initAudio();
-      if (audioCtx) {
-        const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(440, now);
-        osc.frequency.setValueAtTime(554, now + 0.1);
-        osc.frequency.setValueAtTime(659, now + 0.2);
-        osc.frequency.setValueAtTime(880, now + 0.3);
-        
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(now + 0.5);
+    // Función auxiliar para completar el guardado tras ver el anuncio
+    window.finalizarGuardadoLeyenda = function(p) {
+      if (!p) return;
+      const idx = MUNDIAL_JUGADORES.findIndex(item => item.id === 'custom_legend');
+      if (idx !== -1) {
+        MUNDIAL_JUGADORES[idx] = p;
+      } else {
+        MUNDIAL_JUGADORES.unshift(p);
       }
-    } catch(e) {}
 
-    mostrarToastLogro('Leyenda Guardada 👑', `¡${customPlayer.nombre} ya está listo en el estadio!`, false);
-    
-    // Cerrar modal
-    document.getElementById('futbol-editor-overlay').style.display = 'none';
+      selectedPlayer = p;
+      if (typeof renderPlayersList === 'function') renderPlayersList();
+
+      triggerHaptic('success');
+      try {
+        initAudio();
+        if (audioCtx) {
+          const now = audioCtx.currentTime;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.setValueAtTime(554, now + 0.1);
+          osc.frequency.setValueAtTime(659, now + 0.2);
+          osc.frequency.setValueAtTime(880, now + 0.3);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(now + 0.5);
+        }
+      } catch(e) {}
+
+      mostrarToastLogro('Leyenda Guardada 👑', `¡${p.nombre} ya está listo en el estadio!`, false);
+      document.getElementById('futbol-editor-overlay').style.display = 'none';
+    };
+
+    window.onSaveLegendAdCompleted = function() {
+      if (window.pendingCustomLegendToSave) {
+        finalizarGuardadoLeyenda(window.pendingCustomLegendToSave);
+        window.pendingCustomLegendToSave = null;
+      }
+    };
+
+    // Mostrar Anuncio de Video al Guardar Leyenda
+    if (window.AndroidAdBridge && typeof window.AndroidAdBridge.showRewardedAd === 'function' && window.AndroidAdBridge.isAdReady()) {
+      try {
+        window.AndroidAdBridge.showRewardedAd('onSaveLegendAdCompleted');
+      } catch (e) {
+        finalizarGuardadoLeyenda(customPlayer);
+      }
+    } else {
+      console.log("Simulando anuncio de video al guardar leyenda...");
+      confirm("🤖 SIMULADOR ADMOB (Video Guardar Leyenda)\n\n¿Quieres simular ver el video publicitario al guardar tu leyenda?");
+      finalizarGuardadoLeyenda(customPlayer);
+    }
   };
 
 
@@ -21010,6 +22018,103 @@ window.iniciarEstadioJuego = function() {
   // Función para renderizar el peinado posterior (nuca/melena) de cada estrella desde atrás
   function drawHeadBack(ctx, player) {
     if (!player) return;
+    const bMask = player.mask || 'none';
+    if (bMask !== 'none') {
+      ctx.save();
+      let bSkin = player.skin || '#ffedd5';
+      if (bMask === 'zombie') bSkin = '#4ade80';
+      else if (bMask === 'alien') bSkin = '#22c55e';
+      else if (bMask === 'goat') bSkin = '#fbbf24';
+      else if (bMask === 'skeleton') bSkin = '#f8fafc';
+      else if (bMask === 'superman') bSkin = '#fed7aa';
+      
+      if (bMask === 'spidey') {
+        ctx.fillStyle = '#dc2626'; ctx.beginPath(); ctx.arc(0, 0, 16.5, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#000000'; ctx.lineWidth = 0.8;
+        ctx.beginPath(); ctx.moveTo(-16, 0); ctx.lineTo(16, 0); ctx.moveTo(0, -16); ctx.lineTo(0, 16); ctx.stroke();
+      } else if (bMask === 'batman') {
+        ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(0, 0, 16.5, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(-14, -8); ctx.lineTo(-11, -21); ctx.lineTo(-4, -15);
+        ctx.moveTo(14, -8); ctx.lineTo(11, -21); ctx.lineTo(4, -15);
+        ctx.closePath(); ctx.fill();
+      } else if (bMask === 'alien') {
+        ctx.fillStyle = '#22c55e'; ctx.beginPath(); ctx.arc(0, 0, 16.5, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.moveTo(-6, -14); ctx.lineTo(-10, -22); ctx.moveTo(6, -14); ctx.lineTo(10, -22); ctx.stroke();
+        ctx.fillStyle = '#4ade80'; ctx.beginPath(); ctx.arc(-10, -22, 2.5, 0, Math.PI * 2); ctx.arc(10, -22, 2.5, 0, Math.PI * 2); ctx.fill();
+      } else if (bMask === 'goat') {
+        ctx.fillStyle = '#fbbf24'; ctx.beginPath(); ctx.arc(0, 0, 16.5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#78350f'; ctx.strokeStyle = '#facc15'; ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.moveTo(-10, -12); ctx.quadraticCurveTo(-18, -24, -8, -22); ctx.quadraticCurveTo(-14, -18, -6, -14);
+        ctx.moveTo(10, -12); ctx.quadraticCurveTo(18, -24, 8, -22); ctx.quadraticCurveTo(14, -18, 6, -14);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+      } else if (bMask === 'skeleton') {
+        ctx.fillStyle = '#f8fafc'; ctx.beginPath(); ctx.arc(0, 0, 16.5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(0, 12, 3, 0, Math.PI * 2); ctx.fill();
+      } else if (bMask === 'zombie') {
+        ctx.fillStyle = '#4ade80'; ctx.beginPath(); ctx.arc(0, 0, 16.5, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#15803d'; ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.moveTo(-8, 6); ctx.lineTo(-4, 10); ctx.stroke();
+      } else if (bMask === 'cyborg') {
+        ctx.fillStyle = '#94a3b8'; ctx.beginPath(); ctx.arc(0, 0, 16.5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(4, 0, 3, 0, Math.PI * 2); ctx.fill();
+      } else if (bMask === 'jason') {
+        ctx.fillStyle = bSkin; ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 2.2;
+        ctx.beginPath(); ctx.moveTo(-15, -4); ctx.lineTo(0, -6); ctx.moveTo(15, -4); ctx.lineTo(0, -6); ctx.moveTo(0, -6); ctx.lineTo(0, 14); ctx.stroke();
+        ctx.fillStyle = '#64748b'; ctx.beginPath(); ctx.arc(0, -6, 2.2, 0, Math.PI * 2); ctx.fill();
+      } else if (bMask === 'scream') {
+        ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(0, 0, 16.5, 0, Math.PI * 2); ctx.fill();
+      } else if (bMask === 'scorpion') {
+        ctx.fillStyle = bSkin; ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(0, 0, 16.2, Math.PI * 1.12, Math.PI * 1.88); ctx.fill();
+        ctx.fillStyle = '#eab308'; ctx.fillRect(-2.5, 4, 5, 12);
+      } else if (bMask === 'subzero') {
+        ctx.fillStyle = bSkin; ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(0, 0, 16.2, Math.PI * 1.12, Math.PI * 1.88); ctx.fill();
+        ctx.fillStyle = '#38bdf8'; ctx.fillRect(-2.5, 4, 5, 12);
+      } else if (bMask === 'reptile') {
+        ctx.fillStyle = bSkin; ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(0, 0, 16.2, Math.PI * 1.12, Math.PI * 1.88); ctx.fill();
+        ctx.fillStyle = '#22c55e'; ctx.fillRect(-2.5, 4, 5, 12);
+      } else if (bMask === 'smoke') {
+        ctx.fillStyle = bSkin; ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(0, 0, 16.2, Math.PI * 1.12, Math.PI * 1.88); ctx.fill();
+        ctx.fillStyle = '#94a3b8'; ctx.fillRect(-2.5, 4, 5, 12);
+      } else if (bMask === 'mj_thriller') {
+        ctx.fillStyle = '#ca8a04'; ctx.beginPath(); ctx.arc(0, 0, 16.5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#18181b'; ctx.beginPath(); ctx.arc(0, -4, 18.0, 0, Math.PI * 2); ctx.fill();
+      } else if (bMask === 'rambo') {
+        ctx.fillStyle = bSkin; ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#18181b'; ctx.beginPath(); ctx.arc(0, -3, 16.5, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0, -5, 16.8, Math.PI * 1.05, Math.PI * 1.95); ctx.stroke();
+      } else if (bMask === 'terminator') {
+        ctx.fillStyle = bSkin; ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#18181b'; ctx.beginPath(); ctx.arc(0, -3, 16.5, Math.PI * 1.1, Math.PI * 1.9); ctx.fill();
+        ctx.fillStyle = '#64748b'; ctx.fillRect(4, -8, 6, 6);
+      } else if (bMask === 'omniman') {
+        ctx.fillStyle = bSkin; ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#475569'; ctx.beginPath(); ctx.arc(0, -4, 16.5, Math.PI * 1.1, Math.PI * 1.9); ctx.fill();
+        ctx.fillStyle = '#e2e8f0'; ctx.fillRect(-14, -6, 4, 10); ctx.fillRect(10, -6, 4, 10);
+      } else if (bMask === 'thor') {
+        ctx.fillStyle = '#94a3b8'; ctx.beginPath(); ctx.arc(0, -3, 16.5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#facc15'; ctx.fillRect(-12, -4, 24, 18);
+      } else if (bMask === 'ironman') {
+        ctx.fillStyle = '#dc2626'; ctx.beginPath(); ctx.arc(0, 0, 16.5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#eab308'; ctx.fillRect(-6, -10, 12, 16);
+      } else if (bMask === 'superman') {
+        // Vista trasera del Super Héroe de Acero (Nuca nítida y peinado negro con capa lateral)
+        ctx.fillStyle = '#fed7aa'; ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#18181b'; ctx.beginPath(); ctx.arc(0, -4, 16.5, Math.PI * 0.9, Math.PI * 2.1); ctx.fill();
+      } else {
+        ctx.fillStyle = bSkin; ctx.beginPath(); ctx.arc(0, 0, 16.5, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+      return;
+    }
+
     const hairClr = player.hair || '#18181b';
     const hType = player.hairType || '';
     const pId = player.id || '';
@@ -21244,6 +22349,47 @@ window.iniciarEstadioJuego = function() {
 
   function drawCabezon(ctx, x, y, player, isKicking, isGoalie, isJoyful, isDefender = false, isBackView = false, isMenuPreview = false) {
     if (!player) return;
+
+    // Skin tone override for special character masks
+    const currentMask = player.mask || 'none';
+    if (currentMask === 'superman') {
+      player.skin = '#fed7aa';
+    } else if (currentMask === 'mj_thriller') {
+      player.skin = '#ca8a04';
+    }
+
+    // Only apply character suit colors IF the player is actually wearing that suit!
+    if (player.jerseyPattern === 'superman_suit') {
+      player.jerseyColor1 = '#2563eb';
+      player.jerseyColor2 = '#dc2626';
+      player.shortColor = '#2563eb';
+      player.jersey = ['#2563eb', '#dc2626'];
+    } else if (player.jerseyPattern === 'mj_suit') {
+      player.jerseyColor1 = '#dc2626';
+      player.jerseyColor2 = '#18181b';
+      player.shortColor = '#18181b';
+      player.jersey = ['#dc2626', '#18181b'];
+    } else if (player.jerseyPattern === 'rambo_suit') {
+      player.jerseyColor1 = '#18181b';
+      player.jerseyColor2 = '#15803d';
+      player.shortColor = '#15803d';
+      player.jersey = ['#18181b', '#15803d'];
+    } else if (player.jerseyPattern === 'terminator_suit') {
+      player.jerseyColor1 = '#0f172a';
+      player.jerseyColor2 = '#64748b';
+      player.shortColor = '#0f172a';
+      player.jersey = ['#0f172a', '#64748b'];
+    } else if (player.jerseyPattern === 'thor_suit') {
+      player.jerseyColor1 = '#475569';
+      player.jerseyColor2 = '#38bdf8';
+      player.shortColor = '#334155';
+      player.jersey = ['#475569', '#38bdf8'];
+    } else if (player.jerseyPattern === 'omniman_suit') {
+      player.jerseyColor1 = '#ffffff';
+      player.jerseyColor2 = '#dc2626';
+      player.shortColor = '#ffffff';
+      player.jersey = ['#ffffff', '#dc2626'];
+    }
     ctx.save();
     ctx.translate(x, y);
     
@@ -21272,8 +22418,31 @@ window.iniciarEstadioJuego = function() {
         // Giro elegante (solo en campo de juego)
         ctx.rotate(t * 1.2);
       } else if (player.id === 'mesias') {
-        // Pequeño rebote de gratitud
-        ctx.translate(0, Math.sin(t * 0.5) * 2);
+        // Apuntar con dedos al cielo y salto de gratitud
+        ctx.translate(0, -5 - Math.abs(Math.sin(t * 1.3)) * 12);
+      } else if (player.id === 'penaldo') {
+        // Festejo SIUUU: Salto alto y pose triunfal
+        ctx.translate(0, -8 - Math.abs(Math.sin(t * 1.5)) * 16);
+      } else if (player.id === 'romaldinio') {
+        // Baile de Samba rítmico con giro leve de caderas
+        ctx.translate(Math.sin(t * 1.6) * 5, -3 - Math.abs(Math.cos(t * 1.6)) * 6);
+        ctx.rotate(Math.sin(t * 1.6) * 0.12);
+      } else if (player.id === 'batifrutta') {
+        // Salto metralleta eufórico
+        ctx.translate(0, -6 - Math.abs(Math.sin(t * 2.0)) * 13);
+      } else if (player.id === 'yamalisimo') {
+        // Baile de victoria 304 con balanceo
+        ctx.translate(Math.sin(t * 1.5) * 4, -4 - Math.abs(Math.sin(t * 1.4)) * 10);
+      } else if (player.id === 'lucho') {
+        // Salto eufórico de tres dedos en alto
+        ctx.translate(0, -7 - Math.abs(Math.sin(t * 1.4)) * 15);
+      } else if (player.id === 'becan') {
+        // Saludo elegante reverencia británica
+        ctx.translate(0, Math.sin(t * 0.8) * 3);
+        ctx.rotate(Math.sin(t * 0.8) * 0.08);
+      } else if (player.id === 'totto') {
+        // Gladiador romano planeando
+        ctx.translate(Math.sin(t * 1.2) * 5, -8 - Math.abs(Math.sin(t * 1.2)) * 6);
       } else if (player.id === 'infantino') {
         // Salto y aplauso de Infantino
         ctx.translate(0, -4 - Math.abs(Math.sin(t * 1.3)) * 8);
@@ -21628,13 +22797,183 @@ window.iniciarEstadioJuego = function() {
       ctx.lineTo(7, 24.4); ctx.lineTo(0, 27.4); ctx.lineTo(-7, 24.4);
       ctx.closePath();
       ctx.fill();
-    } else if (player.jersey[1]) {
-      ctx.strokeStyle = player.jersey[1];
-      ctx.lineWidth = 2.0;
+    } else if (player.jerseyPattern === 'banda' || player.jerseyPattern === 'river') {
+      // Banda Cruzada Diagonal (River Plate / Perú)
+      ctx.fillStyle = player.jersey[1] || '#dc2626';
       ctx.beginPath();
-      ctx.moveTo(-3, 16); ctx.lineTo(-3, 27);
-      ctx.moveTo(3, 16); ctx.lineTo(3, 27);
+      ctx.moveTo(-7, 16); ctx.lineTo(-3, 16); ctx.lineTo(7, 27); ctx.lineTo(3, 27);
+      ctx.closePath();
+      ctx.fill();
+    } else if (player.jerseyPattern === 'franja-horizontal' || player.jerseyPattern === 'boca' || player.jerseyPattern === 'psg') {
+      // Franja Horizontal al Pecho (Boca Juniors / PSG)
+      ctx.fillStyle = player.jersey[1] || '#facc15';
+      ctx.fillRect(-7, 20, 14, 4.2);
+    } else if (player.jerseyPattern === 'mitades' || player.jerseyPattern === 'galatasaray') {
+      // Mitades Bicolor (Monaco / Blackburn / Galatasaray)
+      ctx.fillStyle = player.jersey[1] || '#dc2626';
+      ctx.fillRect(0, 16, 7, 11);
+    } else if (player.jerseyPattern === 'bastones' || player.jerseyPattern === 'barca' || player.jerseyPattern === 'inter' || player.jerseyPattern === 'milan' || player.jerseyPattern === 'bayern' || player.jerseyPattern === 'juve' || player.jerseyPattern === 'atleti') {
+      // Bastones / Rayas Verticales (Argentina / Barça / Juventus / Milan / Inter)
+      ctx.fillStyle = player.jersey[1] || '#ffffff';
+      ctx.fillRect(-5, 16, 3, 11);
+      ctx.fillRect(2, 16, 3, 11);
+    } else if (player.jerseyPattern === 'spidey_suit') {
+      // Traje Arácnido (Spidey Suit)
+      ctx.fillStyle = player.jersey[1] || '#1d4ed8';
+      ctx.fillRect(-7, 16, 2.5, 11);
+      ctx.fillRect(4.5, 16, 2.5, 11);
+      ctx.fillStyle = '#000000';
+      ctx.beginPath(); ctx.ellipse(0, 21, 2, 3, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#000000'; ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.moveTo(-2, 20); ctx.lineTo(-5, 18);
+      ctx.moveTo(2, 20); ctx.lineTo(5, 18);
+      ctx.moveTo(-2, 22); ctx.lineTo(-5, 24);
+      ctx.moveTo(2, 22); ctx.lineTo(5, 24);
       ctx.stroke();
+    } else if (player.jerseyPattern === 'bat_suit') {
+      // Traje Noche Batman (Bat Suit)
+      ctx.fillStyle = '#facc15';
+      ctx.beginPath(); ctx.ellipse(0, 20.5, 4.5, 2.8, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.moveTo(-3, 20); ctx.lineTo(-1, 19.2); ctx.lineTo(0, 20.2); ctx.lineTo(1, 19.2); ctx.lineTo(3, 20);
+      ctx.lineTo(2, 21.8); ctx.lineTo(0, 22.5); ctx.lineTo(-2, 21.8);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#eab308';
+      ctx.fillRect(-7, 25.5, 14, 1.5);
+    } else if (player.jerseyPattern === 'alien_suit') {
+      // Traje Alien Monstruo
+      ctx.fillStyle = player.jersey[1] || '#38bdf8';
+      ctx.beginPath(); ctx.moveTo(0, 16); ctx.lineTo(7, 21); ctx.lineTo(0, 27); ctx.lineTo(-7, 21); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#22c55e';
+      ctx.beginPath(); ctx.arc(0, 21.5, 2.2, 0, Math.PI * 2); ctx.fill();
+    } else if (player.jerseyPattern === 'skeleton_suit') {
+      // Traje Calavera Esqueleto
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(-5, 18, 10, 1.4);
+      ctx.fillRect(-4.5, 20.5, 9, 1.4);
+      ctx.fillRect(-4, 23, 8, 1.4);
+    } else if (player.jerseyPattern === 'goat_suit') {
+      // Traje GOAT (Cabra Dorada)
+      ctx.fillStyle = player.jersey[1] || '#78350f';
+      ctx.beginPath(); ctx.moveTo(-7, 16); ctx.lineTo(0, 22); ctx.lineTo(7, 16); ctx.fill();
+      ctx.fillStyle = '#fbbf24';
+      ctx.font = '900 7px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('🐐', 0, 26);
+    } else if (player.jerseyPattern === 'zombie_suit') {
+      // Traje Zombie Mutante
+      ctx.fillStyle = player.jersey[1] || '#a855f7';
+      ctx.beginPath();
+      ctx.moveTo(-7, 16); ctx.lineTo(-3, 27); ctx.lineTo(1, 20); ctx.lineTo(7, 27); ctx.lineTo(7, 16);
+      ctx.closePath(); ctx.fill();
+    } else if (player.jerseyPattern === 'rambo_suit') {
+      // 🎖️ Traje Comando Selva: Musculosa negra y Bandolera Diagonal de Balas Doradas
+      ctx.save();
+      ctx.fillStyle = '#18181b'; ctx.fillRect(-10, -3, 20, 16);
+      // Bandolera de balas doradas cruzada en diagonal de hombro a cadera
+      ctx.strokeStyle = '#78350f'; ctx.lineWidth = 3.5;
+      ctx.beginPath(); ctx.moveTo(-9, -2); ctx.lineTo(9, 13); ctx.stroke();
+      ctx.fillStyle = '#facc15';
+      for (let i = 0; i < 5; i++) {
+        const bx = -7 + i * 3.5; const by = 0 + i * 2.8;
+        ctx.fillRect(bx - 1, by - 1.5, 2, 3);
+      }
+      ctx.restore();
+    } else if (player.jerseyPattern === 'mj_suit') {
+      // 🕺 Traje Chaqueta Roja Thriller (Franja negra en V que se extiende desde los hombros HASTA LA CINTURA)
+      ctx.save();
+      // 1. Cuerpo base de la chaqueta roja carmesí
+      ctx.fillStyle = '#b91c1c'; ctx.fillRect(-10, -3, 20, 16);
+
+      // 2. Hombreras / Cuello alto estructurado
+      ctx.fillStyle = '#991b1b';
+      ctx.beginPath();
+      ctx.moveTo(-10, -3); ctx.lineTo(-4, -6); ctx.lineTo(4, -6); ctx.lineTo(10, -3); ctx.lineTo(10, 0); ctx.lineTo(-10, 0);
+      ctx.closePath(); ctx.fill();
+
+      // 3. Franja V negra icónica súper marcada de Thriller EXTENDIDA HASTA LA CINTURA (y: 10.5)
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.moveTo(-10.5, -3); ctx.lineTo(-7.5, -3); ctx.lineTo(0, 10.5); ctx.lineTo(7.5, -3); ctx.lineTo(10.5, -3); ctx.lineTo(0, 13.0);
+      ctx.closePath(); ctx.fill();
+
+      // 4. Botonera vertical central con solapa recta
+      ctx.fillStyle = '#991b1b'; ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 1.0;
+      ctx.fillRect(-2.2, -3, 4.4, 14); ctx.strokeRect(-2.2, -3, 4.4, 14);
+
+      // Botones de presión plateados en la botonera central
+      ctx.fillStyle = '#f8fafc';
+      for (let btnY = -1; btnY <= 9; btnY += 3.2) {
+        ctx.beginPath(); ctx.arc(0, btnY, 0.8, 0, Math.PI * 2); ctx.fill();
+      }
+
+      // 5. Cinturilla negra en la parte inferior de la chaqueta
+      ctx.fillStyle = '#0f172a'; ctx.fillRect(-10, 10.5, 20, 2.5);
+
+      // 6. Guante Blanco de lentejuelas icónico en la mano derecha
+      ctx.fillStyle = '#ffffff'; ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 8;
+      ctx.beginPath(); ctx.arc(-11, 7, 3.5, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 0.6; ctx.stroke();
+      ctx.restore();
+    } else if (player.jerseyPattern === 'superman_suit') {
+      // 🦸 Traje del Super Héroe de Acero (Torso Azul Real, Escudo Pentagonal Amarillo con la 'S' Roja nítida en el pecho y cinturón amarillo)
+      ctx.save();
+      // Torso Azul Real (#2563eb)
+      ctx.fillStyle = '#2563eb'; ctx.fillRect(-7, 16, 14, 11);
+
+      // Escudo Pentagonal Amarillo en el Pecho (y: 17.5 a 24.5)
+      ctx.fillStyle = '#facc15'; ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 1.0;
+      ctx.beginPath();
+      ctx.moveTo(-5, 17.5); ctx.lineTo(5, 17.5); ctx.lineTo(6, 20.5); ctx.lineTo(0, 24.5); ctx.lineTo(-6, 20.5);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+
+      // Letra 'S' roja icónica en el centro del pecho
+      ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 1.6; ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(3, 19); ctx.lineTo(0, 19); ctx.lineTo(-1.8, 20.5); ctx.lineTo(1.8, 22); ctx.lineTo(-2.5, 23.5);
+      ctx.stroke();
+
+      // Cinturón amarillo brillante en la cintura
+      ctx.fillStyle = '#facc15'; ctx.fillRect(-7, 25.5, 14, 1.8);
+      ctx.restore();
+    } else if (player.jerseyPattern === 'cyborg_suit') {
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillRect(-7, 16, 14, 11);
+      ctx.fillStyle = player.jersey[1] || '#ef4444';
+      ctx.beginPath(); ctx.arc(0, 21, 3.2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath(); ctx.arc(0, 21, 1.2, 0, Math.PI * 2); ctx.fill();
+    } else if (player.jerseyPattern === 'jason_suit') {
+      ctx.fillStyle = '#334155'; ctx.fillRect(-7, 16, 14, 11);
+      ctx.fillStyle = '#dc2626'; ctx.beginPath(); ctx.arc(-2, 19, 1.8, 0, Math.PI * 2); ctx.fill();
+    } else if (player.jerseyPattern === 'scream_suit') {
+      ctx.fillStyle = '#0f172a'; ctx.fillRect(-7, 16, 14, 11);
+      ctx.strokeStyle = '#334155'; ctx.lineWidth = 1.0;
+      ctx.beginPath(); ctx.moveTo(-7, 27); ctx.lineTo(-4, 23); ctx.lineTo(0, 27); ctx.lineTo(4, 23); ctx.lineTo(7, 27); ctx.stroke();
+    } else if (player.jerseyPattern === 'scorpion_suit') {
+      ctx.fillStyle = '#0f172a'; ctx.fillRect(-7, 16, 14, 11);
+      ctx.fillStyle = '#eab308'; ctx.beginPath(); ctx.moveTo(-7, 16); ctx.lineTo(0, 26); ctx.lineTo(7, 16); ctx.fill();
+      ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.moveTo(-3, 16); ctx.lineTo(0, 20); ctx.lineTo(3, 16); ctx.fill();
+    } else if (player.jerseyPattern === 'subzero_suit') {
+      ctx.fillStyle = '#0f172a'; ctx.fillRect(-7, 16, 14, 11);
+      ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.moveTo(-7, 16); ctx.lineTo(0, 26); ctx.lineTo(7, 16); ctx.fill();
+      ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.moveTo(-3, 16); ctx.lineTo(0, 20); ctx.lineTo(3, 16); ctx.fill();
+    } else if (player.jerseyPattern === 'reptile_suit') {
+      ctx.fillStyle = '#0f172a'; ctx.fillRect(-7, 16, 14, 11);
+      ctx.fillStyle = '#22c55e'; ctx.beginPath(); ctx.moveTo(-7, 16); ctx.lineTo(0, 26); ctx.lineTo(7, 16); ctx.fill();
+      ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.moveTo(-3, 16); ctx.lineTo(0, 20); ctx.lineTo(3, 16); ctx.fill();
+    } else if (player.jerseyPattern === 'smoke_suit') {
+      ctx.fillStyle = '#0f172a'; ctx.fillRect(-7, 16, 14, 11);
+      ctx.fillStyle = '#94a3b8'; ctx.beginPath(); ctx.moveTo(-7, 16); ctx.lineTo(0, 26); ctx.lineTo(7, 16); ctx.fill();
+      ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.moveTo(-3, 16); ctx.lineTo(0, 20); ctx.lineTo(3, 16); ctx.fill();
+    } else if (player.jerseyPattern !== 'lisa' && player.jersey[1] && player.jersey[1] !== player.jersey[0]) {
+      // Rayas estándar si jerseyPattern no está especificado pero hay 2do color
+      ctx.fillStyle = player.jersey[1];
+      ctx.fillRect(-4, 16, 2.5, 11);
+      ctx.fillRect(1.5, 16, 2.5, 11);
     }
     
     // Infantino suit details (white shirt and red tie)
@@ -21667,10 +23006,103 @@ window.iniciarEstadioJuego = function() {
     ctx.stroke();
     ctx.restore();
 
+    // ── MÁSCARAS ESPECIALES EN VISTA DE ESPALDA (Spider logo, Bat ears, Skull, Cyborg core) ──
+    if (isBackView && player.mask && player.mask !== 'none') {
+      const bMask = player.mask;
+      ctx.save();
+      ctx.translate(0, breathY);
+      if (bMask === 'spidey') {
+        // Fondo rojo de máscara
+        ctx.fillStyle = '#dc2626';
+        ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        // Logo de araña gigante en la nuca
+        ctx.fillStyle = '#000000';
+        ctx.beginPath(); ctx.ellipse(0, 0, 4, 6, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#000000'; ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(-4, -2); ctx.lineTo(-9, -6);
+        ctx.moveTo(4, -2); ctx.lineTo(9, -6);
+        ctx.moveTo(-4, 2); ctx.lineTo(-9, 6);
+        ctx.moveTo(4, 2); ctx.lineTo(9, 6);
+        ctx.stroke();
+      } else if (bMask === 'batman') {
+        // Capucha negra Batman con orejas de espaldas
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(-14, -8); ctx.lineTo(-11, -21); ctx.lineTo(-4, -15);
+        ctx.moveTo(14, -8); ctx.lineTo(11, -21); ctx.lineTo(4, -15);
+        ctx.closePath(); ctx.fill();
+      } else if (bMask === 'skeleton') {
+        // Cráneo blanco de espaldas con vértebra espinal
+        ctx.fillStyle = '#f8fafc';
+        ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.0;
+        ctx.beginPath(); ctx.moveTo(0, -14); ctx.lineTo(0, 14); ctx.stroke();
+        // Vértebras en el cuello
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(-2, 10, 4, 1.5); ctx.fillRect(-2, 13, 4, 1.5);
+      } else if (bMask === 'zombie') {
+        // Cabeza verde zombie con parche de cerebro expuesto rosa
+        ctx.fillStyle = '#4ade80';
+        ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#ec4899';
+        ctx.beginPath(); ctx.arc(-5, -7, 4.5, 0, Math.PI * 2); ctx.fill();
+      } else if (bMask === 'alien') {
+        // Cabeza Alien verde con manchas cósmicas
+        ctx.fillStyle = '#22c55e';
+        ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#15803d';
+        ctx.beginPath(); ctx.arc(-4, -6, 3, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(5, 4, 2.5, 0, Math.PI * 2); ctx.fill();
+      } else if (bMask === 'goat') {
+        // Cabeza de cabra dorada de espaldas con cuernos
+        ctx.fillStyle = '#fbbf24';
+        ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#78350f';
+        ctx.beginPath();
+        ctx.moveTo(-10, -12); ctx.quadraticCurveTo(-18, -24, -8, -22); ctx.quadraticCurveTo(-14, -18, -6, -14);
+        ctx.moveTo(10, -12); ctx.quadraticCurveTo(18, -24, 8, -22); ctx.quadraticCurveTo(14, -18, 6, -14);
+        ctx.closePath(); ctx.fill();
+      } else if (bMask === 'cyborg') {
+        ctx.fillStyle = '#94a3b8';
+        ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#ef4444';
+        ctx.beginPath(); ctx.arc(4, 0, 3, 0, Math.PI * 2); ctx.fill();
+      } else if (bMask === 'jason') {
+        ctx.fillStyle = player.skin || '#ffedd5';
+        ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.moveTo(-15, -4); ctx.lineTo(0, -6); ctx.moveTo(15, -4); ctx.lineTo(0, -6); ctx.moveTo(0, -6); ctx.lineTo(0, 14); ctx.stroke();
+        ctx.fillStyle = '#64748b'; ctx.beginPath(); ctx.arc(0, -6, 2.2, 0, Math.PI * 2); ctx.fill();
+      } else if (bMask === 'scream') {
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath(); ctx.arc(0, 0, 16.5, 0, Math.PI * 2); ctx.fill();
+      } else if (bMask === 'scorpion') {
+        ctx.fillStyle = player.skin || '#ffedd5'; ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(0, 0, 16.2, Math.PI * 1.12, Math.PI * 1.88); ctx.fill();
+        ctx.fillStyle = '#eab308'; ctx.fillRect(-2.5, 4, 5, 12);
+      } else if (bMask === 'subzero') {
+        ctx.fillStyle = player.skin || '#ffedd5'; ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(0, 0, 16.2, Math.PI * 1.12, Math.PI * 1.88); ctx.fill();
+        ctx.fillStyle = '#38bdf8'; ctx.fillRect(-2.5, 4, 5, 12);
+      } else if (bMask === 'reptile') {
+        ctx.fillStyle = player.skin || '#ffedd5'; ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(0, 0, 16.2, Math.PI * 1.12, Math.PI * 1.88); ctx.fill();
+        ctx.fillStyle = '#22c55e'; ctx.fillRect(-2.5, 4, 5, 12);
+      } else if (bMask === 'smoke') {
+        ctx.fillStyle = player.skin || '#ffedd5'; ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(0, 0, 16.2, Math.PI * 1.12, Math.PI * 1.88); ctx.fill();
+        ctx.fillStyle = '#94a3b8'; ctx.fillRect(-2.5, 4, 5, 12);
+      }
+      ctx.restore();
+    }
+
     // ── DORSAL DE ESPALDA (Para vista de espaldas al apuntar) ──
     if (isBackView) {
       const numDorsal = player.dorsal || (typeof PLAYER_DORSALS !== 'undefined' ? PLAYER_DORSALS[player.id] : null) || '10';
-      const numColor = (typeof PLAYER_DORSAL_COLORS !== 'undefined' ? PLAYER_DORSAL_COLORS[player.id] : null) || player.jersey[1] || '#ffffff';
+      const numColor = player.dorsalColor || player.jersey[3] || (typeof PLAYER_DORSAL_COLORS !== 'undefined' ? PLAYER_DORSAL_COLORS[player.id] : null) || '#ffffff';
       ctx.save();
       if (shouldMirror) {
         ctx.scale(-1, 1); // Des-espejar el texto para que el 10 no se lea 01
@@ -21690,7 +23122,7 @@ window.iniciarEstadioJuego = function() {
     }
 
     // Pantalones cortos / Shorts (y=27 a y=34) con color personalizado
-    const shortsColor = player.jersey[2] || player.jersey[1] || '#ffffff';
+    const shortsColor = player.jersey[2] || '#ffffff';
     ctx.fillStyle = shortsColor;
     ctx.beginPath();
     ctx.roundRect(-7.5, 27, 15, 7, [0, 0, 4, 4]);
@@ -21705,14 +23137,30 @@ window.iniciarEstadioJuego = function() {
     ctx.lineWidth = 1.0;
     ctx.strokeRect(-7.5, 27, 15, 7);
 
-    // ── PIERNAS Y MEDIAS DE FÚTBOL ──
-    // Piernas (color piel)
-    ctx.strokeStyle = player.skin;
+    // ── PIERNAS Y MEDIAS DE FÚTBOL (Con soporte para Máscaras Especiales) ──
+    const maskId = player.mask || 'none';
+    let legSkinColor = player.skin;
+    if (maskId === 'zombie') legSkinColor = '#4ade80';
+    else if (maskId === 'alien') legSkinColor = '#22c55e';
+    else if (maskId === 'goat') legSkinColor = '#fbbf24';
+    else if (maskId === 'skeleton') legSkinColor = '#f8fafc';
+    else if (maskId === 'spidey') legSkinColor = '#dc2626';
+
+    ctx.strokeStyle = legSkinColor;
     ctx.lineWidth = 3.0;
     ctx.beginPath();
     ctx.moveTo(-4, 34); ctx.lineTo(-4, 40);
     ctx.moveTo(4, 34); ctx.lineTo(4, 40);
     ctx.stroke();
+
+    // Detalle de huesos para Calavera Esqueleto en las piernas
+    if (maskId === 'skeleton') {
+      ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.moveTo(-4, 34); ctx.lineTo(-4, 40);
+      ctx.moveTo(4, 34); ctx.lineTo(4, 40);
+      ctx.stroke();
+    }
 
     // ── TATUAJE BLACKOUT EN LA PIERNA IZQUIERDA DE MESSI (#10) ──
     if (player.id === 'mesias') {
@@ -21770,7 +23218,8 @@ window.iniciarEstadioJuego = function() {
     ctx.stroke();
     
     // Botines con tacos (cleats), cordones y detalles de realismo
-    ctx.fillStyle = isKicking ? '#38bdf8' : (player.bootColor || '#eab308');
+    const finalBootsColor = player.boots || player.bootColor || (player.jersey && player.jersey[4]) || '#18181b';
+    ctx.fillStyle = isKicking ? '#38bdf8' : finalBootsColor;
     ctx.beginPath();
     ctx.roundRect(-6.2, 39, 4.2, 3.2, 1);
     ctx.roundRect(2, 39, 4.2, 3.2, 1);
@@ -21831,8 +23280,9 @@ window.iniciarEstadioJuego = function() {
       ctx.stroke();
 
       // ── TINTA DE MANGA EN EL BRAZO SUPERIOR (visible sobre la tela como tatuaje oscuro) ──
-      const _isMessiRightUp = (player.id === 'mesias' && !isLeft);
-      const _isNeymarUp = (player.id === 'neymareado');
+      const isCustomTattoo = (player.tattoo && player.tattoo !== 'none');
+      const _isMessiRightUp = (player.id === 'mesias' && !isLeft) || (isCustomTattoo && (player.tattoo === 'sleeve' || player.tattoo === 'both'));
+      const _isNeymarUp = (player.id === 'neymareado') || (isCustomTattoo && (player.tattoo === 'both' || player.tattoo === 'neck'));
       if (_isMessiRightUp || _isNeymarUp) {
         ctx.save();
         // Superposición de tinta oscura semi-transparente sobre la manga de la camiseta
@@ -21910,13 +23360,21 @@ window.iniciarEstadioJuego = function() {
       ctx.rotate(angleHand);
 
       // Antebrazo cónico (estrecho en el codo, más grueso hacia la muñeca si es arquero)
+      const maskIdArm = player.mask || 'none';
+      let armSkin = player.skin;
+      if (maskIdArm === 'zombie') armSkin = '#4ade80';
+      else if (maskIdArm === 'alien') armSkin = '#22c55e';
+      else if (maskIdArm === 'goat') armSkin = '#fbbf24';
+      else if (maskIdArm === 'skeleton') armSkin = '#f8fafc';
+      else if (maskIdArm === 'cyborg' && !isLeft) armSkin = '#94a3b8';
+      else if (maskIdArm === 'spidey') armSkin = '#dc2626';
+
       const forearmW = isGoalie ? 2.2 : 1.8;
-      ctx.fillStyle = player.skin;
-      // Degradado piel para dar volumen
+      ctx.fillStyle = armSkin;
       const skinGrad = ctx.createLinearGradient(-forearmW, 0, forearmW, 7);
-      skinGrad.addColorStop(0, player.skin);
-      skinGrad.addColorStop(0.5, player.skin + 'ee');
-      skinGrad.addColorStop(1, player.skin + 'bb');
+      skinGrad.addColorStop(0, armSkin);
+      skinGrad.addColorStop(0.5, armSkin);
+      skinGrad.addColorStop(1, armSkin);
       ctx.fillStyle = skinGrad;
       ctx.strokeStyle = 'rgba(0,0,0,0.2)';
       ctx.lineWidth = 0.7;
@@ -21930,8 +23388,9 @@ window.iniciarEstadioJuego = function() {
       ctx.stroke();
 
       // ── MANGA COMPLETA DE TATUAJE (Todo el brazo) - Messi brazo derecho, Neymar ambos brazos ──
-      const isMessiRightArm = (player.id === 'mesias' && !isLeft);
-      const isNeymarArm = (player.id === 'neymareado');
+      const isCustomTattooForearm = (player.tattoo && player.tattoo !== 'none');
+      const isMessiRightArm = (player.id === 'mesias' && !isLeft) || (isCustomTattooForearm && (player.tattoo === 'sleeve' || player.tattoo === 'both'));
+      const isNeymarArm = (player.id === 'neymareado') || (isCustomTattooForearm && (player.tattoo === 'both' || player.tattoo === 'neck'));
       if (isMessiRightArm || isNeymarArm) {
         ctx.save();
         // Capa semi-translúcida oscura cubriendo todo el antebrazo (manga de tinta)
@@ -22041,13 +23500,34 @@ window.iniciarEstadioJuego = function() {
         rightHandAngle  =  Math.PI * 0.15;
       }
     } else if (isJoyful) {
-      // Celebración: Brazos arriba en V agitándose
+      // Celebración: Brazos adaptados por personaje
       const wave = Math.sin(t_now * 0.035) * 0.22;
       const bounce = Math.sin(t_now * 0.05) * 0.08;
-      leftElbowAngle = -Math.PI * 0.72 + wave;
-      leftHandAngle = -Math.PI * 0.15 + bounce;
-      rightElbowAngle = Math.PI * 0.72 - wave;
-      rightHandAngle = Math.PI * 0.15 - bounce;
+      
+      if (player.id === 'mesias') {
+        // Apuntar con ambos brazos arriba señalando al cielo
+        leftElbowAngle = -Math.PI * 0.85 + wave * 0.5;
+        leftHandAngle = -Math.PI * 0.1;
+        rightElbowAngle = Math.PI * 0.85 - wave * 0.5;
+        rightHandAngle = Math.PI * 0.1;
+      } else if (player.id === 'penaldo') {
+        // Pose SIUUU: Brazos bien abiertos en V triunfal
+        leftElbowAngle = -Math.PI * 0.45 + wave;
+        leftHandAngle = -Math.PI * 0.2;
+        rightElbowAngle = Math.PI * 0.45 - wave;
+        rightHandAngle = Math.PI * 0.2;
+      } else if (player.id === 'romaldinio') {
+        // Brazos en ritmo de samba
+        leftElbowAngle = -Math.PI * 0.65 + Math.sin(t_now * 0.04) * 0.3;
+        leftHandAngle = -Math.PI * 0.15;
+        rightElbowAngle = Math.PI * 0.65 - Math.sin(t_now * 0.04) * 0.3;
+        rightHandAngle = Math.PI * 0.15;
+      } else {
+        leftElbowAngle = -Math.PI * 0.72 + wave;
+        leftHandAngle = -Math.PI * 0.15 + bounce;
+        rightElbowAngle = Math.PI * 0.72 - wave;
+        rightHandAngle = Math.PI * 0.15 - bounce;
+      }
     } else if (isKicking) {
       // Disparo: Brazos bien abiertos para equilibrio en el tiro
       leftElbowAngle = -Math.PI * 0.5;
@@ -22066,13 +23546,21 @@ window.iniciarEstadioJuego = function() {
     drawArm(true, leftElbowAngle, leftHandAngle);
     drawArm(false, rightElbowAngle, rightHandAngle);
 
-    // Orejas (dibujadas justo detrás del globo de la cabeza para un traslape limpio)
-    // Translación para respiración de la cabeza
+    const maskType = player.mask || 'none';
+    let baseSkin = player.skin || '#ffedd5';
+    if (maskType === 'zombie') baseSkin = '#4ade80';
+    else if (maskType === 'mj_thriller') baseSkin = '#ca8a04';
+    else if (maskType === 'alien') baseSkin = '#22c55e';
+    else if (maskType === 'goat') baseSkin = '#fbbf24';
+    else if (maskType === 'skeleton') baseSkin = '#f8fafc';
+    else if (maskType === 'superman') baseSkin = '#fed7aa';
+
+    // Orejas (dibujadas justo detrás del globo de la cabeza con el tono exacto de baseSkin)
     ctx.save();
     ctx.translate(0, breathY);
 
     ctx.save();
-    ctx.fillStyle = player.skin;
+    ctx.fillStyle = baseSkin;
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)';
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -22106,18 +23594,547 @@ window.iniciarEstadioJuego = function() {
       ctx.restore();
     }
 
+// baseSkin already calculated above
+
     const headGrad = ctx.createRadialGradient(-5, -6, 2, 0, 0, 16);
-    headGrad.addColorStop(0, player.skin + 'ff');
-    headGrad.addColorStop(0.6, player.skin);
-    headGrad.addColorStop(1, player.skin + 'cc');
+    headGrad.addColorStop(0, baseSkin + 'ff');
+    headGrad.addColorStop(0.6, baseSkin);
+    headGrad.addColorStop(1, baseSkin + 'cc');
     ctx.beginPath();
     ctx.arc(0, 0, 16, 0, Math.PI * 2);
     ctx.fillStyle = headGrad;
     ctx.fill();
-    // Contorno sutil
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)';
     ctx.lineWidth = 0.8;
     ctx.stroke();
+
+    // ── MÁSCARAS Y APARIENCIAS ESPECIALES (Spidey, Batman, Zombie, GOAT, Alien, Skeleton, Cyborg) ──
+    if (maskType === 'spidey') {
+      ctx.save();
+      // Máscara roja Spidey
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+      // Telarañas
+      ctx.strokeStyle = '#000000'; ctx.lineWidth = 0.6;
+      ctx.beginPath();
+      ctx.moveTo(-16, 0); ctx.lineTo(16, 0);
+      ctx.moveTo(0, -16); ctx.lineTo(0, 16);
+      ctx.moveTo(-11, -11); ctx.lineTo(11, 11);
+      ctx.moveTo(-11, 11); ctx.lineTo(11, -11);
+      ctx.stroke();
+      // Ojos blancos almendrados Spidey
+      ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#000000'; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.ellipse(-6, -2, 4.5, 3, Math.PI * 0.15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(6, -2, 4.5, 3, -Math.PI * 0.15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.restore();
+    } else if (maskType === 'batman') {
+      ctx.save();
+      // Capucha Caballero Murciélago (cubre frente y sienes, deja libre la boca y barbilla)
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.arc(0, 0, 16.2, Math.PI * 0.85, Math.PI * 2.15);
+      ctx.lineTo(13.5, 3.5);
+      ctx.lineTo(7, 3.5);
+      ctx.lineTo(0, 1.5);
+      ctx.lineTo(-7, 3.5);
+      ctx.lineTo(-13.5, 3.5);
+      ctx.closePath();
+      ctx.fill();
+      // Orejas de murciélago en la coronilla
+      ctx.beginPath();
+      ctx.moveTo(-14, -8); ctx.lineTo(-11, -21); ctx.lineTo(-4, -15);
+      ctx.moveTo(14, -8); ctx.lineTo(11, -21); ctx.lineTo(4, -15);
+      ctx.closePath(); ctx.fill();
+      // Lentes blancos brillantes inclinados
+      ctx.fillStyle = '#ffffff'; ctx.shadowColor = '#60a5fa'; ctx.shadowBlur = 6;
+      ctx.beginPath(); ctx.ellipse(-5.5, -2.5, 4.0, 2.3, -0.2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(5.5, -2.5, 4.0, 2.3, 0.2, 0, Math.PI * 2); ctx.fill();
+      // Boca heroica expresiva sobre la barbilla visible
+      ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 1.6; ctx.lineCap = 'round'; ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.arc(0, 5.2, 3.2, 0, Math.PI);
+      ctx.stroke();
+      ctx.restore();
+    } else if (maskType === 'goat') {
+      ctx.save();
+      // Cuernos de cabra dorada GOAT
+      ctx.fillStyle = '#78350f'; ctx.strokeStyle = '#facc15'; ctx.lineWidth = 1.0;
+      ctx.beginPath();
+      ctx.moveTo(-10, -12); ctx.quadraticCurveTo(-18, -24, -8, -22); ctx.quadraticCurveTo(-14, -18, -6, -14);
+      ctx.moveTo(10, -12); ctx.quadraticCurveTo(18, -24, 8, -22); ctx.quadraticCurveTo(14, -18, 6, -14);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      // Orejas doradas caídas a los lados
+      ctx.fillStyle = '#d97706';
+      ctx.beginPath(); ctx.ellipse(-16, -3, 5, 2.5, -0.4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(16, -3, 5, 2.5, 0.4, 0, Math.PI * 2); ctx.fill();
+      // Ojos de Cabra Dorada: Blancos brillantes con pupila horizontal dorada
+      ctx.fillStyle = '#ffffff'; ctx.shadowColor = '#facc15'; ctx.shadowBlur = 8;
+      ctx.beginPath(); ctx.ellipse(-5.5, -2, 3.8, 3.0, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(5.5, -2, 3.8, 3.0, 0, 0, Math.PI * 2); ctx.fill();
+      // Pupila de cabra horizontal
+      ctx.fillStyle = '#78350f'; ctx.shadowBlur = 0;
+      ctx.fillRect(-7.2, -2.8, 3.4, 1.6); ctx.fillRect(3.8, -2.8, 3.4, 1.6);
+      // Cejas doradas triunfales
+      ctx.strokeStyle = '#78350f'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(-8, -6); ctx.lineTo(-2, -5); ctx.moveTo(8, -6); ctx.lineTo(2, -5); ctx.stroke();
+      // Hocico y boca sonriente de cabra
+      ctx.fillStyle = '#78350f';
+      ctx.beginPath(); ctx.moveTo(-2, 3); ctx.lineTo(2, 3); ctx.lineTo(0, 5); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = '#78350f'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(0, 5); ctx.lineTo(0, 7); ctx.moveTo(-3, 8); ctx.quadraticCurveTo(0, 10, 3, 8); ctx.stroke();
+      // Barba de chivo dorada bajo la barbilla
+      ctx.fillStyle = '#d97706';
+      ctx.beginPath(); ctx.moveTo(-3, 14); ctx.lineTo(0, 22); ctx.lineTo(3, 14); ctx.closePath(); ctx.fill();
+      ctx.restore();
+    } else if (maskType === 'alien') {
+      ctx.save();
+      // Antenas alienígenas
+      ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(-6, -14); ctx.lineTo(-10, -22); ctx.moveTo(6, -14); ctx.lineTo(10, -22); ctx.stroke();
+      ctx.fillStyle = '#4ade80';
+      ctx.beginPath(); ctx.arc(-10, -22, 2.5, 0, Math.PI * 2); ctx.arc(10, -22, 2.5, 0, Math.PI * 2); ctx.fill();
+      // Ojos alien negros grandes y estilizados
+      ctx.fillStyle = '#000000';
+      ctx.beginPath(); ctx.ellipse(-5.5, -2, 5, 3.8, -0.2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(5.5, -2, 5, 3.8, 0.2, 0, Math.PI * 2); ctx.fill();
+      // Brillos de luz en los ojos
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath(); ctx.arc(-6.5, -3.2, 1.2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(4.5, -3.2, 1.2, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    } else if (maskType === 'skeleton') {
+      ctx.save();
+      // Cuencas oscuras de calavera
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath(); ctx.ellipse(-5, -2, 4, 3.5, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(5, -2, 4, 3.5, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(0, 3); ctx.lineTo(-2, 6); ctx.lineTo(2, 6); ctx.closePath(); ctx.fill();
+      // Dientes de esqueleto
+      ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 1.0;
+      ctx.beginPath(); ctx.moveTo(-6, 10); ctx.lineTo(6, 10);
+      for(let tx = -5; tx <= 5; tx += 2.5) { ctx.moveTo(tx, 8); ctx.lineTo(tx, 12); }
+      ctx.stroke();
+      ctx.restore();
+    } else if (maskType === 'cyborg') {
+      ctx.save();
+      // 1. Base del casco de titanio cibernético cromado (Rostro completo)
+      ctx.fillStyle = '#475569';
+      ctx.beginPath(); ctx.arc(0, 0, 16.2, 0, Math.PI * 2); ctx.fill();
+
+      // Placa de titanio cepillado lado derecho
+      ctx.fillStyle = '#64748b';
+      ctx.beginPath(); ctx.arc(0, 0, 16.2, -Math.PI * 0.5, Math.PI * 0.5); ctx.fill();
+
+      // Líneas de paneles metálicos y costuras cyber
+      ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(0, -16.2); ctx.lineTo(0, 16.2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-16, -4); ctx.lineTo(16, -4); ctx.stroke();
+
+      // Remaches de acero en frente, mejillas y barbilla
+      ctx.fillStyle = '#cbd5e1';
+      ctx.beginPath();
+      ctx.arc(-11, -8, 0.9, 0, Math.PI * 2); ctx.arc(11, -8, 0.9, 0, Math.PI * 2);
+      ctx.arc(-13, 4, 0.9, 0, Math.PI * 2); ctx.arc(13, 4, 0.9, 0, Math.PI * 2);
+      ctx.arc(-5, 13, 0.9, 0, Math.PI * 2); ctx.arc(5, 13, 0.9, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Microchip / Núcleo de energía central en la frente
+      ctx.fillStyle = '#0f172a'; ctx.fillRect(-3, -13, 6, 4);
+      ctx.fillStyle = '#38bdf8'; ctx.shadowColor = '#38bdf8'; ctx.shadowBlur = 6;
+      ctx.fillRect(-1.8, -11.8, 3.6, 1.6);
+      ctx.shadowBlur = 0;
+
+      // 💥 OJO DERECHO: LÁSER ROJO T-800 PULSANTE
+      const tGlow = 8 + Math.sin(Date.now() * 0.008) * 4;
+      ctx.shadowColor = '#ef4444'; ctx.shadowBlur = tGlow;
+      ctx.fillStyle = '#0f172a'; ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.0;
+      ctx.beginPath(); ctx.arc(5.5, -3, 4.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+      const eyeGradR = ctx.createRadialGradient(5.5, -3, 0.5, 5.5, -3, 4);
+      eyeGradR.addColorStop(0, '#ffffff');
+      eyeGradR.addColorStop(0.35, '#f87171');
+      eyeGradR.addColorStop(0.8, '#dc2626');
+      eyeGradR.addColorStop(1, '#7f1d1d');
+      ctx.fillStyle = eyeGradR;
+      ctx.beginPath(); ctx.arc(5.5, -3, 3.8, 0, Math.PI * 2); ctx.fill();
+
+      // ⚡ OJO IZQUIERDO: SENSOR VISOR CIBERNÉTICO CYAN NEÓN
+      ctx.shadowColor = '#06b6d4'; ctx.shadowBlur = 8;
+      ctx.fillStyle = '#0f172a'; ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.0;
+      ctx.beginPath(); ctx.arc(-5.5, -3, 4.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+      const eyeGradL = ctx.createRadialGradient(-5.5, -3, 0.5, -5.5, -3, 4);
+      eyeGradL.addColorStop(0, '#ffffff');
+      eyeGradL.addColorStop(0.35, '#67e8f9');
+      eyeGradL.addColorStop(0.8, '#06b6d4');
+      eyeGradL.addColorStop(1, '#164e63');
+      ctx.fillStyle = eyeGradL;
+      ctx.beginPath(); ctx.arc(-5.5, -3, 3.8, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Destellos centrales de luz en ambos ojos robot
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath(); ctx.arc(-6.5, -4.2, 0.9, 0, Math.PI * 2); ctx.arc(4.3, -4.2, 0.9, 0, Math.PI * 2); ctx.fill();
+
+      // 🤖 BOCA CIBERNÉTICA Y REJILLA DE ALTAVOZ
+      ctx.fillStyle = '#0f172a'; ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1.0;
+      ctx.beginPath();
+      ctx.fillRect(-6.5, 4.5, 13, 6);
+      ctx.fill(); ctx.stroke();
+
+      // Rejillas cibernéticas de boca
+      ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 1.2;
+      for (let gx = -4.5; gx <= 4.5; gx += 2.2) {
+        ctx.beginPath(); ctx.moveTo(gx, 5.5); ctx.lineTo(gx, 9.5); ctx.stroke();
+      }
+      ctx.restore();
+    } else if (maskType === 'jason') {
+      ctx.save();
+      ctx.fillStyle = '#f8fafc'; ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.0;
+      ctx.beginPath(); ctx.ellipse(0, 0, 15, 15.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath(); ctx.moveTo(-1, -12); ctx.lineTo(1, -12); ctx.lineTo(0, -7); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(-11, 2); ctx.lineTo(-11, 4); ctx.lineTo(-7, 3); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(11, 2); ctx.lineTo(11, 4); ctx.lineTo(7, 3); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.arc(-5, -2, 2.5, 0, Math.PI * 2); ctx.arc(5, -2, 2.5, 0, Math.PI * 2);
+      ctx.arc(0, 4, 1.2, 0, Math.PI * 2);
+      ctx.arc(-4, 9, 1.0, 0, Math.PI * 2); ctx.arc(-2, 9, 1.0, 0, Math.PI * 2); ctx.arc(0, 9, 1.0, 0, Math.PI * 2); ctx.arc(2, 9, 1.0, 0, Math.PI * 2); ctx.arc(4, 9, 1.0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    } else if (maskType === 'scream') {
+      ctx.save();
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath(); ctx.arc(0, 0, 16.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath(); ctx.ellipse(0, 1, 11, 14, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath(); ctx.ellipse(-4.5, -3, 3.2, 4.5, 0.2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(4.5, -3, 3.2, 4.5, -0.2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(0, 6, 3.0, 6.5, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    } else if (maskType === 'zombie') {
+      ctx.save();
+      // Ojos de Zombi Infectado: Cuencas podridas oscuras
+      ctx.fillStyle = '#14532d';
+      ctx.beginPath(); ctx.ellipse(-5, -2, 4.2, 3.5, -0.1, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(5, -2, 4.2, 3.5, 0.1, 0, Math.PI * 2); ctx.fill();
+      // Iris amarillento infectado
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath(); ctx.arc(-5, -2, 2.5, 0, Math.PI * 2); ctx.arc(5, -2, 2.5, 0, Math.PI * 2); ctx.fill();
+      // Pupila negra zombi
+      ctx.fillStyle = '#000000';
+      ctx.beginPath(); ctx.arc(-5, -2, 1.0, 0, Math.PI * 2); ctx.arc(5, -2, 1.0, 0, Math.PI * 2); ctx.fill();
+      // Cejas podridas enojadas
+      ctx.strokeStyle = '#166534'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(-8, -6); ctx.lineTo(-2, -3.5); ctx.moveTo(8, -6); ctx.lineTo(2, -3.5); ctx.stroke();
+      // Boca abierta de Zombi con dientes amarillos desalineados
+      ctx.fillStyle = '#052e16';
+      ctx.beginPath(); ctx.ellipse(0, 7, 5.5, 3.2, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fef08a';
+      ctx.fillRect(-3, 4.8, 1.5, 2); ctx.fillRect(1.5, 4.8, 1.5, 2); ctx.fillRect(-1.5, 7.5, 1.5, 1.8);
+      // Costuras/cicatrices en la cara
+      ctx.strokeStyle = '#15803d'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(-11, 3); ctx.lineTo(-7, 7); ctx.moveTo(-10, 6); ctx.lineTo(-8, 4); ctx.stroke();
+      ctx.restore();
+    } else if (maskType === 'scorpion') {
+      ctx.save();
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath(); ctx.arc(0, 0, 16.2, Math.PI * 1.12, Math.PI * 1.88); ctx.fill();
+      ctx.fillStyle = '#eab308'; ctx.fillRect(-3.5, -15.5, 7, 3);
+      ctx.fillStyle = '#eab308'; ctx.strokeStyle = '#ca8a04'; ctx.lineWidth = 1.0;
+      ctx.beginPath(); ctx.moveTo(-14, 2); ctx.lineTo(-12, 12); ctx.lineTo(0, 15.5); ctx.lineTo(12, 12); ctx.lineTo(14, 2); ctx.lineTo(0, 3.5); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#ffffff'; ctx.shadowColor = '#facc15'; ctx.shadowBlur = 6;
+      ctx.beginPath(); ctx.ellipse(-5.5, -3, 3.8, 2.2, -0.15, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(5.5, -3, 3.8, 2.2, 0.15, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#000000'; ctx.shadowBlur = 0;
+      ctx.beginPath(); ctx.arc(-5.5, -3, 1.2, 0, Math.PI * 2); ctx.arc(5.5, -3, 1.2, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(-8, -6.5); ctx.lineTo(-2, -4.5); ctx.moveTo(8, -6.5); ctx.lineTo(2, -4.5); ctx.stroke();
+      ctx.restore();
+    } else if (maskType === 'subzero') {
+      ctx.save();
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath(); ctx.arc(0, 0, 16.2, Math.PI * 1.12, Math.PI * 1.88); ctx.fill();
+      ctx.fillStyle = '#38bdf8'; ctx.fillRect(-3.5, -15.5, 7, 3);
+      ctx.fillStyle = '#38bdf8'; ctx.strokeStyle = '#0284c7'; ctx.lineWidth = 1.0;
+      ctx.beginPath(); ctx.moveTo(-14, 2); ctx.lineTo(-12, 12); ctx.lineTo(0, 15.5); ctx.lineTo(12, 12); ctx.lineTo(14, 2); ctx.lineTo(0, 3.5); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#ffffff'; ctx.shadowColor = '#38bdf8'; ctx.shadowBlur = 6;
+      ctx.beginPath(); ctx.ellipse(-5.5, -3, 3.8, 2.2, -0.15, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(5.5, -3, 3.8, 2.2, 0.15, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#000000'; ctx.shadowBlur = 0;
+      ctx.beginPath(); ctx.arc(-5.5, -3, 1.2, 0, Math.PI * 2); ctx.arc(5.5, -3, 1.2, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(-8, -6.5); ctx.lineTo(-2, -4.5); ctx.moveTo(8, -6.5); ctx.lineTo(2, -4.5); ctx.stroke();
+      ctx.restore();
+    } else if (maskType === 'reptile') {
+      ctx.save();
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath(); ctx.arc(0, 0, 16.2, Math.PI * 1.12, Math.PI * 1.88); ctx.fill();
+      ctx.fillStyle = '#22c55e'; ctx.fillRect(-3.5, -15.5, 7, 3);
+      ctx.fillStyle = '#22c55e'; ctx.strokeStyle = '#15803d'; ctx.lineWidth = 1.0;
+      ctx.beginPath(); ctx.moveTo(-14, 2); ctx.lineTo(-12, 12); ctx.lineTo(0, 15.5); ctx.lineTo(12, 12); ctx.lineTo(14, 2); ctx.lineTo(0, 3.5); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#facc15'; ctx.shadowColor = '#22c55e'; ctx.shadowBlur = 6;
+      ctx.beginPath(); ctx.ellipse(-5.5, -3, 3.8, 2.4, -0.15, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(5.5, -3, 3.8, 2.4, 0.15, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#000000'; ctx.shadowBlur = 0;
+      ctx.fillRect(-6, -4.5, 1.2, 3); ctx.fillRect(5, -4.5, 1.2, 3);
+      ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(-8, -6.5); ctx.lineTo(-2, -4.5); ctx.moveTo(8, -6.5); ctx.lineTo(2, -4.5); ctx.stroke();
+      ctx.restore();
+    } else if (maskType === 'smoke') {
+      ctx.save();
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath(); ctx.arc(0, 0, 16.2, Math.PI * 1.12, Math.PI * 1.88); ctx.fill();
+      ctx.fillStyle = '#94a3b8'; ctx.fillRect(-3.5, -15.5, 7, 3);
+      ctx.fillStyle = '#94a3b8'; ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.0;
+      ctx.beginPath(); ctx.moveTo(-14, 2); ctx.lineTo(-12, 12); ctx.lineTo(0, 15.5); ctx.lineTo(12, 12); ctx.lineTo(14, 2); ctx.lineTo(0, 3.5); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#e2e8f0'; ctx.shadowColor = '#94a3b8'; ctx.shadowBlur = 6;
+      ctx.beginPath(); ctx.ellipse(-5.5, -3, 3.8, 2.2, -0.15, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(5.5, -3, 3.8, 2.2, 0.15, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#000000'; ctx.shadowBlur = 0;
+      ctx.beginPath(); ctx.arc(-5.5, -3, 1.2, 0, Math.PI * 2); ctx.arc(5.5, -3, 1.2, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(-8, -6.5); ctx.lineTo(-2, -4.5); ctx.moveTo(8, -6.5); ctx.lineTo(2, -4.5); ctx.stroke();
+      ctx.restore();
+    } else if (maskType === 'mj_thriller') {
+      // 🕺 Rey del Pop Zombie Thriller (Melena larga rizada, sonrisa amigable zombie y dentadura nítida)
+      ctx.save();
+      // 1. Cabello Negro Rizado Largo cayendo abundantemente a los lados de los hombros
+      ctx.fillStyle = '#18181b';
+      const rulosMJ = [
+        {x: -11, y: -12, r: 6.0}, {x: -14, y: -8, r: 6.5}, {x: -13, y: -3, r: 6.5}, {x: -14, y: 3, r: 6.0}, {x: -15, y: 9, r: 5.5}, {x: -12, y: 15, r: 5.0},
+        {x: 11, y: -12, r: 6.0}, {x: 14, y: -8, r: 6.5}, {x: 13, y: -3, r: 6.5}, {x: 14, y: 3, r: 6.0}, {x: 15, y: 9, r: 5.5}, {x: 12, y: 15, r: 5.0},
+        {x: -8, y: -15, r: 6.5}, {x: 8, y: -15, r: 6.5},
+        {x: -4, y: -17, r: 7.0}, {x: 4, y: -17, r: 7.0}, {x: 0, y: -18.5, r: 7.5}
+      ];
+      rulosMJ.forEach(ru => {
+        ctx.beginPath(); ctx.arc(ru.x, ru.y, ru.r, 0, Math.PI * 2); ctx.fill();
+      });
+      ctx.fillRect(-16.0, -6, 4.0, 20); ctx.fillRect(12.0, -6, 4.0, 20);
+
+      // Rizos J-curl finos en la frente
+      ctx.strokeStyle = '#18181b'; ctx.lineWidth = 1.8; ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(0, -14); ctx.quadraticCurveTo(-4, -9, -1, -4);
+      ctx.moveTo(2, -14); ctx.quadraticCurveTo(5, -9, 1.5, -5);
+      ctx.stroke();
+
+      // 2. Ojeras / pómulos zombie
+      ctx.strokeStyle = '#78350f'; ctx.lineWidth = 1.1;
+      ctx.beginPath();
+      ctx.arc(-7, 3, 4.0, 0.2 * Math.PI, 0.7 * Math.PI);
+      ctx.arc(7, 3, 4.0, 0.3 * Math.PI, 0.8 * Math.PI);
+      ctx.stroke();
+
+      // 3. Ojos Zombi Thriller grandes expresivos
+      ctx.fillStyle = '#fef08a'; ctx.strokeStyle = '#18181b'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.ellipse(-5.5, -2, 4.0, 3.2, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(5.5, -2, 4.0, 3.2, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#000000'; ctx.beginPath();
+      ctx.arc(-5.5, -2, 2.0, 0, Math.PI * 2); ctx.arc(5.5, -2, 2.0, 0, Math.PI * 2); ctx.fill();
+
+      // Cejas amigables de zombi Thriller
+      ctx.strokeStyle = '#18181b'; ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(-9, -6.5); ctx.quadraticCurveTo(-5.5, -8.5, -2, -6.5);
+      ctx.moveTo(9, -6.5); ctx.quadraticCurveTo(5.5, -8.5, 2, -6.5);
+      ctx.stroke();
+
+      // 4. Nariz humana fina
+      ctx.strokeStyle = '#78350f'; ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(-1.2, 1.8); ctx.lineTo(0, 2.4); ctx.lineTo(1.2, 1.8);
+      ctx.stroke();
+
+      // 5. SONRISA AMIGABLE THRILLER ZOMBI CON DIENTES BLANCOS
+      ctx.fillStyle = '#300a0a'; ctx.strokeStyle = '#18181b'; ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      ctx.moveTo(-6, 4.5); ctx.quadraticCurveTo(0, 9.0, 6, 4.5); ctx.quadraticCurveTo(0, 3.5, -6, 4.5);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+
+      // Dientes Superiores (Fila blanca completa sonriente)
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.moveTo(-5.2, 4.5); ctx.quadraticCurveTo(0, 6.8, 5.2, 4.5); ctx.lineTo(5.2, 3.8); ctx.lineTo(-5.2, 3.8); ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+    } else if (maskType === 'superman') {
+      // 🦸 Super Héroe de Acero (Basado exactamente en la figura de referencia Pop: Piel clara, pelo negro con rulo en S y rostro heroico nítido)
+      ctx.save();
+      // Cabello negro peinado hacia atrás
+      ctx.fillStyle = '#18181b';
+      ctx.beginPath(); ctx.arc(0, -5, 16.5, Math.PI * 1.05, Math.PI * 1.95); ctx.fill();
+      ctx.fillRect(-16.2, -5, 4.0, 10); ctx.fillRect(12.2, -5, 4.0, 10);
+
+      // Rulo icónico en forma de 'S' sobre la frente
+      ctx.strokeStyle = '#18181b'; ctx.lineWidth = 2.4; ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(0, -14); ctx.quadraticCurveTo(-4, -10, -1, -6); ctx.quadraticCurveTo(2, -4, 0, -2);
+      ctx.stroke();
+
+      // Ojos azules heroicos expresivos
+      ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#18181b'; ctx.lineWidth = 1.0;
+      ctx.beginPath(); ctx.ellipse(-5.5, -2, 3.8, 2.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(5.5, -2, 3.8, 2.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#0284c7'; ctx.beginPath();
+      ctx.arc(-5.5, -2, 1.8, 0, Math.PI * 2); ctx.arc(5.5, -2, 1.8, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffffff'; ctx.beginPath();
+      ctx.arc(-6.0, -2.5, 0.7, 0, Math.PI * 2); ctx.arc(5.0, -2.5, 0.7, 0, Math.PI * 2); ctx.fill();
+
+      // Cejas masculinas expresivas
+      ctx.strokeStyle = '#18181b'; ctx.lineWidth = 1.8;
+      ctx.beginPath(); ctx.moveTo(-8.5, -5.5); ctx.lineTo(-2.5, -4.2); ctx.moveTo(8.5, -5.5); ctx.lineTo(2.5, -4.2); ctx.stroke();
+
+      // Nariz y Sonrisa heroica confiada
+      ctx.fillStyle = '#78350f'; ctx.beginPath(); ctx.arc(0, 2, 1.0, 0, Math.PI * 2); ctx.fill();
+
+      ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#18181b'; ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(-5.5, 5); ctx.quadraticCurveTo(0, 8.5, 5.5, 5); ctx.closePath();
+      ctx.fill(); ctx.stroke();
+      ctx.restore();
+    } else if (maskType === 'rambo') {
+      // 🎖️ Comando Superviviente (Rambo oficial: Pelo negro largo por los hombros, vincha roja y camuflaje)
+      ctx.save();
+      // Cabello negro largo salvaje cayendo bien abajo por los hombros
+      ctx.fillStyle = '#18181b';
+      ctx.beginPath(); ctx.arc(0, -6, 16.5, Math.PI * 1.05, Math.PI * 1.95); ctx.fill();
+      ctx.fillRect(-16.8, -5, 5.0, 22); ctx.fillRect(11.8, -5, 5.0, 22);
+      ctx.beginPath(); ctx.arc(-14, 16, 2.5, 0, Math.PI * 2); ctx.arc(14, 16, 2.5, 0, Math.PI * 2); ctx.fill();
+
+      // Vincha roja de tela en la frente (SIN NINGÚN ANTIFAZ NEGRO)
+      ctx.fillStyle = '#dc2626'; ctx.fillRect(-16.2, -9, 32.4, 4.2);
+      ctx.fillStyle = '#991b1b'; ctx.fillRect(-16.2, -5.2, 32.4, 0.8);
+
+      // Franjas de camuflaje verde y marrón en las mejillas
+      ctx.fillStyle = '#15803d';
+      ctx.beginPath(); ctx.ellipse(-8.5, 3.5, 4.5, 1.8, 0.25, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(8.5, 3.5, 4.5, 1.8, -0.25, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#78350f';
+      ctx.beginPath(); ctx.ellipse(-7.5, 6.2, 3.5, 1.4, 0.2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(7.5, 6.2, 3.5, 1.4, -0.2, 0, Math.PI * 2); ctx.fill();
+
+      // Ojos humanos de combate Rambo
+      ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#18181b'; ctx.lineWidth = 1.0;
+      ctx.beginPath(); ctx.ellipse(-5.5, -2, 3.5, 2.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(5.5, -2, 3.5, 2.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#18181b'; ctx.beginPath();
+      ctx.arc(-5.5, -2, 1.6, 0, Math.PI * 2); ctx.arc(5.5, -2, 1.6, 0, Math.PI * 2); ctx.fill();
+
+      ctx.strokeStyle = '#18181b'; ctx.lineWidth = 1.8;
+      ctx.beginPath(); ctx.moveTo(-8.5, -5.5); ctx.lineTo(-2.5, -4.0); ctx.moveTo(8.5, -5.5); ctx.lineTo(2.5, -4.0); ctx.stroke();
+
+      // Nariz y boca apretada de combate
+      ctx.fillStyle = '#78350f'; ctx.beginPath(); ctx.arc(0, 2, 1.0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#18181b'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(-5, 5); ctx.lineTo(5, 5); ctx.stroke();
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(-3, 4.2, 6, 1.4);
+      ctx.restore();
+    } else if (maskType === 'terminator') {
+      // 🕶️ Cyber Destructor T-800 (Pelo corto prolijo y Gafas de sol tácticas sin cajas en la cabeza)
+      ctx.save();
+      ctx.fillStyle = '#18181b';
+      ctx.beginPath(); ctx.arc(0, -5, 16.2, Math.PI * 1.1, Math.PI * 1.9); ctx.fill();
+
+      // Gafas de sol tácticas negras sobrias
+      ctx.fillStyle = '#0f172a'; ctx.strokeStyle = '#334155'; ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.fillRect(-14, -5, 12, 6);
+      ctx.fillRect(2, -5, 12, 6);
+      ctx.fill(); ctx.stroke();
+      ctx.fillRect(-2, -4, 4, 2);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)'; ctx.lineWidth = 1.0;
+      ctx.beginPath(); ctx.moveTo(-12, -4); ctx.lineTo(-6, -1); ctx.moveTo(4, -4); ctx.lineTo(10, -1); ctx.stroke();
+
+      // Nariz y boca seria Terminator
+      ctx.fillStyle = '#78350f'; ctx.beginPath(); ctx.arc(0, 2, 1.0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#18181b'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(-5, 5); ctx.lineTo(5, 5); ctx.stroke();
+      ctx.restore();
+    } else if (maskType === 'omniman') {
+      // 👨‍✈️ Supremo Invencible (Pelo canoso con sienes blancas, ojos heroicos y bigote)
+      ctx.save();
+      ctx.fillStyle = '#334155';
+      ctx.beginPath(); ctx.arc(0, -5, 16.5, Math.PI * 1.1, Math.PI * 1.9); ctx.fill();
+      ctx.fillStyle = '#f8fafc';
+      ctx.beginPath(); ctx.ellipse(-13.5, -6, 3.2, 5.5, 0.2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(13.5, -6, 3.2, 5.5, -0.2, 0, Math.PI * 2); ctx.fill();
+
+      ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#18181b'; ctx.lineWidth = 1.0;
+      ctx.beginPath(); ctx.ellipse(-5.5, -2, 3.5, 2.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(5.5, -2, 3.5, 2.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#18181b'; ctx.beginPath();
+      ctx.arc(-5.5, -2, 1.6, 0, Math.PI * 2); ctx.arc(5.5, -2, 1.6, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#18181b'; ctx.lineWidth = 1.8;
+      ctx.beginPath(); ctx.moveTo(-8.5, -5.5); ctx.lineTo(-2.5, -4.0); ctx.moveTo(8.5, -5.5); ctx.lineTo(2.5, -4.0); ctx.stroke();
+
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.moveTo(-7, 2.5); ctx.quadraticCurveTo(0, 0.5, 7, 2.5); ctx.quadraticCurveTo(0, 6.5, -7, 2.5);
+      ctx.fill();
+      ctx.restore();
+    } else if (maskType === 'thor') {
+      // ⚡ Dios del Trueno (Melena rubia larga, barba vikinga dorada, casco brillante y ojos de rayo cian)
+      ctx.save();
+      // Melena rubia abundante cayendo a los lados de los hombros (largo)
+      ctx.fillStyle = '#facc15';
+      ctx.beginPath(); ctx.arc(0, -4, 16.8, Math.PI * 0.9, Math.PI * 2.1); ctx.fill();
+      ctx.fillRect(-16.8, -4, 5.0, 18); ctx.fillRect(11.8, -4, 5.0, 18);
+      ctx.strokeStyle = '#eab308'; ctx.lineWidth = 1.0;
+      ctx.beginPath(); ctx.moveTo(-14, -2); ctx.lineTo(-14, 14); ctx.moveTo(14, -2); ctx.lineTo(14, 14); ctx.stroke();
+
+      // Casco Vikingo Plateado realista en la coronilla
+      ctx.fillStyle = '#94a3b8'; ctx.strokeStyle = '#334155'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.arc(0, -6, 16.2, Math.PI, 0); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#cbd5e1'; ctx.fillRect(-16.2, -7, 32.4, 2.5);
+
+      // Cuernos / Alas doradas curvas a los lados del casco
+      ctx.fillStyle = '#fde047'; ctx.strokeStyle = '#ca8a04'; ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(-14, -8); ctx.quadraticCurveTo(-24, -22, -10, -23); ctx.quadraticCurveTo(-15, -16, -8, -9);
+      ctx.moveTo(14, -8); ctx.quadraticCurveTo(24, -22, 10, -23); ctx.quadraticCurveTo(15, -16, 8, -9);
+      ctx.fill(); ctx.stroke();
+
+      // Barba Vikinga Dorada abundante y Bigote
+      ctx.fillStyle = '#facc15'; ctx.strokeStyle = '#ca8a04'; ctx.lineWidth = 1.0;
+      ctx.beginPath();
+      ctx.arc(0, 0, 16.2, 0.08 * Math.PI, 0.92 * Math.PI);
+      ctx.lineTo(0, 19); ctx.closePath(); ctx.fill(); ctx.stroke();
+
+      ctx.fillStyle = '#eab308';
+      ctx.beginPath();
+      ctx.moveTo(-7, 2.5); ctx.quadraticCurveTo(0, 0.5, 7, 2.5); ctx.quadraticCurveTo(0, 5.5, -7, 2.5);
+      ctx.fill();
+
+      // Ojos de rayo cian neón y cejas rubias
+      ctx.fillStyle = '#38bdf8'; ctx.shadowColor = '#38bdf8'; ctx.shadowBlur = 8;
+      ctx.beginPath(); ctx.ellipse(-5.5, -2, 3.8, 2.4, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(5.5, -2, 3.8, 2.4, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffffff'; ctx.shadowBlur = 0;
+      ctx.beginPath(); ctx.arc(-5.5, -2, 1.2, 0, Math.PI * 2); ctx.arc(5.5, -2, 1.2, 0, Math.PI * 2); ctx.fill();
+
+      ctx.strokeStyle = '#ca8a04'; ctx.lineWidth = 1.8;
+      ctx.beginPath(); ctx.moveTo(-8.5, -5.5); ctx.lineTo(-2.5, -4.5); ctx.moveTo(8.5, -5.5); ctx.lineTo(2.5, -4.5); ctx.stroke();
+
+      ctx.strokeStyle = '#18181b'; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(-3, 4); ctx.lineTo(3, 4); ctx.stroke();
+      ctx.restore();
+    } else if (maskType === 'ironman') {
+      // 🚀 Héroe de Hierro (Casco rojo y dorado con ojos cian neón)
+      ctx.save();
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath(); ctx.arc(0, 0, 16.2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#eab308'; ctx.strokeStyle = '#b45309'; ctx.lineWidth = 1.0;
+      ctx.beginPath();
+      ctx.moveTo(-11, -10); ctx.lineTo(11, -10); ctx.lineTo(13, 2); ctx.lineTo(7, 12); ctx.lineTo(-7, 12); ctx.lineTo(-13, 2);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#ffffff'; ctx.shadowColor = '#38bdf8'; ctx.shadowBlur = 8;
+      ctx.fillRect(-9, -4, 6, 2.5); ctx.fillRect(3, -4, 6, 2.5);
+      ctx.restore();
+    }
     // Rim light (borde de luz para sensación 3D)
     ctx.save();
     const rimGrad = ctx.createLinearGradient(-16, 8, 16, 16);
@@ -22284,7 +24301,9 @@ window.iniciarEstadioJuego = function() {
       ctx.restore();
     }
 
-    // 4. CABELLO SEGÚN EL TIPO DE CABEZÓN
+    // 4. CABELLO SEGÚN EL TIPO DE CABEZÓN (Se oculta si usa máscaras integrales como Alien, Spidey, Batman, Skeleton)
+    const isFullHeadMask = (player.mask && player.mask !== 'none');
+    if (!isFullHeadMask) {
     ctx.fillStyle = player.hair;
 if (player.hairType === 'rulos-cortos') {
       // Rulos cortos con bleached tips/reflejos rubios con inercia física (Neymar style con entradas M/W pronunciadas)
@@ -22973,7 +24992,10 @@ if (player.hairType === 'rulos-cortos') {
       ctx.restore();
     }
 
+    } // Fin del bloque de cabello si no es máscara integral
+
     // 5. OJOS DINÁMICOS CON EXPRESIONES Y PARPADEO (BLINKING)
+    if (!isFullHeadMask) {
     // Determinar la expresión emocional del personaje
     let expression = 'normal'; // normal, concentrado, esfuerzo, feliz, triste, burlon
     
@@ -23012,6 +25034,8 @@ if (player.hairType === 'rulos-cortos') {
       }
     }
 
+    
+    
     // Parpadeo (blinking) natural: parpadea 140ms cada 3.5 segundos (excepto en esfuerzo)
     const blinkCycle = Date.now() % 3500;
     const isBlinking = blinkCycle < 140 && expression !== 'esfuerzo' && expression !== 'triste';
@@ -23368,6 +25392,7 @@ if (player.hairType === 'rulos-cortos') {
       ctx.arc(0, 5, 3, 0, Math.PI);
       ctx.stroke();
     }
+    
 
     // Bigote (si corresponde)
     if (player.beard && player.beardType === 'bigote') {
@@ -23517,6 +25542,8 @@ if (player.hairType === 'rulos-cortos') {
       ctx.fillText('¡NOOO! 😭🤬', 0, -29);
       ctx.restore();
     }
+
+    } // Fin del bloque de rostro/pelo/expresión para cabezas sin máscara integral
 
     // Cerrar el bloque de traducción de respiración (breathY save/restore)
     ctx.restore();
@@ -26201,8 +28228,9 @@ if (player.hairType === 'rulos-cortos') {
       }
     }
     drawPlayerGroundShadow(ctx, finalPlayerX, playerY);
-    const isKickerBack = (!pelota.isShot && !pelota.isSettled && (isAiming || ((gameMode === 'penales' || gameMode === 'online') && penalesTurno === 'defensa')));
-    drawCabezon(ctx, finalPlayerX, playerY, tiradorADibujar, (kickTimer > 0), false, (pelota.status === 'gol'), false, isKickerBack);
+    const isPlayerGoal = (pelota.status === 'gol') || (typeof isCelebrating !== 'undefined' && isCelebrating);
+    const isKickerBack = (!pelota.isShot && !pelota.isSettled && (isAiming || ((gameMode === 'penales' || gameMode === 'online') && penalesTurno === 'defensa'))) && !isPlayerGoal;
+    drawCabezon(ctx, finalPlayerX, playerY, tiradorADibujar, (kickTimer > 0), false, isPlayerGoal, false, isKickerBack);
 
     // ══════════════════════════════════════════════
     // 7. PELOTA REALISTA + ESTELA
@@ -27411,6 +29439,11 @@ if (player.hairType === 'rulos-cortos') {
   window.iniciarMatchmakingOnlineReal = function() {
     triggerHaptic('medium');
     playSound('pop');
+
+    if (window.onlineSearchTimerInterval) {
+      clearInterval(window.onlineSearchTimerInterval);
+      window.onlineSearchTimerInterval = null;
+    }
     
     // Crear ID único de jugador si no existe
     if (!myOnlineClientId) {
@@ -27420,13 +29453,38 @@ if (player.hairType === 'rulos-cortos') {
     const lobbyOverlay = document.getElementById('online-lobby-overlay');
     const statusText = document.getElementById('lobby-status-text');
     const titleText = document.getElementById('lobby-title-text');
+    const cancelBtn = document.getElementById('lobby-cancel-btn');
+    const timeoutActions = document.getElementById('lobby-timeout-actions');
     
     const t = translations[currentLang] || translations.es;
     if (lobbyOverlay) {
       lobbyOverlay.style.display = 'flex';
-      titleText.innerText = t.lobbyBuscando || 'Buscando Rival...';
-      statusText.innerText = t.lobbyConectando || 'Conectando a la red de emparejamiento de Ably...';
+      if (titleText) titleText.innerText = t.lobbyBuscando || 'Buscando Rival...';
+      if (statusText) statusText.innerText = 'Conectando a la red de emparejamiento (15s)...';
+      if (cancelBtn) cancelBtn.style.display = 'inline-block';
+      if (timeoutActions) timeoutActions.style.display = 'none';
     }
+
+    let searchTimeLeft = 15;
+    window.onlineSearchTimerInterval = setInterval(() => {
+      searchTimeLeft--;
+      if (statusText && searchTimeLeft > 0) {
+        statusText.innerText = `Buscando oponente activo en la red (${searchTimeLeft}s)...`;
+      }
+      if (searchTimeLeft <= 0) {
+        clearInterval(window.onlineSearchTimerInterval);
+        window.onlineSearchTimerInterval = null;
+
+        desconectarOnline();
+        triggerHaptic('medium');
+        playSound('error');
+
+        if (titleText) titleText.innerText = '⏱️ No se encontró oponente';
+        if (statusText) statusText.innerText = 'Pasaron 15 segundos sin encontrar un rival activo.';
+        if (cancelBtn) cancelBtn.style.display = 'none';
+        if (timeoutActions) timeoutActions.style.display = 'flex';
+      }
+    }, 1000);
     
     try {
       // Conectar a Ably
@@ -27502,6 +29560,10 @@ if (player.hairType === 'rulos-cortos') {
   };
   
   function iniciarSalaPartidoOnline(roomName, partnerClientId, partnerData, isHost) {
+    if (window.onlineSearchTimerInterval) {
+      clearInterval(window.onlineSearchTimerInterval);
+      window.onlineSearchTimerInterval = null;
+    }
     const statusText = document.getElementById('lobby-status-text');
     if (statusText) {
       const t = translations[currentLang] || translations.es;
@@ -27817,11 +29879,18 @@ if (player.hairType === 'rulos-cortos') {
   };
   
   window.cancelarMatchmakingOnline = function() {
+    if (window.onlineSearchTimerInterval) {
+      clearInterval(window.onlineSearchTimerInterval);
+      window.onlineSearchTimerInterval = null;
+    }
     desconectarOnline();
     const lobbyOverlay = document.getElementById('online-lobby-overlay');
     if (lobbyOverlay) lobbyOverlay.style.display = 'none';
     triggerHaptic('medium');
     playSound('tap');
+    
+    // Mostrar anuncio de video al salir del modo online
+    volverASeleccionOnline();
   };
   
   let onlineExitExecuted = false;
