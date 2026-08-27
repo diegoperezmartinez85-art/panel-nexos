@@ -2352,7 +2352,7 @@
       position: absolute;
       top: 9px; /* Centrado vertical perfecto sin translateY */
       left: 0;
-      width: 25%; /* 25% para 4 pestañas */
+      width: 20%; /* 20% para 5 pestañas */
       height: 46px; /* Altura de la cápsula de fondo */
       transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
       z-index: 8400; /* Detrás del icono y del texto */
@@ -3923,6 +3923,7 @@
     /* Standalone overrides: hide non-game elements */
 
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -5597,6 +5598,10 @@
     </svg>
     <span>Reservas</span>
   </button>
+  <button class="nav-item" onclick="cambiarPantalla('mascotas')" id="nav-btn-mascotas">
+    <span style="font-size:20px; display:block; line-height:1; margin-bottom:2px;">🐶</span>
+    <span>Mascotas</span>
+  </button>
   <!-- Botón mundial removido del menú para quedar como antes -->
 </div>
 
@@ -5763,7 +5768,7 @@
     try { sessionStorage.setItem('nx_lp_s', tsStr); } catch(e) {}
   }
 
-  const PANIC_URL = 'https://script.google.com/macros/s/AKfycbwJ36NLQSDyW7mSouJKMzhRy1LH9D4iaAXqPj1CE28qYsGH4j2J9oQvi16iKewJDNjDXA/exec';
+  const PANIC_URL = 'https://script.google.com/macros/s/AKfycbze-sm5pbBINjzN9S9bhHO7r_SusPElLZSmYwZYADZoC1Nvj7hNjJoGJlqs9vOMAM0/exec';
 
 
   function actualizarOffline(){
@@ -7576,7 +7581,7 @@
     playSound('tap');
     
     // Ocultar todas las pantallas principales (Menú limpio de 4 tabs)
-    const pantallas = ['panico', 'comunicados', 'directorio', 'reservas'];
+    const pantallas = ['panico', 'comunicados', 'directorio', 'reservas', 'mascotas'];
     pantallas.forEach(p => {
       const el = document.getElementById('pantalla-' + p);
       if (el) el.classList.remove('visible');
@@ -7610,6 +7615,7 @@
       if (typeof initMundial === 'function') initMundial();
     }
 
+    if (target === 'mascotas') { cargarMisMascotas(); }
     if (target === 'comunicados') {
       const badge = document.getElementById('nav-comunicados-badge');
       if (badge) badge.classList.remove('active');
@@ -12293,7 +12299,7 @@ window.iniciarEstadioJuego = function() {
     } catch(err) {}
     
     // Ocultar todas las pantallas principales
-    const pantallas = ['panico', 'comunicados', 'directorio', 'reservas'];
+    const pantallas = ['panico', 'comunicados', 'directorio', 'reservas', 'mascotas'];
     pantallas.forEach(p => {
       const el = document.getElementById('pantalla-' + p);
       if (el) el.classList.remove('visible');
@@ -20569,5 +20575,308 @@ window.iniciarEstadioJuego = function() {
 
 
 </script>
+
+  <!-- ══════════════════════════════════════════════════════
+       🐶 MÓDULO MASCOTAS — Pantalla Principal
+  ══════════════════════════════════════════════════════ -->
+  <div class="pantalla" id="pantalla-mascotas" style="padding: 20px 16px 110px; width:100%; max-width:480px; box-sizing:border-box;">
+    <div style="text-align:center; margin-bottom:24px;">
+      <div style="font-size:48px; margin-bottom:8px;">🐶</div>
+      <h2 style="color:#fff; font-size:22px; font-weight:700; margin:0 0 6px;">Mis Mascotas</h2>
+      <p style="color:#a1a1aa; font-size:13px; margin:0;">Registrá tus mascotas y generá su QR para la chapita.</p>
+    </div>
+    <button onclick="abrirEditorMascota()" style="width:100%; padding:14px; background:linear-gradient(135deg,#e11d48,#9f1239); color:#fff; border:none; border-radius:14px; font-size:15px; font-weight:700; cursor:pointer; margin-bottom:20px; letter-spacing:0.5px;">
+      🐾 + Nueva Mascota
+    </button>
+    <div id="mascotas-lista-container" style="width:100%;"></div>
+  </div>
+
+  <!-- Modal Editor Mascota -->
+  <div id="mascota-modal-editor" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; padding:20px; overflow-y:auto; box-sizing:border-box;">
+    <div style="background:#18181b; border-radius:20px; padding:24px; max-width:440px; margin:40px auto; border:1px solid #3f3f46;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h3 style="color:#e11d48; font-size:18px; font-weight:700; margin:0;">🐾 Registrar Mascota</h3>
+        <button onclick="cerrarEditorMascota()" style="background:none; border:none; color:#71717a; font-size:22px; cursor:pointer; line-height:1;">✕</button>
+      </div>
+      <input type="hidden" id="mascota-input-id">
+      <label style="display:block; color:#a1a1aa; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">Nombre de la Mascota *</label>
+      <input id="mascota-input-nombre" type="text" placeholder="Ej: Firulais" style="width:100%; padding:12px; background:#27272a; border:1px solid #3f3f46; border-radius:10px; color:#fff; font-size:15px; margin-bottom:14px; box-sizing:border-box;">
+      <label style="display:block; color:#a1a1aa; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">Especie y Raza *</label>
+      <input id="mascota-input-raza" type="text" placeholder="Ej: Perro Labrador" style="width:100%; padding:12px; background:#27272a; border:1px solid #3f3f46; border-radius:10px; color:#fff; font-size:15px; margin-bottom:14px; box-sizing:border-box;">
+      <label style="display:block; color:#a1a1aa; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">Foto URL (opcional)</label>
+      <input id="mascota-input-foto" type="url" placeholder="https://..." style="width:100%; padding:12px; background:#27272a; border:1px solid #3f3f46; border-radius:10px; color:#fff; font-size:15px; margin-bottom:14px; box-sizing:border-box;">
+      <label style="display:block; color:#a1a1aa; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">Telefono de Contacto Directo</label>
+      <input id="mascota-input-telefono" type="tel" placeholder="Ej: 1121305416" style="width:100%; padding:12px; background:#27272a; border:1px solid #3f3f46; border-radius:10px; color:#fff; font-size:15px; margin-bottom:14px; box-sizing:border-box;">
+      <label style="display:block; color:#a1a1aa; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">Notas Medicas / Caracter (opcional)</label>
+      <textarea id="mascota-input-notas" placeholder="Ej: Hiperactivo. Vacunas al dia." rows="3" style="width:100%; padding:12px; background:#27272a; border:1px solid #3f3f46; border-radius:10px; color:#fff; font-size:15px; margin-bottom:20px; box-sizing:border-box; resize:vertical;"></textarea>
+      <button onclick="guardarMascotaBackend()" style="width:100%; padding:14px; background:linear-gradient(135deg,#e11d48,#9f1239); color:#fff; border:none; border-radius:12px; font-size:15px; font-weight:700; cursor:pointer; letter-spacing:0.5px;">
+        💾 GUARDAR MASCOTA
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal QR Mascota -->
+  <div id="mascota-modal-qr" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9999; padding:20px; overflow-y:auto; box-sizing:border-box;">
+    <div style="background:#18181b; border-radius:20px; padding:24px; max-width:380px; margin:40px auto; border:1px solid #3f3f46; text-align:center;">
+      <div style="display:flex; justify-content:flex-end; margin-bottom:12px;">
+        <button onclick="cerrarQRMascota()" style="background:none; border:none; color:#71717a; font-size:22px; cursor:pointer;">✕</button>
+      </div>
+      <div id="mascota-qr-foto-container" style="margin-bottom:16px;"></div>
+      <div id="mascota-qr-nombre" style="color:#fff; font-size:20px; font-weight:700; margin-bottom:4px;"></div>
+      <div id="mascota-qr-raza" style="color:#a1a1aa; font-size:13px; margin-bottom:4px;"></div>
+      <div id="mascota-qr-ubicacion" style="color:#71717a; font-size:12px; margin-bottom:20px;"></div>
+      <div style="color:#a1a1aa; font-size:12px; margin-bottom:12px; text-transform:uppercase; letter-spacing:1px; font-weight:700;">QR para la chapita del collar</div>
+      <div id="mascota-qr-box" style="display:inline-block; background:#fff; padding:12px; border-radius:12px; margin-bottom:16px;"></div>
+      <p style="color:#71717a; font-size:11px; margin-bottom:0;">Cualquier persona que escanee este QR vera la ficha de tu mascota y podra notificarte.</p>
+    </div>
+  </div>
+
+  <!-- Pantalla Publica Mascota (para quien escanea el QR) -->
+  <div id="pantalla-mascota-publica" style="display:none; position:fixed; inset:0; background:linear-gradient(160deg,#0f0f14 0%,#1a0a0f 100%); z-index:99999; overflow-y:auto; padding:24px 16px 40px; box-sizing:border-box;">
+    <div style="max-width:420px; margin:0 auto; text-align:center;">
+      <div style="background:rgba(225,29,72,0.15); border:1px solid rgba(225,29,72,0.4); border-radius:16px; padding:16px 20px; margin-bottom:24px;">
+        <div style="font-size:28px; margin-bottom:6px;">🚨</div>
+        <div style="color:#fca5a5; font-weight:700; font-size:15px;">MASCOTA ENCONTRADA EN EL BARRIO</div>
+        <div id="pub-bienvenida" style="color:#f4f4f5; font-size:13px; margin-top:4px;"></div>
+      </div>
+      <div id="pub-foto-container" style="margin-bottom:20px;"></div>
+      <div id="pub-nombre" style="color:#fff; font-size:28px; font-weight:800; margin-bottom:8px;"></div>
+      <div id="pub-raza" style="color:#a1a1aa; font-size:14px; margin-bottom:8px;"></div>
+      <div id="pub-ubicacion" style="color:#71717a; font-size:13px; margin-bottom:16px;"></div>
+      <div id="pub-notas" style="background:#27272a; border-radius:12px; padding:14px; margin-bottom:24px; text-align:left; display:none;">
+        <div style="color:#a1a1aa; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">Notas Medicas / Caracter</div>
+        <div id="pub-notas-text" style="color:#e4e4e7; font-size:14px;"></div>
+      </div>
+      <button id="pub-btn-notificar" onclick="notificarDuenioPublico()" style="width:100%; padding:16px; background:linear-gradient(135deg,#e11d48,#9f1239); color:#fff; border:none; border-radius:14px; font-size:16px; font-weight:700; cursor:pointer; margin-bottom:12px; letter-spacing:0.3px;">
+        🔔 NOTIFICAR A MI DUENIO AHORA
+      </button>
+      <button id="pub-btn-llamar" style="width:100%; padding:14px; background:#27272a; color:#fff; border:1px solid #3f3f46; border-radius:14px; font-size:15px; font-weight:600; cursor:pointer;">
+        📞 Llamar al Duenio Directamente
+      </button>
+    </div>
+  </div>
+
+  <script>
+  // ══════════════════════════════════════════════════════
+  // 🐶 MÓDULO MASCOTAS QR — Nexos v4.5
+  // ══════════════════════════════════════════════════════
+
+  // ── Pantalla publica (escaneo QR del collar) ──────────
+  (function() {
+    var params = new URLSearchParams(window.location.search);
+    var petId = params.get('mascota') || params.get('pet');
+    if (petId) {
+      document.addEventListener('DOMContentLoaded', function() {
+        cargarFichaPublicaMascota(petId);
+      });
+    }
+  })();
+
+  function cargarFichaPublicaMascota(petId) {
+    var screen = document.getElementById('pantalla-mascota-publica');
+    if (screen) screen.style.display = 'block';
+    fetch(PANIC_URL + '?accion=get_mascota&id=' + encodeURIComponent(petId) + '&t=' + Date.now())
+      .then(function(r){ return r.json(); })
+      .then(function(d) {
+        if (!d.ok) { alert('Mascota no encontrada.'); return; }
+        var p = d;
+        document.getElementById('pub-bienvenida').textContent = 'Hola, me llamo ' + p.nombre + '!';
+        document.getElementById('pub-nombre').textContent = p.nombre;
+        document.getElementById('pub-raza').textContent = p.raza || '';
+        document.getElementById('pub-ubicacion').textContent = 'Manzana ' + p.mza + ' - Casa ' + p.casa;
+        if (p.fotoUrl) {
+          document.getElementById('pub-foto-container').innerHTML = '<img src="' + p.fotoUrl + '" style="width:140px;height:140px;object-fit:cover;border-radius:50%;border:3px solid #e11d48;">';
+        }
+        if (p.notasMedicas) {
+          var notasDiv = document.getElementById('pub-notas');
+          if (notasDiv) notasDiv.style.display = 'block';
+          document.getElementById('pub-notas-text').textContent = p.notasMedicas;
+        }
+        if (p.telefono) {
+          var btnLlamar = document.getElementById('pub-btn-llamar');
+          if (btnLlamar) btnLlamar.onclick = function() { window.open('tel:' + p.telefono); };
+        }
+        window._currentPublicPet = p;
+      })
+      .catch(function(e){ console.error(e); alert('Error cargando ficha de mascota.'); });
+  }
+
+  function notificarDuenioPublico() {
+    var pet = window._currentPublicPet;
+    if (!pet) return;
+    var payload = { accion: 'notificar_escaneo_mascota', petId: pet.id, petNombre: pet.nombre, mza: pet.mza, casa: pet.casa };
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        payload.lat = pos.coords.latitude;
+        payload.lng = pos.coords.longitude;
+        _enviarNotifMascota(payload);
+      }, function() { _enviarNotifMascota(payload); });
+    } else {
+      _enviarNotifMascota(payload);
+    }
+  }
+
+  function _enviarNotifMascota(payload) {
+    fetch(PANIC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      alert('Notificacion enviada al duenio. Espera que venga a buscarlo.');
+    })
+    .catch(function(e){ alert('Notificacion enviada.'); });
+  }
+
+  // ── Pantalla de mis mascotas ──────────────────────────
+  window.cargarMisMascotas = function() {
+    var mza = localStorage.getItem('nx_manzana') || '';
+    var casa = localStorage.getItem('nx_casa') || '';
+    var container = document.getElementById('mascotas-lista-container');
+    if (!container) return;
+    if (!mza || !casa) {
+      container.innerHTML = '<p style="color:#71717a;text-align:center;font-size:14px;">Para ver tus mascotas, primero vinculate a tu lote en la seccion de Panico.</p>';
+      return;
+    }
+    container.innerHTML = '<p style="color:#71717a;font-size:14px;text-align:center;">Cargando...</p>';
+    fetch(PANIC_URL + '?accion=listar_mis_mascotas&mza=' + encodeURIComponent(mza) + '&casa=' + encodeURIComponent(casa) + '&t=' + Date.now())
+      .then(function(r){ return r.json(); })
+      .then(function(d) {
+        if (!d.ok || !d.mascotas || d.mascotas.length === 0) {
+          container.innerHTML = '<p style="color:#71717a;font-size:14px;text-align:center;margin-top:20px;">No tenes mascotas registradas aun.<br>Tocá + Nueva Mascota para empezar.</p>';
+          return;
+        }
+        container.innerHTML = '';
+        d.mascotas.forEach(function(pet) {
+          var card = document.createElement('div');
+          card.style.cssText = 'background:#27272a;border-radius:16px;padding:16px;margin-bottom:14px;display:flex;align-items:center;gap:14px;';
+          var fotoHtml = pet.fotoUrl
+            ? '<img src="' + pet.fotoUrl + '" style="width:56px;height:56px;object-fit:cover;border-radius:50%;border:2px solid #e11d48;flex-shrink:0;">'
+            : '<div style="width:56px;height:56px;border-radius:50%;background:#3f3f46;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;">🐾</div>';
+          card.innerHTML = fotoHtml +
+            '<div style="flex:1;min-width:0;">' +
+              '<div style="color:#fff;font-weight:700;font-size:16px;margin-bottom:2px;">' + pet.nombre + '</div>' +
+              '<div style="color:#a1a1aa;font-size:12px;margin-bottom:8px;">' + (pet.raza||'') + '</div>' +
+              '<div style="display:flex;gap:8px;">' +
+                '<button onclick="mostrarQRMascota(' + JSON.stringify(pet).replace(/"/g,'&quot;') + ')" style="padding:6px 12px;background:#e11d48;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">QR Carnet</button>' +
+                '<button onclick="editarMascota(' + JSON.stringify(pet).replace(/"/g,'&quot;') + ')" style="padding:6px 12px;background:#3f3f46;color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;">Editar</button>' +
+                '<button onclick="eliminarMascotaBackend(\'' + pet.id + '\')" style="padding:6px 12px;background:transparent;color:#71717a;border:1px solid #3f3f46;border-radius:8px;font-size:12px;cursor:pointer;">X</button>' +
+              '</div>' +
+            '</div>';
+          container.appendChild(card);
+        });
+      })
+      .catch(function(e){ container.innerHTML = '<p style="color:#e11d48;font-size:14px;text-align:center;">Error cargando mascotas. Verificá tu conexion.</p>'; });
+  };
+
+  window.abrirEditorMascota = function() {
+    document.getElementById('mascota-input-id').value = '';
+    document.getElementById('mascota-input-nombre').value = '';
+    document.getElementById('mascota-input-raza').value = '';
+    document.getElementById('mascota-input-foto').value = '';
+    document.getElementById('mascota-input-telefono').value = '';
+    document.getElementById('mascota-input-notas').value = '';
+    document.getElementById('mascota-modal-editor').style.display = 'block';
+  };
+
+  window.cerrarEditorMascota = function() {
+    document.getElementById('mascota-modal-editor').style.display = 'none';
+  };
+
+  window.editarMascota = function(pet) {
+    document.getElementById('mascota-input-id').value = pet.id || '';
+    document.getElementById('mascota-input-nombre').value = pet.nombre || '';
+    document.getElementById('mascota-input-raza').value = pet.raza || '';
+    document.getElementById('mascota-input-foto').value = pet.fotoUrl || '';
+    document.getElementById('mascota-input-telefono').value = pet.telefono || '';
+    document.getElementById('mascota-input-notas').value = pet.notasMedicas || '';
+    document.getElementById('mascota-modal-editor').style.display = 'block';
+  };
+
+  window.guardarMascotaBackend = function() {
+    var mza = localStorage.getItem('nx_manzana') || '';
+    var casa = localStorage.getItem('nx_casa') || '';
+    var nombre = document.getElementById('mascota-input-nombre').value.trim();
+    var raza = document.getElementById('mascota-input-raza').value.trim();
+    var fotoUrl = document.getElementById('mascota-input-foto').value.trim();
+    var telefono = document.getElementById('mascota-input-telefono').value.trim();
+    var notasMedicas = document.getElementById('mascota-input-notas').value.trim();
+    var id = document.getElementById('mascota-input-id').value.trim();
+    if (!nombre || !raza) { alert('Completa el nombre y la raza.'); return; }
+    var payload = {
+      accion: 'guardar_mascota',
+      id: id || ('PET-' + Date.now()),
+      mza: mza, casa: casa, nombre: nombre, raza: raza,
+      fotoUrl: fotoUrl, telefono: telefono, notasMedicas: notasMedicas
+    };
+    fetch(PANIC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      if (d.ok || d.success) {
+        cerrarEditorMascota();
+        cargarMisMascotas();
+        alert('Mascota guardada correctamente.');
+      } else {
+        alert('Error: ' + (d.error || d.msg || 'Error desconocido'));
+      }
+    })
+    .catch(function(e){ console.error(e); alert('Error de conexion guardando la mascota.'); });
+  };
+
+  window.eliminarMascotaBackend = function(id) {
+    if (!confirm('Seguro que queres eliminar esta mascota?')) return;
+    fetch(PANIC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ accion: 'eliminar_mascota', id: id })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(d){ cargarMisMascotas(); })
+    .catch(function(e){ cargarMisMascotas(); });
+  };
+
+  window.mostrarQRMascota = function(pet) {
+    var modal = document.getElementById('mascota-modal-qr');
+    if (!modal) return;
+    document.getElementById('mascota-qr-nombre').textContent = pet.nombre;
+    document.getElementById('mascota-qr-raza').textContent = pet.raza || '';
+    document.getElementById('mascota-qr-ubicacion').textContent = 'Manzana ' + pet.mza + ' - Casa ' + pet.casa;
+    var fotoDiv = document.getElementById('mascota-qr-foto-container');
+    fotoDiv.innerHTML = pet.fotoUrl
+      ? '<img src="' + pet.fotoUrl + '" style="width:100px;height:100px;object-fit:cover;border-radius:50%;border:3px solid #e11d48;">'
+      : '<div style="font-size:60px;">🐾</div>';
+    var qrBox = document.getElementById('mascota-qr-box');
+    qrBox.innerHTML = '';
+    var appUrl = window.location.href.split('?')[0];
+    var petUrl = appUrl + '?mascota=' + encodeURIComponent(pet.id);
+    if (window.QRCode) {
+      try {
+        new QRCode(qrBox, {
+          text: petUrl,
+          width: 180, height: 180,
+          typeNumber: 0,
+          colorDark: '#000000', colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      } catch (e) {
+        console.error('Error generando QR:', e);
+        qrBox.innerHTML = '<p style="color:#e11d48;font-size:12px;">No se pudo generar el QR.</p>';
+      }
+    } else {
+      qrBox.innerHTML = '<p style="color:#e11d48;font-size:12px;">QR no disponible. Verifica tu conexion.</p>';
+    }
+    modal.style.display = 'block';
+  };
+
+  window.cerrarQRMascota = function() {
+    document.getElementById('mascota-modal-qr').style.display = 'none';
+  };
+  </script>
+
 </body>
 </html>
