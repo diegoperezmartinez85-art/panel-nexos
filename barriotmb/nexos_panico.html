@@ -20708,25 +20708,30 @@ window.iniciarEstadioJuego = function() {
       alert('Esta mascota no tiene un numero de WhatsApp cargado por su duenio.');
       return;
     }
+
+    // Abrimos la pestaña YA (de forma síncrona, dentro del click) para que el
+    // navegador no la trate como popup bloqueado. La redirigimos después.
+    var ventana = window.open('', '_blank');
+
     var btn = document.getElementById('pub-btn-notificar');
     var textoOriginal = btn ? btn.innerHTML : null;
     if (btn) { btn.innerHTML = '📍 Obteniendo tu ubicación...'; btn.disabled = true; }
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(function(pos) {
-        _abrirWhatsappConUbicacion(pet, pos.coords.latitude, pos.coords.longitude);
+        _abrirWhatsappConUbicacion(pet, pos.coords.latitude, pos.coords.longitude, ventana);
         if (btn) { btn.innerHTML = textoOriginal; btn.disabled = false; }
       }, function() {
-        _abrirWhatsappConUbicacion(pet, null, null);
+        _abrirWhatsappConUbicacion(pet, null, null, ventana);
         if (btn) { btn.innerHTML = textoOriginal; btn.disabled = false; }
       }, { enableHighAccuracy: true, timeout: 8000 });
     } else {
-      _abrirWhatsappConUbicacion(pet, null, null);
+      _abrirWhatsappConUbicacion(pet, null, null, ventana);
       if (btn) { btn.innerHTML = textoOriginal; btn.disabled = false; }
     }
   }
 
-  function _abrirWhatsappConUbicacion(pet, lat, lng) {
+  function _abrirWhatsappConUbicacion(pet, lat, lng, ventana) {
     var mensaje = '🐾 ¡Hola! Soy *' + pet.nombre + '*, tu mascota.\n' +
       'Alguien me encontró y escaneó mi chapita. Vivo en Manzana ' + pet.mza + ' - Casa ' + pet.casa + '.\n' +
       'Veni a buscarme lo antes posible 🙏';
@@ -20737,7 +20742,12 @@ window.iniciarEstadioJuego = function() {
     }
     var telefono = String(pet.telefono).replace(/[^0-9]/g, '');
     var url = 'https://wa.me/' + telefono + '?text=' + encodeURIComponent(mensaje);
-    window.open(url, '_blank');
+    if (ventana && !ventana.closed) {
+      ventana.location.href = url;
+    } else {
+      // Fallback por si el navegador igual bloqueó la ventana en blanco
+      window.open(url, '_blank');
+    }
   }
 
   // ── Pantalla de mis mascotas ──────────────────────────
