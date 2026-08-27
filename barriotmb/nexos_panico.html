@@ -20647,8 +20647,8 @@ window.iniciarEstadioJuego = function() {
         <div style="color:#a1a1aa; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">Notas Medicas / Caracter</div>
         <div id="pub-notas-text" style="color:#e4e4e7; font-size:14px;"></div>
       </div>
-      <button id="pub-btn-notificar" onclick="notificarDuenioPublico()" style="width:100%; padding:16px; background:linear-gradient(135deg,#e11d48,#9f1239); color:#fff; border:none; border-radius:14px; font-size:16px; font-weight:700; cursor:pointer; margin-bottom:12px; letter-spacing:0.3px;">
-        🔔 NOTIFICAR A MI DUENIO AHORA
+      <button id="pub-btn-notificar" onclick="enviarUbicacionWhatsapp()" style="width:100%; padding:16px; background:linear-gradient(135deg,#25D366,#128C7E); color:#fff; border:none; border-radius:14px; font-size:16px; font-weight:700; cursor:pointer; margin-bottom:12px; letter-spacing:0.3px;">
+        📍 ENVIAR UBICACIÓN A MI DUEÑO POR WHATSAPP
       </button>
       <button id="pub-btn-llamar" style="width:100%; padding:14px; background:#27272a; color:#fff; border:1px solid #3f3f46; border-radius:14px; font-size:15px; font-weight:600; cursor:pointer;">
         📞 Llamar al Duenio Directamente
@@ -20701,32 +20701,43 @@ window.iniciarEstadioJuego = function() {
       .catch(function(e){ console.error(e); alert('Error cargando ficha de mascota.'); });
   }
 
-  function notificarDuenioPublico() {
+  function enviarUbicacionWhatsapp() {
     var pet = window._currentPublicPet;
     if (!pet) return;
-    var payload = { accion: 'notificar_escaneo_mascota', petId: pet.id, petNombre: pet.nombre, mza: pet.mza, casa: pet.casa };
+    if (!pet.telefono) {
+      alert('Esta mascota no tiene un numero de WhatsApp cargado por su duenio.');
+      return;
+    }
+    var btn = document.getElementById('pub-btn-notificar');
+    var textoOriginal = btn ? btn.innerHTML : null;
+    if (btn) { btn.innerHTML = '📍 Obteniendo tu ubicación...'; btn.disabled = true; }
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(function(pos) {
-        payload.lat = pos.coords.latitude;
-        payload.lng = pos.coords.longitude;
-        _enviarNotifMascota(payload);
-      }, function() { _enviarNotifMascota(payload); });
+        _abrirWhatsappConUbicacion(pet, pos.coords.latitude, pos.coords.longitude);
+        if (btn) { btn.innerHTML = textoOriginal; btn.disabled = false; }
+      }, function() {
+        _abrirWhatsappConUbicacion(pet, null, null);
+        if (btn) { btn.innerHTML = textoOriginal; btn.disabled = false; }
+      }, { enableHighAccuracy: true, timeout: 8000 });
     } else {
-      _enviarNotifMascota(payload);
+      _abrirWhatsappConUbicacion(pet, null, null);
+      if (btn) { btn.innerHTML = textoOriginal; btn.disabled = false; }
     }
   }
 
-  function _enviarNotifMascota(payload) {
-    fetch(PANIC_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(payload)
-    })
-    .then(function(r){ return r.json(); })
-    .then(function(d) {
-      alert('Notificacion enviada al duenio. Espera que venga a buscarlo.');
-    })
-    .catch(function(e){ alert('Notificacion enviada.'); });
+  function _abrirWhatsappConUbicacion(pet, lat, lng) {
+    var mensaje = '🐾 ¡Hola! Soy *' + pet.nombre + '*, tu mascota.\n' +
+      'Alguien me encontró y escaneó mi chapita. Vivo en Manzana ' + pet.mza + ' - Casa ' + pet.casa + '.\n' +
+      'Veni a buscarme lo antes posible 🙏';
+    if (lat != null && lng != null) {
+      mensaje += '\n\n📍 Esta es mi ubicación actual: https://maps.google.com/?q=' + lat + ',' + lng;
+    } else {
+      mensaje += '\n\n(No se pudo obtener la ubicación exacta, pero estoy cerca de mi casa)';
+    }
+    var telefono = String(pet.telefono).replace(/[^0-9]/g, '');
+    var url = 'https://wa.me/' + telefono + '?text=' + encodeURIComponent(mensaje);
+    window.open(url, '_blank');
   }
 
   // ── Pantalla de mis mascotas ──────────────────────────
