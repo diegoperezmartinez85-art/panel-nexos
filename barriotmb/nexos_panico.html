@@ -20731,6 +20731,40 @@ window.iniciarEstadioJuego = function() {
     }
   }
 
+  function _normalizarTelefonoArgentinoWA(telefonoRaw) {
+    // Deja solo dígitos
+    var t = String(telefonoRaw).replace(/[^0-9]/g, '');
+    if (!t) return '';
+
+    // Si ya viene con 54 al inicio, lo tomamos como base sin el 54
+    if (t.indexOf('54') === 0) {
+      t = t.substring(2);
+    }
+
+    // Quitamos un 9 inicial si ya lo traía (para no duplicarlo despues)
+    if (t.indexOf('9') === 0 && t.length > 10) {
+      t = t.substring(1);
+    }
+
+    // Quitamos el 0 de larga distancia si lo tiene (ej: 011...)
+    if (t.indexOf('0') === 0) {
+      t = t.substring(1);
+    }
+
+    // Quitamos el 15 de celular si esta despues del codigo de area (ej: 11-15-1234567)
+    // Caso comun: area 11 (2 digitos) + 15 + 8 digitos = 12 digitos
+    if (t.length === 12 && t.substring(2, 4) === '15') {
+      t = t.substring(0, 2) + t.substring(4);
+    }
+    // Caso area de 3 o 4 digitos + 15 (menos comun, pero por las dudas)
+    else if (t.length === 13 && t.substring(3, 5) === '15') {
+      t = t.substring(0, 3) + t.substring(5);
+    }
+
+    // Anteponemos 549 (54 = Argentina, 9 = celular) para que WhatsApp lo reconozca
+    return '549' + t;
+  }
+
   function _abrirWhatsappConUbicacion(pet, lat, lng, ventana) {
     var mensaje = '🐾 ¡Hola! Soy *' + pet.nombre + '*, tu mascota.\n' +
       'Alguien me encontró y escaneó mi chapita. Vivo en Manzana ' + pet.mza + ' - Casa ' + pet.casa + '.\n' +
@@ -20740,7 +20774,7 @@ window.iniciarEstadioJuego = function() {
     } else {
       mensaje += '\n\n(No se pudo obtener la ubicación exacta, pero estoy cerca de mi casa)';
     }
-    var telefono = String(pet.telefono).replace(/[^0-9]/g, '');
+    var telefono = _normalizarTelefonoArgentinoWA(pet.telefono);
     var url = 'https://wa.me/' + telefono + '?text=' + encodeURIComponent(mensaje);
     if (ventana && !ventana.closed) {
       ventana.location.href = url;
