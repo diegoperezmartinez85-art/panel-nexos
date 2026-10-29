@@ -304,7 +304,7 @@ $('bcta').onclick=()=>openM('mc');$('gnx').onclick=()=>openM('mc');
 $('mgo').onclick=()=>{closeM('mw');setTimeout(()=>q.focus(),250)};
 let seen=false;try{seen=sessionStorage.getItem('pod_w')==='1'}catch(e){}
 if(!seen){setTimeout(()=>openM('mw'),500);try{sessionStorage.setItem('pod_w','1')}catch(e){}}
-const SHARE_URL='https://alerta.nexosmaps.com/mapa-podesta/mapa_lotes.html',SHARE_TXT='Mapa de lotes de Altos de Podestá. Escribí el número de lote y llegá con Google Maps: ';
+const SHARE_URL='https://alerta.nexosmaps.com/mapa-podesta/altos_podesta',SHARE_TXT='Mapa de lotes de Altos de Podestá. Escribí el número de lote y llegá con Google Maps: ';
 function copyTxt(s){return(navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(s):Promise.reject()).catch(()=>{const a=document.createElement('textarea');a.value=s;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();let ok=false;try{ok=document.execCommand('copy')}catch(_){}a.remove();if(!ok)throw 0})}
 $('bsh').onclick=()=>{$('swa').href='https://wa.me/?text='+encodeURIComponent(SHARE_TXT+SHARE_URL);$('slink').textContent=SHARE_URL.replace('https://','');$('snat').style.display=navigator.share?'flex':'none';openM('ms')};
 $('scp').onclick=()=>copyTxt(SHARE_URL).then(()=>{closeM('ms');toast('Link copiado')}).catch(()=>toast('Mantené apretado el link para copiarlo'));
