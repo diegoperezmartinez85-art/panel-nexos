@@ -1,6 +1,6 @@
 // ── NEXOS SERVICE WORKER ─────────────────────────────────
 // Versión: cambiar este número para forzar actualización
-const CACHE_NAME = 'nexos-v1.10';
+const CACHE_NAME = 'nexos-v1.11';
 
 // Archivos que se guardan offline
 const ARCHIVOS = [
@@ -37,6 +37,8 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   // No interceptar peticiones al Google Script (siempre red)
   if (event.request.url.includes('script.google.com')) return;
+  // El mapa de manzanas siempre se pide a la red (nunca una copia vieja)
+  if (event.request.url.includes('/mapa-podesta/')) return;
 
   event.respondWith(
     caches.match(event.request).then(cached => {
