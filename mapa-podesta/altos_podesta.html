@@ -205,6 +205,7 @@ body.sh .zoom{bottom:calc(env(safe-area-inset-bottom,0px) + 250px)}
 .pday{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid #2a2a34;margin-top:7px}
 .pday .dn{width:48px;font-weight:700;font-size:14px;color:#fff}.pday .di{width:30px;height:30px;color:#22d3ee;display:inline-flex}.di svg{width:100%;height:100%}.pday .dr{font-size:12px;color:#67e8f9;min-width:44px}.pday .dt{margin-left:auto;font-size:14px;color:#fff;font-weight:700}.pday .dt i{font-style:normal;color:#8a8a9a;font-weight:500;margin-left:6px}
 .bdg{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--gold,#f5c842);color:#1a1405;font:800 11px/18px -apple-system,system-ui,sans-serif;font-style:normal;display:none}.bdg.on{display:block}.fvc{max-height:80vh;overflow:auto}#fvl{display:grid;gap:9px}.fvi{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;border:1px solid rgba(245,200,66,.35);background:rgba(245,200,66,.06)}.fvi .fn{min-width:58px;font:800 28px/1 -apple-system,system-ui,sans-serif;color:var(--gold2,#ffd76a);text-align:center}.fvi .fd{flex:1;min-width:0;font-size:13px;color:var(--muted)}.fvi .fd b{display:block;color:var(--gold2,#ffd76a);font-size:19px;font-weight:800;margin-bottom:1px;white-space:nowrap}.fvi .fa{display:flex;gap:6px}.fvi .fa button,.fvi .fa a{height:38px;padding:0 12px;border-radius:11px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:#fff;font:600 13px -apple-system,system-ui,sans-serif;display:grid;place-items:center;text-decoration:none;cursor:pointer}.fvi .fa a{background:linear-gradient(135deg,#06b6d4,#7c5cff);border:0}.fvi .fa .fx{width:38px;padding:0;color:#e07a7a}.fve{text-align:center;color:var(--muted);font-size:14px;line-height:1.5;padding:10px 6px 4px}.fve b{color:#fff}
+#svg{position:absolute;left:0;top:0;transform-origin:0 0;max-width:none}#stage *,.zoom .btn,.cta,#poic *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.zoom .btn,#poic button,#poic .pc,.cta{background-color:rgba(18,18,26,.88)}
 </style>
 </head>
 <body>
@@ -273,10 +274,11 @@ LOTS.forEach(l=>{byN[l.n]=l;
  g.append(r,t);gl.appendChild(g);l.el=g;});
 // ---- vista (pan/zoom)
 let sc=1,tx=0,ty=0,minS=1,maxS=7,vw=innerWidth,vh=innerHeight;
-function fit(){vw=stage.clientWidth;vh=stage.clientHeight;svg.setAttribute("viewBox","0 0 "+vw+" "+vh);
+function fit(){vw=stage.clientWidth;vh=stage.clientHeight;svg.setAttribute("viewBox","0 0 "+W+" "+H);svg.style.width=W+"px";svg.style.height=H+"px";
  const padT=16,padB=16;minS=Math.min((vw-8)/W,(vh-padT-padB)/H);maxS=minS*9;
  return{s:minS,x:(vw-W*minS)/2,y:padT+Math.max(0,((vh-padT-padB)-H*minS)/2)}}
-function apply(){world.setAttribute('transform',`translate(${tx} ${ty}) scale(${sc})`)}
+let _mv=0,_mt=0;function apply(){svg.style.transform='translate3d('+tx+'px,'+ty+'px,0) scale('+sc+')';if(!_mv){_mv=1;svg.style.willChange='transform'}clearTimeout(_mt);_mt=setTimeout(()=>{_mv=0;svg.style.willChange='auto'},260)}
+
 function clamp(){const m=80;tx=Math.min(vw-m,Math.max(m-W*sc,tx));ty=Math.min(vh-m,Math.max(m-H*sc,ty))}
 let anim=null;
 function go(s,x,y,ms=420){cancelAnimationFrame(anim);const s0=sc,x0=tx,y0=ty,t0=performance.now();
@@ -297,7 +299,7 @@ stage.addEventListener('pointermove',e=>{if(!P.has(e.pointerId))return;const o=P
  if(P.size===1&&!pinch){const dx=p.x-o.x,dy=p.y-o.y;moved+=Math.abs(dx)+Math.abs(dy);tx+=dx;ty+=dy;{const t=performance.now(),dt=Math.max(8,t-(lt||t-16));vx=.75*dx/dt+.25*vx;vy=.75*dy/dt+.25*vy;lt=t}clamp();sched()}
  else if(P.size>=2&&pinch){const[a,b]=[...P.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);const s=Math.min(maxS,Math.max(minS,pinch.s*d/pinch.d));const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;sc=s;tx=mx-pinch.wx*s;ty=my-pinch.wy*s;clamp();sched()}});
 function up(e){P.delete(e.pointerId);if(P.size<2&&pinch){pinch=null;moved=99}if(P.size>=2)startPinch();if(!P.size)stage.classList.remove('drag')}
-stage.addEventListener('pointerup',e=>{const wasTap=moved<10&&P.size===1;up(e);if(!wasTap){if(!P.size&&!wasPinch&&performance.now()-lt<90&&Math.hypot(vx,vy)>.15)fling();return}
+stage.addEventListener('pointerup',e=>{const wasTap=moved<10&&P.size===1;up(e);if(!wasTap){if(!P.size&&!wasPinch&&performance.now()-lt<140&&Math.hypot(vx,vy)>.15)fling();return}
  const now=performance.now();const el=document.elementFromPoint(e.clientX,e.clientY);const lot=el&&el.closest&&el.closest('.lot');const L=loc(e);
  if(lot){pick(+lot.dataset.n,false)}else{if(now-tapT<320)zoomAt(2,L.x,L.y);else closeSheet()}tapT=now});
 stage.addEventListener('pointercancel',up);
