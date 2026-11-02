@@ -1696,6 +1696,12 @@
       line-height: 1.2;
       gap: 0;
     }
+    .clima-chip-icon { display: inline-flex; color: #22d3ee; }
+    .clima-chip-icon svg { width: 19px; height: 19px; }
+    .clima-current-icon { display: inline-flex; color: #22d3ee; }
+    .clima-current-icon svg { width: 56px; height: 56px; }
+    .clima-dia-icon { display: inline-flex; color: #22d3ee; }
+    .clima-dia-icon svg { width: 25px; height: 25px; }
     .clima-chip-temp {
       font-size: 13px;
       font-weight: 800;
@@ -2013,6 +2019,7 @@
       font-weight: 700;
       color: #71717a;
     }
+    .clima-dia-lluvia .gotita { width: 12px; height: 12px; vertical-align: -1px; margin-right: 2px; }
     .clima-dia-lluvia {
       font-size: 11px;
       color: #06b6d4;
@@ -4125,7 +4132,7 @@ function initBtnOleajeLongPress() {
     <span onclick="abrirModal('modal-novedades-sistema-panico')" style="cursor: pointer; background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.3); color: var(--ac); font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 20px;" title="Ver Novedades v.1.2">v.1.2 ℹ️</span>
   </div>
   <div class="clima-chip" id="clima-chip" onclick="abrirPronostico()" style="display: flex; align-items: center; gap: 4px;">
-    <span class="clima-chip-icon" id="chip-icon">🌤️</span>
+    <span class="clima-chip-icon" id="chip-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3.2v1.6M3.4 8.6H5M4.9 4.6l1.1 1.1M13.1 4.6 12 5.7"/><path d="M6.4 11.3a3.4 3.4 0 0 1 6-2.5"/><path d="M9 20h8.5a3.6 3.6 0 0 0 .5-7.15A4.9 4.9 0 0 0 8.7 13.2 3.4 3.4 0 0 0 9 20z"/></svg></span>
     <span class="clima-chip-temp" id="chip-temp">17°</span>
     <span id="chip-nautico" style="font-size: 11px; font-weight: 800; color: #06b6d4; margin-left: 4px; display: inline-flex; align-items: center;">🌊 --m</span>
   </div>
@@ -6225,48 +6232,33 @@ function initBtnOleajeLongPress() {
     };
   }
 
-  // Devuelve el ícono correcto según hora del día
+  // ── ÍCONOS DE CLIMA (línea, sin emojis) ─────────────
+  const CLIMA_SVG = {sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/>',moon:'<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/>',cloud:'<path d="M7 18.5h10a4 4 0 0 0 .6-7.95A5.5 5.5 0 0 0 7 9.7 4.4 4.4 0 0 0 7 18.5z"/>',psun:'<path d="M9 3.2v1.6M3.4 8.6H5M4.9 4.6l1.1 1.1M13.1 4.6 12 5.7"/><path d="M6.4 11.3a3.4 3.4 0 0 1 6-2.5"/><path d="M9 20h8.5a3.6 3.6 0 0 0 .5-7.15A4.9 4.9 0 0 0 8.7 13.2 3.4 3.4 0 0 0 9 20z"/>',pmoon:'<path d="M10.5 3.2a3.6 3.6 0 1 0 3.6 5.2 3.2 3.2 0 0 1-3.6-5.2z"/><path d="M9 20h8.5a3.6 3.6 0 0 0 .5-7.15A4.9 4.9 0 0 0 8.7 13.2 3.4 3.4 0 0 0 9 20z"/>',fog:'<path d="M7 13.5h10a3.6 3.6 0 0 0 .5-7.15A5 5 0 0 0 7.2 6.8 3.4 3.4 0 0 0 7 13.5z"/><path d="M4 17h16M7 20.5h10"/>',rain:'<path d="M7 14.5h10a3.6 3.6 0 0 0 .5-7.15A5 5 0 0 0 7.2 7.8 3.4 3.4 0 0 0 7 14.5z"/><path d="M8.5 17.5 7.5 20.5M12.5 17.5l-1 3M16.5 17.5l-1 3"/>',snow:'<path d="M7 14.5h10a3.6 3.6 0 0 0 .5-7.15A5 5 0 0 0 7.2 7.8 3.4 3.4 0 0 0 7 14.5z"/><path d="M8 18v.01M12 19.5v.01M16 18v.01M10 21v.01M14 21v.01" stroke-width="2.6"/>',storm:'<path d="M7 14.5h10a3.6 3.6 0 0 0 .5-7.15A5 5 0 0 0 7.2 7.8 3.4 3.4 0 0 0 7 14.5z"/><path d="M12.5 14.5 10.5 18h3l-1.8 3.5"/>',temp:'<path d="M10 14.5V5a2 2 0 0 1 4 0v9.5a4 4 0 1 1-4 0z"/>'};
+  function climaKind(c) {
+    return c===0?'sun':(c===1||c===2)?'psun':c===3?'cloud':(c===45||c===48)?'fog':((c>=71&&c<=77)||c===85||c===86)?'snow':(c===82||c>=95)?'storm':((c>=51&&c<=67)||c===80||c===81)?'rain':'temp';
+  }
+  function climaSvg(k) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + CLIMA_SVG[k] + '</svg>';
+  }
+
+  // Devuelve el ícono (SVG de línea) según hora del día
   // soloActual=true → usa lógica noche (chip y clima actual del modal)
   // soloActual=false → siempre ícono diurno (filas de pronóstico futuro)
   function iconoClima(code, soloActual = true) {
+    let k = climaKind(code);
     if (soloActual && esNoche()) {
-      const mapa = iconosNoche();
-      let icon = mapa[code] ?? CLIMA_ICONS[code] ?? '🌙';
-      
-      // Lista de emojis de fases lunares para chequear si el ícono ya tiene uno
-      const lunas = ['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘','🌙'];
-      const tieneLuna = lunas.some(l => icon.includes(l));
-      
-      // Si es de noche y el ícono climático (ej: niebla, cubierto) no tiene luna, se la agregamos al principio
-      if (!tieneLuna) {
-        icon = faselunar() + ' ' + icon;
-      }
-      return icon;
+      if (code <= 1) k = 'moon';
+      else if (code === 2) k = 'pmoon';
     }
-    return CLIMA_ICONS[code] || '🌤️';
+    return climaSvg(k);
   }
 
-  // Aplica clase 'doble' al chip-icon si el ícono tiene 2 emojis (con fallback robusto)
+  // Muestra el ícono en el chip (solo toca el DOM si cambió)
   function ajustarIconoChip(icono) {
     const el = document.getElementById('chip-icon');
     if (!el) return;
-    let segs = [];
-    if (typeof Intl !== 'undefined' && Intl.Segmenter) {
-      try {
-        segs = [...new Intl.Segmenter(undefined, {granularity:'grapheme'}).segment(icono)].map(s => s.segment);
-      } catch (e) {
-        segs = [...icono];
-      }
-    } else {
-      segs = [...icono];
-    }
-    const esDoble = segs.length > 1;
-    el.classList.toggle('doble', esDoble);
-    if (esDoble) {
-      el.innerHTML = `<span>${segs[0]}</span><span>${segs[1]}</span>`;
-    } else {
-      el.textContent = icono;
-    }
+    el.classList.remove('doble');
+    if (el.dataset.k !== icono) { el.innerHTML = icono; el.dataset.k = icono; }
   }
 
   let climaCode = 2; // se actualiza al recibir la API; usado para recalcular luna cada segundo
@@ -6360,7 +6352,7 @@ function initBtnOleajeLongPress() {
       
       // Actualizar el ícono en el chip de inicio dinámicamente
       const chipIcon = document.getElementById('chip-icon');
-      if (chipIcon) chipIcon.innerText = iconoClima(code);
+      if (chipIcon) chipIcon.innerHTML = iconoClima(code);
     } catch(e) {
       // Silently fall back to local cache or simulated data
       // Intentar recuperar desde caché de localStorage
@@ -6373,7 +6365,7 @@ function initBtnOleajeLongPress() {
           climaCode = d.current_weather.weathercode;
           document.getElementById('chip-temp').innerText = Math.round(d.current_weather.temperature) + '°';
           const chipIcon = document.getElementById('chip-icon');
-          if (chipIcon) chipIcon.innerText = iconoClima(climaCode);
+          if (chipIcon) chipIcon.innerHTML = iconoClima(climaCode);
           return;
         } catch(e2) {}
       }
@@ -6382,7 +6374,7 @@ function initBtnOleajeLongPress() {
       climaCode = mock.current_weather.weathercode;
       document.getElementById('chip-temp').innerText = mock.current_weather.temperature + '°';
       const chipIcon = document.getElementById('chip-icon');
-      if (chipIcon) chipIcon.innerText = iconoClima(climaCode);
+      if (chipIcon) chipIcon.innerHTML = iconoClima(climaCode);
     }
   }
 
@@ -6638,10 +6630,10 @@ function initBtnOleajeLongPress() {
       const min    = Math.round(daily.temperature_2m_min[i]);
       const lluvia = daily.precipitation_probability_max[i] ?? 0;
       const vMax   = daily.wind_speed_10m_max?.[i] != null ? Math.round(daily.wind_speed_10m_max[i]) : null;
-      diasHtml += '<div class="clima-dia-row"><span class="clima-dia-nombre">' + nombre + '</span><span class="clima-dia-icon">' + dicon + '</span><div class="clima-dia-temps"><span class="clima-dia-max">' + max + '°</span><span class="clima-dia-min">' + min + '°</span></div><span class="clima-dia-lluvia">' + (lluvia > 0 ? '💧' + lluvia + '%' : '') + (vMax != null && vMax > 20 ? ' 💨' + vMax : '') + '</span></div>';
+      diasHtml += '<div class="clima-dia-row"><span class="clima-dia-nombre">' + nombre + '</span><span class="clima-dia-icon">' + dicon + '</span><div class="clima-dia-temps"><span class="clima-dia-max">' + max + '°</span><span class="clima-dia-min">' + min + '°</span></div><span class="clima-dia-lluvia">' + (lluvia > 0 ? '<svg class="gotita" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5s6 6.2 6 10.5a6 6 0 0 1-12 0c0-4.3 6-10.5 6-10.5z"/></svg>' + lluvia + '%' : '') + (vMax != null && vMax > 20 ? ' · ' + vMax + 'km/h' : '') + '</span></div>';
     }
     const lunaActual = nombreFaseLunar();
-    const sensHtml = sensacion != null ? '<span class="clima-current-sensacion">ST: ' + sensacion + '°' + (viento != null ? ' · 💨 ' + viento + ' km/h' : '') + '</span>' : '<span class="clima-current-sensacion">Buenos Aires</span>';
+    const sensHtml = sensacion != null ? '<span class="clima-current-sensacion">ST: ' + sensacion + '°' + (viento != null ? ' · Viento ' + viento + ' km/h' : '') + '</span>' : '<span class="clima-current-sensacion">Buenos Aires</span>';
     
     let offlineBanner = '';
     if (d.isSimulated) {
