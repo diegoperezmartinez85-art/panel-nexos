@@ -315,7 +315,7 @@ let onlyFav=false;const q=$('q');
 function filt(){document.querySelectorAll('.lot').forEach(g=>{g.classList.toggle('dim',onlyFav&&!favs.includes(+g.dataset.n))})}
 $('bf').onclick=()=>{onlyFav=!onlyFav;$('bf').classList.toggle('on',onlyFav);filt();if(onlyFav&&!favs.length)toast('Todavía no tenés favoritos')};
 q.addEventListener('input',()=>{const v=q.value.replace(/\D/g,'');q.value=v;$('msg').classList.remove('on');if(!v)return;const n=+v;
- if(byN[n]&&(v.length>=2||LOTS.every(l=>!String(l.n).startsWith(v)||l.n===n)))pick(n)});
+ clearTimeout(window.__qt);if(!byN[n])return;if(LOTS.every(l=>!String(l.n).startsWith(v)||l.n===n)){pick(n);return}window.__qt=setTimeout(()=>{if(q.value===v)pick(n)},900)});
 q.addEventListener('keydown',e=>{if(e.key==='Enter'){const n=+q.value;if(!q.value)return;if(byN[n]){pick(n);q.blur()}else $('msg').classList.add('on')}});
 addEventListener('resize',()=>{const o=minS;fit();if(sc<=o*1.01)reset(0);else{clamp();apply()}});
 
