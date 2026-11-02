@@ -205,6 +205,7 @@ body.sh .zoom{bottom:calc(env(safe-area-inset-bottom,0px) + 250px)}
 .pday{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid #2a2a34;margin-top:7px}
 .pday .dn{width:48px;font-weight:700;font-size:14px;color:#fff}.pday .di{width:30px;height:30px;color:#22d3ee;display:inline-flex}.di svg{width:100%;height:100%}.pday .dr{font-size:12px;color:#67e8f9;min-width:44px}.pday .dt{margin-left:auto;font-size:14px;color:#fff;font-weight:700}.pday .dt i{font-style:normal;color:#8a8a9a;font-weight:500;margin-left:6px}
 .parque{fill:rgba(46,204,113,.20);stroke:rgba(46,204,113,.35);stroke-width:.8}.arb circle{fill:rgba(34,160,80,.45)}.am-futbol{fill:#1e8a55;stroke:#e8fff2;stroke-width:1.2}.am-tenis{fill:#e8762c;stroke:#fff3;stroke-width:1}.am-pileta{fill:#29c4ea;stroke:#e6fbff;stroke-width:1.2}.am-linea{fill:none;stroke:#ffffffcc;stroke-width:1.4}.am-club{fill:#d94848;stroke:#fff6;stroke-width:1}.lbl.am{fill:#eafff3;font-weight:600;letter-spacing:.6px;paint-order:stroke;stroke:#0b1410;stroke-width:3px}.chip.e2c{box-shadow:inset 0 0 0 1.5px rgba(6,182,212,.75)}
+.etp{display:flex;gap:6px;margin-top:9px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}.etp button{flex:1;height:34px;border:0;border-radius:10px;background:transparent;color:var(--muted);font:600 14px -apple-system,system-ui,sans-serif;cursor:pointer;transition:.18s}.etp button small{font-weight:400;font-size:11px;opacity:.75;margin-left:4px}.etp button.on{background:linear-gradient(135deg,rgba(6,182,212,.9),rgba(124,92,255,.85));color:#fff}
 </style>
 </head>
 <body>
@@ -219,7 +220,7 @@ body.sh .zoom{bottom:calc(env(safe-area-inset-bottom,0px) + 250px)}
 <div class="srch">
 <label class="box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" inputmode="numeric" placeholder="Número de lote…" autocomplete="off"></label>
 <button class="btn" id="bsh" aria-label="Compartir"><svg viewBox="0 0 24 24"><path d="M12 15V4M8 8l4-4 4 4M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg></button><button class="btn" id="bf" aria-label="Favoritos"><svg viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></button>
-</div><div class="sug" id="sug"></div><div class="msg" id="msg">Ese lote no existe en el barrio</div></div>
+</div><div class="etp" id="etp" role="tablist"><button class="on" data-e="1">Etapa 1 <small>lotes 1 a 210</small></button><button data-e="2">Etapa 2 <small>lotes 01 a 62</small></button></div><div class="sug" id="sug"></div><div class="msg" id="msg">Ese lote no existe en el barrio</div></div>
 
 <div class="zoom"><button class="btn" id="zi" aria-label="Acercar"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><button class="btn" id="zo" aria-label="Alejar"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button><button class="btn" id="zr" aria-label="Ver todo"><svg viewBox="0 0 24 24"><path d="M4 9V5h4M20 9V5h-4M4 15v4h4M20 15v4h-4"/></svg></button></div>
 
@@ -255,6 +256,8 @@ const $=id=>document.getElementById(id);
 const stage=$('stage'),svg=$('svg'),world=$('world');
 let favs=[];try{favs=JSON.parse(localStorage.getItem('alb_fav')||'[]')}catch(e){}
 const saveFav=()=>{try{localStorage.setItem('alb_fav',JSON.stringify(favs))}catch(e){}};
+let ET=1;const toN=v=>ET===2?1000+ +v:+v;const lblOk=(l,v)=>String(l.t||l.n).startsWith(v)||(!!l.t&&String(+l.t).startsWith(v));
+function setET(e){ET=e;document.querySelectorAll('#etp button').forEach(b=>b.classList.toggle('on',+b.dataset.e===e));const qi=document.getElementById('q');if(qi)qi.placeholder='Número de lote · Etapa '+e+'…'}
 const byN={};
 // ---- dibujar lotes
 const gl=$('lots');
@@ -297,7 +300,7 @@ let cur=null;const fx=$('fx');
 function pick(n,fly=true){const l=byN[n];if(!l)return;cur=l;
  document.querySelectorAll('.lot.hit').forEach(x=>x.classList.remove('hit'));l.el.classList.add('hit');
  fx.innerHTML='';const c=document.createElementNS(NS,'rect');['x','y','width','height'].forEach((k,i)=>c.setAttribute(k,[l.x,l.y,l.w,l.h][i]));c.setAttribute('rx',6);c.setAttribute('class','pulse');fx.appendChild(c);
- $('sn').classList.remove('poi');$('slb').textContent='Lote';$('fv').style.display='';$('sn').textContent=l.t||l.n;$('sg').textContent=l.lat.toFixed(6)+' , '+l.lng.toFixed(6);
+ $('sn').classList.remove('poi');$('slb').textContent='Lote · Etapa '+(l.e||1);setET(l.e||1);$('fv').style.display='';$('sn').textContent=l.t||l.n;$('sg').textContent=l.lat.toFixed(6)+' , '+l.lng.toFixed(6);
  const ll=l.lat+','+l.lng;
  $('gm').href='https://www.google.com/maps/dir/?api=1&destination='+ll+'&travelmode=driving';
  $('wz').href='https://waze.com/ul?ll='+ll+'&navigate=yes';
@@ -315,18 +318,18 @@ function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');setTi
 let onlyFav=false;const q=$('q');
 function filt(){document.querySelectorAll('.lot').forEach(g=>{g.classList.toggle('dim',onlyFav&&!favs.includes(+g.dataset.n))})}
 $('bf').onclick=()=>{onlyFav=!onlyFav;$('bf').classList.toggle('on',onlyFav);filt();if(onlyFav&&!favs.length)toast('Todavía no tenés favoritos')};
-q.addEventListener('input',()=>{const v=q.value.replace(/\D/g,'');q.value=v;$('msg').classList.remove('on');if(!v)return;clearTimeout(window.__qt);if(v.length===2&&v[0]==='0'&&byN[1000+ +v]){pick(1000+ +v);return}const a=byN[+v]&&+v,b=byN[1000+ +v]&&1000+ +v;if(!a&&!b)return;if(a&&b)return;const n=a||b;if(LOTS.every(l=>!String(l.t||l.n).startsWith(v)||l.n===n)){pick(n);return}window.__qt=setTimeout(()=>{if(q.value===v)pick(n)},900)});
-q.addEventListener('keydown',e=>{if(e.key==='Enter'){const n=(q.value[0]==='0'||!byN[+q.value])?1000+ +q.value:+q.value;if(!q.value)return;if(byN[n]){pick(n);q.blur()}else $('msg').classList.add('on')}});
+q.addEventListener('input',()=>{const v=q.value.replace(/\D/g,'');q.value=v;$('msg').classList.remove('on');if(!v)return;clearTimeout(window.__qt);const n=toN(v);if(!byN[n])return;if(LOTS.every(l=>(l.e||1)!==ET||!lblOk(l,v)||l.n===n)){pick(n);return}window.__qt=setTimeout(()=>{if(q.value===v)pick(n)},900)});
+q.addEventListener('keydown',e=>{if(e.key==='Enter'){const n=toN(q.value);if(!q.value)return;if(byN[n]){pick(n);q.blur()}else $('msg').classList.add('on')}});
 addEventListener('resize',()=>{const o=minS;fit();if(sc<=o*1.01)reset(0);else{clamp();apply()}});
 
 // ---- mejoras: sugerencias, recientes, bienvenida, CTA, compartir, inercia
 let rec=[];try{rec=JSON.parse(localStorage.getItem('alb_rec')||'[]')}catch(e){}
 function saveRec(n){rec=[n,...rec.filter(x=>x!==n)].slice(0,5);try{localStorage.setItem('alb_rec',JSON.stringify(rec))}catch(e){}}
-function chips(list,cls){const s=$('sug');s.innerHTML=(cls==='r'&&list.length)?'<span class="rl">Recientes</span>':'';list.forEach(n=>{const b=document.createElement('button');b.className='chip '+(cls||'');const L=byN[n];b.textContent=L&&L.t?L.t:n;if(L&&L.e===2)b.classList.add('e2c');b.onclick=()=>{q.value='';pick(n);buzz()};s.appendChild(b)})}
-function sug(){const v=q.value;if(!v){chips(rec,'r');return}const m=LOTS.filter(l=>String(l.t||l.n).startsWith(v)||(l.t&&String(+l.t).startsWith(v))).sort((a,b)=>(+(a.t||a.n))-(+(b.t||b.n))||a.n-b.n).map(l=>l.n).slice(0,12);chips(m)}
+function chips(list,cls){const s=$('sug');s.innerHTML=(cls==='r'&&list.length)?'<span class="rl">Recientes</span>':'';list.forEach(n=>{const b=document.createElement('button');b.className='chip '+(cls||'');const L=byN[n];b.textContent=L&&L.t?L.t:n;b.onclick=()=>{q.value='';pick(n);buzz()};s.appendChild(b)})}
+function sug(){const v=q.value;if(!v){chips(rec,'r');return}const m=LOTS.filter(l=>(l.e||1)===ET&&lblOk(l,v)).sort((a,b)=>(+(a.t||a.n))-(+(b.t||b.n))||a.n-b.n).map(l=>l.n).slice(0,12);chips(m)}
 function buzz(){try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}}
 const _pick=pick;pick=function(n,fly){_pick(n,fly);saveRec(n);if(!q.value)sug();buzz()};
-q.addEventListener('input',sug);q.addEventListener('focus',sug);sug();
+document.querySelectorAll('#etp button').forEach(b=>b.onclick=()=>{setET(+b.dataset.e);q.value='';sug();q.focus()});setET(1);q.addEventListener('input',sug);q.addEventListener('focus',sug);sug();
 const openM=id=>$(id).classList.add('on'),closeM=id=>$(id).classList.remove('on');
 document.querySelectorAll('.cl').forEach(b=>b.onclick=()=>closeM(b.dataset.c));
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('pointerdown',e=>{if(e.target===m)closeM(m.id)}));
