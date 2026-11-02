@@ -206,6 +206,7 @@ body.sh .zoom{bottom:calc(env(safe-area-inset-bottom,0px) + 250px)}
 .pday .dn{width:48px;font-weight:700;font-size:14px;color:#fff}.pday .di{width:30px;height:30px;color:#22d3ee;display:inline-flex}.di svg{width:100%;height:100%}.pday .dr{font-size:12px;color:#67e8f9;min-width:44px}.pday .dt{margin-left:auto;font-size:14px;color:#fff;font-weight:700}.pday .dt i{font-style:normal;color:#8a8a9a;font-weight:500;margin-left:6px}
 .parque{fill:rgba(46,204,113,.20);stroke:rgba(46,204,113,.35);stroke-width:.8}.arb circle{fill:rgba(34,160,80,.45)}.am-futbol{fill:#1e8a55;stroke:#e8fff2;stroke-width:1.2}.am-tenis{fill:#e8762c;stroke:#fff3;stroke-width:1}.am-pileta{fill:#29c4ea;stroke:#e6fbff;stroke-width:1.2}.am-linea{fill:none;stroke:#ffffffcc;stroke-width:1.4}.am-club{fill:#d94848;stroke:#fff6;stroke-width:1}.lbl.am{fill:#eafff3;font-weight:600;letter-spacing:.6px;paint-order:stroke;stroke:#0b1410;stroke-width:3px}.chip.e2c{box-shadow:inset 0 0 0 1.5px rgba(6,182,212,.75)}
 .etp{display:flex;gap:6px;margin-top:9px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}.etp button{flex:1;height:34px;border:0;border-radius:10px;background:transparent;color:var(--muted);font:600 14px -apple-system,system-ui,sans-serif;cursor:pointer;transition:.18s}.etp button small{font-weight:400;font-size:11px;opacity:.75;margin-left:4px}.etp button.on{background:linear-gradient(135deg,rgba(6,182,212,.9),rgba(124,92,255,.85));color:#fff}
+.chip .ce{font-weight:400;font-size:11px;opacity:.7}
 </style>
 </head>
 <body>
@@ -317,7 +318,8 @@ function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');setTi
 // ---- búsqueda y favoritos
 let onlyFav=false;const q=$('q');
 function filt(){document.querySelectorAll('.lot').forEach(g=>{g.classList.toggle('dim',onlyFav&&!favs.includes(+g.dataset.n))})}
-$('bf').onclick=()=>{onlyFav=!onlyFav;$('bf').classList.toggle('on',onlyFav);filt();if(onlyFav&&!favs.length)toast('Todavía no tenés favoritos')};
+$('bf').onclick=()=>{onlyFav=!onlyFav;$('bf').classList.toggle('on',onlyFav);filt();if(onlyFav&&!favs.length)toast('Todavía no tenés favoritos. Abrí un lote y tocá Marcar favorito');q.value='';sug();if(onlyFav&&favs.length){fitFavs();toast(favs.length===1?'1 lote favorito':favs.length+' lotes favoritos')}};
+function fitFavs(){const F=favs.map(n=>byN[n]).filter(Boolean);if(!F.length)return;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;F.forEach(l=>{x0=Math.min(x0,l.x);y0=Math.min(y0,l.y);x1=Math.max(x1,l.x+l.w);y1=Math.max(y1,l.y+l.h)});const s=Math.min(maxS,Math.max(minS,Math.min(vw/(x1-x0+160),(vh-220)/(y1-y0+160))));go(s,vw/2-(x0+x1)/2*s,vh/2-(y0+y1)/2*s)}
 q.addEventListener('input',()=>{const v=q.value.replace(/\D/g,'');q.value=v;$('msg').classList.remove('on');if(!v)return;clearTimeout(window.__qt);const n=toN(v);if(!byN[n])return;if(LOTS.every(l=>(l.e||1)!==ET||!lblOk(l,v)||l.n===n)){pick(n);return}window.__qt=setTimeout(()=>{if(q.value===v)pick(n)},900)});
 q.addEventListener('keydown',e=>{if(e.key==='Enter'){const n=toN(q.value);if(!q.value)return;if(byN[n]){pick(n);q.blur()}else $('msg').classList.add('on')}});
 addEventListener('resize',()=>{const o=minS;fit();if(sc<=o*1.01)reset(0);else{clamp();apply()}});
@@ -325,8 +327,8 @@ addEventListener('resize',()=>{const o=minS;fit();if(sc<=o*1.01)reset(0);else{cl
 // ---- mejoras: sugerencias, recientes, bienvenida, CTA, compartir, inercia
 let rec=[];try{rec=JSON.parse(localStorage.getItem('alb_rec')||'[]')}catch(e){}
 function saveRec(n){rec=[n,...rec.filter(x=>x!==n)].slice(0,5);try{localStorage.setItem('alb_rec',JSON.stringify(rec))}catch(e){}}
-function chips(list,cls){const s=$('sug');s.innerHTML=(cls==='r'&&list.length)?'<span class="rl">Recientes</span>':'';list.forEach(n=>{const b=document.createElement('button');b.className='chip '+(cls||'');const L=byN[n];b.textContent=L&&L.t?L.t:n;b.onclick=()=>{q.value='';pick(n);buzz()};s.appendChild(b)})}
-function sug(){const v=q.value;if(!v){chips(rec,'r');return}const m=LOTS.filter(l=>(l.e||1)===ET&&lblOk(l,v)).sort((a,b)=>(+(a.t||a.n))-(+(b.t||b.n))||a.n-b.n).map(l=>l.n).slice(0,12);chips(m)}
+function chips(list,cls){const s=$('sug');s.innerHTML=((cls==='r'||cls==='f')&&list.length)?'<span class="rl">'+(cls==='f'?'Favoritos':'Recientes')+'</span>':'';list.forEach(n=>{const b=document.createElement('button');b.className='chip '+(cls||'');const L=byN[n];b.innerHTML=(L&&L.t?L.t:n)+((cls==='r'||cls==='f')&&L?'<small class="ce"> · Etapa '+(L.e||1)+'</small>':'');b.onclick=()=>{q.value='';pick(n);buzz()};s.appendChild(b)})}
+function sug(){const v=q.value;if(!v){onlyFav&&favs.length?chips(favs,'f'):chips(rec,'r');return}const m=LOTS.filter(l=>(l.e||1)===ET&&lblOk(l,v)).sort((a,b)=>(+(a.t||a.n))-(+(b.t||b.n))||a.n-b.n).map(l=>l.n).slice(0,12);chips(m)}
 function buzz(){try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}}
 const _pick=pick;pick=function(n,fly){_pick(n,fly);saveRec(n);if(!q.value)sug();buzz()};
 document.querySelectorAll('#etp button').forEach(b=>b.onclick=()=>{setET(+b.dataset.e);q.value='';sug();q.focus()});setET(1);q.addEventListener('input',sug);q.addEventListener('focus',sug);sug();
