@@ -177,7 +177,7 @@ body.sh .zoom{bottom:calc(env(safe-area-inset-bottom,0px) + 250px)}
 
 .agua{stroke:#22d3ee;stroke-width:2;stroke-dasharray:3 14;stroke-linecap:round;animation:flow 2.4s linear infinite}
 @keyframes flow{to{stroke-dashoffset:-34}}
-.verde{animation:br 5s ease-in-out infinite}@keyframes br{50%{opacity:.62}}
+@keyframes br{50%{opacity:.62}}
 .bk{fill:#f5c842;transform-box:fill-box;transform-origin:center}.bkr{fill:none;stroke:#f5c842;stroke-width:2;transform-box:fill-box;transform-origin:center;animation:bk 2.4s ease-out infinite}
 @keyframes bk{0%{transform:scale(.4);opacity:.9}100%{transform:scale(3.2);opacity:0}}
 .car{fill:#67e8f9;filter:drop-shadow(0 0 6px #22d3ee)}
@@ -279,17 +279,20 @@ function reset(ms){const f=fit();go(f.s,f.x,f.y,ms??420)}
 function flyTo(l){const s=Math.min(maxS,Math.max(sc,minS*3.4));const cx=l.x+l.w/2,cy=l.y+l.h/2;const hs=document.body.classList.contains('sh')?(vh-240)/2:vh/2;go(s,vw/2-cx*s,hs-cy*s)}
 // punteros: arrastrar, pellizcar
 const P=new Map();let last=null,moved=0,pinch=null,tapT=0;
-stage.addEventListener('pointerdown',e=>{stage.setPointerCapture(e.pointerId);P.set(e.pointerId,{x:e.clientX,y:e.clientY});cancelAnimationFrame(anim);moved=0;
- if(P.size==2){const[a,b]=[...P.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),s:sc}}stage.classList.add('drag')});
-stage.addEventListener('pointermove',e=>{if(!P.has(e.pointerId))return;const p=P.get(e.pointerId);const dx=e.clientX-p.x,dy=e.clientY-p.y;P.set(e.pointerId,{x:e.clientX,y:e.clientY});
- if(P.size==1){moved+=Math.abs(dx)+Math.abs(dy);tx+=dx;ty+=dy;clamp();apply()}
- else if(P.size==2&&pinch){const[a,b]=[...P.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);const s=Math.min(maxS,Math.max(minS,pinch.s*d/pinch.d));const cx=(a.x+b.x)/2,cy=(a.y+b.y)/2;const k=s/sc;tx=cx-(cx-tx)*k;ty=cy-(cy-ty)*k;sc=s;moved+=9;clamp();apply()}});
-function up(e){P.delete(e.pointerId);if(P.size<2)pinch=null;if(!P.size)stage.classList.remove('drag')}
+let raf=0;const sched=()=>{if(!raf)raf=requestAnimationFrame(()=>{raf=0;apply()})};
+const loc=e=>{const r=stage.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+function startPinch(){const[a,b]=[...P.values()];const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;pinch={d:Math.max(1,Math.hypot(a.x-b.x,a.y-b.y)),s:sc,wx:(mx-tx)/sc,wy:(my-ty)/sc}}
+stage.addEventListener('pointerdown',e=>{try{stage.setPointerCapture(e.pointerId)}catch(_){}P.set(e.pointerId,loc(e));cancelAnimationFrame(anim);if(P.size===1)moved=0;
+ if(P.size===2){startPinch();moved=99}stage.classList.add('drag')});
+stage.addEventListener('pointermove',e=>{if(!P.has(e.pointerId))return;const o=P.get(e.pointerId),p=loc(e);P.set(e.pointerId,p);
+ if(P.size===1&&!pinch){const dx=p.x-o.x,dy=p.y-o.y;moved+=Math.abs(dx)+Math.abs(dy);tx+=dx;ty+=dy;clamp();sched()}
+ else if(P.size>=2&&pinch){const[a,b]=[...P.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);const s=Math.min(maxS,Math.max(minS,pinch.s*d/pinch.d));const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;sc=s;tx=mx-pinch.wx*s;ty=my-pinch.wy*s;clamp();sched()}});
+function up(e){P.delete(e.pointerId);if(P.size<2&&pinch){pinch=null;moved=99}if(P.size>=2)startPinch();if(!P.size)stage.classList.remove('drag')}
 stage.addEventListener('pointerup',e=>{const wasTap=moved<8&&P.size===1;up(e);if(!wasTap)return;
- const now=performance.now();const el=document.elementFromPoint(e.clientX,e.clientY);const lot=el&&el.closest&&el.closest('.lot');
- if(lot){pick(+lot.dataset.n,false)}else{if(now-tapT<320)zoomAt(2,e.clientX,e.clientY);else closeSheet()}tapT=now});
+ const now=performance.now();const el=document.elementFromPoint(e.clientX,e.clientY);const lot=el&&el.closest&&el.closest('.lot');const L=loc(e);
+ if(lot){pick(+lot.dataset.n,false)}else{if(now-tapT<320)zoomAt(2,L.x,L.y);else closeSheet()}tapT=now});
 stage.addEventListener('pointercancel',up);
-stage.addEventListener('wheel',e=>{e.preventDefault();zoomAt(Math.exp(-e.deltaY*.0018),e.clientX,e.clientY,90)},{passive:false});
+stage.addEventListener('wheel',e=>{e.preventDefault();const L=loc(e);zoomAt(Math.exp(-e.deltaY*.0018),L.x,L.y,90)},{passive:false});
 $('zi').onclick=()=>zoomAt(1.7,vw/2,vh/2);$('zo').onclick=()=>zoomAt(1/1.7,vw/2,vh/2);$('zr').onclick=()=>{closeSheet();reset()};
 // ---- selección
 let cur=null;const fx=$('fx');
