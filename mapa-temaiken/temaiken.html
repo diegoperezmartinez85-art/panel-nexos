@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="es">
-<head><meta name="nx-build" content="11032018">
+<head><meta name="nx-build" content="11032140">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#1f6f3f">
@@ -261,6 +261,8 @@ body.sh .wx{display:none}
 .me.ent .acc,.me.ent .cone{display:none}
 .me.ent .tag{font-size:0;padding:3px 9px;background:#1f6f3f;box-shadow:0 3px 8px rgba(31,111,63,.4)}
 .me.ent .tag::after{content:"Salís desde acá";font:800 12px Nunito}
+.top .brand{pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .15s}
+.top .brand:active{transform:scale(.96)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -276,7 +278,7 @@ body.sh .wx{display:none}
 </div>
 
 <div class="top">
- <div class="brand">
+ <div class="brand" id="brand" role="button" aria-label="Ver todo el parque">
   <div class="leaf" id="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14z"/><path d="M5 19 13 11"/></svg></div>
   <div class="ttl"><div class="k">Bioparque</div><div class="t">Temaik<b>è</b>n</div></div>
   <button class="loc" id="bloc" aria-label="Mostrar dónde estoy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7.5"/></svg><span id="bloct">Estás acá</span></button>
@@ -655,10 +657,11 @@ $('wx').onclick=()=>{wxModal();openM('mwx');wxLoad()};
 wxPill();setInterval(wxPill,20000);wxLoad();setInterval(wxLoad,15*60*1000);
 
 if(location.hostname==='temaiken.nexosmaps.com'&&'serviceWorker' in navigator){addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js').catch(()=>{})})}
+$('brand').onclick=()=>{try{q.blur();closeRes()}catch(e){}if(typeof navFollow!=='undefined'){navFollow=false}if(!routeOn&&$('sheet').classList.contains('on'))closeSheet();else if(routeOn&&!document.body.classList.contains('mini'))minimize();setTimeout(()=>{reset(520);try{rcbUI()}catch(e){}},routeOn?380:0)};
 // ---------- init ----------
 addEventListener('resize',()=>{const f=fit();if(sc<=minS*1.02)go(f.s,f.x,f.y,0);else{clamp();apply()}});
 renderChips();paintFav();reset(0);
 const h=decodeURIComponent(location.hash.slice(1));if(h){const p=POIS.find(x=>x.n===h);if(p)setTimeout(()=>select(p),400)}
 </script>
-<script>(function(){var B='11032018';try{navigator.serviceWorker&&navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(x){x.update()})})}catch(e){}if(/[?&]v=/.test(location.search))return;fetch(location.pathname+'?chk='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/<meta name="nx-build" content="([0-9]+)"/);if(m&&m[1]!==B)location.replace(location.pathname+'?v='+m[1])}).catch(function(){})})()</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a8059f322e8f40e684d926ac94b56d82"}'></script></body>
+<script>(function(){var B='11032140';try{navigator.serviceWorker&&navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(x){x.update()})})}catch(e){}if(/[?&]v=/.test(location.search))return;fetch(location.pathname+'?chk='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/<meta name="nx-build" content="([0-9]+)"/);if(m&&m[1]!==B)location.replace(location.pathname+'?v='+m[1])}).catch(function(){})})()</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a8059f322e8f40e684d926ac94b56d82"}'></script></body>
 </html>
