@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="es">
-<head><meta name="nx-build" content="11031958">
+<head><meta name="nx-build" content="11032004">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#1f6f3f">
@@ -256,6 +256,9 @@ body.sh .wx{display:none}
 .rcb{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + var(--shh,0px) + var(--navh,0px) + 14px);z-index:24;display:none;align-items:center;gap:8px;height:42px;padding:0 16px;border:0;border-radius:21px;background:#fff;color:#1d4ed8;font:800 14px Nunito;box-shadow:0 8px 22px rgba(23,50,38,.28);cursor:pointer}
 .rcb svg{width:18px;height:18px}
 .rcb.on{display:flex}
+.me.ent .acc,.me.ent .cone{display:none}
+.me.ent .tag{font-size:0;padding:3px 9px;background:#1f6f3f;box-shadow:0 3px 8px rgba(31,111,63,.4)}
+.me.ent .tag::after{content:"Salís desde acá";font:800 12px Nunito}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -396,7 +399,7 @@ const prio=p=>p.k==='entrance'?9:p.k==='zone'?8:p.k==='animal'?6:p.k==='food'?5:
 // ---------- me (GPS) ----------
 const me=document.createElement('div');me.className='me';me.innerHTML='<div class="acc" id="acc"></div><div class="cone" id="cone"></div><svg class="ex" viewBox="0 0 48 66" aria-hidden="true"><ellipse cx="24" cy="62" rx="11" ry="3.4" fill="rgba(0,0,0,.28)"/><g class="exb"><g class="lg1"><path d="M20 44v12" stroke="#5b4426" stroke-width="5.2" stroke-linecap="round"/><path d="M17.5 58h5.5" stroke="#2e2116" stroke-width="4" stroke-linecap="round"/></g><g class="lg2"><path d="M28 44v12" stroke="#5b4426" stroke-width="5.2" stroke-linecap="round"/><path d="M27 58h5.5" stroke="#2e2116" stroke-width="4" stroke-linecap="round"/></g><rect x="12.5" y="27" width="9" height="15" rx="3.5" fill="#3f7d4a" stroke="#fff" stroke-width="1.2"/><path class="ar1" d="M15.5 30.5l-3.5 9" stroke="#c9a86a" stroke-width="4.4" stroke-linecap="round"/><path class="ar2" d="M32.5 30.5l3.5 9" stroke="#c9a86a" stroke-width="4.4" stroke-linecap="round"/><circle cx="11.6" cy="40.4" r="2.2" fill="#f0c49a"/><circle cx="36.4" cy="40.4" r="2.2" fill="#f0c49a"/><rect x="15" y="26" width="18" height="20" rx="7" fill="#d6b677" stroke="#fff" stroke-width="1.6"/><path d="M15.5 40h17" stroke="#6b4f2a" stroke-width="2.4"/><rect x="22.6" y="38.8" width="2.8" height="2.4" rx=".6" fill="#e9c45a"/><path d="M24 27v11" stroke="#b8955a" stroke-width="1.1"/><rect x="17.5" y="30" width="4.5" height="3.6" rx="1" fill="none" stroke="#b8955a" stroke-width="1"/><path d="M19.5 26.5l4.5 4 4.5-4" fill="#f3e6c4" stroke="#b8955a" stroke-width="1"/><circle cx="24" cy="19.5" r="7.6" fill="#f0c49a" stroke="#fff" stroke-width="1.6"/><circle cx="21.4" cy="20" r="1.05" fill="#3a2a1c"/><circle cx="26.6" cy="20" r="1.05" fill="#3a2a1c"/><path d="M21.6 23q2.4 1.8 4.8 0" fill="none" stroke="#a0603a" stroke-width="1.1" stroke-linecap="round"/><circle cx="19.4" cy="22.2" r="1.3" fill="#f2a38a" opacity=".6"/><circle cx="28.6" cy="22.2" r="1.3" fill="#f2a38a" opacity=".6"/><ellipse cx="24" cy="15.4" rx="14.2" ry="3.7" fill="#e6cf98" stroke="#fff" stroke-width="1.4"/><path d="M14.4 15.2Q14.6 4.2 24 4.2T33.6 15.2Z" fill="#f2e1b2" stroke="#c7a76a" stroke-width="1"/><path d="M14.9 12.4Q24 14.6 33.1 12.4l.3 2.6Q24 17.2 14.6 15z" fill="#2e7d4f"/><circle cx="24" cy="4.6" r="1.4" fill="#c7a76a"/></g></svg><div class="dot"></div><div class="tag">Estás acá</div>';ov.appendChild(me);
 let myPos=null,watch=null,follow=false;
-function placeMe(){if(!myPos||!myPos.in){me.classList.remove('on');return}me.classList.add('on');const x=tx+myPos.s[0]*sc,y=ty+myPos.s[1]*sc;me.style.transform='translate('+x+'px,'+y+'px)';const r=Math.max(10,myPos.acc*GEO.K*sc);const a=$('acc');a.style.width=a.style.height=(2*r)+'px'}
+function placeMe(){if(!myPos||!myPos.in){if(typeof routeOn!=='undefined'&&routeOn){me.classList.add('on','ent');const x=tx+ENT[0]*sc,y=ty+ENT[1]*sc;me.style.transform='translate('+x+'px,'+y+'px)';return}me.classList.remove('on','ent');return}me.classList.remove('ent');me.classList.add('on');const x=tx+myPos.s[0]*sc,y=ty+myPos.s[1]*sc;me.style.transform='translate('+x+'px,'+y+'px)';const r=Math.max(10,myPos.acc*GEO.K*sc);const a=$('acc');a.style.width=a.style.height=(2*r)+'px'}
 const parkPoly=D.park;
 function inPoly(p,poly){let c=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const a=poly[i],b=poly[j];if((a[1]>p[1])!==(b[1]>p[1])&&p[0]<(b[0]-a[0])*(p[1]-a[1])/(b[1]-a[1])+a[0])c=!c}return c}
 function distToPark(s){if(inPoly(s,parkPoly))return 0;let m=1e9;for(let i=0,j=parkPoly.length-1;i<parkPoly.length;j=i++){const a=parkPoly[j],b=parkPoly[i];const dx=b[0]-a[0],dy=b[1]-a[1],L=dx*dx+dy*dy;let t=L?((s[0]-a[0])*dx+(s[1]-a[1])*dy)/L:0;t=Math.max(0,Math.min(1,t));m=Math.min(m,Math.hypot(s[0]-a[0]-t*dx,s[1]-a[1]-t*dy))}return m/GEO.K}
@@ -511,7 +514,7 @@ const ARW={l:'<path d="M17 20v-7a3 3 0 0 0-3-3H6M10 6 6 10l4 4"/>',r:'<path d="M
 const arw=k=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">'+ARW[k]+'</svg>';
 const stepSub=(s,i)=>(i===0&&s.m<8?'Ahora':'En '+fm(s.m))+(s.via.length?' · pasás por '+s.via.join(' y '):'');
 function shh(){if($('sheet').classList.contains('on'))document.documentElement.style.setProperty('--shh',$('sheet').getBoundingClientRect().height+'px')}
-function renderSteps(){if(typeof renderBar==='function'&&document.body.classList.contains('mini'))renderBar();const b=$('stb'),l=$('stl'),n=$('nav');setTimeout(()=>document.documentElement.style.setProperty('--navh',($('nav').classList.contains('on')?$('nav').getBoundingClientRect().height+10:0)+'px'),0);
+function renderSteps(){try{placeMe()}catch(e){}if(typeof renderBar==='function'&&document.body.classList.contains('mini'))renderBar();const b=$('stb'),l=$('stl'),n=$('nav');setTimeout(()=>document.documentElement.style.setProperty('--navh',($('nav').classList.contains('on')?$('nav').getBoundingClientRect().height+10:0)+'px'),0);
  if(!STEPS.length){b.classList.remove('on');l.classList.remove('on');l.innerHTML='';if(!n.classList.contains('ok'))n.classList.remove('on');return}
  b.classList.add('on');b.textContent=(l.classList.contains('on')?'Ocultar':'Ver')+' indicaciones paso a paso ('+STEPS.length+')';
  l.innerHTML=STEPS.map((s,i)=>'<li><i>'+arw(s.dir)+'</i><div><b>'+cap(s.t)+'</b><small>'+stepSub(s,i)+'</small></div></li>').join('');
@@ -636,5 +639,5 @@ addEventListener('resize',()=>{const f=fit();if(sc<=minS*1.02)go(f.s,f.x,f.y,0);
 renderChips();paintFav();reset(0);
 const h=decodeURIComponent(location.hash.slice(1));if(h){const p=POIS.find(x=>x.n===h);if(p)setTimeout(()=>select(p),400)}
 </script>
-<script>(function(){var B='11031958';try{navigator.serviceWorker&&navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(x){x.update()})})}catch(e){}if(/[?&]v=/.test(location.search))return;fetch(location.pathname+'?chk='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/<meta name="nx-build" content="([0-9]+)"/);if(m&&m[1]!==B)location.replace(location.pathname+'?v='+m[1])}).catch(function(){})})()</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a8059f322e8f40e684d926ac94b56d82"}'></script></body>
+<script>(function(){var B='11032004';try{navigator.serviceWorker&&navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(x){x.update()})})}catch(e){}if(/[?&]v=/.test(location.search))return;fetch(location.pathname+'?chk='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/<meta name="nx-build" content="([0-9]+)"/);if(m&&m[1]!==B)location.replace(location.pathname+'?v='+m[1])}).catch(function(){})})()</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a8059f322e8f40e684d926ac94b56d82"}'></script></body>
 </html>
