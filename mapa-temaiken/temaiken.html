@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="es">
-<head><meta name="nx-build" content="11032004">
+<head><meta name="nx-build" content="11032010">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#1f6f3f">
@@ -251,8 +251,10 @@ body.sh .wx{display:none}
 @keyframes exa{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
 @keyframes exb{from{transform:translateY(0)}to{transform:translateY(-1.6px)}}
 @keyframes exi{0%,100%{transform:translateY(0)}50%{transform:translateY(-1px)}}
-#route .rc{stroke-width:max(10px,calc(var(--k,1) * 13px))}
-#route .rl,#route .ra{stroke-width:max(6px,calc(var(--k,1) * 7.5px))}
+#route .rc{stroke-width:calc(var(--d,1) * 10.5px)}
+#route .rl,#route .ra{stroke-width:calc(var(--d,1) * 6px)}
+#route .ra{stroke-dasharray:calc(var(--d,1) * 4px) calc(var(--d,1) * 14px);animation:ra2 1s linear infinite}
+@keyframes ra2{from{stroke-dashoffset:0}to{stroke-dashoffset:calc(var(--d,1) * -18px)}}
 .rcb{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + var(--shh,0px) + var(--navh,0px) + 14px);z-index:24;display:none;align-items:center;gap:8px;height:42px;padding:0 16px;border:0;border-radius:21px;background:#fff;color:#1d4ed8;font:800 14px Nunito;box-shadow:0 8px 22px rgba(23,50,38,.28);cursor:pointer}
 .rcb svg{width:18px;height:18px}
 .rcb.on{display:flex}
@@ -349,7 +351,7 @@ let vw=0,vh=0,sc=1,tx=0,ty=0,minS=.2,maxS=4,anim=0;
 const TOPH=()=>document.querySelector('.top').getBoundingClientRect().bottom;
 const FB=D.fb;function fit(){vw=stage.clientWidth;vh=stage.clientHeight;svg.setAttribute('viewBox','0 0 '+vw+' '+vh);const top=TOPH()+6,bot=60;const fw=FB[2]-FB[0],fh=FB[3]-FB[1];minS=Math.min((vw-16)/fw,(vh-top-bot)/fh);maxS=Math.max(minS*14,3.2);return {s:minS,x:(vw-fw*minS)/2-FB[0]*minS,y:top+((vh-top-bot)-fh*minS)/2-FB[1]*minS}}
 function clamp(){tx=Math.min(-FB[0]*sc+vw*.6,Math.max(vw*.4-FB[2]*sc,tx));ty=Math.min(-FB[1]*sc+vh*.6,Math.max(vh*.4-FB[3]*sc,ty));}
-let raf=0;function apply(){world.setAttribute('transform','translate('+tx+' '+ty+') scale('+sc+')');try{$('route').style.setProperty('--k',(1/sc).toFixed(4))}catch(e){}placeMarks();clearTimeout(apply._t);apply._t=setTimeout(layoutLabels,140)}
+let raf=0;function apply(){world.setAttribute('transform','translate('+tx+' '+ty+') scale('+sc+')');try{$('route').style.setProperty('--d',Math.max(1,1.25/sc).toFixed(4))}catch(e){}placeMarks();clearTimeout(apply._t);apply._t=setTimeout(layoutLabels,140)}
 const sched=()=>{if(!raf)raf=requestAnimationFrame(()=>{raf=0;apply()})};
 function go(s,x,y,ms=420){cancelAnimationFrame(anim);const s0=sc,x0=tx,y0=ty,t0=performance.now();if(!ms){sc=s;tx=x;ty=y;clamp();apply();return}
  (function f(t){const k=Math.min(1,(t-t0)/ms),e=1-Math.pow(1-k,3);sc=s0+(s-s0)*e;tx=x0+(x-x0)*e;ty=y0+(y-y0)*e;clamp();apply();if(k<1)anim=requestAnimationFrame(f)})(t0)}
@@ -639,5 +641,5 @@ addEventListener('resize',()=>{const f=fit();if(sc<=minS*1.02)go(f.s,f.x,f.y,0);
 renderChips();paintFav();reset(0);
 const h=decodeURIComponent(location.hash.slice(1));if(h){const p=POIS.find(x=>x.n===h);if(p)setTimeout(()=>select(p),400)}
 </script>
-<script>(function(){var B='11032004';try{navigator.serviceWorker&&navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(x){x.update()})})}catch(e){}if(/[?&]v=/.test(location.search))return;fetch(location.pathname+'?chk='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/<meta name="nx-build" content="([0-9]+)"/);if(m&&m[1]!==B)location.replace(location.pathname+'?v='+m[1])}).catch(function(){})})()</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a8059f322e8f40e684d926ac94b56d82"}'></script></body>
+<script>(function(){var B='11032010';try{navigator.serviceWorker&&navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(x){x.update()})})}catch(e){}if(/[?&]v=/.test(location.search))return;fetch(location.pathname+'?chk='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/<meta name="nx-build" content="([0-9]+)"/);if(m&&m[1]!==B)location.replace(location.pathname+'?v='+m[1])}).catch(function(){})})()</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a8059f322e8f40e684d926ac94b56d82"}'></script></body>
 </html>
