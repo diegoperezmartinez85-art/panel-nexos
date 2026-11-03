@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="es">
-<head><meta name="nx-build" content="11031313">
+<head><meta name="nx-build" content="11031321">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#1f6f3f">
@@ -237,11 +237,11 @@ body.sh .leg{display:none}
  <h2>Bienvenido al Bioparque Temaikèn</h2>
  <p class="s">Tu guía para recorrer el parque desde el celular.</p>
  <div class="steps1">
-  <div class="st"><i style="background:#2563eb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-8-8 18-2-8z"/></svg></i><div><b>Mirá dónde estás</b><span>Tocá "Estás acá" y activá la ubicación</span></div></div>
+  <div class="st"><i style="background:#2563eb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-8-8 18-2-8z"/></svg></i><div><b>Mirá dónde estás</b><span>Activá la ubicación: el mapa detecta solo si estás dentro o fuera del parque</span></div></div>
   <div class="st"><i style="background:#f59e0b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg></i><div><b>Buscá un animal</b><span>Tigres, hipopótamos, lémures, aves y más</span></div></div>
   <div class="st"><i style="background:#2e9450"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="2"/><path d="m9 20 3-6 3 3v5M8 12l2-4 4 1 3 3M6 21l3-7"/></svg></i><div><b>Llegá caminando</b><span>Te marcamos el camino por los senderos</span></div></div>
  </div>
- <button class="btn pri" id="mgo" style="width:100%">Empezar a recorrer</button>
+ <button class="btn pri" id="mloc" style="width:100%">Activar mi ubicación y empezar</button><button class="btn" id="mgo" style="width:100%;margin-top:8px;background:none;height:40px;font-size:14px;color:var(--mut)">Ver el mapa sin ubicación</button>
  <p class="disc">Mapa interactivo no oficial, basado en datos abiertos de OpenStreetMap y en el plano del parque. Horarios y servicios pueden cambiar: confirmalos en el Bioparque. Sonidos de animales: grabaciones libres de Wikimedia Commons y Freesound (autores y licencias en cada ficha).</p>
 </div></div>
 
@@ -337,9 +337,9 @@ function distToPark(s){if(inPoly(s,parkPoly))return 0;let m=1e9;for(let i=0,j=pa
 function startGPS(center){if(!navigator.geolocation){toast('Tu celular no permite ubicación en este navegador');return}
  $('bloc').classList.add('on');$('bloct').textContent='Buscando…';follow=!!center;
  if(watch!==null){if(myPos)onPos(myPos.raw,true);return}
- watch=navigator.geolocation.watchPosition(pos=>onPos(pos,follow),err=>{$('bloc').classList.remove('on');$('bloct').textContent='Estás acá';watch=null;if(pendingNear){const k=pendingNear;pendingNear=null;doNear(k)}toast(err.code===1?'Para verte en el mapa, permití la ubicación en el navegador':'No pudimos obtener tu ubicación. Probá al aire libre.',3200)},{enableHighAccuracy:true,maximumAge:5000,timeout:20000})}
-function onPos(pos,center){const s=ll2s(pos.coords.latitude,pos.coords.longitude);const d=distToPark(s);myPos={s,acc:pos.coords.accuracy||20,in:d<120,d,raw:pos};if(hdgSrc!=='c'&&pos.coords.heading!=null&&!isNaN(pos.coords.heading)&&(pos.coords.speed||0)>0.6)setHdg(pos.coords.heading);if(pendingNear){const k=pendingNear;pendingNear=null;setTimeout(()=>doNear(k),0)}$('bloct').textContent=myPos.in?'Estás acá':'Fuera del parque';
- if(!myPos.in){if(center){toast('Estás a '+(d>=1000?(d/1000).toFixed(1)+' km':Math.round(d)+' m')+' del Bioparque. Te mostramos el ingreso.',3400);select(POIS.find(p=>p.k==='entrance'))}follow=false;placeMe();return}
+ watch=navigator.geolocation.watchPosition(pos=>onPos(pos,follow),err=>{if(err.code!==1){if(pendingNear){const k=pendingNear;pendingNear=null;doNear(k)}if(!myPos){$('bloct').textContent='Buscando señal…';toast('Buscando señal de GPS… al aire libre funciona mejor',2600)}return}try{navigator.geolocation.clearWatch(watch)}catch(e){}$('bloc').classList.remove('on');$('bloct').textContent='Estás acá';watch=null;if(pendingNear){const k=pendingNear;pendingNear=null;doNear(k)}toast(err.code===1?'Para verte en el mapa, permití la ubicación en el navegador':'No pudimos obtener tu ubicación. Probá al aire libre.',3200)},{enableHighAccuracy:true,maximumAge:5000,timeout:20000})}
+function onPos(pos,center){const s=ll2s(pos.coords.latitude,pos.coords.longitude);const d=distToPark(s);myPos={s,acc:pos.coords.accuracy||20,in:d<120,d,raw:pos};if(lastIn!==null&&lastIn!==myPos.in)toast(myPos.in?'Entraste al Bioparque: ya te ubicamos en el mapa':'Saliste del Bioparque',3000);else if(lastIn===null&&!center){toast(myPos.in?'Estás dentro del Bioparque':'Estás fuera del Bioparque, a '+(d>=1000?(d/1000).toFixed(1).replace('.',',')+' km':Math.round(d)+' m')+'. Cuando entres, el mapa te ubica solo.',3600)}else if(lastIn===null&&center&&myPos.in)toast('Estás dentro del Bioparque',2400);lastIn=myPos.in;if(hdgSrc!=='c'&&pos.coords.heading!=null&&!isNaN(pos.coords.heading)&&(pos.coords.speed||0)>0.6)setHdg(pos.coords.heading);if(pendingNear){const k=pendingNear;pendingNear=null;setTimeout(()=>doNear(k),0)}$('bloct').textContent=myPos.in?'Estás acá':'Fuera del parque';
+ if(!myPos.in){if(center){toast('Estás a '+(d>=1000?(d/1000).toFixed(1).replace('.',',')+' km':Math.round(d)+' m')+' del Bioparque. Te mostramos el ingreso.',3400);select(POIS.find(p=>p.k==='entrance'))}follow=false;placeMe();return}
  placeMe();if(center){flyTo(s,Math.max(sc,minS*5));follow=false}
  if(cur&&routeOn){drawRoute(cur);checkArrive()}}
 $('bloc').onclick=()=>{startCompass();startGPS(true)};$('bme').onclick=()=>{startCompass();startGPS(true)};
@@ -396,7 +396,7 @@ $('bsh').onclick=async()=>{if(!cur)return;const url=location.origin+location.pat
 // ---------- search ----------
 const q=$('q'),res=$('res');
 const dist=p=>myPos&&myPos.in?Math.hypot(p.p[0]-myPos.s[0],p.p[1]-myPos.s[1])/GEO.K:null;
-const fmtD=d=>d==null?'':(d<1000?Math.round(d/10)*10+' m':(d/1000).toFixed(1)+' km');
+const fmtD=d=>d==null?'':(d<1000?Math.round(d/10)*10+' m':(d/1000).toFixed(1).replace('.',',')+' km');
 function item(p){const b=document.createElement('button');b.className='ri';const d=dist(p);b.innerHTML='<span class="b" style="background:'+colOf(p)+'">'+(IC[p.i]||IC.paw)+'</span><span class="tx"><b>'+p.n+'</b><span>'+(p.k==='animal'?REG[p.r][0]:(p.d||regName(p)))+'</span></span><span class="ds">'+fmtD(d)+'</span>';b.onclick=()=>{q.blur();select(p)};return b}
 function groups(list){const seen={};const out=[];list.forEach(p=>{const k=p.n;if(!seen[k]){seen[k]=[];out.push(seen[k])}seen[k].push(p)});return out.map(g=>g.slice().sort((a,b)=>(dist(a)??0)-(dist(b)??0))[0])}
 function search(){const v=norm(q.value.trim());$('qx').classList.toggle('on',!!v);res.innerHTML='';if(!v){closeRes();return}
@@ -493,6 +493,9 @@ const openM=id=>$(id).classList.add('on'),closeM=id=>$(id).classList.remove('on'
 document.querySelectorAll('.cl').forEach(b=>b.onclick=()=>closeM(b.dataset.c));
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('pointerdown',e=>{if(e.target===m)closeM(m.id)}));
 $('mgo').onclick=()=>{closeM('mw');try{localStorage.setItem('tmk_seen','1')}catch(e){}};
+$('mloc').onclick=()=>{closeM('mw');try{localStorage.setItem('tmk_seen','1')}catch(e){}startCompass();startGPS(true)};
+let lastIn=null;
+try{navigator.permissions&&navigator.permissions.query({name:'geolocation'}).then(r=>{if(r.state==='granted'&&watch===null)startGPS(false)}).catch(()=>{})}catch(e){}
 try{if(!localStorage.getItem('tmk_seen'))openM('mw')}catch(e){openM('mw')}
 
 // ---------- init ----------
@@ -500,5 +503,5 @@ addEventListener('resize',()=>{const f=fit();if(sc<=minS*1.02)go(f.s,f.x,f.y,0);
 renderChips();paintFav();reset(0);
 const h=decodeURIComponent(location.hash.slice(1));if(h){const p=POIS.find(x=>x.n===h);if(p)setTimeout(()=>select(p),400)}
 </script>
-<script>(function(){var B='11031313';try{navigator.serviceWorker&&navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(x){x.update()})})}catch(e){}if(/[?&]v=/.test(location.search))return;fetch(location.pathname+'?chk='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/<meta name="nx-build" content="([0-9]+)"/);if(m&&m[1]!==B)location.replace(location.pathname+'?v='+m[1])}).catch(function(){})})()</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a8059f322e8f40e684d926ac94b56d82"}'></script></body>
+<script>(function(){var B='11031321';try{navigator.serviceWorker&&navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(x){x.update()})})}catch(e){}if(/[?&]v=/.test(location.search))return;fetch(location.pathname+'?chk='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/<meta name="nx-build" content="([0-9]+)"/);if(m&&m[1]!==B)location.replace(location.pathname+'?v='+m[1])}).catch(function(){})})()</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a8059f322e8f40e684d926ac94b56d82"}'></script></body>
 </html>
