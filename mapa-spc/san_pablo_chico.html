@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
-<head><meta name="nx-build" content="11031332">
+<head><link rel="manifest" href="/mapa-spc/mapa.webmanifest"><meta name="theme-color" content="#0f0f11"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="San Pablo Chico"><meta name="nx-build" content="11040221">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>San Pablo Chico · Mapa de lotes</title>
@@ -436,4 +436,63 @@ async function load(){$('pbody').innerHTML='<div class="pld">Cargando…</div>';
 $('wx').onclick=()=>{openM('mp');load()};$('wx').setAttribute('role','button');$('wx').tabIndex=0;
 $('wx').onkeydown=e=>{if(e.key==='Enter')$('wx').click()}})();
 </script>
-<!-- Cloudflare Web Analytics --><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a8059f322e8f40e684d926ac94b56d82"}'></script><!-- End Cloudflare Web Analytics --><script>(function(){var B='11031332';try{navigator.serviceWorker&&navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(x){x.update()})})}catch(e){}if(/[?&]v=/.test(location.search))return;fetch(location.pathname+'?chk='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/<meta name="nx-build" content="([0-9]+)"/);if(m&&m[1]!==B)location.replace(location.pathname+'?v='+m[1])}).catch(function(){})})()</script><script>(function(){var st=document.getElementById('stage');if(!st)return;st.addEventListener('touchmove',function(e){if(e.target.closest&&e.target.closest('#poic'))return;if(e.cancelable)e.preventDefault()},{passive:false});st.addEventListener('touchstart',function(e){if(e.touches.length>1&&e.cancelable)e.preventDefault()},{passive:false});['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault()},{passive:false})})})()</script></body></html>
+<!-- Cloudflare Web Analytics --><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a8059f322e8f40e684d926ac94b56d82"}'></script><!-- End Cloudflare Web Analytics --><script>(function(){var B='11040221';try{navigator.serviceWorker&&navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(x){x.update()})})}catch(e){}if(/[?&]v=/.test(location.search))return;fetch(location.pathname+'?chk='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/<meta name="nx-build" content="([0-9]+)"/);if(m&&m[1]!==B)location.replace(location.pathname+'?v='+m[1])}).catch(function(){})})()</script><script>(function(){var st=document.getElementById('stage');if(!st)return;st.addEventListener('touchmove',function(e){if(e.target.closest&&e.target.closest('#poic'))return;if(e.cancelable)e.preventDefault()},{passive:false});st.addEventListener('touchstart',function(e){if(e.touches.length>1&&e.cancelable)e.preventDefault()},{passive:false});['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault()},{passive:false})})})()</script><script>window.NXI={title:'Instalá el mapa de San Pablo Chico',sub:'Abrilo como una app, sin descargar nada',icon:'/nexos-icon-192.png',pos:'bottom',offset:12,key:'nx_inst_mapa-spc',busy:function(){var m=document.querySelector('.modal.on,.ov.on');return !!m}};</script><script>// NEXOS · Aviso para instalar la app (Android: botón Instalar · iPhone: cómo "Agregar a inicio")
+// Configuración opcional antes de cargar: window.NXI = { title, sub, icon, pos:'top'|'bottom', offset, key, skip:fn }
+(function () {
+  var C = window.NXI || {};
+  var KEY = C.key || 'nx_inst_seen';
+  var DAYS = 7;
+  function standalone() { try { return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch (e) { return false; } }
+  if (standalone()) return;
+  try { if (C.skip && C.skip()) return; } catch (e) {}
+  function seen() { try { return +localStorage.getItem(KEY) || 0; } catch (e) { return 0; } }
+  function mark() { try { localStorage.setItem(KEY, String(Date.now())); } catch (e) {} }
+  if (Date.now() - seen() < DAYS * 864e5) return;
+
+  var pos = C.pos === 'top' ? 'top' : 'bottom';
+  var off = C.offset == null ? 12 : C.offset;
+  var R = 'margin:0;padding:0;border:0;width:auto;height:auto;min-width:0;max-width:none;position:static;float:none;letter-spacing:normal;text-transform:none;text-align:left;box-shadow:none;background:none;';
+  var css = '.nxi{all:initial;box-sizing:border-box;position:fixed;left:12px;right:12px;' + pos + ':calc(env(safe-area-inset-' + pos + ',0px) + ' + off + 'px);z-index:2147483000;display:none;align-items:center;gap:12px;padding:12px 10px 12px 14px;border-radius:18px;background:#15161d;color:#fff;border:1px solid rgba(255,255,255,.12);box-shadow:0 14px 36px rgba(0,0,0,.45);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;max-width:520px;margin:0 auto}' +
+    '.nxi.on{display:flex;animation:nxiIn .35s cubic-bezier(.2,.8,.2,1)}' +
+    '@keyframes nxiIn{from{opacity:0;transform:translateY(' + (pos === 'top' ? '-' : '') + '14px)}to{opacity:1;transform:none}}' +
+    '.nxi *{box-sizing:border-box;font-family:inherit}' +
+    '.nxi .nxi-ic{' + R + 'flex:none;width:44px;height:44px;border-radius:12px;overflow:hidden;background:linear-gradient(135deg,#6366f1,#06b6d4);display:block}' +
+    '.nxi .nxi-ic img{' + R + 'display:block;width:44px;height:44px;object-fit:cover}' +
+    '.nxi .nxi-tx{' + R + 'display:block;flex:1 1 auto;min-width:0}' +
+    '.nxi .nxi-ti{' + R + 'display:block;color:#fff;font-size:14.5px;font-weight:800;line-height:1.25}' +
+    '.nxi .nxi-su{' + R + 'display:block;color:rgba(255,255,255,.8);font-size:12.5px;font-weight:600;line-height:1.35;margin-top:2px}' +
+    '.nxi .nxi-su strong{color:#fff;font-weight:800}' +
+    '.nxi .nxi-su svg{display:inline-block;width:15px;height:15px;vertical-align:-3px;margin:0 2px}' +
+    '.nxi .nxi-ok{' + R + 'flex:none;display:inline-flex;align-items:center;justify-content:center;border-radius:11px;height:38px;padding:0 14px;font-size:13px;font-weight:800;color:#fff;background:linear-gradient(135deg,#6366f1,#06b6d4);cursor:pointer;white-space:nowrap}' +
+    '.nxi .nxi-no{' + R + 'flex:none;display:inline-flex;align-items:center;justify-content:center;width:30px;height:38px;color:rgba(255,255,255,.6);font-size:18px;cursor:pointer}';
+  var SHARE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M8 8l4-4 4 4M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg>';
+  var el = null, dip = null;
+  function build() {
+    if (el) return el;
+    var s = document.createElement('style'); s.textContent = css; document.head.appendChild(s);
+    el = document.createElement('div'); el.className = 'nxi'; el.setAttribute('role', 'dialog');
+    el.innerHTML = '<div class="nxi-ic">' + (C.icon ? '<img alt="" src="' + C.icon + '">' : '') + '</div>' +
+      '<div class="nxi-tx"><div class="nxi-ti">' + (C.title || 'Instalá la app') + '</div><div class="nxi-su">' + (C.sub || 'Abrila como una app, sin descargar nada') + '</div></div>' +
+      '<button class="nxi-ok" type="button">Instalar</button><button class="nxi-no" type="button" aria-label="Cerrar">\u2715</button>';
+    document.body.appendChild(el);
+    el.querySelector('.nxi-no').onclick = function () { hide(); };
+    el.querySelector('.nxi-ok').onclick = function () {
+      if (dip) { dip.prompt(); try { dip.userChoice.then(function () { dip = null; hide(); }); } catch (e) { hide(); } return; }
+      hide();
+    };
+    return el;
+  }
+  function show() { if (standalone()) return; build(); el.classList.add('on'); }
+  function hide() { if (el) el.classList.remove('on'); mark(); }
+  window.nxInstalar = function () { if (dip) { dip.prompt(); return; } var ios = /iPhone|iPad|iPod/.test(navigator.userAgent); build(); if (ios) iosText(); show(); };
+  function iosText() { build(); el.querySelector('.nxi-su').innerHTML = 'Tocá ' + SHARE + ' <strong>Compartir</strong> y después <strong>"Agregar a inicio"</strong>'; el.querySelector('.nxi-ok').textContent = 'Entendido'; }
+
+  addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault(); dip = e;
+    setTimeout(function () { if (!(C.busy && C.busy())) show(); }, C.delay || 12000);
+  });
+  addEventListener('appinstalled', function () { hide(); });
+  var ios = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if (ios) setTimeout(function () { if (C.busy && C.busy()) return; iosText(); show(); }, C.delayIos || 20000);
+})();
+</script><script>if('serviceWorker' in navigator&&location.hostname!=='localhost'){addEventListener('load',function(){navigator.serviceWorker.register('/mapa-spc/sw-mapa.js',{scope:'/mapa-spc/'}).catch(function(){})})}</script></body></html>
