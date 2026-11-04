@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="es">
-<head><meta name="nx-build" content="11040449"><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#1f6f3f"><link rel="apple-touch-icon" href="/icon-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Temaikèn">
+<head><meta name="nx-build" content="11040452"><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#1f6f3f"><link rel="apple-touch-icon" href="/icon-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Temaikèn">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#1f6f3f">
@@ -420,13 +420,13 @@ stage.addEventListener('pointermove',e=>{if(!P.has(e.pointerId))return;const o=P
  if(P.size===1&&!pinch){const dx=p.x-o.x,dy=p.y-o.y;moved+=Math.abs(dx)+Math.abs(dy);tx+=dx;ty+=dy;if(moved>10)stage.classList.add('mv');clamp();sched()}
  else if(P.size>=2&&pinch){const[a,b]=[...P.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);const s=Math.min(maxS,Math.max(minS,pinch.s*d/pinch.d));const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;sc=s;tx=mx-pinch.wx*s;ty=my-pinch.wy*s;stage.classList.add('mv');clamp();sched()}});
 function up(e){P.delete(e.pointerId);if(P.size<2&&pinch){pinch=null;moved=99}if(P.size>=2)startPinch();if(!P.size){stage.classList.remove('drag');stage.classList.remove('mv')}}
-stage.addEventListener('pointerup',e=>{const wasTap=moved<10&&P.size===1;up(e);if(!wasTap)return;const now=performance.now();const L=loc(e);if(now-tapT<320)zoomAt(2,L.x,L.y);else closeSheet();tapT=now});
+stage.addEventListener('pointerup',e=>{const wasTap=moved<10&&P.size===1;up(e);if(!wasTap)return;const now=performance.now();const L=loc(e);if(now-tapT<320)zoomAt(2,L.x,L.y);else if(routeOn||arrived){if(!document.body.classList.contains('mini')&&$('sheet').classList.contains('on'))minimize()}else closeSheet();tapT=now});
 stage.addEventListener('pointercancel',up);
 stage.addEventListener('wheel',e=>{e.preventDefault();const L=loc(e);zoomAt(Math.exp(-e.deltaY*.0018),L.x,L.y,90)},{passive:false});
 stage.addEventListener('touchmove',e=>{if(e.cancelable)e.preventDefault()},{passive:false});
 stage.addEventListener('touchstart',e=>{if(e.touches.length>1&&e.cancelable)e.preventDefault()},{passive:false});
 ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
-$('zi').onclick=()=>zoomAt(1.7,vw/2,vh/2);$('zo').onclick=()=>zoomAt(1/1.7,vw/2,vh/2);$('zr').onclick=()=>{closeSheet();reset()};
+$('zi').onclick=()=>zoomAt(1.7,vw/2,vh/2);$('zo').onclick=()=>zoomAt(1/1.7,vw/2,vh/2);$('zr').onclick=()=>{if(routeOn){navFollow=false;try{rcbUI()}catch(e){}if(!document.body.classList.contains('mini'))minimize();setTimeout(()=>reset(),380)}else{closeSheet();reset()}};
 
 // ---------- zone labels ----------
 const RL=D.rlab.map(r=>{const e=document.createElement('div');e.className='rdl'+(r.k?' '+r.k:'');e.innerHTML=r.k==='up'?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg>'+r.t:r.t;ov.appendChild(e);return {p:r.p,el:e,k:r.k}});
@@ -805,5 +805,5 @@ addEventListener('resize',()=>{const f=fit();if(sc<=minS*1.02)go(f.s,f.x,f.y,0);
 renderChips();paintFav();reset(0);
 const h=decodeURIComponent(location.hash.slice(1));if(h&&!meetFromHash()){const p=POIS.find(x=>x.n===h);if(p)setTimeout(()=>select(p),400)}
 </script>
-<script>(function(){var B='11040449';try{navigator.serviceWorker&&navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(x){x.update()})})}catch(e){}if(/[?&]v=/.test(location.search))return;fetch(location.pathname+'?chk='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/<meta name="nx-build" content="([0-9]+)"/);if(m&&m[1]!==B)location.replace(location.pathname+'?v='+m[1]+location.hash)}).catch(function(){})})()</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a8059f322e8f40e684d926ac94b56d82"}'></script></body>
+<script>(function(){var B='11040452';try{navigator.serviceWorker&&navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(x){x.update()})})}catch(e){}if(/[?&]v=/.test(location.search))return;fetch(location.pathname+'?chk='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/<meta name="nx-build" content="([0-9]+)"/);if(m&&m[1]!==B)location.replace(location.pathname+'?v='+m[1]+location.hash)}).catch(function(){})})()</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a8059f322e8f40e684d926ac94b56d82"}'></script></body>
 </html>
