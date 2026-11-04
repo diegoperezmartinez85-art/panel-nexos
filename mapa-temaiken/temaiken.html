@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="es">
-<head><meta name="nx-build" content="11040442"><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#1f6f3f"><link rel="apple-touch-icon" href="/icon-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Temaikèn">
+<head><meta name="nx-build" content="11040449"><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#1f6f3f"><link rel="apple-touch-icon" href="/icon-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Temaikèn">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#1f6f3f">
@@ -307,6 +307,11 @@ body.sh .wx{display:none}
 .inst .ok{background:#f59e0b;color:#1c1917}.inst .no{background:transparent;color:#fff;opacity:.7;padding:0 6px}
 .wxhr{margin:10px 0 0;padding:10px 12px;border-radius:14px;background:#eef7f1;color:#14532d;font:700 13px Nunito}
 @media (min-width:760px){.clos{left:12px;right:auto;width:440px}.inst{right:auto;width:440px}}
+body.rmode .mk:not(.sel):not(.key){opacity:.42;transition:opacity .25s}
+body.rmode .mk:not(.sel):not(.key) .p{scale:.62}
+body.rmode .mk:not(.sel):not(.key) .l{display:none!important}
+body.rmode .mk.key .p{scale:1.08;box-shadow:0 0 0 4px rgba(37,99,235,.35),0 3px 8px rgba(0,0,0,.28)}
+body.rmode .rlab{opacity:.45}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -439,7 +444,7 @@ function visible(m){const p=m.p;if(filt==='fav')return favs.includes(keyOf(p));i
  const zf=sc/minS;if(filt==='all'&&zf<1.8&&!['animal','zone','entrance','parking'].includes(p.k))return false;if(p.z>=2&&zf<3.2&&filt==='all')return false;if(p.z===1&&zf<2.2&&filt==='all')return false;if(p.k==='view'&&zf<4)return false;return true}
 function placeMarks(){const zf=sc/minS;ov.classList.toggle('mini',zf<1.8);for(const r of RL){const x=tx+r.p[0]*sc;let y=ty+r.p[1]*sc;if(r.k==='up')y=Math.max(y,TOPH()+18);r.el.style.transform='translate('+x.toFixed(1)+'px,'+y.toFixed(1)+'px) translate(-50%,-50%) rotate('+(r.k?0:r.p[2])+'deg)';r.el.classList.toggle('hide',!r.k&&zf<1.25)}for(const z of ZN){const x=tx+z.l[0]*sc,y=ty+z.l[1]*sc;z.el.style.transform='translate('+x.toFixed(1)+'px,'+y.toFixed(1)+'px)';z.el.classList.toggle('hide',zf>5)}for(const m of MK){const v=visible(m);m.el.classList.toggle('hide',!v);if(!v)continue;const x=tx+m.p.p[0]*sc,y=ty+m.p.p[1]*sc;m.x=x;m.y=y;m.el.style.transform='translate('+x.toFixed(1)+'px,'+y.toFixed(1)+'px)'}placeMe()}
 function layoutLabels(){const zf=sc/minS;const boxes=[];const order=MK.filter(m=>!m.el.classList.contains('hide')).sort((a,b)=>(b.el.classList.contains('sel')-a.el.classList.contains('sel'))||(prio(b.p)-prio(a.p)));
- for(const m of order){let show=zf>=1.9||m.el.classList.contains('sel')||(m.p.k==='entrance');if(m.p.k==='wc'||m.p.k==='water'||m.p.k==='parking'||m.p.k==='view')show=show&&zf>=4.5;
+ for(const m of order){let show=zf>=1.9||m.el.classList.contains('sel')||m.el.classList.contains('key')||(m.p.k==='entrance');if(m.p.k==='wc'||m.p.k==='water'||m.p.k==='parking'||m.p.k==='view')show=show&&zf>=4.5;
   if(show){const w=m.p.n.length*7.2+16,h=20;const b=[m.x-w/2,m.y+15,m.x+w/2,m.y+15+h];if(boxes.some(o=>!(b[2]<o[0]||b[0]>o[2]||b[3]<o[1]||b[1]>o[3]))||m.x<-50||m.x>vw+50)show=false;else boxes.push(b)}
   m.el.classList.toggle('nol',!show)}}
 const prio=p=>p.k==='entrance'?9:p.k==='zone'?8:p.k==='animal'?6:p.k==='food'?5:p.k==='service'?4:2;
@@ -552,7 +557,7 @@ function buildSteps(pts,dest){const K=GEO.K;if(!JREF){JREF=new Map();GN.forEach(
    if(aa<minO-20)continue}
   const side=ang>0?'derecha':'izquierda';const verb=aa>150?'pegá la vuelta':aa<60?'doblá levemente a la '+side:'doblá a la '+side;
   let lm=nearLm(b,25,dest);if(lm&&(!farStart(lm)||(lastLm&&lm.n===lastLm.n)))lm=null;
-  steps.push({m:d-last,dir:aa>150?'u':aa<60?(ang>0?'sr':'sl'):(ang>0?'r':'l'),t:(lm?'al llegar '+aName(lm)+', ':'')+verb,via:viaBetween(last,d,lm),at:[b[0],b[1]]});last=d;lastLm=lm}
+  steps.push({m:d-last,dir:aa>150?'u':aa<60?(ang>0?'sr':'sl'):(ang>0?'r':'l'),t:(lm?'al llegar '+aName(lm)+', ':'')+verb,lmn:lm?lm.n:null,via:viaBetween(last,d,lm),at:[b[0],b[1]]});last=d;lastLm=lm}
  const b=P[P.length-1],a=at(tot-10);let side='',off=0;
  if(P.length>1){const v=[b[0]-a[0],b[1]-a[1]],w=[dest.p[0]-b[0],dest.p[1]-b[1]];off=Math.hypot(w[0],w[1])/K;if(off>3&&Math.hypot(...v)){const cr=v[0]*w[1]-v[1]*w[0];side=cr>0?', a tu derecha':', a tu izquierda'}}
  steps.push({m:tot-last+off,dir:'f',t:'llegás a '+dest.n+side,via:viaBetween(last,tot,null),at:[dest.p[0],dest.p[1]]});
@@ -562,7 +567,7 @@ const ARW={l:'<path d="M17 20v-7a3 3 0 0 0-3-3H6M10 6 6 10l4 4"/>',r:'<path d="M
 const arw=k=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">'+ARW[k]+'</svg>';
 const stepSub=(s,i)=>(i===0&&s.m<8?'Ahora':'En '+fm(s.m))+(s.via.length?' · pasás por '+s.via.join(' y '):'');
 function shh(){if($('sheet').classList.contains('on'))document.documentElement.style.setProperty('--shh',$('sheet').getBoundingClientRect().height+'px')}
-function renderSteps(){try{placeMe()}catch(e){}if(typeof renderBar==='function'&&document.body.classList.contains('mini'))renderBar();const b=$('stb'),l=$('stl'),n=$('nav');setTimeout(()=>document.documentElement.style.setProperty('--navh',($('nav').classList.contains('on')?$('nav').getBoundingClientRect().height+10:0)+'px'),0);
+function renderSteps(){try{const on=!!routeOn;document.body.classList.toggle('rmode',on);const kn=on&&STEPS[0]&&STEPS[0].lmn;MK.forEach(m=>m.el.classList.toggle('key',!!kn&&m.p.n===kn));layoutLabels()}catch(e){}try{placeMe()}catch(e){}if(typeof renderBar==='function'&&document.body.classList.contains('mini'))renderBar();const b=$('stb'),l=$('stl'),n=$('nav');setTimeout(()=>document.documentElement.style.setProperty('--navh',($('nav').classList.contains('on')?$('nav').getBoundingClientRect().height+10:0)+'px'),0);
  if(!STEPS.length){b.classList.remove('on');l.classList.remove('on');l.innerHTML='';if(!n.classList.contains('ok'))n.classList.remove('on');return}
  b.classList.add('on');b.textContent=(l.classList.contains('on')?'Ocultar':'Ver')+' indicaciones paso a paso ('+STEPS.length+')';
  l.innerHTML=STEPS.map((s,i)=>'<li><i>'+arw(s.dir)+'</i><div><b>'+cap(s.t)+'</b><small>'+stepSub(s,i)+'</small></div></li>').join('');
@@ -800,5 +805,5 @@ addEventListener('resize',()=>{const f=fit();if(sc<=minS*1.02)go(f.s,f.x,f.y,0);
 renderChips();paintFav();reset(0);
 const h=decodeURIComponent(location.hash.slice(1));if(h&&!meetFromHash()){const p=POIS.find(x=>x.n===h);if(p)setTimeout(()=>select(p),400)}
 </script>
-<script>(function(){var B='11040442';try{navigator.serviceWorker&&navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(x){x.update()})})}catch(e){}if(/[?&]v=/.test(location.search))return;fetch(location.pathname+'?chk='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/<meta name="nx-build" content="([0-9]+)"/);if(m&&m[1]!==B)location.replace(location.pathname+'?v='+m[1]+location.hash)}).catch(function(){})})()</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a8059f322e8f40e684d926ac94b56d82"}'></script></body>
+<script>(function(){var B='11040449';try{navigator.serviceWorker&&navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(x){x.update()})})}catch(e){}if(/[?&]v=/.test(location.search))return;fetch(location.pathname+'?chk='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/<meta name="nx-build" content="([0-9]+)"/);if(m&&m[1]!==B)location.replace(location.pathname+'?v='+m[1]+location.hash)}).catch(function(){})})()</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a8059f322e8f40e684d926ac94b56d82"}'></script></body>
 </html>
