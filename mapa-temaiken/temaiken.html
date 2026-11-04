@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="es">
-<head><meta name="nx-build" content="11040436"><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#1f6f3f"><link rel="apple-touch-icon" href="/icon-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Temaikèn">
+<head><meta name="nx-build" content="11040442"><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#1f6f3f"><link rel="apple-touch-icon" href="/icon-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Temaikèn">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#1f6f3f">
@@ -687,18 +687,25 @@ function meetFromHash(){const m=/^#@(-?\d+),(-?\d+)$/.exec(location.hash);if(!m)
 IC.sos='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="3"/><path d="M6.5 21v-5.5A5.5 5.5 0 0 1 12 10a5.5 5.5 0 0 1 5.5 5.5V21"/><path d="M19.5 4.5l2 2M21.5 4.5l-2 2"/></svg>';
 // foto con marco
 $('bph').onclick=()=>{$('phin').value='';$('phin').click()};
-$('phin').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f||!cur)return;const name=cur.n;const img=new Image();const u=URL.createObjectURL(f);img.onload=()=>{makeFrame(img,name);URL.revokeObjectURL(u)};img.src=u};
+$('phin').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f||!cur)return;const name=cur.n;const img=new Image();const u=URL.createObjectURL(f);img.onload=()=>{const go=()=>{makeFrame(img,name);URL.revokeObjectURL(u)};try{Promise.all([document.fonts.load('700 58px Fredoka'),document.fonts.load('800 34px Nunito')]).then(go,go)}catch(e){go()}};img.src=u};
 function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
 let PHB=null;
 function makeFrame(img,name){const W=1080,H=1350,cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d');
  c.fillStyle='#1f6f3f';c.fillRect(0,0,W,H);
  const M=36,PW=W-2*M,PH=H-2*M-230;const r=Math.max(PW/img.width,PH/img.height);const iw=img.width*r,ih=img.height*r;
  c.save();rr(c,M,M,PW,PH,34);c.clip();c.drawImage(img,M+(PW-iw)/2,M+(PH-ih)/2,iw,ih);c.restore();
+ // logo del mapa (placa blanca arriba a la izquierda)
+ {const bx=M+26,by=M+26,bh=118;c.font='700 58px Fredoka, Nunito, Arial, sans-serif';const w1=c.measureText('Temaik').width,w2=c.measureText('è').width,w3=c.measureText('n').width;const tw=w1+w2+w3;const bw=26+86+20+Math.max(tw,230)+30;
+  c.save();c.shadowColor='rgba(0,0,0,.28)';c.shadowBlur=22;c.shadowOffsetY=6;c.fillStyle='rgba(255,255,255,.95)';rr(c,bx,by,bw,bh,30);c.fill();c.restore();
+  const lx=bx+18,ly=by+16,ls=86;const g=c.createLinearGradient(lx,ly,lx+ls,ly+ls);g.addColorStop(0,'#2e9450');g.addColorStop(1,'#1f6f3f');c.fillStyle=g;rr(c,lx,ly,ls,ls,26);c.fill();
+  c.save();c.translate(lx+ls*0.14,ly+ls*0.14);c.scale(ls*0.72/24,ls*0.72/24);c.strokeStyle='#fff';c.lineWidth=1.8;c.lineCap='round';c.lineJoin='round';c.stroke(new Path2D('M5 19c0-8 5-13 14-14-1 9-6 14-14 14z'));c.stroke(new Path2D('M5 19 13 11'));c.restore();
+  const tx0=lx+ls+20;c.fillStyle='#2e9450';c.font='700 22px Nunito, Arial, sans-serif';const k='BIOPARQUE';let xx=tx0;for(const ch of k){c.fillText(ch,xx,by+46);xx+=c.measureText(ch).width+5}
+  c.font='700 58px Fredoka, Nunito, Arial, sans-serif';c.fillStyle='#1f6f3f';c.fillText('Temaik',tx0,by+100);c.fillStyle='#f59e0b';c.fillText('è',tx0+w1,by+100);c.fillStyle='#1f6f3f';c.fillText('n',tx0+w1+w2,by+100)}
  // hojas decorativas
  c.fillStyle='rgba(255,255,255,.08)';for(let i=0;i<14;i++){const x=(i*173)%W,y=H-210+(i*57)%180;c.beginPath();c.ellipse(x,y,46,18,(i%5)-2,0,Math.PI*2);c.fill()}
  const y0=H-230+30;c.fillStyle='#f5c842';c.font='800 34px Nunito, Arial, sans-serif';c.fillText('VISITÉ A',M+10,y0+22);
  c.fillStyle='#ffffff';let fs=74;c.font='700 '+fs+'px Fredoka, Nunito, Arial, sans-serif';while(c.measureText(name).width>W-2*M-20&&fs>40){fs-=4;c.font='700 '+fs+'px Fredoka, Nunito, Arial, sans-serif'}c.fillText(name,M+10,y0+22+fs);
- c.font='800 32px Nunito, Arial, sans-serif';c.fillStyle='rgba(255,255,255,.92)';const d=new Intl.DateTimeFormat('es-AR',{day:'numeric',month:'long',year:'numeric',timeZone:'America/Argentina/Buenos_Aires'}).format(new Date());c.fillText('Bioparque Temaikèn · '+d,M+10,H-M-14);
+ c.font='800 32px Nunito, Arial, sans-serif';c.fillStyle='rgba(255,255,255,.92)';const d=new Intl.DateTimeFormat('es-AR',{day:'numeric',month:'long',year:'numeric',timeZone:'America/Argentina/Buenos_Aires'}).format(new Date());c.fillText(d,M+10,H-M-14);
  c.font='700 22px Nunito, Arial, sans-serif';c.fillStyle='rgba(255,255,255,.55)';const tg='temaiken.nexosmaps.com';c.fillText(tg,W-M-c.measureText(tg).width-6,H-M-16);
  cv.toBlob(b=>{PHB=b;const url=URL.createObjectURL(b);$('phw').innerHTML='<img alt="Foto con marco" src="'+url+'">';$('phd').href=url;$('phd').download='temaiken_'+name.replace(/[^a-z0-9]+/gi,'_').toLowerCase()+'.jpg';openM('mph')},'image/jpeg',.9)}
 $('phs').onclick=async()=>{if(!PHB)return;const f=new File([PHB],'temaiken.jpg',{type:'image/jpeg'});try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Bioparque Temaikèn',text:'¡Mirá a quién visité en el Bioparque Temaikèn!'});return}}catch(e){if(e&&e.name==='AbortError')return}$('phd').click()};
@@ -793,5 +800,5 @@ addEventListener('resize',()=>{const f=fit();if(sc<=minS*1.02)go(f.s,f.x,f.y,0);
 renderChips();paintFav();reset(0);
 const h=decodeURIComponent(location.hash.slice(1));if(h&&!meetFromHash()){const p=POIS.find(x=>x.n===h);if(p)setTimeout(()=>select(p),400)}
 </script>
-<script>(function(){var B='11040436';try{navigator.serviceWorker&&navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(x){x.update()})})}catch(e){}if(/[?&]v=/.test(location.search))return;fetch(location.pathname+'?chk='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/<meta name="nx-build" content="([0-9]+)"/);if(m&&m[1]!==B)location.replace(location.pathname+'?v='+m[1]+location.hash)}).catch(function(){})})()</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a8059f322e8f40e684d926ac94b56d82"}'></script></body>
+<script>(function(){var B='11040442';try{navigator.serviceWorker&&navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(x){x.update()})})}catch(e){}if(/[?&]v=/.test(location.search))return;fetch(location.pathname+'?chk='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/<meta name="nx-build" content="([0-9]+)"/);if(m&&m[1]!==B)location.replace(location.pathname+'?v='+m[1]+location.hash)}).catch(function(){})})()</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a8059f322e8f40e684d926ac94b56d82"}'></script></body>
 </html>
