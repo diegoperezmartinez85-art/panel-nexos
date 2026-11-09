@@ -1,0 +1,3 @@
+<!doctype html><meta charset="utf-8"><title>envío</title><body>enviando…<script>
+(async()=>{const fs=[];for(let i=1;i<=5;i++){const r=await fetch('mapa_post_'+i+'.jpg?x='+Date.now());const b=await r.blob();fs.push({name:'nexos_mapa_'+i+'.jpg',blob:b})}
+(window.opener||parent).postMessage({nxImgs:fs},'https://business.facebook.com');document.body.textContent='listo '+fs.length})()</script>
