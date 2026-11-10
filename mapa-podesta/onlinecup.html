@@ -4943,6 +4943,35 @@
 })();
 </script>
 
+<style id="nx-mejoras-v1355">
+  /* Editor de equipaciones: pasos claros y controles más grandes */
+  .nx-ed-step { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 900; color: #fff; letter-spacing: 0.6px; text-transform: uppercase; margin-top: 4px; }
+  .nx-ed-step b { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(135deg, #a855f7, #7c3aed); font-size: 11px; color: #fff; flex-shrink: 0; }
+  .nx-ed-hint { font-size: 10.5px; font-weight: 600; color: #cbd5e1; line-height: 1.35; }
+  .nx-kit-tabs { display: flex; gap: 6px; width: 100%; }
+  .nx-kit-tabs button { flex: 1; padding: 8px 4px; border-radius: 10px; background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.12); color: #cbd5e1; font-weight: 800; font-size: 11.5px; cursor: pointer; }
+  .nx-kit-tabs button.on { background: rgba(6,182,212,0.22); border-color: #06b6d4; color: #fff; box-shadow: 0 0 10px rgba(6,182,212,0.35); }
+  #editor-tab-2 #editor-jersey-pattern { display: none !important; }
+  #editor-tab-2 #editor-uniform-thumbnails-wrap { order: -1; margin-top: 2px !important; }
+  #editor-tab-2 #editor-kit-unlock-btn { flex: 1; font-size: 12px !important; padding: 10px 12px !important; border-radius: 10px !important; }
+  #editor-tab-2 .swatch-btn { width: 27px !important; height: 27px !important; border-width: 2px !important; box-shadow: 0 0 0 1px rgba(255,255,255,0.18); }
+  #editor-tab-2 .swatch-btn.nx-sel { box-shadow: 0 0 0 2px #0b0b10, 0 0 0 4.5px #22d3ee; transform: scale(1.08); }
+  #editor-tab-2 [id^="palette-"] { gap: 8px !important; padding: 3px 2px; }
+  #editor-custom-color-swatches > div > span, #editor-tab-2 > div > span[style*="font-weight: 800"] { font-size: 11.5px !important; }
+  #editor-custom-color-swatches { gap: 11px !important; }
+  /* Encabezado: título en una línea y botones siempre visibles */
+  .nexos-presi-header > div:first-child { min-width: 0; flex: 1 1 auto; }
+  .nexos-presi-header h2 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .nexos-presi-header > div:last-child { flex-shrink: 0; margin-right: 0 !important; gap: 6px !important; }
+  @media (max-width: 430px) {
+    .nexos-presi-header h2 { font-size: 13px !important; letter-spacing: 0.5px !important; }
+    #tv-round-tag { display: none !important; }
+    #header-salir-btn { padding: 5px 8px !important; }
+  }
+  .app-version-tag { opacity: 0.35 !important; font-size: 8px !important; }
+  #nx-ed-preview-card { position: sticky; top: 0; z-index: 6; background: #17171c !important; box-shadow: 0 10px 18px -8px rgba(0,0,0,0.85); }
+  #editor-uniform-thumbnails-grid { max-height: 268px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+</style>
 </head>
 <body>
 <script>
@@ -5581,7 +5610,7 @@ window.reanudarAudioJuego = function() {
     <div style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-right: 4px; box-sizing: border-box;">
       
       <!-- Fila Superior: Preview y Nombre/País -->
-      <div style="display: flex; gap: 12px; align-items: center; background: rgba(255, 255, 255, 0.03); border: 1.5px solid rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 16px; box-sizing: border-box;">
+      <div id="nx-ed-preview-card" style="display: flex; gap: 12px; align-items: center; background: rgba(255, 255, 255, 0.03); border: 1.5px solid rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 16px; box-sizing: border-box;">
         <div style="background: rgba(15, 15, 20, 0.8); border: 1.5px solid rgba(168, 85, 247, 0.35); border-radius: 12px; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; box-shadow: inset 0 0 12px rgba(168, 85, 247, 0.15);">
           <canvas id="editor-face-canvas" width="100" height="100" style="width: 100px; height: 100px; display: block;"></canvas>
           <div id="editor-flag-container" style="position: absolute; bottom: 4px; right: 4px; font-size: 14px;">🇦🇷</div>
@@ -5754,8 +5783,8 @@ window.reanudarAudioJuego = function() {
       <div id="editor-tab-2" style="display: none; flex-direction: column; gap: 9px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); padding: 12px; border-radius: 16px;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div style="display: flex; flex-direction: column; gap: 2px;">
-            <span style="font-size: 11px; font-weight: 900; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px;">🚀 DESBLOQUEÁ EQUIPACIONES EXCLUSIVAS (🪙200)</span>
-            <span style="font-size: 9.5px; font-weight: 800; color: #cbd5e1;">Elegí camisetas de clubes o trajes especiales para desbloquear:</span>
+            <span class="nx-ed-step"><b>1</b> ELEGÍ LA CAMISETA</span>
+            <span class="nx-ed-hint">Tocá una para probarla en tu jugador. «Color Liso» es gratis; las demás se desbloquean con 🪙200.</span>
           </div>
           <button onclick="toggleEditorPreviewBackView()" style="background: rgba(168, 85, 247, 0.2); border: 1px solid #c084fc; color: #fff; font-size: 9.5px; font-weight: 900; padding: 4px 8px; border-radius: 6px; cursor: pointer; white-space: nowrap;">🔄 Girar Espalda</button>
         </div>
@@ -5810,7 +5839,7 @@ window.reanudarAudioJuego = function() {
               <option value="omniman_suit">👨‍✈️ Traje Capa Suprema (200 🪙)</option>
               <option value="thor_suit">⚡ Traje Armadura de Rayos (200 🪙)</option>
               <option value="ironman_suit">🚀 Traje Armadura de Hierro (200 🪙)</option>
-              <option value="superman_suit">🦸 Traje Traje de Acero (200 🪙)</option>
+              <option value="superman_suit">🦸 Traje de Acero (200 🪙)</option>
             </optgroup>
           </select>
           <button id="editor-kit-unlock-btn" onclick="comprarEquipacionSeleccionada()" style="display: none; background: linear-gradient(135deg, #eab308, #ca8a04); border: none; color: #000; font-weight: 900; font-size: 10px; padding: 5px 8px; border-radius: 8px; cursor: pointer; white-space: nowrap; flex-shrink: 0;">🔓 Comprar 🪙200</button>
@@ -5818,10 +5847,13 @@ window.reanudarAudioJuego = function() {
           <!-- GALERÍA DE MINIATURAS VISUALES DE UNIFORMES -->
           <div id="editor-uniform-thumbnails-wrap" style="width: 100%; margin-top: 10px; margin-bottom: 8px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-              <span style="font-size: 10px; font-weight: 800; color: #a1a1aa; text-transform: uppercase; letter-spacing: 1px;">👕 Vista previa de Uniformes:</span>
-              <span style="font-size: 9px; color: #06b6d4; font-weight: 700;">Toca para probar</span>
+              <div class="nx-kit-tabs">
+                <button type="button" id="nx-kitcat-basicos" onclick="nxSetKitCat('basicos')">Básicas</button>
+                <button type="button" id="nx-kitcat-clubes" onclick="nxSetKitCat('clubes')">Clubes</button>
+                <button type="button" id="nx-kitcat-trajes" onclick="nxSetKitCat('trajes')">Trajes</button>
+              </div>
             </div>
-            <div id="editor-uniform-thumbnails-grid" style="display: flex; gap: 8px; overflow-x: auto; padding: 6px 2px 10px 2px; scrollbar-width: none; -ms-overflow-style: none;">
+            <div id="editor-uniform-thumbnails-grid" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 6px 2px 10px 2px;">
               <!-- Miniaturas inyectadas dinámicamente por JS -->
             </div>
           </div>
@@ -5831,6 +5863,7 @@ window.reanudarAudioJuego = function() {
 
 
 
+        <span class="nx-ed-step" id="nx-ed-step-colores"><b>2</b> ELEGÍ LOS COLORES</span>
         <!-- Paletas de Colores Swatches (Sin ventanas molestas) -->
         <!-- Contenedores de Paletas de Colores de Camiseta y Short (Solo para Diseños Básicos Gratis) -->
         <div id="editor-custom-color-swatches" style="display: flex; flex-direction: column; gap: 8px;">
@@ -5886,6 +5919,7 @@ window.reanudarAudioJuego = function() {
           🔒 Colores y diseño oficial del club / traje
         </div>
 
+        <span class="nx-ed-step"><b>3</b> NÚMERO Y BOTINES</span>
         <!-- Dorsal (Número) y Color de Dorsal -->
         <div style="display: flex; align-items: center; justify-content: space-between; font-size: 10.5px;">
           <span style="font-weight: 800; color: #d1d5db;">Dorsal (Número y Color)</span>
@@ -11114,7 +11148,7 @@ window.iniciarConAudioDesbloqueado = function() {
       window.AndroidAdBridge.showRewardedAd(callbackName);
     } else {
       console.log("AndroidAdBridge not found, simulating rewarded ad for:", callbackName);
-      const confirmar = confirm("🤖 SIMULADOR ADMOB (Local/Navegador)\n\n¿Quieres simular ver un video publicitario completo con éxito?");
+      const confirmar = true; // Versión web: no hay video publicitario, se entrega la recompensa directo
       if (confirmar) {
         if (typeof window[callbackName] === 'function') {
           window[callbackName]();
@@ -11298,7 +11332,11 @@ window.iniciarConAudioDesbloqueado = function() {
         mostrarToastLogro('Error de Tienda ❌', 'No se pudo iniciar la compra en Google Play.', true);
       }
     } else {
-      console.log("Facturación nativa no detectada. Activando simulador Sandbox para: " + productId);
+      console.log("Facturación nativa no detectada para: " + productId);
+      if (!/[?&]sandbox=1/.test(location.search)) {
+        mostrarToastLogro('Tienda disponible en la app 🛒', 'En la versión web ganás monedas jugando. La compra de monedas está en la app de Google Play.', true);
+        return;
+      }
       sandboxCurrentProductId = productId;
       
       let desc = "";
@@ -12515,12 +12553,18 @@ window.iniciarConAudioDesbloqueado = function() {
         { val: 'omniman_suit', name: '👨‍✈️ Traje Capa Suprema', price: 200 },
         { val: 'thor_suit', name: '⚡ Traje Armadura Rayos', price: 200 },
         { val: 'ironman_suit', name: '🚀 Traje Armadura Hierro', price: 200 },
-        { val: 'superman_suit', name: '🦸 Traje Traje de Acero', price: 200 }
+        { val: 'superman_suit', name: '🦸 Traje de Acero', price: 200 }
       ];
     }
     
     let unlocked = typeof getUnlockedKits === 'function' ? getUnlockedKits() : ['lisa'];
     const currentPattern = selectEl ? selectEl.value : 'lisa';
+    // NX: categorías (Básicas / Clubes / Trajes) para no mostrar 40 opciones en una fila
+    const nxBasicas = ['lisa', 'banda', 'franja-horizontal', 'bastones', 'mitades'];
+    const nxCatOf = v => v.indexOf('suit') !== -1 ? 'trajes' : (nxBasicas.indexOf(v) !== -1 ? 'basicos' : 'clubes');
+    if (!window._nxKitCat) window._nxKitCat = nxCatOf(currentPattern);
+    ['basicos', 'clubes', 'trajes'].forEach(c => { const b = document.getElementById('nx-kitcat-' + c); if (b) b.classList.toggle('on', c === window._nxKitCat); });
+    allOptions = allOptions.filter(k => nxCatOf(k.val) === window._nxKitCat);
 
     grid.innerHTML = allOptions.map(k => {
       const isSelected = currentPattern === k.val;
@@ -12537,19 +12581,30 @@ window.iniciarConAudioDesbloqueado = function() {
       else if (k.val === 'bastones') { c1 = '#ef4444'; c2 = '#1d4ed8'; }
       else if (k.val === 'mitades') { c1 = '#f97316'; c2 = '#ef4444'; }
       
-      const shirtSvg = `<svg width="50" height="50" viewBox="0 0 100 100" style="filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
-        <path d="M 25,25 L 38,15 L 62,15 L 75,25 L 90,38 L 80,52 L 72,44 L 72,85 L 28,85 L 28,44 L 20,52 L 10,38 Z" fill="${c1}" stroke="#000" stroke-width="3" stroke-linejoin="round"/>
-        ${k.val === 'banda' ? `<polygon points="25,25 38,15 72,85 58,85" fill="${c2}"/>` : ''}
-        ${k.val === 'franja-horizontal' ? `<rect x="28" y="45" width="44" height="16" fill="${c2}"/>` : ''}
-        ${k.val === 'bastones' ? `<rect x="40" y="16" width="9" height="69" fill="${c2}"/><rect x="58" y="16" width="9" height="69" fill="${c2}"/>` : ''}
-        ${k.val === 'mitades' ? `<path d="M 50,15 L 62,15 L 75,25 L 90,38 L 80,52 L 72,44 L 72,85 L 50,85 Z" fill="${c2}"/>` : ''}
-        ${isSuit ? `<text x="50" y="60" text-anchor="middle" font-size="28" fill="#fff">${k.name.split(' ')[0]}</text>` : ''}
-        <path d="M 38,15 Q 50,26 62,15" fill="none" stroke="#000" stroke-width="3"/>
+      const nxPatT = (typeof KIT_PRESETS_MAP !== 'undefined' && KIT_PRESETS_MAP[k.val]) ? KIT_PRESETS_MAP[k.val].pattern : k.val;
+      const nxClip = 'nxk' + k.val.replace(/[^a-z0-9]/gi, '');
+      const nxShape = 'M 25,25 L 38,15 L 62,15 L 75,25 L 90,38 L 80,52 L 72,44 L 72,85 L 28,85 L 28,44 L 20,52 L 10,38 Z';
+      const shirtSvg = `<svg width="62" height="62" viewBox="0 0 100 100" style="filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+        <defs><clipPath id="${nxClip}"><path d="${nxShape}"/></clipPath></defs>
+        <path d="${nxShape}" fill="${c1}"/>
+        <g clip-path="url(#${nxClip})">
+          ${nxPatT === 'banda' ? `<polygon points="22,15 40,15 76,85 58,85" fill="${c2}"/>` : ''}
+          ${nxPatT === 'franja-horizontal' ? `<rect x="0" y="43" width="100" height="17" fill="${c2}"/>` : ''}
+          ${nxPatT === 'bastones' ? `<rect x="28" y="10" width="7" height="80" fill="${c2}"/><rect x="41" y="10" width="7" height="80" fill="${c2}"/><rect x="54" y="10" width="7" height="80" fill="${c2}"/><rect x="66" y="10" width="7" height="80" fill="${c2}"/><rect x="6" y="20" width="9" height="40" fill="${c2}" transform="rotate(38 15 40)"/><rect x="85" y="20" width="9" height="40" fill="${c2}" transform="rotate(-38 85 40)"/>` : ''}
+          ${nxPatT === 'mitades' ? `<rect x="50" y="0" width="50" height="100" fill="${c2}"/>` : ''}
+          ${nxPatT === 'lisa' ? `<rect x="28" y="50" width="4" height="35" fill="${c2}"/><rect x="68" y="50" width="4" height="35" fill="${c2}"/>` : ''}
+          ${!isSuit ? `<polygon points="10,38 20,52 24,48 14,34" fill="${c2}"/><polygon points="90,38 80,52 76,48 86,34" fill="${c2}"/><path d="M 58,34 h 8 v 6 l -4,5 l -4,-5 Z" fill="${c2}" stroke="rgba(0,0,0,0.55)" stroke-width="1"/>` : ''}
+          <rect x="28" y="15" width="6" height="70" fill="rgba(0,0,0,0.13)"/><rect x="66" y="15" width="6" height="70" fill="rgba(0,0,0,0.13)"/>
+          <rect x="37" y="18" width="5" height="66" fill="rgba(255,255,255,0.10)"/>
+        </g>
+        ${isSuit ? `<text x="50" y="62" text-anchor="middle" font-size="30" fill="#fff">${k.name.split(' ')[0]}</text>` : ''}
+        <path d="${nxShape}" fill="none" stroke="#000" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M 38,15 Q 50,27 62,15" fill="${isSuit ? 'none' : 'rgba(0,0,0,0.35)'}" stroke="${isSuit ? '#000' : c2}" stroke-width="3.5"/>
       </svg>`;
 
       return `<div onclick="seleccionarUniformeThumb('${k.val}')" style="
-        min-width: 82px;
-        flex-shrink: 0;
+        min-width: 0;
+        min-height: 104px;
         scroll-snap-align: start;
         position: relative;
         background: ${isSelected ? 'rgba(6, 182, 212, 0.22)' : 'rgba(15, 23, 42, 0.85)'};
@@ -12565,13 +12620,32 @@ window.iniciarConAudioDesbloqueado = function() {
         box-shadow: ${isSelected ? '0 0 14px rgba(6, 182, 212, 0.6)' : 'none'};
       ">
         ${shirtSvg}
-        <span style="font-size: 9px; font-weight: 800; color: #fff; text-align: center; margin-top: 4px; line-height: 1.1; max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${k.name}</span>
-        <span style="font-size: 8.5px; font-weight: 900; color: ${isOwned ? '#34d399' : '#fbbf24'}; margin-top: 3px;">
-          ${isOwned ? (k.price === 0 ? 'Gratis' : '✓ Adquirido') : '🪙 200'}
+        <span style="font-size: 10px; font-weight: 800; color: #fff; text-align: center; margin-top: 4px; line-height: 1.15; max-width: 100%; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${isSuit ? k.name.split(' ').slice(1).join(' ') : k.name.replace(/^[^A-Za-zÁÉÍÓÚáéíóúÑñ]+/, '')}</span>
+        <span style="font-size: 10px; font-weight: 900; color: ${isOwned ? '#34d399' : '#fbbf24'}; margin-top: 3px;">
+          ${isOwned ? (k.price === 0 ? 'Gratis' : '✓ Tuya') : '🔒 🪙200'}
         </span>
       </div>`;
     }).join('');
   };
+
+  window.nxSetKitCat = function(cat) {
+    window._nxKitCat = cat;
+    try { triggerHaptic('soft'); } catch(e) {}
+    if (typeof renderUniformThumbnails === 'function') renderUniformThumbnails();
+  };
+  // NX: marca con un aro la muestra de color elegida en cada paleta del editor
+  window.nxMarkSwatches = function() {
+    const cur = { jersey1: window.currentEditorJersey1, jersey2: window.currentEditorJersey2, short: window.currentEditorShort, dorsal: window.currentEditorDorsalColor, boots: window.currentEditorBootsColor };
+    document.querySelectorAll('#editor-tab-2 .swatch-btn').forEach(b => {
+      const m = /setSwatchColor\('([a-z0-9]+)',\s*'([^']+)'\)/i.exec(b.getAttribute('onclick') || '');
+      if (!m) return;
+      b.classList.toggle('nx-sel', String(cur[m[1]] || '').toLowerCase() === m[2].toLowerCase());
+    });
+    const oficial = document.getElementById('editor-official-colors-badge');
+    const paso = document.getElementById('nx-ed-step-colores');
+    if (paso && oficial) paso.style.opacity = '1';
+  };
+  setInterval(function() { const t2 = document.getElementById('editor-tab-2'); if (t2 && t2.offsetParent) window.nxMarkSwatches(); }, 600);
 
   window.seleccionarUniformeThumb = function(val) {
     const isSuit = val.includes('suit');
@@ -12894,53 +12968,8 @@ window.iniciarConAudioDesbloqueado = function() {
     else if (target === 'jersey2') window.currentEditorJersey2 = color;
     else if (target === 'short') window.currentEditorShort = color;
     else if (target === 'dorsal') { window.currentEditorDorsalColor = color; window.editorIsBackView = true; }
-    else if (target === 'boots') 
-  window.getUnlockedMasks = function() {
-    try {
-      const raw = localStorage.getItem('nx_futbol_unlocked_masks');
-      if (raw) return JSON.parse(raw);
-    } catch(e) {}
-    return ['none'];
-  };
-
-  /* handleEditorMaskChange handled by main window definition */
-
-  window.comprarMascaraSeleccionada = function() { window.obtenerMonedasActuales();
-    const maskVal = document.getElementById('editor-mask-type') ? document.getElementById('editor-mask-type').value : 'none';
-    if (maskVal === 'none') return;
-    
-    const unlocked = getUnlockedMasks();
-    if (unlocked.includes(maskVal)) return;
-    
-    const MASK_PRICE = 250;
-    const currentCoins = window.obtenerMonedasActuales();
-    if (currentCoins < MASK_PRICE) {
-      triggerHaptic('heavy');
-      playSound('error');
-      alert(`¡Monedas insuficientes! Necesitás 🪙${MASK_PRICE} monedas y tenés 🪙${currentCoins}.`);
-      return;
-    }
-    
-    // Deduct coins and unlock
-    const newCoins = currentCoins - MASK_PRICE;
-    window.guardarMonedasActuales(newCoins);
-    unlocked.push(maskVal);
-    localStorage.setItem('nx_futbol_unlocked_masks', JSON.stringify(unlocked));
-    
-    // Update coin display
-    const coinEl = document.getElementById('coins-count');
-    if (coinEl) coinEl.textContent = newCoins.toLocaleString();
-    
-    triggerHaptic('success');
-    playSound('tap');
-    
-    const btn = document.getElementById('editor-mask-unlock-btn');
-    if (btn) btn.style.display = 'none';
-    
-    actualizarEditorPreview();
-  };
-
-  window.currentEditorBootsColor = color;
+    else if (target === 'boots') window.currentEditorBootsColor = color;
+    if (typeof window.nxMarkSwatches === 'function') window.nxMarkSwatches();
     
     actualizarEditorPreview();
     triggerHaptic('soft');
@@ -13124,7 +13153,11 @@ window.iniciarConAudioDesbloqueado = function() {
     const canvas = document.getElementById('editor-face-canvas');
     if (!canvas) return;
     const c = canvas.getContext('2d');
-    c.clearRect(0, 0, 84, 84);
+    // NX: vista previa en alta resolución (nítida en pantallas retina)
+    if (canvas.width !== 300) { canvas.width = 300; canvas.height = 300; }
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.clearRect(0, 0, 300, 300);
+    c.setTransform(3.3, 0, 0, 3.3, 11, 12); // jugador más grande dentro del recuadro
 
     const nameVal = (document.getElementById('editor-player-name') && document.getElementById('editor-player-name').value) || 'Mi Leyenda';
     const code = document.getElementById('editor-player-country') ? document.getElementById('editor-player-country').value : 'ARG';
@@ -13316,7 +13349,6 @@ window.iniciarConAudioDesbloqueado = function() {
       }
     } else {
       console.log("Simulando anuncio de video al guardar leyenda...");
-      confirm("🤖 SIMULADOR ADMOB (Video Guardar Leyenda)\n\n¿Quieres simular ver el video publicitario al guardar tu leyenda?");
       finalizarGuardadoLeyenda(customPlayer);
     }
   };
@@ -13568,7 +13600,7 @@ window.iniciarConAudioDesbloqueado = function() {
     const oroCard = document.getElementById('ball-skin-oro');
     const oroDesc = document.getElementById('ball-desc-oro');
     if (oroCard) {
-      if (realRecord >= 5 || realRecord > 0 || unlockedBalls.includes('oro') || savedUnlocked.includes('oro') || selectedBallSkin === 'oro') {
+      if (realRecord >= 5 || realRecord > 0 || unlockedBalls.includes('oro') || (typeof savedUnlocked !== 'undefined' && savedUnlocked.includes('oro')) || selectedBallSkin === 'oro') {
         oroCard.classList.remove('locked');
         if (oroDesc) oroDesc.innerHTML = `<span style="color: #22c55e; font-weight:750;">¡Desbloqueado!</span>`;
       } else {
@@ -22066,7 +22098,7 @@ window.iniciarEstadioJuego = function() {
         } else {
           // Desplazamiento lateral oscilante (shuffling/pasos de acomodo en la barrera)
           if (typeof def.baseX !== 'undefined') {
-            def.x = def.baseX + Math.sin(_now * 0.005 + index * 1.5) * 5.2;
+            def.x = def.baseX + Math.sin(Date.now() * 0.005 + index * 1.5) * 5.2;
           }
           // Salto de distracción ocasional antes del tiro
           if (Math.random() < 0.003 && def.y === def.targetY) {
@@ -24397,6 +24429,12 @@ document.getElementById('gameover-overlay').style.display = 'flex';
     ctx.setLineDash([]);
     ctx.restore();
     
+    // NX: acabado fino de equipaciones (solo camisetas, no trajes ni diseños únicos)
+    const _nxPat = String(player.jerseyPattern || '');
+    const _nxKitFino = _nxPat.indexOf('suit') === -1 && (!player.mask || player.mask === 'none') && player.id !== 'infantino' && player.id !== 'woltemadre' && player.id !== 'hajalan' && player.id !== 'kingsman';
+    const _nxC0 = player.jersey[0] || '#ffffff';
+    const _nxTrim = (player.jersey[1] && player.jersey[1] !== _nxC0) ? player.jersey[1] : ((parseInt(String(_nxC0).slice(1, 3), 16) || 0) > 150 ? '#1e293b' : '#ffffff');
+    const _nxClipJersey = () => { ctx.save(); ctx.beginPath(); ctx.roundRect(-7, 16, 14, 11, [5, 5, 0, 0]); ctx.clip(); };
     // Rayas o detalles en la camiseta (y=16 a y=27)
     if (player.id === 'hajalan') {
       ctx.fillStyle = player.jersey[1] || '#ffffff';
@@ -24448,24 +24486,40 @@ document.getElementById('gameover-overlay').style.display = 'flex';
       ctx.fill();
     } else if (player.jerseyPattern === 'banda' || player.jerseyPattern === 'river') {
       // Banda Cruzada Diagonal (River Plate / Perú)
+      _nxClipJersey();
       ctx.fillStyle = player.jersey[1] || '#dc2626';
       ctx.beginPath();
-      ctx.moveTo(-7, 16); ctx.lineTo(-3, 16); ctx.lineTo(7, 27); ctx.lineTo(3, 27);
+      ctx.moveTo(-7.4, 16); ctx.lineTo(-3.2, 16); ctx.lineTo(7.4, 27); ctx.lineTo(3.2, 27);
       ctx.closePath();
       ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.22)'; ctx.lineWidth = 0.35;
+      ctx.beginPath(); ctx.moveTo(-3.2, 16); ctx.lineTo(7.4, 27); ctx.moveTo(-7.4, 16); ctx.lineTo(3.2, 27); ctx.stroke();
+      ctx.restore();
     } else if (player.jerseyPattern === 'franja-horizontal' || player.jerseyPattern === 'boca' || player.jerseyPattern === 'psg') {
       // Franja Horizontal al Pecho (Boca Juniors / PSG)
+      _nxClipJersey();
       ctx.fillStyle = player.jersey[1] || '#facc15';
       ctx.fillRect(-7, 20, 14, 4.2);
+      ctx.fillStyle = 'rgba(0,0,0,0.20)'; ctx.fillRect(-7, 19.7, 14, 0.35); ctx.fillRect(-7, 24.15, 14, 0.35);
+      ctx.fillStyle = 'rgba(255,255,255,0.22)'; ctx.fillRect(-7, 20, 14, 0.5);
+      ctx.restore();
     } else if (player.jerseyPattern === 'mitades' || player.jerseyPattern === 'galatasaray') {
       // Mitades Bicolor (Monaco / Blackburn / Galatasaray)
+      _nxClipJersey();
       ctx.fillStyle = player.jersey[1] || '#dc2626';
       ctx.fillRect(0, 16, 7, 11);
+      ctx.fillStyle = 'rgba(0,0,0,0.22)'; ctx.fillRect(-0.15, 16, 0.3, 11);
+      ctx.restore();
     } else if (player.jerseyPattern === 'bastones' || player.jerseyPattern === 'barca' || player.jerseyPattern === 'inter' || player.jerseyPattern === 'milan' || player.jerseyPattern === 'bayern' || player.jerseyPattern === 'juve' || player.jerseyPattern === 'atleti') {
       // Bastones / Rayas Verticales (Argentina / Barça / Juventus / Milan / Inter)
+      _nxClipJersey();
       ctx.fillStyle = player.jersey[1] || '#ffffff';
-      ctx.fillRect(-5, 16, 3, 11);
-      ctx.fillRect(2, 16, 3, 11);
+      ctx.fillRect(-6.9, 16, 1.7, 11);
+      ctx.fillRect(-3.6, 16, 2.0, 11);
+      ctx.fillRect(-0.2 - 0.8, 16, 2.0, 11);
+      ctx.fillRect(1.6 + 1.0, 16, 2.0, 11);
+      ctx.fillRect(5.2, 16, 1.7, 11);
+      ctx.restore();
     } else if (player.jerseyPattern === 'spidey_suit') {
       // Traje Arácnido (Spidey Suit)
       ctx.fillStyle = player.jersey[1] || '#1d4ed8';
@@ -24655,6 +24709,38 @@ document.getElementById('gameover-overlay').style.display = 'flex';
     ctx.stroke();
     ctx.restore();
 
+    // ── NX: ACABADO DE CAMISETA (vivos, volumen de tela, cuello y escudo) ──
+    if (_nxKitFino) {
+      _nxClipJersey();
+      if (_nxPat === 'lisa' && player.jersey[1] && player.jersey[1] !== _nxC0) {
+        // Vivos laterales para camisetas lisas de dos colores
+        ctx.fillStyle = player.jersey[1];
+        ctx.fillRect(-7, 20.5, 0.9, 6.5); ctx.fillRect(6.1, 20.5, 0.9, 6.5);
+      }
+      ctx.fillStyle = 'rgba(0,0,0,0.15)'; ctx.fillRect(-7, 16, 1.4, 11); ctx.fillRect(5.6, 16, 1.4, 11);
+      ctx.fillStyle = 'rgba(255,255,255,0.11)'; ctx.fillRect(-4.7, 16.4, 1.2, 10);
+      ctx.fillStyle = 'rgba(0,0,0,0.10)'; ctx.fillRect(-7, 25.4, 14, 1.6);
+      if (!isBackView) {
+        // Cuello en V redibujado por encima del diseño
+        ctx.fillStyle = player.skin;
+        ctx.beginPath(); ctx.moveTo(-2.5, 16); ctx.lineTo(2.5, 16); ctx.lineTo(0, 19.5); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = _nxTrim; ctx.lineWidth = 1.0;
+        ctx.beginPath(); ctx.moveTo(-2.5, 16); ctx.lineTo(0, 19.5); ctx.lineTo(2.5, 16); ctx.stroke();
+        // Escudo bordado
+        ctx.fillStyle = _nxTrim; ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.lineWidth = 0.3;
+        ctx.beginPath(); ctx.moveTo(2.7, 20.1); ctx.lineTo(4.7, 20.1); ctx.lineTo(4.7, 21.4); ctx.lineTo(3.7, 22.5); ctx.lineTo(2.7, 21.4); ctx.closePath(); ctx.fill(); ctx.stroke();
+        // Marca deportiva
+        ctx.strokeStyle = _nxTrim; ctx.lineWidth = 0.45;
+        ctx.beginPath(); ctx.moveTo(-4.6, 21.2); ctx.lineTo(-3.9, 21.7); ctx.lineTo(-2.9, 20.5); ctx.stroke();
+      } else {
+        // Cuello redondo en la espalda
+        ctx.fillStyle = _nxC0; ctx.fillRect(-2.8, 16, 5.6, 3.6);
+        ctx.strokeStyle = _nxTrim; ctx.lineWidth = 0.8;
+        ctx.beginPath(); ctx.moveTo(-2.5, 16.3); ctx.quadraticCurveTo(0, 17.6, 2.5, 16.3); ctx.stroke();
+      }
+      ctx.restore();
+    }
+
     // ── MÁSCARAS ESPECIALES EN VISTA DE ESPALDA (Spider logo, Bat ears, Skull, Cyborg core) ──
     if (isBackView && player.mask && player.mask !== 'none') {
       const bMask = player.mask;
@@ -24784,6 +24870,19 @@ document.getElementById('gameover-overlay').style.display = 'flex';
 
     ctx.strokeStyle = '#000000';
     ctx.lineWidth = 1.0;
+    if (_nxKitFino) {
+      // NX: detalle de short (cintura, cordón, costura central y sombra)
+      ctx.fillStyle = 'rgba(0,0,0,0.20)'; ctx.fillRect(-7.5, 27, 15, 0.9);
+      ctx.fillStyle = 'rgba(0,0,0,0.13)'; ctx.fillRect(-7.5, 32.4, 15, 1.6);
+      ctx.strokeStyle = 'rgba(0,0,0,0.30)'; ctx.lineWidth = 0.35;
+      ctx.beginPath(); ctx.moveTo(0, 29.6); ctx.lineTo(0, 34); ctx.stroke();
+      if (!isBackView) {
+        const _nxLuzShort = (parseInt(String(shortsColor).slice(1, 3), 16) || 0) > 150;
+        ctx.strokeStyle = _nxLuzShort ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.85)'; ctx.lineWidth = 0.4;
+        ctx.beginPath(); ctx.moveTo(-0.6, 27.9); ctx.lineTo(-1.0, 29.6); ctx.moveTo(0.6, 27.9); ctx.lineTo(1.0, 29.6); ctx.stroke();
+      }
+      ctx.strokeStyle = '#000000'; ctx.lineWidth = 1.0;
+    }
     ctx.strokeRect(-7.5, 27, 15, 7);
 
     // ── PIERNAS Y MEDIAS DE FÚTBOL (Con soporte para Máscaras Especiales) ──
@@ -30321,7 +30420,8 @@ if (player.hairType === 'rulos-cortos') {
       const shadowWidth = pelota.r * (1.1 + heightOffset * 0.003);
       const shadowHeight = pelota.r * (0.45 + heightOffset * 0.001);
       ctx.save();
-      ctx.fillStyle = ctx.fillStyle = 'rgba(15, 23, 42, ' + (typeof ball3dShadowAlpha !== 'undefined' ? ball3dShadowAlpha : 0.3) + ')';
+      ctx.fillStyle = 
+ctx.fillStyle = 'rgba(15, 23, 42, ' + (typeof ball3dShadowAlpha !== 'undefined' ? ball3dShadowAlpha : 0.3) + ')';
       ctx.beginPath();
       ctx.ellipse(pelota.x, 264 + heightOffset * 0.08, shadowWidth, shadowHeight, 0, 0, Math.PI * 2);
       ctx.fill();
@@ -31469,8 +31569,9 @@ if (player.hairType === 'rulos-cortos') {
           if (window.onlineSearchTimerInterval) { clearInterval(window.onlineSearchTimerInterval); window.onlineSearchTimerInterval = null; }
           if (window.publicMatchPollInterval) { clearInterval(window.publicMatchPollInterval); window.publicMatchPollInterval = null; }
           
-          const partnerData = msg.data;
-          const partnerClientId = msg.clientId;
+          const partnerData = (msg.data && msg.data.data) ? msg.data.data : (msg.data || {});
+          const partnerClientId = msg.clientId || (msg.data && msg.data.clientId);
+          if (!partnerClientId || partnerClientId === myOnlineClientId) return;
           const amIHost = (myOnlineClientId < partnerClientId);
           const sharedRoomName = amIHost ? (`sala-partido-` + myOnlineClientId) : (partnerData.salaPropia || (`sala-partido-` + partnerClientId));
           
@@ -31500,6 +31601,10 @@ if (player.hairType === 'rulos-cortos') {
   ;
   
   function iniciarSalaPartidoOnline(roomName, partnerClientId, partnerData, isHost) {
+    if (partnerData && partnerData.data && !partnerData.nombre) partnerData = partnerData.data;
+    partnerData = partnerData || {};
+    if (!partnerData.nombre) partnerData.nombre = 'Rival';
+    if (!partnerData.pais) partnerData.pais = 'Mundo 🌐';
     if (window.onlineSearchTimerInterval) {
       clearInterval(window.onlineSearchTimerInterval);
       window.onlineSearchTimerInterval = null;
@@ -31709,10 +31814,13 @@ if (player.hairType === 'rulos-cortos') {
     
     // Escuchar desconexión del rival
     window.onlineChannel.presence.subscribe('leave', (msg) => {
-      if (msg.clientId === partnerClientId) {
-        manejarAbandonoRival();
-      }
+      if (msg.clientId !== partnerClientId || gameMode !== 'online') return;
+      const goEl = document.getElementById('gameover-overlay');
+      const partidoTerminado = goEl && goEl.style.display && goEl.style.display !== 'none';
+      if (partidoTerminado) { logOnline('El rival salió con el partido ya terminado.'); return; }
+      manejarAbandonoRival();
     });
+    try { window.onlineChannel.presence.enter({ nombre: localStorage.getItem('nx_online_username') || 'Jugador' }); } catch(e) {}
     
     // Dar un delay de 3.5 segundos para poder leer las estadísticas del rival
     setTimeout(() => {
@@ -33333,7 +33441,7 @@ if (player.hairType === 'rulos-cortos') {
 
 
 </script>
-<div class="app-version-tag" id="nx-app-version">v1.3.54 (b176)</div>
+<div class="app-version-tag" id="nx-app-version">v1.3.55 (b177)</div>
 <script id="nx-back-button-handler">
 window.onAndroidBackPressed = function() {
   try {
