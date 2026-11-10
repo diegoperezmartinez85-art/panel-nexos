@@ -31495,12 +31495,15 @@ ctx.fillStyle = 'rgba(15, 23, 42, ' + (typeof ball3dShadowAlpha !== 'undefined' 
 
         privChan.subscribe((msg) => {
           if (!msg || !msg.data || msg.data.clientId === myOnlineClientId) return;
-          if (msg.name === 'guest_join') {
-            privChan.publish('host_accept', { clientId: myOnlineClientId, data: myData });
-            launchMatch(msg.data.clientId, msg.data.data, true);
-          } else if (msg.name === 'host_accept' || msg.name === 'host_beacon') {
-            launchMatch(msg.data.clientId, msg.data.data, false);
-          }
+          if (privMatched || !msg.data.data) return;
+          // NX: el anfitrión se decide por ID (igual en los dos teléfonos) y se responde
+          // siempre una vez más, así el otro jugador nos escucha aunque haya entrado después.
+          const otroId = msg.data.clientId;
+          const soyHost = (myOnlineClientId < otroId);
+          const nxAvisar = () => { try { privChan.publish(soyHost ? 'host_accept' : 'guest_join', { clientId: myOnlineClientId, data: myData }); } catch(e) {} };
+          nxAvisar();
+          [600, 1400, 2500].forEach(ms => setTimeout(() => { if (window.ablyClient) nxAvisar(); }, ms));
+          launchMatch(otroId, msg.data.data, soyHost);
         });
 
         privChan.publish('guest_join', { clientId: myOnlineClientId, data: myData });
@@ -31539,7 +31542,10 @@ ctx.fillStyle = 'rgba(15, 23, 42, ' + (typeof ball3dShadowAlpha !== 'undefined' 
         
         try {
           const partnerRoomChan = window.ablyClient.channels.get(partner.data.salaPropia);
-          partnerRoomChan.publish('join', { clientId: myOnlineClientId, data: myData });
+          const nxEnviarJoin = () => { try { partnerRoomChan.publish('join', { clientId: myOnlineClientId, data: myData }); } catch(e) {} };
+          nxEnviarJoin();
+          // NX: se repite el aviso por si el rival todavía se estaba conectando a su sala
+          [700, 1600, 2800].forEach(ms => setTimeout(() => { if (window.ablyClient) nxEnviarJoin(); }, ms));
         } catch(e) {}
         
         try { lobbyChannel.presence.leave(); } catch(e) {}
@@ -33441,7 +33447,7 @@ ctx.fillStyle = 'rgba(15, 23, 42, ' + (typeof ball3dShadowAlpha !== 'undefined' 
 
 
 </script>
-<div class="app-version-tag" id="nx-app-version">v1.3.55 (b177)</div>
+<div class="app-version-tag" id="nx-app-version">v1.3.56 (b178)</div>
 <script id="nx-back-button-handler">
 window.onAndroidBackPressed = function() {
   try {
